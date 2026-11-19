@@ -1,0 +1,408 @@
+{
+  "entities": {
+    "AdminUser": {
+      "title": "AdminUser",
+      "description": "Trusted owner/admin document granting full platform access.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "email": { "type": "string", "format": "email", "maxLength": 160 },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "email", "createdAt"]
+    },
+    "StaffRole": {
+      "title": "StaffRole",
+      "description": "Owner-assigned staff or supplier role binding a verified Google user to a portal.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "email": { "type": "string", "format": "email", "maxLength": 160 },
+        "displayName": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "role": { "type": "string", "enum": ["owner", "operations", "supplier"] },
+        "supplierName": { "type": "string", "maxLength": 120 },
+        "status": { "type": "string", "enum": ["Active", "Paused"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "email", "displayName", "role", "status", "createdAt", "updatedAt"]
+    },
+    "AccessRequest": {
+      "title": "AccessRequest",
+      "description": "Pending request from a signed-in user asking to access Operations or Supplier portal.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "email": { "type": "string", "format": "email", "maxLength": 160 },
+        "displayName": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "requestedRole": { "type": "string", "enum": ["operations", "supplier"] },
+        "companyName": { "type": "string", "maxLength": 120 },
+        "city": { "type": "string", "maxLength": 60 },
+        "status": { "type": "string", "enum": ["Pending", "Approved", "Rejected"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "email", "displayName", "requestedRole", "status", "createdAt", "updatedAt"]
+    },
+    "PublicSettings": {
+      "title": "PublicSettings",
+      "description": "Public storefront configuration including WhatsApp number, hero customization, analytics IDs, and roadmap flags.",
+      "type": "object",
+      "properties": {
+        "whatsappNumber": { "type": "string", "minLength": 6, "maxLength": 24 },
+        "whatsappDisplay": { "type": "string", "minLength": 6, "maxLength": 32 },
+        "email": { "type": "string", "format": "email", "maxLength": 120 },
+        "domain": { "type": "string", "minLength": 3, "maxLength": 100 },
+        "airTicketsEnabled": { "type": "boolean" },
+        "metaPixelId": { "type": "string", "maxLength": 64 },
+        "ga4Id": { "type": "string", "maxLength": 64 },
+        "heroImageUrl": { "type": "string", "maxLength": 250000 },
+        "heroCaptionEn": { "type": "string", "maxLength": 240 },
+        "heroCaptionAr": { "type": "string", "maxLength": 240 },
+        "heroCaptionDe": { "type": "string", "maxLength": 240 },
+        "heroSubEn": { "type": "string", "maxLength": 600 },
+        "heroSubAr": { "type": "string", "maxLength": 600 },
+        "heroSubDe": { "type": "string", "maxLength": 600 },
+        "heroFontStyle": { "type": "string", "enum": ["editorial", "modern", "clean", "luxury", "bold", "architectural"] },
+        "heroTheme": { "type": "string", "enum": ["red-sea", "midnight", "golden-dusk", "minimal", "deep-turquoise", "coral-horizon", "desert-amber", "obsidian-gold"] },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["whatsappNumber", "whatsappDisplay", "email", "domain", "airTicketsEnabled", "updatedAt"]
+    },
+    "OwnerSettings": {
+      "title": "OwnerSettings",
+      "description": "Private platform economics such as commission rate.",
+      "type": "object",
+      "properties": {
+        "commissionRate": { "type": "number" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["commissionRate", "updatedAt"]
+    },
+    "Trip": {
+      "title": "Trip",
+      "description": "Marketplace excursion, transfer, guide, or shopping tour listing with multilingual fields and options.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 2, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "name": { "type": "object" },
+        "category": { "type": "string", "enum": ["sea", "desert", "historical", "horse", "city", "shopping", "guides", "transfers"] },
+        "destination": { "type": "string", "enum": ["Hurghada", "Marsa Alam", "Luxor", "Cairo"] },
+        "images": { "type": "array" },
+        "galleryCaptions": { "type": "array" },
+        "rating": { "type": "number" },
+        "reviewCount": { "type": "number" },
+        "duration": { "type": "object" },
+        "departureTimes": { "type": "array", "items": { "type": "string", "maxLength": 60 } },
+        "timingNote": { "type": "object" },
+        "price": { "type": "number" },
+        "options": { "type": "array" },
+        "shortDescription": { "type": "object" },
+        "fullDescription": { "type": "object" },
+        "itinerary": { "type": "array" },
+        "historicalFacts": { "type": "array" },
+        "highlights": { "type": "array" },
+        "included": { "type": "array" },
+        "tips": { "type": "array" },
+        "notSuitableFor": { "type": "array" },
+        "meetingPoint": { "type": "object" },
+        "meetingPointUrl": { "type": "string", "maxLength": 400 },
+        "whatToBring": { "type": "array" },
+        "notAllowed": { "type": "array" },
+        "knowBeforeYouGo": { "type": "array" },
+        "outerTransferEnabled": { "type": "boolean" },
+        "pickup": { "type": "object" },
+        "supplierName": { "type": "string", "minLength": 2, "maxLength": 120 },
+        "supplierUid": { "type": "string", "maxLength": 128 },
+        "approvalStatus": { "type": "string", "enum": ["Approved", "Pending", "Paused", "Rejected"] },
+        "familyFriendly": { "type": "boolean" },
+        "womenFriendly": { "type": "boolean" },
+        "minChildAge": { "type": "number" },
+        "kidsDiscount": { "type": "object" },
+        "featured": { "type": "boolean" },
+        "languages": { "type": "array" },
+        "operatingDays": { "type": "array" },
+        "availableFrom": { "type": "string", "maxLength": 20 },
+        "availableTo": { "type": "string", "maxLength": 20 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": [
+        "id",
+        "name",
+        "category",
+        "destination",
+        "images",
+        "rating",
+        "reviewCount",
+        "duration",
+        "price",
+        "shortDescription",
+        "highlights",
+        "included",
+        "pickup",
+        "supplierName",
+        "approvalStatus",
+        "familyFriendly",
+        "womenFriendly",
+        "featured",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "Booking": {
+      "title": "Booking",
+      "description": "Customer excursion booking or customized trip request containing guest PII restricted to staff.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 2, "maxLength": 64, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "tripId": { "type": "string", "minLength": 2, "maxLength": 128 },
+        "tripTitle": { "type": "string", "minLength": 2, "maxLength": 240 },
+        "category": { "type": "string", "enum": ["sea", "desert", "historical", "horse", "city", "shopping", "guides", "transfers", "custom"] },
+        "destination": { "type": "string", "enum": ["Hurghada", "Marsa Alam", "Luxor", "Cairo"] },
+        "date": { "type": "string", "minLength": 8, "maxLength": 20 },
+        "tripStartTime": { "type": "string", "maxLength": 80 },
+        "pickupTime": { "type": "string", "maxLength": 24 },
+        "pickupSpot": { "type": "string", "enum": ["Inside Reception", "Outside Main Gate"] },
+        "guestName": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "guestCountry": { "type": "string", "maxLength": 80 },
+        "guestContact": { "type": "string", "minLength": 3, "maxLength": 160 },
+        "guestWhatsapp": { "type": "string", "maxLength": 60 },
+        "guestEmail": { "type": "string", "maxLength": 160 },
+        "guestLang": { "type": "string", "enum": ["en", "de", "ar", "fr", "es", "it", "nl", "pl", "pt", "cs", "sv", "ro", "ru", "uk", "tr", "zh", "ja", "ko", "no", "da", "fi", "hu", "el", "hi"] },
+        "hotel": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "roomNumber": { "type": "string", "maxLength": 40 },
+        "locationImageUrl": { "type": "string", "maxLength": 250000 },
+        "adults": { "type": "number" },
+        "children": { "type": "number" },
+        "infants": { "type": "number" },
+        "grossEur": { "type": "number" },
+        "supplierName": { "type": "string", "minLength": 2, "maxLength": 120 },
+        "supplierUid": { "type": "string", "maxLength": 128 },
+        "assignedDriverOrGuide": { "type": "string", "maxLength": 160 },
+        "paymentStatus": { "type": "string", "enum": ["Awaiting link", "Link sent", "Paid online", "Cash on pickup"] },
+        "status": { "type": "string", "enum": ["Pending", "Confirmed", "Driver assigned", "Completed", "Refunded", "Cancelled", "No show"] },
+        "notes": { "type": "string", "maxLength": 800 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": [
+        "id",
+        "tripId",
+        "tripTitle",
+        "category",
+        "destination",
+        "date",
+        "pickupTime",
+        "guestName",
+        "guestCountry",
+        "guestContact",
+        "guestLang",
+        "hotel",
+        "adults",
+        "children",
+        "grossEur",
+        "supplierName",
+        "assignedDriverOrGuide",
+        "paymentStatus",
+        "status",
+        "notes",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "BookingReceipt": {
+      "title": "BookingReceipt",
+      "description": "Zero-PII booking status receipt used solely to verify post-trip review eligibility by exact booking reference.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 2, "maxLength": 64, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "tripId": { "type": "string", "minLength": 2, "maxLength": 128 },
+        "tripDate": { "type": "string", "minLength": 8, "maxLength": 20 },
+        "tripEndAt": { "type": "string", "format": "date-time" },
+        "status": { "type": "string", "enum": ["Pending", "Confirmed", "Driver assigned", "Completed", "Refunded", "Cancelled", "No show"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "tripId", "tripDate", "tripEndAt", "status", "createdAt", "updatedAt"]
+    },
+    "Supplier": {
+      "title": "Supplier",
+      "description": "Local partner supplier profile.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 2, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "name": { "type": "string", "minLength": 2, "maxLength": 120 },
+        "city": { "type": "string", "enum": ["Hurghada", "Marsa Alam", "Luxor", "Cairo"] },
+        "specialty": { "type": "string", "maxLength": 240 },
+        "languages": { "type": "array" },
+        "status": { "type": "string", "enum": ["Active", "Pending", "Paused"] },
+        "contactPhone": { "type": "string", "maxLength": 40 },
+        "email": { "type": "string", "maxLength": 160 },
+        "payoutSettledEur": { "type": "number" },
+        "linkedUid": { "type": "string", "maxLength": 128 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "name", "city", "specialty", "languages", "status", "contactPhone", "email", "payoutSettledEur", "createdAt", "updatedAt"]
+    },
+    "ChatThread": {
+      "title": "ChatThread",
+      "description": "Customer inquiry and operations reply thread.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 2, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "bookingRef": { "type": "string", "maxLength": 64 },
+        "customerName": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "customerLang": { "type": "string", "enum": ["en", "de", "ar", "fr", "es", "it", "nl", "pl", "pt", "cs", "sv", "ro", "ru", "uk", "tr", "zh", "ja", "ko", "no", "da", "fi", "hu", "el", "hi"] },
+        "tripTitle": { "type": "string", "maxLength": 240 },
+        "pickupInfo": { "type": "string", "maxLength": 300 },
+        "unread": { "type": "boolean" },
+        "messages": { "type": "array" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "bookingRef", "customerName", "customerLang", "tripTitle", "pickupInfo", "unread", "messages", "createdAt", "updatedAt"]
+    },
+    "ComplaintCase": {
+      "title": "ComplaintCase",
+      "description": "Quality issue, customer complaint, and refund tracking record.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 2, "maxLength": 64, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "bookingRef": { "type": "string", "maxLength": 64 },
+        "customerName": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "tripTitle": { "type": "string", "maxLength": 240 },
+        "issueType": { "type": "string", "maxLength": 160 },
+        "ownerRole": { "type": "string", "maxLength": 120 },
+        "severity": { "type": "string", "enum": ["Low", "Medium", "High"] },
+        "refundRequestedEur": { "type": "number" },
+        "status": { "type": "string", "enum": ["Open", "Investigating", "Refunded", "Resolved"] },
+        "summary": { "type": "string", "maxLength": 800 },
+        "createdAt": { "type": "string", "maxLength": 40 },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "bookingRef", "customerName", "tripTitle", "issueType", "ownerRole", "severity", "refundRequestedEur", "status", "summary", "createdAt", "updatedAt"]
+    },
+    "NewsletterSubscriber": {
+      "title": "NewsletterSubscriber",
+      "description": "Tourist email subscription record.",
+      "type": "object",
+      "properties": {
+        "email": { "type": "string", "format": "email", "maxLength": 160 },
+        "lang": { "type": "string", "enum": ["en", "de", "ar", "fr", "es", "it", "nl", "pl", "pt", "cs", "sv", "ro", "ru", "uk", "tr", "zh", "ja", "ko", "no", "da", "fi", "hu", "el", "hi"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["email", "lang", "createdAt"]
+    },
+    "EmailLog": {
+      "title": "EmailLog",
+      "description": "Operational email log entry.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 2, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "to": { "type": "string", "maxLength": 160 },
+        "subject": { "type": "string", "maxLength": 240 },
+        "type": { "type": "string", "enum": ["Booking Confirmation", "Payment Link", "Supplier Dispatch", "Newsletter"] },
+        "sentAt": { "type": "string", "maxLength": 60 },
+        "status": { "type": "string", "enum": ["Delivered"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "to", "subject", "type", "sentAt", "status", "createdAt"]
+    },
+    "TripReview": {
+      "title": "TripReview",
+      "description": "Customer rating and testimonial for a specific trip, gated by confirmed post-trip receipt and Owner approval.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 2, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "tripId": { "type": "string", "minLength": 2, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "bookingId": { "type": "string", "maxLength": 64 },
+        "verifiedBooking": { "type": "boolean" },
+        "tripTitle": { "type": "string", "minLength": 2, "maxLength": 240 },
+        "guestName": { "type": "string", "minLength": 1, "maxLength": 80 },
+        "guestCountry": { "type": "string", "maxLength": 60 },
+        "rating": { "type": "number" },
+        "comment": { "type": "string", "minLength": 5, "maxLength": 800 },
+        "photoUrl": { "type": "string", "maxLength": 250000 },
+        "visitDate": { "type": "string", "maxLength": 20 },
+        "lang": { "type": "string", "enum": ["en", "de", "ar", "fr", "es", "it", "nl", "pl", "pt", "cs", "sv", "ro", "ru", "uk", "tr", "zh", "ja", "ko", "no", "da", "fi", "hu", "el", "hi"] },
+        "approvalStatus": { "type": "string", "enum": ["Pending", "Approved", "Rejected"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": [
+        "id",
+        "tripId",
+        "tripTitle",
+        "guestName",
+        "guestCountry",
+        "rating",
+        "comment",
+        "visitDate",
+        "lang",
+        "approvalStatus",
+        "createdAt",
+        "updatedAt"
+      ]
+    }
+  },
+  "firestore": {
+    "/admins/{uid}": {
+      "schema": { "$ref": "#/entities/AdminUser" },
+      "description": "Additional owner UID grants managed by the bootstrapped owner."
+    },
+    "/staff_roles/{uid}": {
+      "schema": { "$ref": "#/entities/StaffRole" },
+      "description": "Trusted staff and supplier portal roles."
+    },
+    "/access_requests/{uid}": {
+      "schema": { "$ref": "#/entities/AccessRequest" },
+      "description": "Pending portal access requests submitted by authenticated Google users."
+    },
+    "/public_settings/{settingId}": {
+      "schema": { "$ref": "#/entities/PublicSettings" },
+      "description": "Public storefront settings (WhatsApp number, hero customization, domain, analytics IDs)."
+    },
+    "/owner_settings/{settingId}": {
+      "schema": { "$ref": "#/entities/OwnerSettings" },
+      "description": "Private owner/staff economics settings such as commission rate."
+    },
+    "/trips/{tripId}": {
+      "schema": { "$ref": "#/entities/Trip" },
+      "description": "Marketplace trips, options, and supplier submissions."
+    },
+    "/bookings/{bookingId}": {
+      "schema": { "$ref": "#/entities/Booking" },
+      "description": "Customer bookings and custom trip requests."
+    },
+    "/booking_receipts/{receiptId}": {
+      "schema": { "$ref": "#/entities/BookingReceipt" },
+      "description": "Zero-PII booking status receipts enabling server-verified post-trip reviews without leaking guest data."
+    },
+    "/suppliers/{supplierId}": {
+      "schema": { "$ref": "#/entities/Supplier" },
+      "description": "Registered local tourism suppliers."
+    },
+    "/chats/{chatId}": {
+      "schema": { "$ref": "#/entities/ChatThread" },
+      "description": "Customer inquiries and operator replies."
+    },
+    "/complaints/{complaintId}": {
+      "schema": { "$ref": "#/entities/ComplaintCase" },
+      "description": "Quality complaints and refund records."
+    },
+    "/newsletter_subscribers/{subId}": {
+      "schema": { "$ref": "#/entities/NewsletterSubscriber" },
+      "description": "Newsletter email signups."
+    },
+    "/email_logs/{logId}": {
+      "schema": { "$ref": "#/entities/EmailLog" },
+      "description": "Operational notification audit logs."
+    },
+    "/trip_reviews/{reviewId}": {
+      "schema": { "$ref": "#/entities/TripReview" },
+      "description": "Customer ratings and testimonials per trip, requiring verified completed booking and Owner approval."
+    }
+  }
+}

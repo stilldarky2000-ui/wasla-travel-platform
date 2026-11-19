@@ -1,0 +1,6 @@
+{
+  "name": "Wasla Travel — Hurghada Travel Marketplace",
+  "description": "Small-group sea days, desert safaris, Luxor history, and local Hurghada experiences with whole-euro pricing and human-confirmed bookings.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

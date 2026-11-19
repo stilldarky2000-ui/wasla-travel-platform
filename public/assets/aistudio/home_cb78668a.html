@@ -1,0 +1,147 @@
+{% extends "storefront/base.html" %}
+{% block title %}{{ site.brand_name }} — Hurghada Travel Marketplace{% endblock %}
+{% block head_extra %}
+<script type="application/ld+json">{{ json_ld | tojson }}</script>
+{% endblock %}
+{% macro star_row(value) -%}{%- set full = value|round(0, 'floor')|int -%}{{ '★' * full }}{{ '☆' * (5 - full) }}{%- endmacro %}
+{% block content %}
+
+<section class="hero" aria-labelledby="hero-title">
+  <p class="eyebrow">Hurghada · Red Sea · Luxor</p>
+  <h1 id="hero-title">Small-group days,<br><em>booked without the guesswork.</em></h1>
+  <p class="lede">{{ site.brand_name }} is the marketplace for Hurghada’s local tourism providers — sea days, desert safaris, Luxor history and every travel service in between. Hotel pickup where offered, prices in whole euros, and a human confirming every booking.</p>
+
+  <form action="{{ url_for('catalog.home') }}" method="get" role="search">
+    <div class="searchbar">
+      <label>Where or what
+        <input type="text" name="q" placeholder="Try: Luxor, desert, snorkel…" value="{{ q }}">
+      </label>
+      <button type="submit" class="btn btn-primary" style="height:44px; padding:0 26px;">Search</button>
+    </div>
+  </form>
+
+  <div class="trust-strip" aria-label="Why book with us">
+    <span><b>✓</b> Whole-euro prices</span>
+    <span><b>✓</b> Human-confirmed booking</span>
+    <span><b>✓</b> Hotel pickup where offered</span>
+    <span><b>✓</b> Vetted local suppliers</span>
+  </div>
+</section>
+
+{% if featured_tours %}
+<div class="section-title">
+  <h2>Top activities</h2>
+  <a href="{{ url_for('catalog.index') }}">View all trips →</a>
+</div>
+<div class="sf-a-carousel">
+  {% for tour in featured_tours[:6] %}
+  <article class="sf-a-slide">
+    <div class="sf-a-photo">
+      {% if tour.image_url %}<img src="{{ tour.image_url }}" alt="{{ tour.title_en }}" loading="lazy">{% endif %}
+    </div>
+    <div class="sf-a-body">
+      {% if tour.option_name %}<span class="tag tag-built">{{ tour.option_name }}</span>{% endif %}
+      <h3>{{ tour.title_en }}</h3>
+      <p>from <strong class="price">€{{ tour.sale_minor }}</strong> per person</p>
+      <a class="btn btn-primary" href="{{ url_for('catalog.detail', tour_id=tour.id) }}">View trip</a>
+    </div>
+  </article>
+  {% endfor %}
+</div>
+{% endif %}
+
+<div class="section-title" id="destinations"><h2>Destinations</h2><a href="{{ url_for('catalog.index') }}">All trips →</a></div>
+<div class="grid-4">
+  {% for name, stats in destination_stats.items() %}
+  <a href="{{ url_for('catalog.index', q=name) }}" class="tile">
+    <strong>{{ name }}</strong>
+    <span>{% if stats.min_price is not none %}From €{{ stats.min_price }} · {{ stats.count }} trip{{ '' if stats.count == 1 else 's' }}{% else %}Explore trips{% endif %}</span>
+  </a>
+  {% endfor %}
+</div>
+
+<div class="section-title" id="trips">
+  <h2>{% if q %}Results for “{{ q }}”{% else %}Trips available now{% endif %}</h2>
+  <a href="{{ url_for('catalog.index') }}">View all →</a>
+</div>
+{% if tours %}
+<div class="grid-4">
+  {% for tour in tours[:8] %}
+  {% set stats = review_stats.get(tour.id) if review_stats is defined else none %}
+  <article class="card trip-card">
+    <div class="trip-thumb">
+      {% if tour.image_url %}<img src="{{ tour.image_url }}" alt="{{ tour.title_en }}" loading="lazy">{% else %}🐎{% endif %}
+    </div>
+    <div class="trip-body">
+      {% if tour.option_name %}<span class="tag tag-built" style="align-self:flex-start;">{{ tour.option_name }}</span>{% endif %}
+      <h3>{{ tour.title_en }}</h3>
+      <p>{{ tour.description|truncate(100, true, '…') }}</p>
+      {% if stats %}<div class="trip-meta"><span class="rating"><span class="stars" aria-hidden="true">{{ star_row(stats.avg) }}</span><b>{{ stats.avg }}</b><span class="small muted">({{ stats.count }})</span></span></div>{% endif %}
+      <div class="trip-foot">
+        <span class="price">€{{ tour.sale_minor }}</span>
+        <a class="btn btn-primary btn-sm" href="{{ url_for('catalog.detail', tour_id=tour.id) }}">View</a>
+      </div>
+    </div>
+  </article>
+  {% endfor %}
+</div>
+{% else %}
+<div class="card card-pad empty-state">
+  <h3>No trips match{% if q %} “{{ q }}”{% endif %}</h3>
+  <p class="small muted">Try another search, or browse all current trips.</p>
+  <p><a class="btn btn-primary" href="{{ url_for('catalog.index') }}">Show all trips</a></p>
+</div>
+{% endif %}
+
+{% if approved_reviews %}
+<div class="section-title">
+  <h2>Guest reviews</h2>
+  {% if review_total %}<span class="small muted">{{ review_total }} approved review{{ '' if review_total == 1 else 's' }}{% if review_avg %} · {{ review_avg }} ★ average{% endif %}</span>{% endif %}
+</div>
+<div class="review-grid">
+  {% for review in approved_reviews[:3] %}
+  <article class="card card-pad review-card">
+    <p class="stars" aria-label="{{ review.rating }} out of 5 stars">{{ star_row(review.rating) }}</p>
+    {% if review.title %}<h3>{{ review.title }}</h3>{% endif %}
+    <p class="small">{{ review.body|truncate(160, true, '…') }}</p>
+    {% if review.tour %}<p class="review-trip">{{ review.tour.title_en }}</p>{% endif %}
+  </article>
+  {% endfor %}
+</div>
+{% endif %}
+
+<div class="section-title" id="kids"><h2>Travelling with kids?</h2></div>
+<div class="kids-grid">
+  <a class="kids-card" href="{{ url_for('catalog.index', q='horse') }}"><h3>Horse riding &amp; carriage</h3><p class="small muted">Gentle rides on the beach or a calm carriage tour — tell us the ages and we’ll match a suitable horse and pace.</p></a>
+  <a class="kids-card" href="{{ url_for('catalog.index', q='desert') }}"><h3>Desert safari</h3><p class="small muted">Dunes, camels and a Bedouin stop — ask our team which safari fits your children’s ages.</p></a>
+  <a class="kids-card" href="{{ url_for('catalog.index', q='boat') }}"><h3>Island &amp; boat days</h3><p class="small muted">Boat days with calm water stops for snorkelling — we confirm swim conditions with the captain.</p></a>
+  <a class="kids-card" href="{{ url_for('pages.help_page') }}#contact"><h3>Ask us first</h3><p class="small muted">Message us on WhatsApp with ages and needs — we’ll suggest what actually works.</p></a>
+</div>
+
+<div class="section-title"><h2>Adventures and activities</h2></div>
+<div class="cat-grid">
+  <a href="{{ url_for('catalog.index', q='horse') }}" class="cat-tile"><span><span class="icon" aria-hidden="true">🐎</span><span class="cat-copy">Horse Riding<small>Beach &amp; carriage</small></span></span></a>
+  <a href="{{ url_for('catalog.index', q='desert') }}" class="cat-tile"><span><span class="icon" aria-hidden="true">🏜️</span><span class="cat-copy">Desert Safari<small>Quad &amp; camel</small></span></span></a>
+  <a href="{{ url_for('catalog.index', q='boat') }}" class="cat-tile"><span><span class="icon" aria-hidden="true">⛵</span><span class="cat-copy">Boat Trips<small>Islands &amp; reefs</small></span></span></a>
+  <a href="{{ url_for('catalog.index', q='snorkel') }}" class="cat-tile"><span><span class="icon" aria-hidden="true">🤿</span><span class="cat-copy">Snorkelling<small>House reef &amp; boats</small></span></span></a>
+  <a href="{{ url_for('catalog.index', q='luxor') }}" class="cat-tile"><span><span class="icon" aria-hidden="true">🏛️</span><span class="cat-copy">History<small>Luxor &amp; Cairo</small></span></span></a>
+</div>
+
+<div class="section-title"><h2>Why book with us</h2></div>
+<div class="sf-a-why">
+  <div class="why-card"><div class="why-icon" aria-hidden="true">🙋</div><h3>Human-confirmed booking</h3><p class="small muted">The operator checks your request and sends a payment link — no instant bot sales.</p></div>
+  <div class="why-card"><div class="why-icon" aria-hidden="true">📍</div><h3>Local suppliers</h3><p class="small muted">Independent Hurghada operators, vetted for quality before they list with us.</p></div>
+  <div class="why-card"><div class="why-icon" aria-hidden="true">🔒</div><h3>Pay after confirmation</h3><p class="small muted">You pay only via the link we send after your booking is reviewed.</p></div>
+  <div class="why-card"><div class="why-icon" aria-hidden="true">💬</div><h3>WhatsApp support</h3><p class="small muted">Quick human answers before you book and before your trip day.</p></div>
+</div>
+
+<div class="section-title"><h2>Newsletter</h2></div>
+<div class="news-band">
+  <div>
+    <h3>Get the good trips first</h3>
+    <p class="small muted">One short email when new trips and seasonal offers open. No spam — unsubscribe any time.</p>
+  </div>
+  <a class="btn btn-primary" href="mailto:{{ site.email }}?subject=Subscribe%20me%20to%20Wasla%20Travel%20updates">Subscribe by email</a>
+</div>
+
+{% endblock %}

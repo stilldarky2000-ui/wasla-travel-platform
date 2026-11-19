@@ -1,0 +1,1045 @@
+@import "tailwindcss";
+
+@theme {
+  --font-display: "Fraunces", "IBM Plex Sans Arabic", Georgia, serif;
+  --font-sans: "Plus Jakarta Sans", "IBM Plex Sans Arabic", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+@layer base {
+  html {
+    font-family: var(--font-sans);
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+}
+
+@property --wasla-led-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes waslaLedRotate {
+  to {
+    --wasla-led-angle: 360deg;
+  }
+}
+
+/* Google-style rotating multi-color LED strip when hovering, pointing, or typing inside inputs */
+input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not(.bg-transparent):not(.no-led),
+textarea:not(.no-led),
+select:not(.bg-transparent):not(.no-led) {
+  transition: box-shadow 180ms ease, border-color 180ms ease;
+}
+
+input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not(.bg-transparent):not(.no-led):hover,
+textarea:not(.no-led):hover,
+select:not(.bg-transparent):not(.no-led):hover {
+  border-color: transparent !important;
+  background-image:
+    linear-gradient(#ffffff, #ffffff),
+    conic-gradient(
+      from var(--wasla-led-angle, 0deg),
+      #ff7000 0deg,
+      #f54400 90deg,
+      #fbbc05 180deg,
+      #de1b00 270deg,
+      #ff7000 360deg
+    );
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+  animation: waslaLedRotate 2.8s linear infinite;
+  box-shadow: 0 0 0 2px rgba(245, 68, 0, 0.14);
+}
+
+input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not(.bg-transparent):not(.no-led):focus,
+textarea:not(.no-led):focus,
+select:not(.bg-transparent):not(.no-led):focus {
+  outline: none !important;
+  border-color: transparent !important;
+  background-image:
+    linear-gradient(#ffffff, #ffffff),
+    conic-gradient(
+      from var(--wasla-led-angle, 0deg),
+      #ff7000 0deg,
+      #f54400 75deg,
+      #fbbc05 155deg,
+      #ea580c 235deg,
+      #de1b00 305deg,
+      #ff7000 360deg
+    );
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+  animation: waslaLedRotate 1.9s linear infinite;
+  box-shadow: 0 0 0 3px rgba(245, 68, 0, 0.22), 0 4px 14px rgba(245, 68, 0, 0.14);
+}
+
+.wasla-led-ring {
+  border: 2px solid transparent;
+  background-image:
+    linear-gradient(#ffffff, #ffffff),
+    conic-gradient(
+      from var(--wasla-led-angle, 0deg),
+      rgba(254, 215, 170, 0.9) 0deg,
+      rgba(254, 215, 170, 0.9) 360deg
+    );
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+  transition: box-shadow 200ms ease;
+}
+
+.wasla-led-ring:hover,
+.wasla-led-ring:focus-within {
+  background-image:
+    linear-gradient(#ffffff, #ffffff),
+    conic-gradient(
+      from var(--wasla-led-angle, 0deg),
+      #ff7000 0deg,
+      #f54400 90deg,
+      #fbbc05 180deg,
+      #de1b00 270deg,
+      #ff7000 360deg
+    );
+  animation: waslaLedRotate 2.2s linear infinite;
+  box-shadow: 0 0 0 3px rgba(245, 68, 0, 0.24), 0 12px 30px rgba(15, 23, 42, 0.18);
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+.text-balance {
+  text-wrap: balance;
+}
+
+/* Scrollbar hiding for snap carousels */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.carousel-track {
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-x pan-y;
+  overscroll-behavior-x: contain;
+}
+
+/* Scroll reveal (runs once via IntersectionObserver) */
+.reveal-item {
+  opacity: 0;
+  transform: translate3d(0, 24px, 0);
+  transition:
+    opacity 600ms cubic-bezier(0.16, 1, 0.3, 1),
+    transform 600ms cubic-bezier(0.16, 1, 0.3, 1);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+
+.reveal-item.is-revealed,
+.reveal-item[data-wasla-revealed="1"] {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+/* Hero initial entrance */
+@keyframes heroRise {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 18px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.hero-enter {
+  animation: heroRise 650ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.hero-enter-delayed {
+  animation: heroRise 700ms cubic-bezier(0.16, 1, 0.3, 1) 120ms both;
+}
+
+/* Subtle slow zoom on active hero slide */
+@keyframes gentleZoom {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.06);
+  }
+}
+
+.slide-zoom-active {
+  animation: gentleZoom 10s ease-out forwards;
+}
+
+/* Gentle periodic WhatsApp pulse */
+@keyframes softPulse {
+  0%, 78%, 100% {
+    transform: scale(1);
+  }
+  86% {
+    transform: scale(1.07);
+  }
+  93% {
+    transform: scale(1);
+  }
+}
+
+.whatsapp-pulse {
+  animation: softPulse 5.5s ease-in-out infinite;
+}
+
+/* Shimmer loading placeholder */
+@keyframes shimmerSlide {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.shimmer-wave {
+  position: relative;
+  overflow: hidden;
+}
+
+.shimmer-wave::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.55) 50%,
+    transparent 100%
+  );
+  animation: shimmerSlide 1.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  pointer-events: none;
+}
+
+[data-wasla-theme="dark"] .shimmer-wave::after {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.12) 50%,
+    transparent 100%
+  );
+}
+
+/* Cheerful kinetic brand accent for "Travel" / "ترافل" inspired by modern live polish */
+@keyframes travelSheen {
+  0%, 100% {
+    background-position: 0% 50%;
+    transform: translateY(0px);
+  }
+  50% {
+    background-position: 100% 50%;
+    transform: translateY(-1.5px);
+  }
+}
+
+@keyframes sparkleFloat {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg) scale(1);
+    opacity: 0.9;
+  }
+  50% {
+    transform: translateY(-2.5px) rotate(12deg) scale(1.12);
+    opacity: 1;
+  }
+}
+
+.wasla-brand-first {
+  display: inline-block;
+  color: #ea580c;
+  background-image: linear-gradient(110deg, #de1b00 0%, #f54400 50%, #ff7000 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.wasla-brand-first-light {
+  display: inline-block;
+  color: #ffffff;
+  background-image: linear-gradient(110deg, #ffffff 0%, #fff7ed 55%, #fde047 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.wasla-travel-word {
+  display: inline-block;
+  color: #f54400;
+  background-image: linear-gradient(
+    110deg,
+    #ff7000 0%,
+    #f54400 35%,
+    #f59e0b 52%,
+    #de1b00 72%,
+    #ff7000 100%
+  );
+  background-size: 230% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: travelSheen 5.2s ease-in-out infinite;
+}
+
+.wasla-travel-word-light {
+  display: inline-block;
+  color: #fdba74;
+  background-image: linear-gradient(
+    110deg,
+    #ffffff 0%,
+    #fdba74 35%,
+    #fde68a 52%,
+    #fb923c 70%,
+    #ffffff 100%
+  );
+  background-size: 230% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: travelSheen 5.2s ease-in-out infinite;
+}
+
+.wasla-glint {
+  display: inline-block;
+  animation: sparkleFloat 3.6s ease-in-out infinite;
+}
+
+/* Warm orange-to-red CTA button, Hero banner, & Image hover glossy glare sweep */
+@keyframes waslaBookGlare {
+  0%, 55% {
+    transform: translateX(-160%) skewX(-22deg);
+    opacity: 0;
+  }
+  65% {
+    opacity: 0.62;
+  }
+  88% {
+    transform: translateX(260%) skewX(-22deg);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(260%) skewX(-22deg);
+    opacity: 0;
+  }
+}
+
+@keyframes waslaHeroCalmGlare {
+  0%, 68% {
+    transform: translateX(-160%) skewX(-22deg);
+    opacity: 0;
+  }
+  76% {
+    opacity: 0.28;
+  }
+  94% {
+    transform: translateX(260%) skewX(-22deg);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(260%) skewX(-22deg);
+    opacity: 0;
+  }
+}
+
+@keyframes waslaImageHoverGlare {
+  0% {
+    transform: translateX(-160%) skewX(-22deg);
+    opacity: 0;
+  }
+  8% {
+    opacity: 0.62;
+  }
+  30% {
+    transform: translateX(260%) skewX(-22deg);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(260%) skewX(-22deg);
+    opacity: 0;
+  }
+}
+
+@layer components {
+  .wasla-book-glare,
+  .wasla-wa-glare {
+    position: relative;
+    overflow: hidden;
+    transition: transform 180ms ease, box-shadow 200ms ease, filter 200ms ease;
+  }
+
+  .wasla-book-glare {
+    background: linear-gradient(110deg, #ff7000 0%, #f54400 48%, #de1b00 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.38),
+      inset 0 -1px 0 rgba(120, 14, 0, 0.25),
+      0 8px 20px -6px rgba(229, 46, 0, 0.55);
+  }
+
+  .wasla-wa-glare {
+    background: linear-gradient(110deg, #25d366 0%, #16a34a 50%, #0f8a3c 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.38),
+      inset 0 -1px 0 rgba(5, 68, 25, 0.28),
+      0 8px 20px -6px rgba(22, 163, 74, 0.52);
+  }
+
+  .wasla-book-glare::before,
+  .wasla-wa-glare::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 52% 0;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.26) 0%, rgba(255, 255, 255, 0) 100%);
+    pointer-events: none;
+  }
+
+  .wasla-book-glare::after,
+  .wasla-wa-glare::after {
+    content: "";
+    position: absolute;
+    top: -20%;
+    left: 0;
+    width: 38%;
+    height: 140%;
+    background: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.48) 50%,
+      rgba(255, 255, 255, 0) 100%
+    );
+    transform: translateX(-160%) skewX(-22deg);
+    animation: waslaBookGlare 8.5s ease-in-out infinite;
+    pointer-events: none;
+  }
+
+  .wasla-book-glare:hover {
+    filter: brightness(1.06);
+    transform: translateY(-1px);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.45),
+      0 12px 24px -6px rgba(229, 46, 0, 0.68);
+  }
+
+  .wasla-wa-glare:hover {
+    filter: brightness(1.06);
+    transform: translateY(-1px);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.45),
+      0 12px 24px -6px rgba(22, 163, 74, 0.65);
+  }
+
+  .wasla-book-glare:hover::after,
+  .wasla-wa-glare:hover::after {
+    animation-duration: 4.5s;
+  }
+
+  /* Hero section & Footer calm, occasional glossy glare sweep */
+  .wasla-hero-glare,
+  .wasla-footer-glare {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .wasla-footer-glare {
+    background: linear-gradient(110deg, #ff7000 0%, #f54400 48%, #de1b00 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.38),
+      inset 0 -1px 0 rgba(120, 14, 0, 0.25),
+      0 -10px 28px -8px rgba(229, 46, 0, 0.38);
+  }
+
+  .wasla-hero-glare::before,
+  .wasla-footer-glare::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 55% 0;
+    z-index: 2;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0) 100%);
+    pointer-events: none;
+  }
+
+  .wasla-hero-glare::after,
+  .wasla-footer-glare::after {
+    content: "";
+    position: absolute;
+    top: -25%;
+    left: 0;
+    width: 38%;
+    height: 150%;
+    z-index: 2;
+    background: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.28) 50%,
+      rgba(255, 255, 255, 0) 100%
+    );
+    transform: translateX(-160%) skewX(-22deg);
+    animation: waslaHeroCalmGlare 12s ease-in-out infinite;
+    pointer-events: none;
+  }
+
+  /* Image hover calm glossy glare sweep (one gentle sweep, then long pause) */
+  .wasla-img-glare {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .wasla-img-glare::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 52% 0;
+    z-index: 25;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0) 100%);
+    opacity: 0;
+    transition: opacity 350ms ease;
+    pointer-events: none;
+  }
+
+  .wasla-img-glare::after {
+    content: "";
+    position: absolute;
+    top: -25%;
+    left: 0;
+    width: 40%;
+    height: 150%;
+    z-index: 26;
+    background: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.46) 50%,
+      rgba(255, 255, 255, 0) 100%
+    );
+    transform: translateX(-160%) skewX(-22deg);
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .wasla-img-glare:hover::before,
+  .group:hover .wasla-img-glare::before {
+    opacity: 1;
+  }
+
+  .wasla-img-glare:hover::after,
+  .group:hover .wasla-img-glare::after {
+    animation: waslaImageHoverGlare 7.5s ease-in-out infinite;
+  }
+
+  /* TripCard subtle scale-up animation and smooth shadow elevation on hover */
+  .wasla-storefront-root .wasla-trip-card {
+    will-change: transform, box-shadow;
+    transition:
+      transform 320ms cubic-bezier(0.22, 1, 0.36, 1),
+      box-shadow 320ms cubic-bezier(0.22, 1, 0.36, 1),
+      border-color 220ms ease;
+  }
+
+  .wasla-storefront-root .wasla-trip-card:hover {
+    transform: translate3d(0, -4px, 0) scale(1.02);
+    box-shadow:
+      0 20px 36px -12px rgba(15, 23, 42, 0.16),
+      0 8px 18px -6px rgba(234, 88, 12, 0.18);
+  }
+
+  .wasla-storefront-root .wasla-trip-card:active {
+    transform: translate3d(0, -1px, 0) scale(0.99);
+  }
+}
+
+[data-wasla-theme="dark"] .wasla-storefront-root .wasla-trip-card:hover {
+  box-shadow:
+    0 22px 40px -12px rgba(0, 0, 0, 0.65),
+    0 8px 20px -6px rgba(234, 88, 12, 0.28);
+}
+
+.font-hero-editorial {
+  font-family: "Fraunces", "IBM Plex Sans Arabic", Georgia, serif;
+}
+
+.font-hero-modern {
+  font-family: "Plus Jakarta Sans", "Cairo", "IBM Plex Sans Arabic", ui-sans-serif, system-ui, sans-serif;
+}
+
+.font-hero-clean {
+  font-family: "DM Sans", "IBM Plex Sans Arabic", ui-sans-serif, system-ui, sans-serif;
+}
+
+.font-hero-luxury {
+  font-family: "Playfair Display", "IBM Plex Sans Arabic", Georgia, serif;
+}
+
+.font-hero-bold {
+  font-family: "Outfit", "Cairo", "IBM Plex Sans Arabic", ui-sans-serif, system-ui, sans-serif;
+}
+
+.font-hero-architectural {
+  font-family: "Manrope", "IBM Plex Sans Arabic", ui-sans-serif, system-ui, sans-serif;
+}
+
+/* System-Wide Dark Mode Theme ([data-wasla-theme="dark"]) for Storefront, Operations Desk, Supplier Portal, and Owner Control */
+[data-wasla-theme="dark"] {
+  color-scheme: dark;
+}
+
+[data-wasla-theme="dark"] body,
+[data-wasla-theme="dark"] .wasla-storefront-root {
+  background-color: #090D16 !important;
+  color: #F1F5F9 !important;
+}
+
+[data-wasla-theme="dark"] .wasla-storefront-root main,
+[data-wasla-theme="dark"] .wasla-storefront-root > div.bg-\[\#F8FAFC\],
+[data-wasla-theme="dark"] .wasla-storefront-root > div.bg-\[\#E8EEF5\] {
+  background-color: #090D16 !important;
+  color: #F1F5F9 !important;
+}
+
+[data-wasla-theme="dark"] nav[aria-label="Quick destinations and services"] {
+  background-color: #0F1624 !important;
+  border-color: rgba(255, 255, 255, 0.09) !important;
+}
+
+/* Primary Cards, Panels, Sticky Modal Headers, Sidebars, Thread Cards & Modals across all 4 pages */
+[data-wasla-theme="dark"] .wasla-storefront-root .bg-white:not(.wasla-book-glare):not(.wasla-wa-glare):not(.wasla-led-ring),
+[data-wasla-theme="dark"] .wasla-storefront-root .bg-white\/50,
+[data-wasla-theme="dark"] .wasla-storefront-root .bg-white\/60,
+[data-wasla-theme="dark"] .wasla-storefront-root .bg-white\/65,
+[data-wasla-theme="dark"] .wasla-storefront-root .bg-white\/75,
+[data-wasla-theme="dark"] .wasla-storefront-root .bg-white\/80,
+[data-wasla-theme="dark"] .wasla-storefront-root .bg-white\/85,
+[data-wasla-theme="dark"] .wasla-storefront-root .bg-white\/90:not(.rounded-full),
+[data-wasla-theme="dark"] .wasla-storefront-root .bg-white\/95:not(.rounded-full),
+[data-wasla-theme="dark"] .wasla-storefront-root .bg-\[\#FFFFFF\],
+[data-wasla-theme="dark"] .wasla-storefront-root .bg-\[\#FFFFFF\]\/95,
+[data-wasla-theme="dark"] [role="dialog"] .bg-white:not(.wasla-book-glare):not(.wasla-wa-glare):not(.wasla-led-ring),
+[data-wasla-theme="dark"] [role="dialog"] .bg-white\/65,
+[data-wasla-theme="dark"] [role="dialog"] .bg-white\/75,
+[data-wasla-theme="dark"] [role="dialog"] .bg-white\/80,
+[data-wasla-theme="dark"] [role="dialog"] .bg-white\/85,
+[data-wasla-theme="dark"] [role="dialog"] .bg-white\/90:not(.rounded-full),
+[data-wasla-theme="dark"] [role="dialog"] .bg-white\/95:not(.rounded-full),
+[data-wasla-theme="dark"] [role="dialog"] .bg-\[\#FFFFFF\],
+[data-wasla-theme="dark"] [role="listbox"].bg-white {
+  background-color: #111827 !important;
+  color: #F1F5F9;
+}
+
+/* White/80 unselected list/thread rows slightly offset from #111827 cards */
+[data-wasla-theme="dark"] .wasla-storefront-root button.bg-white\/80,
+[data-wasla-theme="dark"] .wasla-storefront-root tr.bg-white\/65 {
+  background-color: #161F32 !important;
+  color: #F1F5F9;
+}
+
+[data-wasla-theme="dark"] .wasla-storefront-root .hover\:bg-white:hover,
+[data-wasla-theme="dark"] .wasla-storefront-root .hover\:bg-white\/95:hover,
+[data-wasla-theme="dark"] [role="dialog"] .hover\:bg-white:hover {
+  background-color: #1E293B !important;
+}
+
+/* Default Dark Surface for Form Inputs, Selects & Textareas */
+[data-wasla-theme="dark"] input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not(.bg-transparent),
+[data-wasla-theme="dark"] select:not(.bg-transparent),
+[data-wasla-theme="dark"] textarea {
+  background-color: #0F172A !important;
+  color: #F8FAFC !important;
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+[data-wasla-theme="dark"] input::placeholder,
+[data-wasla-theme="dark"] textarea::placeholder {
+  color: #64748B !important;
+}
+
+/* Owner Control Header Banner in Dark Mode */
+[data-wasla-theme="dark"] .wasla-storefront-root .from-\[\#EEF2FF\] {
+  background-image: linear-gradient(to right, #111827, #162038, #0F172A) !important;
+  border-color: rgba(99, 102, 241, 0.32) !important;
+}
+
+/* Keep the Hero's active white pill & Carousel arrow buttons readable in dark mode */
+[data-wasla-theme="dark"] .wasla-hero-glare [role="group"] button.bg-white {
+  background-color: #FFFFFF !important;
+  color: #DE1B00 !important;
+}
+
+[data-wasla-theme="dark"] .wasla-storefront-root button.rounded-full.bg-white\/90,
+[data-wasla-theme="dark"] .wasla-storefront-root button.rounded-full.bg-white\/95 {
+  background-color: rgba(15, 23, 42, 0.88) !important;
+  color: #F8FAFC !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+/* Secondary Muted Surfaces & Chat Feeds across all 4 pages */
+[data-wasla-theme="dark"] .wasla-storefront-root .bg-\[\#FAFCFF\],
+[data-wasla-theme="dark"] .wasla-storefront-root .bg-\[\#FAF7F2\],
+[data-wasla-theme="dark"] .wasla-storefront-root .bg-\[\#F8FAFC\],
+[data-wasla-theme="dark"] .wasla-storefront-root .bg-\[\#F8FAFC\]\/60,
+[data-wasla-theme="dark"] .wasla-storefront-root .bg-\[\#F1F5F9\],
+[data-wasla-theme="dark"] .wasla-storefront-root .bg-\[\#E8EEF0\],
+[data-wasla-theme="dark"] .wasla-storefront-root .bg-\[\#E8EEF5\],
+[data-wasla-theme="dark"] [role="dialog"] .bg-\[\#FAFCFF\],
+[data-wasla-theme="dark"] [role="dialog"] .bg-\[\#F8FAFC\],
+[data-wasla-theme="dark"] [role="dialog"] .bg-\[\#EEF2F6\],
+[data-wasla-theme="dark"] [role="dialog"] .bg-\[\#F1F5F9\] {
+  background-color: #0D1422 !important;
+}
+
+/* Warm Orange / Amber / Yellow Pastel Surfaces in Dark Mode */
+[data-wasla-theme="dark"] .wasla-storefront-root .bg-\[\#FFF7ED\],
+[data-wasla-theme="dark"] .wasla-storefront-root .bg-\[\#FFF7ED\]\/40,
+[data-wasla-theme="dark"] .wasla-storefront-root .bg-\[\#FFF7ED\]\/50,
+[data-wasla-theme="dark"] .wasla-storefront-root .bg-\[\#FFF7ED\]\/60,
+[data-wasla-theme="dark"] .wasla-storefront-root .bg-\[\#FFF7ED\]\/70,
+[data-wasla-theme="dark"] .wasla-storefront-root .bg-\[\#FFF7ED\]\/95,
+[data-wasla-theme="dark"] .wasla-storefront-root .bg-\[\#FFEDD5\]\/75,
+[data-wasla-theme="dark"] .wasla-storefront-root .bg-\[\#FED7AA\]\/50,
+[data-wasla-theme="dark"] [role="dialog"] .bg-\[\#FFF7ED\],
+[data-wasla-theme="dark"] [role="dialog"] .bg-\[\#FFF7ED\]\/40,
+[data-wasla-theme="dark"] [role="dialog"] .bg-\[\#FFF7ED\]\/50,
+[data-wasla-theme="dark"] [role="dialog"] .bg-\[\#FFF7ED\]\/60,
+[data-wasla-theme="dark"] [role="dialog"] .bg-\[\#FFF7ED\]\/70,
+[data-wasla-theme="dark"] [role="dialog"] .bg-\[\#FFF7ED\]\/80,
+[data-wasla-theme="dark"] [role="listbox"] .bg-\[\#FFF7ED\] {
+  background-color: rgba(234, 88, 12, 0.18) !important;
+}
+
+[data-wasla-theme="dark"] [role="listbox"] .hover\:bg-\[\#FFF7ED\]\/60:hover {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+[data-wasla-theme="dark"] .wasla-storefront-root .bg-\[\#FFFBEB\],
+[data-wasla-theme="dark"] .wasla-storefront-root .bg-\[\#FFFBEB\]\/95,
+[data-wasla-theme="dark"] .wasla-storefront-root .bg-\[\#FEFCE8\],
+[data-wasla-theme="dark"] .wasla-storefront-root .bg-\[\#FEFCE8\]\/90,
+[data-wasla-theme="dark"] .wasla-storefront-root .bg-\[\#FEF3C7\],
+[data-wasla-theme="dark"] .wasla-storefront-root .bg-\[\#FEF3C7\]\/45,
+[data-wasla-theme="dark"] .wasla-storefront-root .bg-\[\#FEF3C7\]\/75,
+[data-wasla-theme="dark"] [role="dialog"] .bg-\[\#FFFBEB\],
+[data-wasla-theme="dark"] [role="dialog"] .bg-\[\#FEFCE8\],
+[data-wasla-theme="dark"] [role="dialog"] .bg-\[\#FEF3C7\] {
+  background-color: rgba(245, 158, 11, 0.14) !important;
+}
+
+/* Green / Emerald / Teal Pastel Surfaces in Dark Mode */
+[data-wasla-theme="dark"] .wasla-storefront-root .bg-\[\#F0FDF4\],
+[data-wasla-theme="dark"] .wasla-storefront-root .bg-\[\#F0FDF4\]\/60,
+[data-wasla-theme="dark"] .wasla-storefront-root .bg-\[\#F0FDF4\]\/90,
+[data-wasla-theme="dark"] .wasla-storefront-root .bg-\[\#DCFCE7\],
+[data-wasla-theme="dark"] .wasla-storefront-root .bg-\[\#ECFDF5\],
+[data-wasla-theme="dark"] .wasla-storefront-root .bg-\[\#ECFDF5\]\/90,
+[data-wasla-theme="dark"] .wasla-storefront-root .bg-\[\#ECFDF5\]\/95,
+[data-wasla-theme="dark"] .wasla-storefront-root .bg-\[\#D1FAE5\]\/70,
+[data-wasla-theme="dark"] .wasla-storefront-root .bg-\[\#D1FAE5\]\/40,
+[data-wasla-theme="dark"] [role="dialog"] .bg-\[\#F0FDF4\],
+[data-wasla-theme="dark"] [role="dialog"] .bg-\[\#F0FDF4\]\/60,
+[data-wasla-theme="dark"] [role="dialog"] .bg-\[\#F0FDF4\]\/90,
+[data-wasla-theme="dark"] [role="dialog"] .bg-\[\#DCFCE7\],
+[data-wasla-theme="dark"] [role="dialog"] .bg-\[\#ECFDF5\] {
+  background-color: rgba(22, 163, 74, 0.14) !important;
+}
+
+[data-wasla-theme="dark"] .wasla-storefront-root .bg-\[\#F0FDFA\],
+[data-wasla-theme="dark"] .wasla-storefront-root .bg-\[\#F0FDFA\]\/95,
+[data-wasla-theme="dark"] [role="dialog"] .bg-\[\#F0FDFA\] {
+  background-color: rgba(13, 148, 136, 0.15) !important;
+}
+
+/* Indigo / Violet / Purple Pastel Surfaces in Dark Mode */
+[data-wasla-theme="dark"] .wasla-storefront-root .bg-\[\#EEF2FF\],
+[data-wasla-theme="dark"] .wasla-storefront-root .bg-\[\#F5F3FF\],
+[data-wasla-theme="dark"] .wasla-storefront-root .bg-\[\#F5F3FF\]\/90,
+[data-wasla-theme="dark"] .wasla-storefront-root .bg-\[\#F5F3FF\]\/95,
+[data-wasla-theme="dark"] .wasla-storefront-root .bg-\[\#EDE9FE\]\/70,
+[data-wasla-theme="dark"] [role="dialog"] .bg-\[\#EEF2FF\],
+[data-wasla-theme="dark"] [role="dialog"] .bg-\[\#F5F3FF\] {
+  background-color: rgba(99, 102, 241, 0.15) !important;
+}
+
+/* Red / Rose Pastel Surfaces in Dark Mode */
+[data-wasla-theme="dark"] .wasla-storefront-root .bg-\[\#FFF1F2\]\/90,
+[data-wasla-theme="dark"] .wasla-storefront-root .bg-\[\#FEF2F2\],
+[data-wasla-theme="dark"] .wasla-storefront-root .bg-\[\#FDF2F2\],
+[data-wasla-theme="dark"] .wasla-storefront-root .bg-\[\#FEE2E2\],
+[data-wasla-theme="dark"] [role="dialog"] .bg-\[\#FFF1F2\]\/90,
+[data-wasla-theme="dark"] [role="dialog"] .bg-\[\#FEF2F2\],
+[data-wasla-theme="dark"] [role="dialog"] .bg-\[\#FDF2F2\],
+[data-wasla-theme="dark"] [role="dialog"] .bg-\[\#FEE2E2\] {
+  background-color: rgba(220, 38, 38, 0.16) !important;
+}
+
+/* Interactive Hover States in Dark Mode */
+[data-wasla-theme="dark"] .wasla-storefront-root .hover\:bg-\[\#F1F5F9\]:hover,
+[data-wasla-theme="dark"] .wasla-storefront-root .hover\:bg-\[\#F8FAFC\]\/80:hover,
+[data-wasla-theme="dark"] .wasla-storefront-root .hover\:bg-\[\#FFEDD5\]:hover,
+[data-wasla-theme="dark"] .wasla-storefront-root .hover\:bg-\[\#FFF7ED\]:hover,
+[data-wasla-theme="dark"] .wasla-storefront-root .hover\:bg-\[\#DCFCE7\]:hover,
+[data-wasla-theme="dark"] .wasla-storefront-root .hover\:bg-\[\#FEE2E2\]:hover,
+[data-wasla-theme="dark"] .wasla-storefront-root .hover\:bg-\[\#FEF3C7\]:hover,
+[data-wasla-theme="dark"] .wasla-storefront-root .hover\:bg-\[\#E0E7FF\]:hover,
+[data-wasla-theme="dark"] .wasla-storefront-root .hover\:bg-\[\#CCFBF1\]:hover,
+[data-wasla-theme="dark"] [role="dialog"] .hover\:bg-\[\#F1F5F9\]:hover,
+[data-wasla-theme="dark"] [role="dialog"] .hover\:bg-\[\#FFEDD5\]:hover,
+[data-wasla-theme="dark"] [role="dialog"] .hover\:bg-\[\#FFF7ED\]:hover,
+[data-wasla-theme="dark"] [role="dialog"] .hover\:bg-\[\#DCFCE7\]:hover,
+[data-wasla-theme="dark"] [role="dialog"] .hover\:bg-\[\#FEE2E2\]:hover,
+[data-wasla-theme="dark"] [role="dialog"] .hover\:bg-\[\#FEF3C7\]:hover {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Typography Hierarchy across all 4 pages */
+[data-wasla-theme="dark"] .wasla-storefront-root .text-\[\#0F172A\],
+[data-wasla-theme="dark"] [role="dialog"] .text-\[\#0F172A\],
+[data-wasla-theme="dark"] [role="listbox"] .text-\[\#0F172A\] {
+  color: #F8FAFC !important;
+}
+
+[data-wasla-theme="dark"] .wasla-storefront-root .text-\[\#334155\],
+[data-wasla-theme="dark"] .wasla-storefront-root .text-\[\#475569\],
+[data-wasla-theme="dark"] .wasla-storefront-root .text-\[\#52525B\],
+[data-wasla-theme="dark"] .wasla-storefront-root .text-\[\#384C54\],
+[data-wasla-theme="dark"] [role="dialog"] .text-\[\#334155\],
+[data-wasla-theme="dark"] [role="dialog"] .text-\[\#475569\],
+[data-wasla-theme="dark"] [role="dialog"] .text-\[\#52525B\],
+[data-wasla-theme="dark"] [role="dialog"] .text-\[\#384C54\],
+[data-wasla-theme="dark"] [role="listbox"] .text-\[\#475569\] {
+  color: #CBD5E1 !important;
+}
+
+[data-wasla-theme="dark"] .wasla-storefront-root .text-\[\#64748B\],
+[data-wasla-theme="dark"] .wasla-storefront-root .text-\[\#7B8E95\],
+[data-wasla-theme="dark"] [role="dialog"] .text-\[\#64748B\],
+[data-wasla-theme="dark"] [role="dialog"] .text-\[\#7B8E95\],
+[data-wasla-theme="dark"] [role="listbox"] .text-\[\#64748B\] {
+  color: #94A3B8 !important;
+}
+
+/* Semantic Dark Text Colors Brightened for Dark Surfaces */
+[data-wasla-theme="dark"] .wasla-storefront-root .text-\[\#3730A3\],
+[data-wasla-theme="dark"] .wasla-storefront-root .text-\[\#4338CA\],
+[data-wasla-theme="dark"] .wasla-storefront-root .text-\[\#4C1D95\],
+[data-wasla-theme="dark"] .wasla-storefront-root .text-\[\#5B21B6\],
+[data-wasla-theme="dark"] .wasla-storefront-root .text-\[\#6D28D9\],
+[data-wasla-theme="dark"] [role="dialog"] .text-\[\#3730A3\] {
+  color: #C4B5FD !important;
+}
+
+[data-wasla-theme="dark"] .wasla-storefront-root .text-\[\#064E3B\],
+[data-wasla-theme="dark"] .wasla-storefront-root .text-\[\#065F46\],
+[data-wasla-theme="dark"] .wasla-storefront-root .text-\[\#047857\],
+[data-wasla-theme="dark"] .wasla-storefront-root .text-\[\#15803D\],
+[data-wasla-theme="dark"] .wasla-storefront-root .text-\[\#166534\],
+[data-wasla-theme="dark"] [role="dialog"] .text-\[\#15803D\],
+[data-wasla-theme="dark"] [role="dialog"] .text-\[\#166534\] {
+  color: #6EE7B7 !important;
+}
+
+[data-wasla-theme="dark"] .wasla-storefront-root .text-\[\#0F766E\],
+[data-wasla-theme="dark"] .wasla-storefront-root .text-\[\#115E59\],
+[data-wasla-theme="dark"] [role="dialog"] .text-\[\#0F766E\] {
+  color: #5EEAD4 !important;
+}
+
+[data-wasla-theme="dark"] .wasla-storefront-root .text-\[\#78350F\],
+[data-wasla-theme="dark"] .wasla-storefront-root .text-\[\#92400E\],
+[data-wasla-theme="dark"] .wasla-storefront-root .text-\[\#B45309\],
+[data-wasla-theme="dark"] [role="dialog"] .text-\[\#B45309\] {
+  color: #FCD34D !important;
+}
+
+[data-wasla-theme="dark"] .wasla-storefront-root .text-\[\#9A3412\],
+[data-wasla-theme="dark"] .wasla-storefront-root .text-\[\#C2410C\],
+[data-wasla-theme="dark"] [role="dialog"] .text-\[\#C2410C\] {
+  color: #FDBA74 !important;
+}
+
+[data-wasla-theme="dark"] .wasla-storefront-root .text-\[\#881337\],
+[data-wasla-theme="dark"] .wasla-storefront-root .text-\[\#9F1239\],
+[data-wasla-theme="dark"] .wasla-storefront-root .text-\[\#8A2424\],
+[data-wasla-theme="dark"] .wasla-storefront-root .text-\[\#991B1B\],
+[data-wasla-theme="dark"] .wasla-storefront-root .text-\[\#B91C1C\],
+[data-wasla-theme="dark"] .wasla-storefront-root .text-\[\#BE123C\],
+[data-wasla-theme="dark"] [role="dialog"] .text-\[\#8A2424\],
+[data-wasla-theme="dark"] [role="dialog"] .text-\[\#B91C1C\] {
+  color: #FDA4AF !important;
+}
+
+/* Borders & Dividers across all 4 pages */
+[data-wasla-theme="dark"] .wasla-storefront-root .border-\[\#E2E8F0\],
+[data-wasla-theme="dark"] .wasla-storefront-root .border-\[\#E2E8F0\]\/70,
+[data-wasla-theme="dark"] .wasla-storefront-root .border-\[\#CBD5E1\],
+[data-wasla-theme="dark"] .wasla-storefront-root .border-\[\#F1F5F9\],
+[data-wasla-theme="dark"] [role="dialog"] .border-\[\#E2E8F0\],
+[data-wasla-theme="dark"] [role="dialog"] .border-\[\#CBD5E1\],
+[data-wasla-theme="dark"] [role="dialog"] .border-\[\#94A3B8\],
+[data-wasla-theme="dark"] [role="dialog"] .border-\[\#94A3B8\]\/80,
+[data-wasla-theme="dark"] [role="dialog"] .border-\[\#94A3B8\]\/70,
+[data-wasla-theme="dark"] [role="dialog"] .border-\[\#94A3B8\]\/60,
+[data-wasla-theme="dark"] [role="dialog"] .border-\[\#94A3B8\]\/55,
+[data-wasla-theme="dark"] [role="dialog"] .border-\[\#64748B\],
+[data-wasla-theme="dark"] .wasla-storefront-root .divide-\[\#E2E8F0\] > :not([hidden]) ~ :not([hidden]),
+[data-wasla-theme="dark"] .wasla-storefront-root .divide-\[\#F1F5F9\] > :not([hidden]) ~ :not([hidden]),
+[data-wasla-theme="dark"] [role="dialog"] .divide-\[\#F1F5F9\] > :not([hidden]) ~ :not([hidden]),
+[data-wasla-theme="dark"] [role="listbox"] {
+  border-color: rgba(148, 163, 184, 0.28) !important;
+}
+
+[data-wasla-theme="dark"] .wasla-storefront-root .border-\[\#FED7AA\],
+[data-wasla-theme="dark"] .wasla-storefront-root .border-\[\#FED7AA\]\/70,
+[data-wasla-theme="dark"] .wasla-storefront-root .border-\[\#FED7AA\]\/60,
+[data-wasla-theme="dark"] .wasla-storefront-root .border-\[\#FDBA74\],
+[data-wasla-theme="dark"] [role="dialog"] .border-\[\#FED7AA\],
+[data-wasla-theme="dark"] [role="dialog"] .border-\[\#FED7AA\]\/60 {
+  border-color: rgba(251, 146, 60, 0.28) !important;
+}
+
+[data-wasla-theme="dark"] .wasla-storefront-root .border-\[\#A7F3D0\],
+[data-wasla-theme="dark"] .wasla-storefront-root .border-\[\#BBF7D0\],
+[data-wasla-theme="dark"] [role="dialog"] .border-\[\#BBF7D0\] {
+  border-color: rgba(52, 211, 153, 0.28) !important;
+}
+
+[data-wasla-theme="dark"] .wasla-storefront-root .border-\[\#99F6E4\],
+[data-wasla-theme="dark"] .wasla-storefront-root .border-\[\#CCFBF1\],
+[data-wasla-theme="dark"] .wasla-storefront-root .border-\[\#5EEAD4\],
+[data-wasla-theme="dark"] [role="dialog"] .border-\[\#CCFBF1\] {
+  border-color: rgba(45, 212, 191, 0.28) !important;
+}
+
+[data-wasla-theme="dark"] .wasla-storefront-root .border-\[\#DDD6FE\],
+[data-wasla-theme="dark"] .wasla-storefront-root .border-\[\#C7D2FE\],
+[data-wasla-theme="dark"] .wasla-storefront-root .border-\[\#C4B5FD\] {
+  border-color: rgba(167, 139, 250, 0.3) !important;
+}
+
+[data-wasla-theme="dark"] .wasla-storefront-root .border-\[\#FDE68A\] {
+  border-color: rgba(251, 191, 36, 0.3) !important;
+}
+
+[data-wasla-theme="dark"] .wasla-storefront-root .border-\[\#FECACA\],
+[data-wasla-theme="dark"] .wasla-storefront-root .border-\[\#FECDD3\],
+[data-wasla-theme="dark"] .wasla-storefront-root .border-\[\#FFE4E6\],
+[data-wasla-theme="dark"] .wasla-storefront-root .border-\[\#EBC6C6\],
+[data-wasla-theme="dark"] [role="dialog"] .border-\[\#FECACA\],
+[data-wasla-theme="dark"] [role="dialog"] .border-\[\#EBC6C6\] {
+  border-color: rgba(248, 113, 113, 0.32) !important;
+}
+
+[data-wasla-theme="dark"] .wasla-led-ring {
+  background-color: transparent !important;
+  background-image:
+    linear-gradient(#111827, #111827),
+    conic-gradient(
+      from var(--wasla-led-angle, 0deg),
+      rgba(251, 146, 60, 0.35) 0deg,
+      rgba(251, 146, 60, 0.35) 360deg
+    );
+}
+
+[data-wasla-theme="dark"] .wasla-led-ring:hover,
+[data-wasla-theme="dark"] .wasla-led-ring:focus-within {
+  background-color: transparent !important;
+  background-image:
+    linear-gradient(#111827, #111827),
+    conic-gradient(
+      from var(--wasla-led-angle, 0deg),
+      #ff7000 0deg,
+      #f54400 90deg,
+      #fbbc05 180deg,
+      #de1b00 270deg,
+      #ff7000 360deg
+    );
+}
+
+[data-wasla-theme="dark"] input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not(.bg-transparent):not(.no-led):hover,
+[data-wasla-theme="dark"] textarea:not(.no-led):hover,
+[data-wasla-theme="dark"] select:not(.bg-transparent):not(.no-led):hover,
+[data-wasla-theme="dark"] input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not(.bg-transparent):not(.no-led):focus,
+[data-wasla-theme="dark"] textarea:not(.no-led):focus,
+[data-wasla-theme="dark"] select:not(.bg-transparent):not(.no-led):focus {
+  background-color: transparent !important;
+  background-image:
+    linear-gradient(#0F172A, #0F172A),
+    conic-gradient(
+      from var(--wasla-led-angle, 0deg),
+      #ff7000 0deg,
+      #f54400 75deg,
+      #fbbc05 155deg,
+      #ea580c 235deg,
+      #de1b00 305deg,
+      #ff7000 360deg
+    );
+  color: #F8FAFC !important;
+}
+
+[data-wasla-theme="dark"] select option {
+  background-color: #111827;
+  color: #F8FAFC;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .reveal-item,
+  .reveal-item.is-revealed {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .hero-enter,
+  .hero-enter-delayed,
+  .slide-zoom-active,
+  .whatsapp-pulse,
+  .shimmer-wave::after,
+  .wasla-travel-word,
+  .wasla-travel-word-light,
+  .wasla-glint,
+  .wasla-led-ring,
+  .wasla-led-ring:hover,
+  .wasla-led-ring:focus-within,
+  input:hover,
+  input:focus,
+  textarea:hover,
+  textarea:focus,
+  select:hover,
+  select:focus,
+  .wasla-book-glare::after,
+  .wasla-wa-glare::after,
+  .wasla-hero-glare::after,
+  .wasla-img-glare::after {
+    animation: none !important;
+  }
+
+  * {
+    transition-duration: 0.01ms !important;
+  }
+
+  .wasla-storefront-root .wasla-trip-card:hover,
+  .wasla-storefront-root .wasla-trip-card:active {
+    transform: none !important;
+  }
+}

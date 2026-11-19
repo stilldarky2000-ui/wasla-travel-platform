@@ -1,0 +1,716 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Global default-deny safety net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Core identity & path validation primitives (flat to stay well under CEL 20-call limit)
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_-]+$');
+    }
+
+    function isEmailVerified() {
+      return request.auth != null && request.auth.token.email_verified == true;
+    }
+
+    function isBootstrappedOwner() {
+      return request.auth != null
+        && request.auth.token.email_verified == true
+        && ('email' in request.auth.token)
+        && request.auth.token.email.lower() == 'stilldarky2000@gmail.com';
+    }
+
+    function isAdmin() {
+      return request.auth != null
+        && request.auth.token.email_verified == true
+        && (
+          (('email' in request.auth.token) && request.auth.token.email.lower() == 'stilldarky2000@gmail.com')
+          || exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+        );
+    }
+
+    function isOperations() {
+      return request.auth != null
+        && request.auth.token.email_verified == true
+        && (
+          (('email' in request.auth.token) && request.auth.token.email.lower() == 'stilldarky2000@gmail.com')
+          || exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+          || (
+            exists(/databases/$(database)/documents/staff_roles/$(request.auth.uid))
+            && get(/databases/$(database)/documents/staff_roles/$(request.auth.uid)).data.status == 'Active'
+            && get(/databases/$(database)/documents/staff_roles/$(request.auth.uid)).data.role == 'operations'
+          )
+        );
+    }
+
+    function isSupplier() {
+      return request.auth != null
+        && request.auth.token.email_verified == true
+        && (
+          (('email' in request.auth.token) && request.auth.token.email.lower() == 'stilldarky2000@gmail.com')
+          || exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+          || (
+            exists(/databases/$(database)/documents/staff_roles/$(request.auth.uid))
+            && get(/databases/$(database)/documents/staff_roles/$(request.auth.uid)).data.status == 'Active'
+            && get(/databases/$(database)/documents/staff_roles/$(request.auth.uid)).data.role == 'supplier'
+          )
+        );
+    }
+
+    // Entity validation blueprints (inlined field checks to avoid nested function call limits)
+    function isValidAdminUser(data) {
+      return data.keys().hasAll(['uid', 'email', 'createdAt'])
+        && data.keys().hasOnly(['uid', 'email', 'createdAt'])
+        && data.uid is string && data.uid.size() >= 1 && data.uid.size() <= 128
+        && data.email is string && data.email.size() >= 3 && data.email.size() <= 160
+        && data.createdAt is timestamp;
+    }
+
+    function isValidStaffRole(data) {
+      return data.keys().hasAll(['uid', 'email', 'displayName', 'role', 'status', 'createdAt', 'updatedAt'])
+        && data.keys().hasOnly(['uid', 'email', 'displayName', 'role', 'supplierName', 'status', 'createdAt', 'updatedAt'])
+        && data.uid is string && data.uid.size() >= 1 && data.uid.size() <= 128
+        && data.email is string && data.email.size() >= 3 && data.email.size() <= 160
+        && data.displayName is string && data.displayName.size() >= 1 && data.displayName.size() <= 120
+        && data.role in ['owner', 'operations', 'supplier']
+        && (!('supplierName' in data) || (data.supplierName is string && data.supplierName.size() <= 120))
+        && data.status in ['Active', 'Paused']
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidAccessRequest(data) {
+      return data.keys().hasAll(['uid', 'email', 'displayName', 'requestedRole', 'status', 'createdAt', 'updatedAt'])
+        && data.keys().hasOnly(['uid', 'email', 'displayName', 'requestedRole', 'companyName', 'city', 'status', 'createdAt', 'updatedAt'])
+        && data.uid == request.auth.uid
+        && data.uid is string && data.uid.size() >= 1 && data.uid.size() <= 128
+        && data.email is string && data.email.size() >= 3 && data.email.size() <= 160
+        && data.displayName is string && data.displayName.size() >= 1 && data.displayName.size() <= 120
+        && data.requestedRole in ['operations', 'supplier']
+        && (!('companyName' in data) || (data.companyName is string && data.companyName.size() <= 120))
+        && (!('city' in data) || (data.city is string && data.city.size() <= 60))
+        && data.status in ['Pending', 'Approved', 'Rejected']
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidPublicSettings(data) {
+      return data.keys().hasAll(['whatsappNumber', 'whatsappDisplay', 'email', 'domain', 'airTicketsEnabled', 'updatedAt'])
+        && data.keys().hasOnly([
+          'whatsappNumber', 'whatsappDisplay', 'email', 'domain', 'airTicketsEnabled', 'metaPixelId', 'ga4Id',
+          'heroImageUrl', 'heroCaptionEn', 'heroCaptionAr', 'heroCaptionDe',
+          'heroSubEn', 'heroSubAr', 'heroSubDe', 'heroFontStyle', 'heroTheme',
+          'updatedAt'
+        ])
+        && data.whatsappNumber is string && data.whatsappNumber.size() >= 6 && data.whatsappNumber.size() <= 24
+        && data.whatsappDisplay is string && data.whatsappDisplay.size() >= 6 && data.whatsappDisplay.size() <= 32
+        && data.email is string && data.email.size() >= 5 && data.email.size() <= 120
+        && data.domain is string && data.domain.size() >= 3 && data.domain.size() <= 100
+        && data.airTicketsEnabled is bool
+        && (!('metaPixelId' in data) || (data.metaPixelId is string && data.metaPixelId.size() <= 64))
+        && (!('ga4Id' in data) || (data.ga4Id is string && data.ga4Id.size() <= 64))
+        && (!('heroImageUrl' in data) || (data.heroImageUrl is string && data.heroImageUrl.size() <= 250000))
+        && (!('heroCaptionEn' in data) || (data.heroCaptionEn is string && data.heroCaptionEn.size() <= 240))
+        && (!('heroCaptionAr' in data) || (data.heroCaptionAr is string && data.heroCaptionAr.size() <= 240))
+        && (!('heroCaptionDe' in data) || (data.heroCaptionDe is string && data.heroCaptionDe.size() <= 240))
+        && (!('heroSubEn' in data) || (data.heroSubEn is string && data.heroSubEn.size() <= 600))
+        && (!('heroSubAr' in data) || (data.heroSubAr is string && data.heroSubAr.size() <= 600))
+        && (!('heroSubDe' in data) || (data.heroSubDe is string && data.heroSubDe.size() <= 600))
+        && (!('heroFontStyle' in data) || data.heroFontStyle in ['editorial', 'modern', 'clean', 'luxury', 'bold', 'architectural'])
+        && (!('heroTheme' in data) || data.heroTheme in ['red-sea', 'midnight', 'golden-dusk', 'minimal', 'deep-turquoise', 'coral-horizon', 'desert-amber', 'obsidian-gold'])
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidOwnerSettings(data) {
+      return data.keys().hasAll(['commissionRate', 'updatedAt'])
+        && data.keys().hasOnly(['commissionRate', 'updatedAt'])
+        && (
+          (data.commissionRate is int && data.commissionRate >= 5 && data.commissionRate <= 40)
+          || (data.commissionRate is float && data.commissionRate >= 5.0 && data.commissionRate <= 40.0)
+        )
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidTrip(data) {
+      return data.keys().hasAll([
+          'id', 'name', 'category', 'destination', 'images', 'rating', 'reviewCount',
+          'duration', 'price', 'shortDescription', 'highlights', 'included', 'pickup',
+          'supplierName', 'approvalStatus', 'familyFriendly', 'womenFriendly', 'featured',
+          'createdAt', 'updatedAt'
+        ])
+        && data.keys().hasOnly([
+          'id', 'name', 'category', 'destination', 'images', 'galleryCaptions', 'rating', 'reviewCount',
+          'duration', 'departureTimes', 'timingNote', 'price', 'options', 'shortDescription', 'fullDescription',
+          'itinerary', 'historicalFacts', 'highlights', 'included', 'tips', 'notSuitableFor', 'meetingPoint', 'meetingPointUrl',
+          'whatToBring', 'notAllowed', 'knowBeforeYouGo', 'outerTransferEnabled', 'pickup',
+          'supplierName', 'supplierUid', 'approvalStatus', 'familyFriendly', 'womenFriendly',
+          'minChildAge', 'kidsDiscount', 'featured', 'languages',
+          'operatingDays', 'availableFrom', 'availableTo', 'createdAt', 'updatedAt'
+        ])
+        && data.id is string && data.id.size() >= 1 && data.id.size() <= 128
+        && data.name is map && data.name.en is string && data.name.en.size() >= 1 && data.name.en.size() <= 160
+        && data.name.ar is string && data.name.ar.size() >= 1 && data.name.ar.size() <= 160
+        && data.name.de is string && data.name.de.size() >= 1 && data.name.de.size() <= 160
+        && data.category in ['sea', 'desert', 'historical', 'horse', 'city', 'shopping', 'guides', 'transfers']
+        && data.destination in ['Hurghada', 'Marsa Alam', 'Luxor', 'Cairo']
+        && data.images is list && data.images.size() >= 0 && data.images.size() <= 8
+        && (data.images.size() == 0 || (data.images[0] is string && data.images[0].size() <= 250000))
+        && (!('galleryCaptions' in data) || (data.galleryCaptions is list && data.galleryCaptions.size() <= 8))
+        && (
+          (data.rating is int && data.rating >= 0 && data.rating <= 5)
+          || (data.rating is float && data.rating >= 0.0 && data.rating <= 5.0)
+        )
+        && (
+          (data.reviewCount is int && data.reviewCount >= 0 && data.reviewCount <= 100000)
+          || (data.reviewCount is float && data.reviewCount >= 0.0 && data.reviewCount <= 100000.0)
+        )
+        && data.duration is map && data.duration.en is string && data.duration.en.size() >= 1 && data.duration.en.size() <= 60
+        && (
+          !('departureTimes' in data)
+          || (
+            data.departureTimes is list
+            && data.departureTimes.size() <= 8
+            && (data.departureTimes.size() == 0 || (data.departureTimes[0] is string && data.departureTimes[0].size() <= 60))
+          )
+        )
+        && (!('timingNote' in data) || (data.timingNote is map && data.timingNote.en is string && data.timingNote.en.size() <= 160))
+        && (
+          (data.price is int && data.price >= 1 && data.price <= 50000)
+          || (data.price is float && data.price >= 1.0 && data.price <= 50000.0)
+        )
+        && (!('options' in data) || (data.options is list && data.options.size() <= 10))
+        && data.shortDescription is map && data.shortDescription.en is string && data.shortDescription.en.size() >= 1 && data.shortDescription.en.size() <= 600
+        && (!('fullDescription' in data) || (data.fullDescription is map && data.fullDescription.en is string && data.fullDescription.en.size() <= 4500))
+        && (!('itinerary' in data) || (data.itinerary is list && data.itinerary.size() <= 20))
+        && (!('historicalFacts' in data) || (data.historicalFacts is list && data.historicalFacts.size() <= 10))
+        && data.highlights is list && data.highlights.size() >= 1 && data.highlights.size() <= 8
+        && data.included is list && data.included.size() >= 1 && data.included.size() <= 8
+        && (!('tips' in data) || (data.tips is list && data.tips.size() <= 15))
+        && (!('notSuitableFor' in data) || (data.notSuitableFor is list && data.notSuitableFor.size() <= 15))
+        && (!('meetingPoint' in data) || (data.meetingPoint is map && data.meetingPoint.en is string && data.meetingPoint.en.size() <= 300))
+        && (!('meetingPointUrl' in data) || (data.meetingPointUrl is string && data.meetingPointUrl.size() <= 400))
+        && (!('whatToBring' in data) || (data.whatToBring is list && data.whatToBring.size() <= 15))
+        && (!('notAllowed' in data) || (data.notAllowed is list && data.notAllowed.size() <= 15))
+        && (!('knowBeforeYouGo' in data) || (data.knowBeforeYouGo is list && data.knowBeforeYouGo.size() <= 15))
+        && (!('outerTransferEnabled' in data) || data.outerTransferEnabled is bool)
+        && data.pickup is map && data.pickup.en is string && data.pickup.en.size() >= 1 && data.pickup.en.size() <= 160
+        && data.supplierName is string && data.supplierName.size() >= 2 && data.supplierName.size() <= 120
+        && (!('supplierUid' in data) || (data.supplierUid is string && data.supplierUid.size() <= 128))
+        && data.approvalStatus in ['Approved', 'Pending', 'Paused', 'Rejected']
+        && data.familyFriendly is bool
+        && data.womenFriendly is bool
+        && (
+          !('minChildAge' in data)
+          || (data.minChildAge is int && data.minChildAge >= 0 && data.minChildAge <= 18)
+          || (data.minChildAge is float && data.minChildAge >= 0.0 && data.minChildAge <= 18.0)
+        )
+        && (!('kidsDiscount' in data) || (data.kidsDiscount is map && data.kidsDiscount.en is string && data.kidsDiscount.en.size() <= 160))
+        && data.featured is bool
+        && (!('languages' in data) || (data.languages is list && data.languages.size() <= 12))
+        && (
+          !('operatingDays' in data)
+          || (
+            data.operatingDays is list
+            && data.operatingDays.size() <= 7
+            && (data.operatingDays.size() == 0 || (data.operatingDays[0] is int && data.operatingDays[0] >= 0 && data.operatingDays[0] <= 6))
+          )
+        )
+        && (!('availableFrom' in data) || (data.availableFrom is string && data.availableFrom.size() <= 20))
+        && (!('availableTo' in data) || (data.availableTo is string && data.availableTo.size() <= 20))
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidBooking(data) {
+      return data.keys().hasAll([
+          'id', 'tripId', 'tripTitle', 'category', 'destination', 'date', 'pickupTime',
+          'guestName', 'guestCountry', 'guestContact', 'guestLang', 'hotel',
+          'adults', 'children', 'grossEur', 'supplierName', 'assignedDriverOrGuide',
+          'paymentStatus', 'status', 'notes', 'createdAt', 'updatedAt'
+        ])
+        && data.keys().hasOnly([
+          'id', 'tripId', 'tripTitle', 'category', 'destination', 'date', 'tripStartTime', 'pickupTime', 'pickupSpot',
+          'guestName', 'guestCountry', 'guestContact', 'guestWhatsapp', 'guestEmail', 'guestLang', 'hotel',
+          'roomNumber', 'locationImageUrl',
+          'adults', 'children', 'infants', 'grossEur', 'supplierName', 'supplierUid',
+          'assignedDriverOrGuide', 'paymentStatus', 'status', 'notes', 'createdAt', 'updatedAt'
+        ])
+        && data.id is string && data.id.size() >= 1 && data.id.size() <= 128
+        && data.tripId is string && data.tripId.size() >= 2 && data.tripId.size() <= 128
+        && data.tripTitle is string && data.tripTitle.size() >= 2 && data.tripTitle.size() <= 240
+        && data.category in ['sea', 'desert', 'historical', 'horse', 'city', 'shopping', 'guides', 'transfers', 'custom']
+        && data.destination in ['Hurghada', 'Marsa Alam', 'Luxor', 'Cairo']
+        && data.date is string && data.date.size() >= 8 && data.date.size() <= 20
+        && (!('tripStartTime' in data) || (data.tripStartTime is string && data.tripStartTime.size() <= 80))
+        && data.pickupTime is string && data.pickupTime.size() <= 24
+        && (!('pickupSpot' in data) || data.pickupSpot in ['Inside Reception', 'Outside Main Gate'])
+        && data.guestName is string && data.guestName.size() >= 1 && data.guestName.size() <= 120
+        && data.guestCountry is string && data.guestCountry.size() <= 80
+        && data.guestContact is string && data.guestContact.size() >= 3 && data.guestContact.size() <= 160
+        && (!('guestWhatsapp' in data) || (data.guestWhatsapp is string && data.guestWhatsapp.size() <= 60))
+        && (!('guestEmail' in data) || (data.guestEmail is string && data.guestEmail.size() <= 160))
+        && data.guestLang is string && data.guestLang.size() <= 8
+        && data.hotel is string && data.hotel.size() >= 1 && data.hotel.size() <= 200
+        && (!('roomNumber' in data) || (data.roomNumber is string && data.roomNumber.size() <= 40))
+        && (!('locationImageUrl' in data) || (data.locationImageUrl is string && data.locationImageUrl.size() <= 250000))
+        && (
+          (data.adults is int && data.adults >= 1 && data.adults <= 50)
+          || (data.adults is float && data.adults >= 1.0 && data.adults <= 50.0)
+        )
+        && (
+          (data.children is int && data.children >= 0 && data.children <= 50)
+          || (data.children is float && data.children >= 0.0 && data.children <= 50.0)
+        )
+        && (
+          !('infants' in data)
+          || (data.infants is int && data.infants >= 0 && data.infants <= 50)
+          || (data.infants is float && data.infants >= 0.0 && data.infants <= 50.0)
+        )
+        && (
+          (data.grossEur is int && data.grossEur >= 0 && data.grossEur <= 100000)
+          || (data.grossEur is float && data.grossEur >= 0.0 && data.grossEur <= 100000.0)
+        )
+        && data.supplierName is string && data.supplierName.size() >= 2 && data.supplierName.size() <= 120
+        && (!('supplierUid' in data) || (data.supplierUid is string && data.supplierUid.size() <= 128))
+        && data.assignedDriverOrGuide is string && data.assignedDriverOrGuide.size() <= 160
+        && data.paymentStatus in ['Awaiting link', 'Link sent', 'Paid online', 'Cash on pickup']
+        && data.status in ['Pending', 'Confirmed', 'Driver assigned', 'Completed', 'Refunded', 'Cancelled', 'No show']
+        && data.notes is string && data.notes.size() <= 800
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidBookingReceipt(data) {
+      return data.keys().hasAll(['id', 'tripId', 'tripDate', 'tripEndAt', 'status', 'createdAt', 'updatedAt'])
+        && data.keys().hasOnly(['id', 'tripId', 'tripDate', 'tripEndAt', 'status', 'createdAt', 'updatedAt'])
+        && data.id is string && data.id.size() >= 1 && data.id.size() <= 128
+        && data.tripId is string && data.tripId.size() >= 2 && data.tripId.size() <= 128
+        && data.tripDate is string && data.tripDate.size() >= 8 && data.tripDate.size() <= 20
+        && data.tripEndAt is timestamp
+        && data.status in ['Pending', 'Confirmed', 'Driver assigned', 'Completed', 'Refunded', 'Cancelled', 'No show']
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidSupplier(data) {
+      return data.keys().hasAll([
+          'id', 'name', 'city', 'specialty', 'languages', 'status',
+          'contactPhone', 'email', 'payoutSettledEur', 'createdAt', 'updatedAt'
+        ])
+        && data.keys().hasOnly([
+          'id', 'name', 'city', 'specialty', 'languages', 'status',
+          'contactPhone', 'email', 'payoutSettledEur', 'linkedUid', 'createdAt', 'updatedAt'
+        ])
+        && data.id is string && data.id.size() >= 1 && data.id.size() <= 128
+        && data.name is string && data.name.size() >= 2 && data.name.size() <= 120
+        && data.city in ['Hurghada', 'Marsa Alam', 'Luxor', 'Cairo']
+        && data.specialty is string && data.specialty.size() <= 240
+        && data.languages is list && data.languages.size() >= 1 && data.languages.size() <= 12
+        && data.status in ['Active', 'Pending', 'Paused']
+        && data.contactPhone is string && data.contactPhone.size() <= 40
+        && data.email is string && data.email.size() <= 160
+        && (
+          (data.payoutSettledEur is int && data.payoutSettledEur >= 0 && data.payoutSettledEur <= 1000000)
+          || (data.payoutSettledEur is float && data.payoutSettledEur >= 0.0 && data.payoutSettledEur <= 1000000.0)
+        )
+        && (!('linkedUid' in data) || (data.linkedUid is string && data.linkedUid.size() <= 128))
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidChatThread(data) {
+      return data.keys().hasAll([
+          'id', 'bookingRef', 'customerName', 'customerLang', 'tripTitle',
+          'pickupInfo', 'unread', 'messages', 'createdAt', 'updatedAt'
+        ])
+        && data.keys().hasOnly([
+          'id', 'bookingRef', 'customerName', 'customerLang', 'tripTitle',
+          'pickupInfo', 'unread', 'messages', 'createdAt', 'updatedAt'
+        ])
+        && data.id is string && data.id.size() >= 1 && data.id.size() <= 128
+        && data.bookingRef is string && data.bookingRef.size() >= 2 && data.bookingRef.size() <= 64
+        && data.customerName is string && data.customerName.size() >= 1 && data.customerName.size() <= 120
+        && data.customerLang is string && data.customerLang.size() <= 8
+        && data.tripTitle is string && data.tripTitle.size() <= 240
+        && data.pickupInfo is string && data.pickupInfo.size() <= 300
+        && data.unread is bool
+        && data.messages is list && data.messages.size() >= 1 && data.messages.size() <= 50
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidComplaint(data) {
+      return data.keys().hasAll([
+          'id', 'bookingRef', 'customerName', 'tripTitle', 'issueType',
+          'ownerRole', 'severity', 'refundRequestedEur', 'status', 'summary', 'createdAt', 'updatedAt'
+        ])
+        && data.keys().hasOnly([
+          'id', 'bookingRef', 'customerName', 'tripTitle', 'issueType',
+          'ownerRole', 'severity', 'refundRequestedEur', 'status', 'summary', 'createdAt', 'updatedAt'
+        ])
+        && data.id is string && data.id.size() >= 1 && data.id.size() <= 128
+        && data.bookingRef is string && data.bookingRef.size() >= 2 && data.bookingRef.size() <= 64
+        && data.customerName is string && data.customerName.size() >= 1 && data.customerName.size() <= 120
+        && data.tripTitle is string && data.tripTitle.size() <= 240
+        && data.issueType is string && data.issueType.size() <= 160
+        && data.ownerRole is string && data.ownerRole.size() <= 120
+        && data.severity in ['Low', 'Medium', 'High']
+        && (
+          (data.refundRequestedEur is int && data.refundRequestedEur >= 0 && data.refundRequestedEur <= 50000)
+          || (data.refundRequestedEur is float && data.refundRequestedEur >= 0.0 && data.refundRequestedEur <= 50000.0)
+        )
+        && data.status in ['Open', 'Investigating', 'Refunded', 'Resolved']
+        && data.summary is string && data.summary.size() <= 800
+        && data.createdAt is string && data.createdAt.size() <= 40
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidNewsletterSubscriber(data) {
+      return data.keys().hasAll(['email', 'lang', 'createdAt'])
+        && data.keys().hasOnly(['email', 'lang', 'createdAt'])
+        && data.email is string && data.email.size() >= 5 && data.email.size() <= 160
+        && data.lang is string && data.lang.size() <= 8
+        && data.createdAt is timestamp;
+    }
+
+    function isValidEmailLog(data) {
+      return data.keys().hasAll(['id', 'to', 'subject', 'type', 'sentAt', 'status', 'createdAt'])
+        && data.keys().hasOnly(['id', 'to', 'subject', 'type', 'sentAt', 'status', 'createdAt'])
+        && data.id is string && data.id.size() >= 1 && data.id.size() <= 128
+        && data.to is string && data.to.size() >= 3 && data.to.size() <= 160
+        && data.subject is string && data.subject.size() >= 2 && data.subject.size() <= 240
+        && data.type in ['Booking Confirmation', 'Payment Link', 'Supplier Dispatch', 'Newsletter']
+        && data.sentAt is string && data.sentAt.size() <= 60
+        && data.status in ['Delivered']
+        && data.createdAt is timestamp;
+    }
+
+    function isValidTripReview(data) {
+      return data.keys().hasAll([
+          'id', 'tripId', 'tripTitle', 'guestName', 'guestCountry',
+          'rating', 'comment', 'visitDate', 'lang', 'approvalStatus',
+          'createdAt', 'updatedAt'
+        ])
+        && data.keys().hasOnly([
+          'id', 'tripId', 'bookingId', 'verifiedBooking', 'tripTitle', 'guestName', 'guestCountry',
+          'rating', 'comment', 'photoUrl', 'visitDate', 'lang', 'approvalStatus',
+          'createdAt', 'updatedAt'
+        ])
+        && data.id is string && data.id.size() >= 1 && data.id.size() <= 128
+        && data.tripId is string && data.tripId.size() >= 1 && data.tripId.size() <= 128
+        && (!('bookingId' in data) || (data.bookingId is string && data.bookingId.size() >= 1 && data.bookingId.size() <= 128))
+        && (!('verifiedBooking' in data) || data.verifiedBooking is bool)
+        && data.tripTitle is string && data.tripTitle.size() >= 2 && data.tripTitle.size() <= 240
+        && data.guestName is string && data.guestName.size() >= 1 && data.guestName.size() <= 80
+        && data.guestCountry is string && data.guestCountry.size() <= 60
+        && (
+          (data.rating is int && data.rating >= 1 && data.rating <= 5)
+          || (data.rating is float && data.rating >= 1.0 && data.rating <= 5.0)
+        )
+        && data.comment is string && data.comment.size() >= 5 && data.comment.size() <= 800
+        && (!('photoUrl' in data) || (data.photoUrl is string && data.photoUrl.size() <= 250000))
+        && data.visitDate is string && data.visitDate.size() <= 20
+        && data.lang is string && data.lang.size() <= 8
+        && data.approvalStatus in ['Pending', 'Approved', 'Rejected']
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    // 1. Admins (Owner only; verified users may check their own admin doc)
+    match /admins/{uid} {
+      allow get: if isValidId(uid) && (isAdmin() || (isEmailVerified() && request.auth.uid == uid));
+      allow list: if isBootstrappedOwner();
+      allow create: if isValidId(uid) && isAdmin() && isValidAdminUser(request.resource.data);
+      allow update, delete: if isValidId(uid) && isAdmin();
+    }
+
+    // 2. Trusted Staff Roles (Writable only by Owner; self-readable)
+    match /staff_roles/{uid} {
+      allow get: if isValidId(uid) && (isAdmin() || (isEmailVerified() && request.auth.uid == uid));
+      allow list: if isBootstrappedOwner();
+      allow create: if isValidId(uid) && isAdmin() && isValidStaffRole(request.resource.data)
+        && request.resource.data.uid == uid;
+      allow update: if isValidId(uid) && isAdmin() && isValidStaffRole(request.resource.data)
+        && request.resource.data.uid == resource.data.uid;
+      allow delete: if isValidId(uid) && isAdmin();
+    }
+
+    // 3. Access Requests (Authenticated user can request pending access; only Owner approves)
+    match /access_requests/{uid} {
+      allow get: if isValidId(uid) && (isAdmin() || (isEmailVerified() && request.auth.uid == uid));
+      allow list: if isBootstrappedOwner();
+      allow create: if isValidId(uid) && isEmailVerified() && request.auth.uid == uid
+        && isValidAccessRequest(request.resource.data)
+        && request.resource.data.status == 'Pending';
+      allow update: if isValidId(uid) && isAdmin() && isValidAccessRequest(request.resource.data)
+        && request.resource.data.uid == resource.data.uid;
+      allow delete: if isValidId(uid) && isAdmin();
+    }
+
+    // 4. Public Storefront Settings (WhatsApp, Domain, Pixel IDs)
+    match /public_settings/{settingId} {
+      allow get: if isValidId(settingId) && settingId == 'storefront';
+      allow create, update: if isValidId(settingId) && isAdmin()
+        && isValidPublicSettings(request.resource.data);
+    }
+
+    // 5. Private Owner Economics Settings
+    match /owner_settings/{settingId} {
+      allow get: if isValidId(settingId) && (isBootstrappedOwner() || isOperations() || isSupplier());
+      allow list: if isBootstrappedOwner();
+      allow create, update: if isValidId(settingId) && isAdmin()
+        && isValidOwnerSettings(request.resource.data);
+    }
+
+    // 6. Trips Catalog & Supplier Submissions
+    match /trips/{tripId} {
+      allow get: if isValidId(tripId) && (
+        isBootstrappedOwner()
+        || isOperations()
+        || (resource != null && resource.data.approvalStatus == 'Approved')
+        || (isSupplier() && resource != null && resource.data.supplierUid == request.auth.uid)
+      );
+      allow list: if isBootstrappedOwner()
+        || resource.data.approvalStatus == 'Approved'
+        || isOperations()
+        || (isEmailVerified() && resource.data.supplierUid == request.auth.uid);
+      allow create: if isValidId(tripId) && isValidTrip(request.resource.data)
+        && request.resource.data.id == tripId
+        && (
+          isAdmin()
+          || (
+            isSupplier()
+            && request.resource.data.approvalStatus == 'Pending'
+            && request.resource.data.supplierUid == request.auth.uid
+          )
+        );
+      allow update: if isValidId(tripId) && isValidTrip(request.resource.data)
+        && request.resource.data.id == resource.data.id
+        && (
+          isAdmin()
+          || (
+            isSupplier()
+            && resource.data.supplierUid == request.auth.uid
+            && request.resource.data.supplierUid == resource.data.supplierUid
+            && request.resource.data.createdAt == resource.data.createdAt
+            && request.resource.data.approvalStatus in ['Pending', 'Paused']
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+              'name', 'duration', 'departureTimes', 'timingNote', 'price', 'options', 'shortDescription', 'fullDescription',
+              'itinerary', 'historicalFacts', 'highlights', 'included', 'tips', 'notSuitableFor', 'meetingPoint', 'meetingPointUrl',
+              'whatToBring', 'notAllowed', 'knowBeforeYouGo', 'outerTransferEnabled',
+              'pickup', 'images', 'galleryCaptions', 'operatingDays', 'availableFrom', 'availableTo', 'approvalStatus', 'updatedAt'
+            ])
+          )
+        );
+      allow delete: if isValidId(tripId) && isAdmin();
+    }
+
+    // 7. Bookings (Strict PII Protection + Public Create Intake)
+    match /bookings/{bookingId} {
+      allow get: if isValidId(bookingId) && (
+        isBootstrappedOwner()
+        || isOperations()
+        || (isSupplier() && resource != null && resource.data.supplierUid == request.auth.uid)
+      );
+      allow list: if isBootstrappedOwner()
+        || isOperations()
+        || (isEmailVerified() && resource.data.supplierUid == request.auth.uid);
+      allow create: if isValidId(bookingId) && isValidBooking(request.resource.data)
+        && request.resource.data.id == bookingId
+        && (
+          isAdmin()
+          || isOperations()
+          || (
+            request.resource.data.status == 'Pending'
+            && request.resource.data.paymentStatus == 'Awaiting link'
+            && request.resource.data.assignedDriverOrGuide == ''
+            && (
+              (request.resource.data.tripId == 'custom-itinerary' && request.resource.data.category == 'custom')
+              || exists(/databases/$(database)/documents/trips/$(request.resource.data.tripId))
+            )
+          )
+        );
+      allow update: if isValidId(bookingId) && isValidBooking(request.resource.data)
+        && request.resource.data.id == resource.data.id
+        && (
+          isAdmin()
+          || (
+            isOperations()
+            && request.resource.data.createdAt == resource.data.createdAt
+            && !(resource.data.status in ['Completed', 'Refunded'])
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+              'tripTitle', 'category', 'destination', 'date', 'tripStartTime', 'pickupTime', 'pickupSpot',
+              'guestName', 'guestCountry', 'guestContact', 'guestWhatsapp', 'guestEmail',
+              'hotel', 'roomNumber', 'locationImageUrl', 'adults', 'children', 'infants', 'grossEur', 'supplierName',
+              'assignedDriverOrGuide', 'paymentStatus', 'status', 'notes', 'updatedAt'
+            ])
+          )
+          || (
+            isSupplier()
+            && resource.data.supplierUid == request.auth.uid
+            && request.resource.data.supplierUid == resource.data.supplierUid
+            && request.resource.data.createdAt == resource.data.createdAt
+            && !(resource.data.status in ['Completed', 'Refunded', 'Cancelled', 'No show'])
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+              'assignedDriverOrGuide', 'status', 'updatedAt'
+            ])
+            && request.resource.data.status in ['Pending', 'Confirmed', 'Driver assigned']
+          )
+        );
+      allow delete: if isValidId(bookingId) && isAdmin();
+    }
+
+    // 8. Suppliers Directory
+    match /suppliers/{supplierId} {
+      allow get: if isValidId(supplierId) && (
+        isBootstrappedOwner()
+        || isOperations()
+        || (isSupplier() && resource != null && resource.data.linkedUid == request.auth.uid)
+      );
+      allow list: if isBootstrappedOwner()
+        || isOperations()
+        || (isEmailVerified() && resource.data.linkedUid == request.auth.uid);
+      allow create: if isValidId(supplierId) && isAdmin() && isValidSupplier(request.resource.data)
+        && request.resource.data.id == supplierId;
+      allow update: if isValidId(supplierId) && isAdmin() && isValidSupplier(request.resource.data)
+        && request.resource.data.id == resource.data.id;
+      allow delete: if isValidId(supplierId) && isAdmin();
+    }
+
+    // 9. Customer Chat Threads
+    match /chats/{chatId} {
+      allow get: if isValidId(chatId) && (isBootstrappedOwner() || isOperations());
+      allow list: if isBootstrappedOwner() || isOperations();
+      allow create: if isValidId(chatId) && isValidChatThread(request.resource.data)
+        && request.resource.data.id == chatId
+        && (isAdmin() || request.resource.data.unread == true);
+      allow update: if isValidId(chatId) && isOperations() && isValidChatThread(request.resource.data)
+        && request.resource.data.id == resource.data.id
+        && (
+          isAdmin()
+          || (
+            request.resource.data.createdAt == resource.data.createdAt
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['unread', 'messages', 'updatedAt'])
+          )
+        );
+      allow delete: if isValidId(chatId) && isAdmin();
+    }
+
+    // 10. Quality Complaints & Refunds
+    match /complaints/{complaintId} {
+      allow get: if isValidId(complaintId) && (isBootstrappedOwner() || isOperations());
+      allow list: if isBootstrappedOwner() || isOperations();
+      allow create: if isValidId(complaintId) && isOperations() && isValidComplaint(request.resource.data)
+        && request.resource.data.id == complaintId;
+      allow update: if isValidId(complaintId) && isOperations() && isValidComplaint(request.resource.data)
+        && request.resource.data.id == resource.data.id
+        && (
+          isAdmin()
+          || (
+            request.resource.data.createdAt == resource.data.createdAt
+            && !(resource.data.status in ['Refunded', 'Resolved'])
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'summary', 'updatedAt'])
+          )
+        );
+      allow delete: if isValidId(complaintId) && isAdmin();
+    }
+
+    // 11. Newsletter Subscribers
+    match /newsletter_subscribers/{subId} {
+      allow get: if isValidId(subId) && (isBootstrappedOwner() || isOperations());
+      allow list: if isBootstrappedOwner() || isOperations();
+      allow create: if isValidId(subId) && isValidNewsletterSubscriber(request.resource.data);
+      allow delete: if isValidId(subId) && isAdmin();
+    }
+
+    // 12. Email Audit Logs
+    match /email_logs/{logId} {
+      allow get: if isValidId(logId) && (isBootstrappedOwner() || isOperations());
+      allow list: if isBootstrappedOwner() || isOperations();
+      allow create: if isValidId(logId) && isValidEmailLog(request.resource.data);
+      allow delete: if isValidId(logId) && isAdmin();
+    }
+
+    // 7B. Booking Verification Receipts (Zero-PII status lookup by exact ref; no public list)
+    match /booking_receipts/{receiptId} {
+      allow get: if isValidId(receiptId);
+      allow list: if isBootstrappedOwner() || isOperations();
+      allow create: if isValidId(receiptId) && isValidBookingReceipt(request.resource.data)
+        && request.resource.data.id == receiptId
+        && (
+          isAdmin()
+          || isOperations()
+          || (
+            request.resource.data.status == 'Pending'
+            && (
+              request.resource.data.tripId == 'custom-itinerary'
+              || exists(/databases/$(database)/documents/trips/$(request.resource.data.tripId))
+            )
+          )
+        );
+      allow update: if isValidId(receiptId) && isValidBookingReceipt(request.resource.data)
+        && request.resource.data.id == resource.data.id
+        && request.resource.data.tripId == resource.data.tripId
+        && (isAdmin() || isOperations() || isSupplier());
+      allow delete: if isValidId(receiptId) && isAdmin();
+    }
+
+    // 13. Trip Reviews & Testimonials (Public reads Approved only; new submissions require verified post-trip booking receipt + Owner approval)
+    match /trip_reviews/{reviewId} {
+      allow get: if isValidId(reviewId) && (
+        isBootstrappedOwner()
+        || isOperations()
+        || (resource != null && resource.data.approvalStatus == 'Approved')
+      );
+      allow list: if isBootstrappedOwner()
+        || resource.data.approvalStatus == 'Approved'
+        || isOperations();
+      allow create: if isValidId(reviewId) && isValidTripReview(request.resource.data)
+        && request.resource.data.id == reviewId
+        && (
+          isAdmin()
+          || (
+            request.resource.data.approvalStatus == 'Pending'
+            && exists(/databases/$(database)/documents/trips/$(request.resource.data.tripId))
+            && ('bookingId' in request.resource.data)
+            && isValidId(request.resource.data.bookingId)
+            && exists(/databases/$(database)/documents/booking_receipts/$(request.resource.data.bookingId))
+            && get(/databases/$(database)/documents/booking_receipts/$(request.resource.data.bookingId)).data.tripId == request.resource.data.tripId
+            && get(/databases/$(database)/documents/booking_receipts/$(request.resource.data.bookingId)).data.status in ['Confirmed', 'Driver assigned', 'Completed']
+            && (
+              get(/databases/$(database)/documents/booking_receipts/$(request.resource.data.bookingId)).data.status == 'Completed'
+              || get(/databases/$(database)/documents/booking_receipts/$(request.resource.data.bookingId)).data.tripEndAt <= request.time
+            )
+            && (
+              !('verifiedBooking' in request.resource.data)
+              || request.resource.data.verifiedBooking == (
+                get(/databases/$(database)/documents/booking_receipts/$(request.resource.data.bookingId)).data.status == 'Completed'
+              )
+            )
+          )
+        );
+      allow update: if isValidId(reviewId) && isValidTripReview(request.resource.data)
+        && request.resource.data.id == resource.data.id
+        && request.resource.data.tripId == resource.data.tripId
+        && (
+          isAdmin()
+          || (
+            isOperations()
+            && request.resource.data.createdAt == resource.data.createdAt
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+              'verifiedBooking', 'updatedAt'
+            ])
+            && request.resource.data.verifiedBooking == (
+              ('bookingId' in resource.data)
+              && isValidId(resource.data.bookingId)
+              && exists(/databases/$(database)/documents/booking_receipts/$(resource.data.bookingId))
+              && get(/databases/$(database)/documents/booking_receipts/$(resource.data.bookingId)).data.status == 'Completed'
+            )
+          )
+        );
+      allow delete: if isValidId(reviewId) && isAdmin();
+    }
+  }
+}
