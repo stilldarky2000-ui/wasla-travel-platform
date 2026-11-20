@@ -183,6 +183,7 @@
         "paymentStatus": { "type": "string", "enum": ["Awaiting link", "Link sent", "Paid online", "Cash on pickup"] },
         "status": { "type": "string", "enum": ["Pending", "Confirmed", "Driver assigned", "Completed", "Refunded", "Cancelled", "No show"] },
         "notes": { "type": "string", "maxLength": 800 },
+        "supplierNotes": { "type": "string", "maxLength": 500 },
         "createdAt": { "type": "string", "format": "date-time" },
         "updatedAt": { "type": "string", "format": "date-time" }
       },
@@ -372,7 +373,7 @@
         "supplierUid": { "type": "string", "minLength": 1, "maxLength": 128 },
         "assignedDriverOrGuide": { "type": "string", "maxLength": 160 },
         "status": { "type": "string", "enum": ["Confirmed", "Driver assigned", "Completed"] },
-        "notes": { "type": "string", "maxLength": 800 },
+        "operationalNotes": { "type": "string", "maxLength": 500 },
         "createdAt": { "type": "string", "format": "date-time" },
         "updatedAt": { "type": "string", "format": "date-time" }
       },
@@ -394,7 +395,7 @@
         "supplierUid",
         "assignedDriverOrGuide",
         "status",
-        "notes",
+        "operationalNotes",
         "createdAt",
         "updatedAt"
       ]

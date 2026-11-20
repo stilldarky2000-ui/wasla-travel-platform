@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import crypto from 'crypto';
 import fs from 'fs';
+import os from 'os';
 import express from 'express';
 import http from 'http';
 import path from 'path';
@@ -129,54 +130,58 @@ async function verifyFirebaseIdToken(idToken: string): Promise<VerifiedFirebaseU
   }
 }
 
-const roleCache = new Map<string, { role: ServerRole; expiresAt: number }>();
+const TRUST_PROXY_ENABLED = process.env.TRUST_PROXY === '1';
 
 async function resolveCallerRole(user: VerifiedFirebaseUser): Promise<ServerRole> {
   if (!user.emailVerified) return 'none';
-  if (user.email === BOOTSTRAPPED_OWNER_EMAIL) return 'owner';
 
-  const cached = roleCache.get(user.uid);
-  if (cached && cached.expiresAt > Date.now()) {
-    return cached.role;
-  }
-
-  let resolved: ServerRole = 'none';
   const authHeaders = { Authorization: `Bearer ${user.idToken}` };
 
   try {
+    // Live uncached Firestore REST check on every protected request (no 30s role cache).
+    // Even for the bootstrapped owner, hitting Firestore with the caller's Bearer token
+    // ensures Google's Firestore backend validates token acceptance live on every call.
     const adminResp = await fetch(
       `${FIRESTORE_DOCS_BASE}/admins/${encodeURIComponent(user.uid)}`,
       { headers: authHeaders }
     );
+    if (adminResp.status === 401) {
+      return 'none';
+    }
     if (adminResp.ok) {
-      resolved = 'owner';
-    } else {
-      const roleResp = await fetch(
-        `${FIRESTORE_DOCS_BASE}/staff_roles/${encodeURIComponent(user.uid)}`,
-        { headers: authHeaders }
-      );
-      if (roleResp.ok) {
-        const docJson = (await roleResp.json()) as {
-          fields?: {
-            status?: { stringValue?: string };
-            role?: { stringValue?: string };
-          };
+      return 'owner';
+    }
+    if (user.email === BOOTSTRAPPED_OWNER_EMAIL && adminResp.status < 500) {
+      return 'owner';
+    }
+
+    const roleResp = await fetch(
+      `${FIRESTORE_DOCS_BASE}/staff_roles/${encodeURIComponent(user.uid)}`,
+      { headers: authHeaders }
+    );
+    if (roleResp.status === 401) {
+      return 'none';
+    }
+    if (roleResp.ok) {
+      const docJson = (await roleResp.json()) as {
+        fields?: {
+          status?: { stringValue?: string };
+          role?: { stringValue?: string };
         };
-        const status = docJson.fields?.status?.stringValue;
-        const roleVal = docJson.fields?.role?.stringValue;
-        if (status === 'Active') {
-          if (roleVal === 'owner') resolved = 'owner';
-          else if (roleVal === 'operations') resolved = 'operations';
-          else if (roleVal === 'supplier') resolved = 'supplier';
-        }
+      };
+      const status = docJson.fields?.status?.stringValue;
+      const roleVal = docJson.fields?.role?.stringValue;
+      if (status === 'Active') {
+        if (roleVal === 'owner') return 'owner';
+        if (roleVal === 'operations') return 'operations';
+        if (roleVal === 'supplier') return 'supplier';
       }
     }
   } catch {
-    resolved = 'none';
+    return 'none';
   }
 
-  roleCache.set(user.uid, { role: resolved, expiresAt: Date.now() + 30_000 });
-  return resolved;
+  return 'none';
 }
 
 function extractBearerToken(req: express.Request): string {
@@ -186,23 +191,26 @@ function extractBearerToken(req: express.Request): string {
 }
 
 function getClientIp(req: express.Request): string {
-  const fwd = req.headers['x-forwarded-for'];
-  if (typeof fwd === 'string' && fwd.trim()) {
-    return fwd.split(',')[0].trim();
+  // Never trust raw X-Forwarded-For headers directly; only use req.ip when Express
+  // trust proxy is explicitly enabled for a known reverse proxy (e.g., Cloud Run).
+  if (TRUST_PROXY_ENABLED) {
+    return req.ip || req.socket.remoteAddress || 'unknown';
   }
-  return req.ip || req.socket.remoteAddress || 'unknown';
+  return req.socket.remoteAddress || 'unknown';
 }
 
 function createRateLimiter(options: {
   windowMs: number;
   maxRequests: number;
   keyPrefix: string;
+  useGlobalKey?: boolean;
 }): express.RequestHandler {
   const hits = new Map<string, number[]>();
   return (req, res, next) => {
     const now = Date.now();
     const uid = (req as express.Request & { authUser?: VerifiedFirebaseUser }).authUser?.uid;
-    const key = `${options.keyPrefix}:${uid || getClientIp(req)}`;
+    const identity = options.useGlobalKey ? 'global' : uid || getClientIp(req);
+    const key = `${options.keyPrefix}:${identity}`;
     const recent = (hits.get(key) || []).filter((ts) => now - ts < options.windowMs);
     if (recent.length >= options.maxRequests) {
       const retryAfterSec = Math.max(1, Math.ceil((options.windowMs - (now - recent[0])) / 1000));
@@ -251,12 +259,81 @@ function requireRole(allowedRoles: ServerRole[]): express.RequestHandler {
   };
 }
 
-const notifiedBookingIds = new Map<string, number>();
+const NOTIFIED_TTL_MS = 24 * 60 * 60 * 1000;
+const NOTIFICATION_OUTBOX_FILE = path.join(os.tmpdir(), 'wasla-notified-bookings.json');
+const inFlightBookingNotifications = new Set<string>();
 
-async function verifyBookingReceiptExists(
+function loadDeliveredNotifications(): Map<string, number> {
+  const map = new Map<string, number>();
+  const now = Date.now();
+  try {
+    if (!fs.existsSync(NOTIFICATION_OUTBOX_FILE)) return map;
+    const raw = fs.readFileSync(NOTIFICATION_OUTBOX_FILE, 'utf8');
+    const parsed = JSON.parse(raw) as Record<string, number>;
+    for (const [id, ts] of Object.entries(parsed)) {
+      if (typeof ts === 'number' && now - ts < NOTIFIED_TTL_MS) {
+        map.set(id, ts);
+      }
+    }
+  } catch {
+    // Ignore corrupted cache file and start clean
+  }
+  return map;
+}
+
+const deliveredBookingNotifications = loadDeliveredNotifications();
+
+function persistDeliveredNotifications(): void {
+  const now = Date.now();
+  const payload: Record<string, number> = {};
+  for (const [id, ts] of deliveredBookingNotifications.entries()) {
+    if (now - ts < NOTIFIED_TTL_MS) {
+      payload[id] = ts;
+    } else {
+      deliveredBookingNotifications.delete(id);
+    }
+  }
+  try {
+    const tmpPath = `${NOTIFICATION_OUTBOX_FILE}.${process.pid}.tmp`;
+    fs.writeFileSync(tmpPath, JSON.stringify(payload), 'utf8');
+    fs.renameSync(tmpPath, NOTIFICATION_OUTBOX_FILE);
+  } catch {
+    // Non-fatal if tmpdir is read-only; in-memory map still guards current process
+  }
+}
+
+function isBookingNotificationDelivered(bookingId: string): boolean {
+  const sentAt = deliveredBookingNotifications.get(bookingId);
+  if (!sentAt) return false;
+  if (Date.now() - sentAt >= NOTIFIED_TTL_MS) {
+    deliveredBookingNotifications.delete(bookingId);
+    return false;
+  }
+  return true;
+}
+
+function markBookingNotificationDelivered(bookingId: string): void {
+  deliveredBookingNotifications.set(bookingId, Date.now());
+  persistDeliveredNotifications();
+}
+
+interface VerifiedBookingReceipt {
+  exists: boolean;
+  reason?: string;
+  tripId?: string;
+  tripDate?: string;
+  status?: string;
+  verifiedTripTitle?: string;
+  verifiedDestination?: string;
+  verifiedSupplierName?: string;
+  catalogBasePriceEur?: number;
+}
+
+async function verifyBookingReceiptAndTrip(
   bookingId: string,
-  expectedDate?: string
-): Promise<{ exists: boolean; reason?: string }> {
+  expectedDate?: string,
+  expectedTripId?: string
+): Promise<VerifiedBookingReceipt> {
   if (!/^[a-zA-Z0-9_-]{3,64}$/.test(bookingId)) {
     return { exists: false, reason: 'Invalid booking ID format.' };
   }
@@ -270,12 +347,22 @@ async function verifyBookingReceiptExists(
     const docJson = (await resp.json()) as {
       createTime?: string;
       fields?: {
+        tripId?: { stringValue?: string };
         tripDate?: { stringValue?: string };
         status?: { stringValue?: string };
       };
     };
-    const receiptDate = docJson.fields?.tripDate?.stringValue || '';
-    if (expectedDate && receiptDate && receiptDate !== expectedDate) {
+    const receiptTripId = (docJson.fields?.tripId?.stringValue || '').trim();
+    const receiptDate = (docJson.fields?.tripDate?.stringValue || '').trim();
+    const receiptStatus = (docJson.fields?.status?.stringValue || '').trim();
+
+    if (!receiptTripId || !receiptDate) {
+      return { exists: false, reason: 'Incomplete booking receipt in Firestore.' };
+    }
+    if (expectedTripId && receiptTripId !== expectedTripId) {
+      return { exists: false, reason: 'Booking trip ID mismatch.' };
+    }
+    if (expectedDate && receiptDate !== expectedDate) {
       return { exists: false, reason: 'Booking date mismatch.' };
     }
     if (docJson.createTime) {
@@ -284,7 +371,51 @@ async function verifyBookingReceiptExists(
         return { exists: false, reason: 'Booking notification window expired.' };
       }
     }
-    return { exists: true };
+
+    // Pull authoritative trip catalog details from Firestore for non-custom trips
+    if (receiptTripId !== 'custom-itinerary') {
+      const tripResp = await fetch(
+        `${FIRESTORE_DOCS_BASE}/trips/${encodeURIComponent(receiptTripId)}`
+      );
+      if (!tripResp.ok) {
+        return { exists: false, reason: 'Referenced excursion does not exist in catalog.' };
+      }
+      const tripJson = (await tripResp.json()) as {
+        fields?: {
+          name?: { mapValue?: { fields?: { en?: { stringValue?: string } } } };
+          destination?: { stringValue?: string };
+          supplierName?: { stringValue?: string };
+          price?: { integerValue?: string; doubleValue?: number };
+        };
+      };
+      const verifiedTripTitle = tripJson.fields?.name?.mapValue?.fields?.en?.stringValue?.trim();
+      const verifiedDestination = tripJson.fields?.destination?.stringValue?.trim();
+      const verifiedSupplierName = tripJson.fields?.supplierName?.stringValue?.trim();
+      const rawPrice =
+        tripJson.fields?.price?.doubleValue !== undefined
+          ? Number(tripJson.fields.price.doubleValue)
+          : tripJson.fields?.price?.integerValue !== undefined
+          ? Number(tripJson.fields.price.integerValue)
+          : undefined;
+
+      return {
+        exists: true,
+        tripId: receiptTripId,
+        tripDate: receiptDate,
+        status: receiptStatus,
+        verifiedTripTitle,
+        verifiedDestination,
+        verifiedSupplierName,
+        catalogBasePriceEur: Number.isFinite(rawPrice) ? rawPrice : undefined,
+      };
+    }
+
+    return {
+      exists: true,
+      tripId: receiptTripId,
+      tripDate: receiptDate,
+      status: receiptStatus,
+    };
   } catch {
     return { exists: false, reason: 'Unable to verify booking record.' };
   }
@@ -304,6 +435,7 @@ function parseModelJson<T>(rawText: string | undefined, contextLabel: string): T
 
 async function startServer() {
   const app = express();
+  app.set('trust proxy', TRUST_PROXY_ENABLED ? 1 : false);
   app.use(express.json({ limit: '12mb' }));
 
   app.get('/api/maps-config', (_req, res) => {
@@ -361,160 +493,201 @@ async function startServer() {
     maxRequests: 6,
     keyPrefix: 'notify-booking',
   });
+  const notificationGlobalLimiter = createRateLimiter({
+    windowMs: 10 * 60_000,
+    maxRequests: 40,
+    keyPrefix: 'notify-booking-global',
+    useGlobalKey: true,
+  });
 
   app.get('/api/notifications/status', requireRole(['owner']), (_req, res) => {
     res.json(getNotificationChannelStatus());
   });
 
-  app.post('/api/notifications/new-booking', notificationRateLimiter, async (req, res) => {
-    const body = (req.body ?? {}) as {
-      id?: string;
-      tripId?: string;
-      tripTitle?: string;
-      destination?: string;
-      category?: string;
-      date?: string;
-      tripStartTime?: string;
-      guestName?: string;
-      guestCountry?: string;
-      guestWhatsapp?: string;
-      guestEmail?: string;
-      guestContact?: string;
-      hotel?: string;
-      roomNumber?: string;
-      adults?: number;
-      children?: number;
-      infants?: number;
-      grossEur?: number;
-      supplierName?: string;
-      paymentStatus?: string;
-      notes?: string;
-      isTest?: boolean;
-    };
+  app.post(
+    '/api/notifications/new-booking',
+    notificationGlobalLimiter,
+    notificationRateLimiter,
+    async (req, res) => {
+      const body = (req.body ?? {}) as {
+        id?: string;
+        tripId?: string;
+        tripTitle?: string;
+        destination?: string;
+        category?: string;
+        date?: string;
+        tripStartTime?: string;
+        guestName?: string;
+        guestCountry?: string;
+        guestWhatsapp?: string;
+        guestEmail?: string;
+        guestContact?: string;
+        hotel?: string;
+        roomNumber?: string;
+        adults?: number;
+        children?: number;
+        infants?: number;
+        grossEur?: number;
+        supplierName?: string;
+        paymentStatus?: string;
+        notes?: string;
+        isTest?: boolean;
+      };
 
-    const isTest = Boolean(body.isTest);
-    const bookingId = String(body.id || '').trim();
+      const isTest = Boolean(body.isTest);
+      const bookingId = String(body.id || '').trim();
+      let verifiedReceipt: VerifiedBookingReceipt | null = null;
 
-    if (isTest) {
-      const token = extractBearerToken(req);
-      const verified = token ? await verifyFirebaseIdToken(token) : null;
-      const role = verified ? await resolveCallerRole(verified) : 'none';
-      if (role !== 'owner') {
-        res.status(verified ? 403 : 401).json({
-          ok: false,
-          error: 'Owner authentication is required to send test notifications.',
-        });
-        return;
-      }
-    } else {
-      if (!/^[a-zA-Z0-9_-]{3,64}$/.test(bookingId)) {
-        res.status(400).json({ ok: false, error: 'A valid saved booking ID is required.' });
-        return;
-      }
+      if (isTest) {
+        const token = extractBearerToken(req);
+        const verified = token ? await verifyFirebaseIdToken(token) : null;
+        const role = verified ? await resolveCallerRole(verified) : 'none';
+        if (role !== 'owner') {
+          res.status(verified ? 403 : 401).json({
+            ok: false,
+            error: 'Owner authentication is required to send test notifications.',
+          });
+          return;
+        }
+      } else {
+        if (!/^[a-zA-Z0-9_-]{3,64}$/.test(bookingId)) {
+          res.status(400).json({ ok: false, error: 'A valid saved booking ID is required.' });
+          return;
+        }
 
-      const now = Date.now();
-      const prevSentAt = notifiedBookingIds.get(bookingId);
-      if (prevSentAt && now - prevSentAt < 24 * 60 * 60 * 1000) {
-        res.json({ ok: true, deduplicated: true });
-        return;
-      }
+        if (isBookingNotificationDelivered(bookingId)) {
+          res.json({ ok: true, deduplicated: true, delivered: true });
+          return;
+        }
 
-      const receiptCheck = await verifyBookingReceiptExists(bookingId, String(body.date || '').trim());
-      if (!receiptCheck.exists) {
-        res.status(400).json({
-          ok: false,
-          error: receiptCheck.reason || 'Booking must be persisted before triggering notifications.',
-        });
-        return;
-      }
+        if (inFlightBookingNotifications.has(bookingId)) {
+          res.status(409).json({
+            ok: false,
+            inFlight: true,
+            retryable: true,
+            error: 'Notification dispatch is already in progress for this booking.',
+          });
+          return;
+        }
 
-      notifiedBookingIds.set(bookingId, now);
-      if (notifiedBookingIds.size > 2000) {
-        for (const [k, ts] of notifiedBookingIds.entries()) {
-          if (now - ts > 24 * 60 * 60 * 1000) notifiedBookingIds.delete(k);
+        verifiedReceipt = await verifyBookingReceiptAndTrip(
+          bookingId,
+          String(body.date || '').trim(),
+          String(body.tripId || '').trim()
+        );
+        if (!verifiedReceipt.exists) {
+          res.status(400).json({
+            ok: false,
+            error:
+              verifiedReceipt.reason || 'Booking must be persisted before triggering notifications.',
+          });
+          return;
         }
       }
-    }
 
-    const safeBookingId = bookingId || 'WT-TEST';
-    const tripTitle = String(body.tripTitle || 'Wasla Travel Excursion').trim().slice(0, 240);
-    const destination = String(body.destination || 'Hurghada').trim().slice(0, 60);
-    const tripDate = String(body.date || new Date().toISOString().slice(0, 10)).trim().slice(0, 20);
-    const startTime = String(body.tripStartTime || '').trim().slice(0, 80);
-    const guestName = String(body.guestName || 'Guest').trim().slice(0, 120);
-    const guestCountry = String(body.guestCountry || 'Guest').trim().slice(0, 80);
-    const guestWa = String(body.guestWhatsapp || '').trim().slice(0, 60);
-    const guestEmail = String(body.guestEmail || '').trim().slice(0, 160);
-    const guestContact = String(body.guestContact || guestWa || guestEmail || 'N/A').trim().slice(0, 160);
-    const hotel = String(body.hotel || 'Hotel Pickup').trim().slice(0, 200);
-    const roomNumber = String(body.roomNumber || '').trim().slice(0, 40);
-    const adults = Math.min(50, Math.max(1, Math.round(Number(body.adults) || 1)));
-    const children = Math.min(50, Math.max(0, Math.round(Number(body.children) || 0)));
-    const infants = Math.min(50, Math.max(0, Math.round(Number(body.infants) || 0)));
-    const grossEur = Math.min(100000, Math.max(0, Math.round(Number(body.grossEur) || 0)));
-    const supplierName = String(body.supplierName || 'Wasla Operations').trim().slice(0, 120);
-    const paymentStatus = String(body.paymentStatus || 'Awaiting link').trim().slice(0, 40);
-    const notes = String(body.notes || '').trim().slice(0, 800);
+      const safeBookingId = bookingId || 'WT-TEST';
+      // Catalog facts come from Firestore whenever verified; client-submitted guest/total fields
+      // are explicitly labeled for Dispatch Desk review before confirmation.
+      const tripTitle = String(
+        verifiedReceipt?.verifiedTripTitle || body.tripTitle || 'Wasla Travel Excursion'
+      )
+        .trim()
+        .slice(0, 240);
+      const destination = String(
+        verifiedReceipt?.verifiedDestination || body.destination || 'Hurghada'
+      )
+        .trim()
+        .slice(0, 60);
+      const tripDate = String(
+        verifiedReceipt?.tripDate || body.date || new Date().toISOString().slice(0, 10)
+      )
+        .trim()
+        .slice(0, 20);
+      const supplierName = String(
+        verifiedReceipt?.verifiedSupplierName || body.supplierName || 'Wasla Operations'
+      )
+        .trim()
+        .slice(0, 120);
+      const catalogBasePriceEur = verifiedReceipt?.catalogBasePriceEur;
+      const startTime = String(body.tripStartTime || '').trim().slice(0, 80);
+      const guestName = String(body.guestName || 'Guest').trim().slice(0, 120);
+      const guestCountry = String(body.guestCountry || 'Guest').trim().slice(0, 80);
+      const guestWa = String(body.guestWhatsapp || '').trim().slice(0, 60);
+      const guestEmail = String(body.guestEmail || '').trim().slice(0, 160);
+      const guestContact = String(body.guestContact || guestWa || guestEmail || 'N/A')
+        .trim()
+        .slice(0, 160);
+      const hotel = String(body.hotel || 'Hotel Pickup').trim().slice(0, 200);
+      const roomNumber = String(body.roomNumber || '').trim().slice(0, 40);
+      const adults = Math.min(50, Math.max(1, Math.round(Number(body.adults) || 1)));
+      const children = Math.min(50, Math.max(0, Math.round(Number(body.children) || 0)));
+      const infants = Math.min(50, Math.max(0, Math.round(Number(body.infants) || 0)));
+      const grossEur = Math.min(100000, Math.max(0, Math.round(Number(body.grossEur) || 0)));
+      const paymentStatus = String(body.paymentStatus || 'Awaiting link').trim().slice(0, 40);
+      const notes = String(body.notes || '').trim().slice(0, 800);
 
-    // Recipients are ALWAYS controlled exclusively by server config (never client payload)
-    const targetOwnerEmail = String(
-      process.env.OWNER_ALERT_EMAIL || 'booking@waslatravel.com'
-    ).trim();
-    const targetOwnerWaDigits = String(
-      process.env.OWNER_WHATSAPP_TO || '201129155520'
-    ).replace(/\D/g, '');
-    const appUrl = (process.env.APP_URL || 'https://waslatravel.com').replace(/\/$/, '');
+      // Recipients are ALWAYS controlled exclusively by server config (never client payload)
+      const targetOwnerEmail = String(
+        process.env.OWNER_ALERT_EMAIL || 'booking@waslatravel.com'
+      ).trim();
+      const targetOwnerWaDigits = String(
+        process.env.OWNER_WHATSAPP_TO || '201129155520'
+      ).replace(/\D/g, '');
+      const appUrl = (process.env.APP_URL || 'https://waslatravel.com').replace(/\/$/, '');
 
-    const bookedAtStr = new Date().toLocaleString('en-GB', {
-      timeZone: 'Africa/Cairo',
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false,
-    });
+      const bookedAtStr = new Date().toLocaleString('en-GB', {
+        timeZone: 'Africa/Cairo',
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+      });
 
-    const paxLine = `${adults} Adults${children > 0 ? ` + ${children} Children` : ''}${
-      infants > 0 ? ` + ${infants} Infants` : ''
-    }`;
+      const paxLine = `${adults} Adults${children > 0 ? ` + ${children} Children` : ''}${
+        infants > 0 ? ` + ${infants} Infants` : ''
+      }`;
 
-    const guestWaDigits = guestWa.replace(/\D/g, '');
-    const guestWaLink = guestWaDigits ? `https://wa.me/${guestWaDigits}` : '';
+      const guestWaDigits = guestWa.replace(/\D/g, '');
+      const guestWaLink = guestWaDigits ? `https://wa.me/${guestWaDigits}` : '';
 
-    const whatsappAlertText = [
-      isTest
-        ? `🧪 *TEST ALERT — Wasla Travel Owner Desk*`
-        : `🔔 *NEW BOOKING ALERT — ${safeBookingId}*`,
-      `━━━━━━━━━━━━━━━━━━`,
-      `🎫 *Excursion:* ${tripTitle} (${destination})`,
-      `📅 *Trip Date:* ${tripDate}${startTime ? ` · ${startTime}` : ''}`,
-      `🕒 *Booked At:* ${bookedAtStr} (Egypt Time)`,
-      `👤 *Guest:* ${guestName} (${guestCountry})`,
-      `🏨 *Hotel:* ${hotel}${roomNumber ? ` · Room ${roomNumber}` : ''}`,
-      `👥 *Pax:* ${paxLine}`,
-      `💶 *Total:* €${grossEur} (${paymentStatus} · EUR/USD/EGP)`,
-      `🚐 *Supplier:* ${supplierName}`,
-      `📞 *Guest Contact:* ${guestContact}`,
-      notes ? `📝 *Notes:* ${notes}` : '',
-      guestWaLink ? `💬 *Message Guest:* ${guestWaLink}` : '',
-      `🔗 *Dispatch Desk:* ${appUrl}`,
-    ]
-      .filter(Boolean)
-      .join('\n');
+      const whatsappAlertText = [
+        isTest
+          ? `🧪 *TEST ALERT — Wasla Travel Owner Desk*`
+          : `🔔 *NEW BOOKING ALERT — ${safeBookingId}*`,
+        `━━━━━━━━━━━━━━━━━━`,
+        `🎫 *Excursion (Verified):* ${tripTitle} (${destination})`,
+        `📅 *Trip Date (Verified):* ${tripDate}${startTime ? ` · ${startTime}` : ''}`,
+        `🚐 *Supplier (Verified):* ${supplierName}`,
+        catalogBasePriceEur !== undefined
+          ? `🏷️ *Catalog Base Price:* €${catalogBasePriceEur}/adult`
+          : '',
+        `🕒 *Booked At:* ${bookedAtStr} (Egypt Time)`,
+        `👤 *Guest (Client Input):* ${guestName} (${guestCountry})`,
+        `🏨 *Hotel (Client Input):* ${hotel}${roomNumber ? ` · Room ${roomNumber}` : ''}`,
+        `👥 *Pax (Client Input):* ${paxLine}`,
+        `💶 *Submitted Total:* €${grossEur} (${paymentStatus} · verify in Dispatch Desk)`,
+        `📞 *Guest Contact:* ${guestContact}`,
+        notes ? `📝 *Notes:* ${notes}` : '',
+        guestWaLink ? `💬 *Message Guest:* ${guestWaLink}` : '',
+        `🔗 *Dispatch Desk:* ${appUrl}`,
+      ]
+        .filter(Boolean)
+        .join('\n');
 
-    const emailSubject = isTest
-      ? `[TEST] Wasla Travel Owner Booking Alert — ${safeBookingId}`
-      : `🔔 New Booking ${safeBookingId} — ${tripTitle} (${tripDate}) · €${grossEur}`;
+      const emailSubject = isTest
+        ? `[TEST] Wasla Travel Owner Booking Alert — ${safeBookingId}`
+        : `🔔 New Booking ${safeBookingId} — ${tripTitle} (${tripDate})`;
 
-    const escapeHtml = (str: string) =>
-      str
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;');
+      const escapeHtml = (str: string) =>
+        str
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
 
-    const emailHtml = `
+      const emailHtml = `
       <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; max-width: 620px; margin: 0 auto; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 14px; overflow: hidden;">
         <div style="background: #0f172a; color: #ffffff; padding: 20px 24px;">
           <div style="font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: #fdba74; font-weight: 700;">
@@ -530,19 +703,24 @@ async function startServer() {
 
         <div style="padding: 22px 24px; color: #0f172a; font-size: 14px; line-height: 1.5;">
           <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
-            <tr><td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0; color: #475569; width: 38%;">Guest Name</td><td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0; font-weight: 700;">${escapeHtml(guestName)} (${escapeHtml(guestCountry)})</td></tr>
-            <tr><td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0; color: #475569;">Trip Date & Time</td><td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0; font-weight: 700;">${escapeHtml(tripDate)}${startTime ? ` · ${escapeHtml(startTime)}` : ''}</td></tr>
-            <tr><td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0; color: #475569;">Hotel & Room</td><td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0; font-weight: 700;">${escapeHtml(hotel)}${roomNumber ? ` · Room ${escapeHtml(roomNumber)}` : ''}</td></tr>
-            <tr><td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0; color: #475569;">Passengers</td><td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0; font-weight: 700;">${escapeHtml(paxLine)}</td></tr>
-            <tr><td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0; color: #475569;">Gross Total</td><td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0; font-weight: 800; color: #15803d;">€${grossEur} (${escapeHtml(paymentStatus)} · EUR/USD/EGP accepted)</td></tr>
-            <tr><td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0; color: #475569;">Assigned Supplier</td><td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0; font-weight: 700;">${escapeHtml(supplierName)}</td></tr>
+            <tr><td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0; color: #475569; width: 38%;">Guest Name (Client Input)</td><td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0; font-weight: 700;">${escapeHtml(guestName)} (${escapeHtml(guestCountry)})</td></tr>
+            <tr><td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0; color: #475569;">Trip Date (Verified)</td><td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0; font-weight: 700;">${escapeHtml(tripDate)}${startTime ? ` · ${escapeHtml(startTime)}` : ''}</td></tr>
+            <tr><td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0; color: #475569;">Hotel & Room (Client Input)</td><td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0; font-weight: 700;">${escapeHtml(hotel)}${roomNumber ? ` · Room ${escapeHtml(roomNumber)}` : ''}</td></tr>
+            <tr><td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0; color: #475569;">Passengers (Client Input)</td><td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0; font-weight: 700;">${escapeHtml(paxLine)}</td></tr>
+            ${
+              catalogBasePriceEur !== undefined
+                ? `<tr><td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0; color: #475569;">Catalog Base Price (Verified)</td><td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0; font-weight: 700;">€${catalogBasePriceEur} / adult</td></tr>`
+                : ''
+            }
+            <tr><td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0; color: #475569;">Client-Submitted Total</td><td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0; font-weight: 800; color: #15803d;">€${grossEur} (${escapeHtml(paymentStatus)} · verify saved booking in Dispatch Desk)</td></tr>
+            <tr><td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0; color: #475569;">Assigned Supplier (Verified)</td><td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0; font-weight: 700;">${escapeHtml(supplierName)}</td></tr>
             <tr><td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0; color: #475569;">Guest WhatsApp</td><td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0; font-weight: 700;">${escapeHtml(guestWa || 'Not provided')}</td></tr>
             <tr><td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0; color: #475569;">Guest Email</td><td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0; font-weight: 700;">${escapeHtml(guestEmail || 'Not provided')}</td></tr>
             ${notes ? `<tr><td style="padding: 8px 0; color: #475569;">Special Notes</td><td style="padding: 8px 0; font-weight: 600;">${escapeHtml(notes)}</td></tr>` : ''}
           </table>
 
           <div style="margin-top: 20px; padding: 12px 14px; background: #fff7ed; border: 1px solid #fed7aa; border-radius: 10px; font-size: 12px; color: #9a3412;">
-            <strong>Voucher Lock Status:</strong> The customer's final printable Digital Boarding Voucher remains locked until you confirm the booking and set the manual hotel pickup time inside Reservations &amp; Dispatch.
+            <strong>Voucher Lock Status:</strong> Always verify the saved Firestore booking record inside Reservations &amp; Dispatch before confirming payment and unlocking the Digital Boarding Voucher.
           </div>
 
           <div style="margin-top: 20px;">
@@ -559,17 +737,33 @@ async function startServer() {
       </div>
     `;
 
-    const result: {
-      ok: boolean;
-      email: { sent: boolean; provider: string; to: string; error?: string };
-      whatsapp: { sent: boolean; provider: string; to: string; error?: string };
-      webhook: { sent: boolean; error?: string };
-    } = {
-      ok: true,
-      email: { sent: false, provider: 'none', to: targetOwnerEmail },
-      whatsapp: { sent: false, provider: 'none', to: targetOwnerWaDigits },
-      webhook: { sent: false },
-    };
+      const channelStatus = getNotificationChannelStatus();
+      const anyChannelConfigured =
+        channelStatus.emailConfigured ||
+        channelStatus.whatsappConfigured ||
+        channelStatus.webhookConfigured;
+
+      const result: {
+        ok: boolean;
+        delivered: boolean;
+        retryable?: boolean;
+        skipped?: string;
+        email: { sent: boolean; provider: string; to: string; error?: string };
+        whatsapp: { sent: boolean; provider: string; to: string; error?: string };
+        webhook: { sent: boolean; error?: string };
+      } = {
+        ok: true,
+        delivered: false,
+        email: { sent: false, provider: 'none', to: targetOwnerEmail },
+        whatsapp: { sent: false, provider: 'none', to: targetOwnerWaDigits },
+        webhook: { sent: false },
+      };
+
+      if (!isTest) {
+        inFlightBookingNotifications.add(bookingId);
+      }
+
+      try {
 
     // 1. Official Email Delivery (SMTP first, then Resend fallback)
     if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
@@ -766,8 +960,34 @@ async function startServer() {
       }
     }
 
-    res.json(result);
-  });
+        const anyDelivered = result.email.sent || result.whatsapp.sent || result.webhook.sent;
+        result.delivered = anyDelivered;
+
+        if (!anyChannelConfigured) {
+          result.skipped = 'no_channels_configured';
+          res.json(result);
+          return;
+        }
+
+        if (anyDelivered) {
+          if (!isTest) {
+            markBookingNotificationDelivered(bookingId);
+          }
+          res.json(result);
+          return;
+        }
+
+        // All configured channels failed: do NOT poison dedupe cache; allow retry.
+        result.ok = false;
+        result.retryable = true;
+        res.status(502).json(result);
+      } finally {
+        if (!isTest) {
+          inFlightBookingNotifications.delete(bookingId);
+        }
+      }
+    }
+  );
 
   app.get('/dev-sw.js', (_req, res) => {
     res.setHeader('Content-Type', 'application/javascript');

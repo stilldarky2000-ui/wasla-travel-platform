@@ -235,7 +235,7 @@ service cloud.firestore {
           'guestName', 'guestCountry', 'guestContact', 'guestWhatsapp', 'guestEmail', 'guestLang', 'hotel',
           'roomNumber', 'locationImageUrl',
           'adults', 'children', 'infants', 'grossEur', 'supplierName', 'supplierUid',
-          'assignedDriverOrGuide', 'paymentStatus', 'status', 'notes', 'createdAt', 'updatedAt'
+          'assignedDriverOrGuide', 'paymentStatus', 'status', 'notes', 'supplierNotes', 'createdAt', 'updatedAt'
         ])
         && data.id is string && data.id.size() >= 1 && data.id.size() <= 128
         && data.tripId is string && data.tripId.size() >= 2 && data.tripId.size() <= 128
@@ -278,6 +278,7 @@ service cloud.firestore {
         && data.paymentStatus in ['Awaiting link', 'Link sent', 'Paid online', 'Cash on pickup']
         && data.status in ['Pending', 'Confirmed', 'Driver assigned', 'Completed', 'Refunded', 'Cancelled', 'No show']
         && data.notes is string && data.notes.size() <= 800
+        && (!('supplierNotes' in data) || (data.supplierNotes is string && data.supplierNotes.size() <= 500))
         && data.createdAt is timestamp
         && data.updatedAt is timestamp;
     }
@@ -286,14 +287,14 @@ service cloud.firestore {
       return data.keys().hasAll([
           'id', 'bookingId', 'tripId', 'tripTitle', 'category', 'destination', 'date', 'pickupTime',
           'guestName', 'guestCountry', 'hotel', 'adults', 'children',
-          'supplierName', 'supplierUid', 'assignedDriverOrGuide', 'status', 'notes',
+          'supplierName', 'supplierUid', 'assignedDriverOrGuide', 'status', 'operationalNotes',
           'createdAt', 'updatedAt'
         ])
         && data.keys().hasOnly([
           'id', 'bookingId', 'tripId', 'tripTitle', 'category', 'destination', 'date', 'tripStartTime',
           'pickupTime', 'pickupSpot', 'guestName', 'guestCountry', 'hotel', 'roomNumber',
           'adults', 'children', 'infants', 'supplierName', 'supplierUid', 'assignedDriverOrGuide',
-          'status', 'notes', 'createdAt', 'updatedAt'
+          'status', 'operationalNotes', 'createdAt', 'updatedAt'
         ])
         && data.id is string && data.id.size() >= 1 && data.id.size() <= 128 && data.id.matches('^[a-zA-Z0-9_-]+$')
         && data.bookingId is string && data.bookingId.size() >= 1 && data.bookingId.size() <= 128 && data.bookingId.matches('^[a-zA-Z0-9_-]+$')
@@ -326,7 +327,7 @@ service cloud.firestore {
         && data.supplierUid is string && data.supplierUid.size() >= 1 && data.supplierUid.size() <= 128
         && data.assignedDriverOrGuide is string && data.assignedDriverOrGuide.size() <= 160
         && data.status in ['Confirmed', 'Driver assigned', 'Completed']
-        && data.notes is string && data.notes.size() <= 800
+        && data.operationalNotes is string && data.operationalNotes.size() <= 500
         && data.createdAt is timestamp
         && data.updatedAt is timestamp;
     }
@@ -556,7 +557,7 @@ service cloud.firestore {
       allow delete: if isValidId(tripId) && isAdmin();
     }
 
-    // 7. Bookings (Strict Owner/Operations PII & Financial Isolation + Public Create Intake)
+    // 7. Bookings (Strict Owner/Operations PII & Financial Isolation + Atomic Public Intake + Atomic Dispatch Revocation)
     match /bookings/{bookingId} {
       allow get: if isValidId(bookingId) && (
         isBootstrappedOwner()
@@ -573,6 +574,7 @@ service cloud.firestore {
             request.resource.data.status == 'Pending'
             && request.resource.data.paymentStatus == 'Awaiting link'
             && request.resource.data.assignedDriverOrGuide == ''
+            && existsAfter(/databases/$(database)/documents/booking_receipts/$(bookingId))
             && (
               (request.resource.data.tripId == 'custom-itinerary' && request.resource.data.category == 'custom')
               || exists(/databases/$(database)/documents/trips/$(request.resource.data.tripId))
@@ -581,6 +583,11 @@ service cloud.firestore {
         );
       allow update: if isValidId(bookingId) && isValidBooking(request.resource.data)
         && request.resource.data.id == resource.data.id
+        // Atomicity Guarantee: non-dispatchable bookings MUST atomically remove supplier_dispatches/{bookingId}
+        && (
+          request.resource.data.status in ['Confirmed', 'Driver assigned', 'Completed']
+          || !existsAfter(/databases/$(database)/documents/supplier_dispatches/$(bookingId))
+        )
         && (
           isAdmin()
           || (
@@ -591,14 +598,15 @@ service cloud.firestore {
               'tripTitle', 'category', 'destination', 'date', 'tripStartTime', 'pickupTime', 'pickupSpot',
               'guestName', 'guestCountry', 'guestContact', 'guestWhatsapp', 'guestEmail',
               'hotel', 'roomNumber', 'locationImageUrl', 'adults', 'children', 'infants', 'grossEur', 'supplierName',
-              'assignedDriverOrGuide', 'paymentStatus', 'status', 'notes', 'updatedAt'
+              'assignedDriverOrGuide', 'paymentStatus', 'status', 'notes', 'supplierNotes', 'updatedAt'
             ])
           )
         );
-      allow delete: if isValidId(bookingId) && isAdmin();
+      allow delete: if isValidId(bookingId) && isAdmin()
+        && !existsAfter(/databases/$(database)/documents/supplier_dispatches/$(bookingId));
     }
 
-    // 7C. Supplier Dispatches (Zero-PII, Zero-Financials Operational Projection for Active Suppliers)
+    // 7C. Supplier Dispatches (Zero-PII, Zero-Financials Operational Projection; Parent-Booking Verified)
     match /supplier_dispatches/{dispatchId} {
       allow get: if isValidId(dispatchId) && (
         isBootstrappedOwner()
@@ -608,6 +616,9 @@ service cloud.firestore {
           && resource != null
           && resource.data.supplierUid == request.auth.uid
           && resource.data.status in ['Confirmed', 'Driver assigned', 'Completed']
+          && exists(/databases/$(database)/documents/bookings/$(resource.data.bookingId))
+          && get(/databases/$(database)/documents/bookings/$(resource.data.bookingId)).data.status in ['Confirmed', 'Driver assigned', 'Completed']
+          && get(/databases/$(database)/documents/bookings/$(resource.data.bookingId)).data.supplierUid == request.auth.uid
         )
       );
       allow list: if isBootstrappedOwner()
@@ -619,7 +630,10 @@ service cloud.firestore {
         );
       allow create: if isValidId(dispatchId) && (isAdmin() || isOperations())
         && isValidSupplierDispatch(request.resource.data)
-        && request.resource.data.id == dispatchId;
+        && request.resource.data.id == dispatchId
+        && request.resource.data.bookingId == dispatchId
+        && existsAfter(/databases/$(database)/documents/bookings/$(dispatchId))
+        && getAfter(/databases/$(database)/documents/bookings/$(dispatchId)).data.status in ['Confirmed', 'Driver assigned', 'Completed'];
       allow update: if isValidId(dispatchId) && isValidSupplierDispatch(request.resource.data)
         && request.resource.data.id == resource.data.id
         && (
@@ -633,6 +647,9 @@ service cloud.firestore {
             && request.resource.data.tripId == resource.data.tripId
             && request.resource.data.createdAt == resource.data.createdAt
             && resource.data.status in ['Confirmed', 'Driver assigned']
+            && exists(/databases/$(database)/documents/bookings/$(resource.data.bookingId))
+            && get(/databases/$(database)/documents/bookings/$(resource.data.bookingId)).data.status in ['Confirmed', 'Driver assigned']
+            && get(/databases/$(database)/documents/bookings/$(resource.data.bookingId)).data.supplierUid == request.auth.uid
             && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
               'assignedDriverOrGuide', 'status', 'updatedAt'
             ])
@@ -719,12 +736,16 @@ service cloud.firestore {
       allow delete: if isValidId(logId) && isAdmin();
     }
 
-    // 7B. Booking Verification Receipts (Zero-PII status lookup by exact ref; Owner/Operations updates only)
+    // 7B. Booking Verification Receipts (Zero-PII status lookup; Atomically bound to real bookings/{receiptId})
     match /booking_receipts/{receiptId} {
       allow get: if isValidId(receiptId);
       allow list: if isBootstrappedOwner() || isOperations();
       allow create: if isValidId(receiptId) && isValidBookingReceipt(request.resource.data)
         && request.resource.data.id == receiptId
+        && existsAfter(/databases/$(database)/documents/bookings/$(receiptId))
+        && getAfter(/databases/$(database)/documents/bookings/$(receiptId)).data.tripId == request.resource.data.tripId
+        && getAfter(/databases/$(database)/documents/bookings/$(receiptId)).data.date == request.resource.data.tripDate
+        && getAfter(/databases/$(database)/documents/bookings/$(receiptId)).data.status == request.resource.data.status
         && (
           isAdmin()
           || isOperations()

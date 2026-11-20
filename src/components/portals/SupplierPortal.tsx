@@ -1658,7 +1658,9 @@ export const SupplierPortal: React.FC<SupplierPortalProps> = ({
                             Guest contact &amp; payments are handled centrally by Wasla Operations.
                           </span>
                         </div>
-                        {b.notes && <p className="text-xs text-[#EA580C]">Note: {b.notes}</p>}
+                        {b.supplierNotes && (
+                          <p className="text-xs text-[#EA580C]">Dispatch Note: {b.supplierNotes}</p>
+                        )}
                       </div>
 
                       <div className="flex flex-wrap items-center gap-2.5">

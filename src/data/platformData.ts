@@ -43,6 +43,7 @@ export interface PlatformBooking {
   paymentStatus: PaymentStatus;
   status: BookingStatus;
   notes: string;
+  supplierNotes?: string;
   createdAtMs?: number;
 }
 

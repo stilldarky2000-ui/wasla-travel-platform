@@ -22,6 +22,7 @@ import {
   setDoc,
   updateDoc,
   where,
+  writeBatch,
 } from 'firebase/firestore';
 import { Lang } from '../data/i18n';
 import {
@@ -529,6 +530,10 @@ function sanitizeBookingForFirestore(
     paymentStatus: booking.paymentStatus,
     status: booking.status,
     notes: truncateText(booking.notes, 800, ''),
+    supplierNotes:
+      booking.supplierNotes !== undefined
+        ? truncateText(booking.supplierNotes, 500, '')
+        : undefined,
   });
 }
 
@@ -565,6 +570,18 @@ function isSupplierVisibleBookingStatus(
   status: PlatformBooking['status']
 ): status is SupplierDispatchStatus {
   return status === 'Confirmed' || status === 'Driver assigned' || status === 'Completed';
+}
+
+function sanitizeOperationalNoteForSupplier(raw?: string): string {
+  if (!raw) return '';
+  const redacted = raw
+    .replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi, '[redacted]')
+    .replace(/https?:\/\/\S+|www\.\S+/gi, '[redacted]')
+    .replace(/(?:\+?\d[\d\s().-]{6,}\d)/g, '[redacted]')
+    .replace(/(?:€|\$|£)\s?\d+(?:[.,]\d+)?|\d+(?:[.,]\d+)?\s?(?:eur|euro|euros|usd|egp|gbp)\b/gi, '[redacted]')
+    .replace(/\s+/g, ' ')
+    .trim();
+  return truncateText(redacted, 500, '');
 }
 
 function buildSupplierDispatchFields(
@@ -608,7 +625,8 @@ function buildSupplierDispatchFields(
     supplierUid: supplierUid.slice(0, 128),
     assignedDriverOrGuide: truncateText(booking.assignedDriverOrGuide, 160, ''),
     status: isSupplierVisibleBookingStatus(booking.status) ? booking.status : 'Confirmed',
-    notes: truncateText(booking.notes, 800, ''),
+    // Strictly dedicated, sanitized operational instructions only — never copies customer booking.notes
+    operationalNotes: sanitizeOperationalNoteForSupplier(booking.supplierNotes),
   });
 }
 
@@ -648,7 +666,8 @@ function mapSupplierDispatchToBooking(
     assignedDriverOrGuide: String(raw.assignedDriverOrGuide || ''),
     paymentStatus: 'Paid online',
     status,
-    notes: String(raw.notes || ''),
+    notes: '',
+    supplierNotes: String(raw.operationalNotes || ''),
     createdAtMs,
   };
 }
@@ -1880,38 +1899,17 @@ export function useWaslaFirebase() {
     []
   );
 
-  const syncSupplierDispatchDoc = useCallback(
-    async (targetBooking: PlatformBooking, explicitSupplierUid?: string) => {
-      const dispatchId = sanitizeDocId(targetBooking.id, 'WT');
+  const resolveBookingSupplierUid = useCallback(
+    (targetBooking: PlatformBooking, explicitSupplierUid?: string): string => {
       const linkedTrip = trips.find((t) => t.id === targetBooking.tripId);
       const linkedSupplier = suppliers.find((s) => s.name === targetBooking.supplierName);
-      const resolvedUid = (
+      return (
         explicitSupplierUid ||
         targetBooking.supplierUid ||
         linkedTrip?.supplierUid ||
         linkedSupplier?.linkedUid ||
         ''
       ).trim();
-
-      const dispRef = doc(db, 'supplier_dispatches', dispatchId);
-      if (isSupplierVisibleBookingStatus(targetBooking.status) && resolvedUid) {
-        const dispatchFields = buildSupplierDispatchFields(targetBooking, resolvedUid);
-        const existingSnap = await getDoc(dispRef).catch(() => null);
-        if (existingSnap?.exists()) {
-          await updateDoc(dispRef, {
-            ...dispatchFields,
-            updatedAt: serverTimestamp(),
-          }).catch(() => {});
-        } else {
-          await setDoc(dispRef, {
-            ...dispatchFields,
-            createdAt: serverTimestamp(),
-            updatedAt: serverTimestamp(),
-          }).catch(() => {});
-        }
-      } else {
-        await deleteDoc(dispRef).catch(() => {});
-      }
     },
     [trips, suppliers]
   );
@@ -1968,19 +1966,19 @@ export function useWaslaFirebase() {
         // Allow instant WhatsApp confirmation if storefront database hasn't been seeded yet
         return;
       }
-      const linkedTrip = trips.find((t) => t.id === booking.tripId);
-      const linkedSupplier = suppliers.find((s) => s.name === booking.supplierName);
-      const resolvedSupplierUid = linkedTrip?.supplierUid || linkedSupplier?.linkedUid;
-      const sanitized = sanitizeBookingForFirestore(booking, resolvedSupplierUid);
+      const resolvedSupplierUid = resolveBookingSupplierUid(booking);
+      const sanitized = sanitizeBookingForFirestore(booking, resolvedSupplierUid || undefined);
       const bookingId = String(sanitized.id);
       try {
-        await setDoc(doc(db, 'bookings', bookingId), {
+        // Atomic batch: bookings/{id} + booking_receipts/{id} (+ supplier_dispatches/{id} if already Confirmed by Owner/Ops)
+        const batch = writeBatch(db);
+        batch.set(doc(db, 'bookings', bookingId), {
           ...sanitized,
           createdAt: serverTimestamp(),
           updatedAt: serverTimestamp(),
         });
 
-        await setDoc(doc(db, 'booking_receipts', bookingId), {
+        batch.set(doc(db, 'booking_receipts', bookingId), {
           ...buildBookingReceiptFields({
             id: bookingId,
             tripId: String(sanitized.tripId),
@@ -1993,15 +1991,22 @@ export function useWaslaFirebase() {
 
         if (
           (effectiveRole === 'owner' || effectiveRole === 'operations') &&
-          isSupplierVisibleBookingStatus(booking.status)
+          isSupplierVisibleBookingStatus(booking.status) &&
+          resolvedSupplierUid
         ) {
-          await syncSupplierDispatchDoc(
-            { ...bookingWithTs, id: bookingId, supplierUid: resolvedSupplierUid },
-            resolvedSupplierUid
-          );
+          batch.set(doc(db, 'supplier_dispatches', bookingId), {
+            ...buildSupplierDispatchFields(
+              { ...bookingWithTs, id: bookingId, supplierUid: resolvedSupplierUid },
+              resolvedSupplierUid
+            ),
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp(),
+          });
         }
 
-        // Fire real-time Owner WhatsApp + Official Email alert ONLY AFTER Firestore persistence succeeds
+        await batch.commit();
+
+        // Fire real-time Owner WhatsApp + Official Email alert ONLY AFTER atomic Firestore commit succeeds
         void dispatchOwnerNotifications(bookingWithTs, bookingId);
 
         const officialInbox = publicSettings.email || SITE_CONFIG.email;
@@ -2055,11 +2060,9 @@ export function useWaslaFirebase() {
     [
       firestoreSeeded,
       effectiveRole,
-      trips,
-      suppliers,
       publicSettings.email,
       logDispatchEmailInDb,
-      syncSupplierDispatchDoc,
+      resolveBookingSupplierUid,
     ]
   );
 
@@ -2297,21 +2300,55 @@ export function useWaslaFirebase() {
         paymentStatus: patch.paymentStatus,
         status: patch.status,
         notes: patch.notes !== undefined ? truncateText(patch.notes, 800, '') : undefined,
+        supplierNotes:
+          patch.supplierNotes !== undefined
+            ? truncateText(patch.supplierNotes, 500, '')
+            : undefined,
       });
+      const safeDocId = sanitizeDocId(id, 'WT');
       try {
-        await updateDoc(doc(db, 'bookings', id), {
+        // Pre-read existing dispatch & receipt docs to decide set vs update inside ONE atomic batch
+        const dispRef = doc(db, 'supplier_dispatches', safeDocId);
+        const rcptRef = doc(db, 'booking_receipts', safeDocId);
+        const [dispSnap, rcptSnap] = await Promise.all([
+          getDoc(dispRef).catch(() => null),
+          patch.status !== undefined || patch.date !== undefined
+            ? getDoc(rcptRef).catch(() => null)
+            : Promise.resolve(null),
+        ]);
+
+        const batch = writeBatch(db);
+        batch.update(doc(db, 'bookings', id), {
           ...safePatch,
           updatedAt: serverTimestamp(),
         });
 
         if (existingBooking) {
           const mergedBooking: PlatformBooking = { ...existingBooking, ...patch };
-          await syncSupplierDispatchDoc(mergedBooking);
+          const resolvedUid = resolveBookingSupplierUid(mergedBooking);
+          if (isSupplierVisibleBookingStatus(mergedBooking.status) && resolvedUid) {
+            const dispatchFields = buildSupplierDispatchFields(mergedBooking, resolvedUid);
+            if (dispSnap?.exists()) {
+              batch.update(dispRef, {
+                ...dispatchFields,
+                updatedAt: serverTimestamp(),
+              });
+            } else {
+              batch.set(dispRef, {
+                ...dispatchFields,
+                createdAt: serverTimestamp(),
+                updatedAt: serverTimestamp(),
+              });
+            }
+          } else {
+            // Atomically revoke supplier dispatch on cancellation/refund/pending/no-show/unassigned
+            batch.delete(dispRef);
+          }
+        } else if (patch.status !== undefined && !isSupplierVisibleBookingStatus(patch.status)) {
+          batch.delete(dispRef);
         }
 
         if (patch.status !== undefined || patch.date !== undefined) {
-          const rcptRef = doc(db, 'booking_receipts', id);
-          const rcptSnap = await getDoc(rcptRef).catch(() => null);
           if (rcptSnap?.exists()) {
             const receiptUpdate: Record<string, unknown> = {
               updatedAt: serverTimestamp(),
@@ -2321,9 +2358,9 @@ export function useWaslaFirebase() {
               receiptUpdate.tripDate = truncateText(patch.date, 20, '');
               receiptUpdate.tripEndAt = buildTripEndTimestamp(patch.date);
             }
-            await updateDoc(rcptRef, receiptUpdate).catch(() => {});
+            batch.update(rcptRef, receiptUpdate);
           } else if (existingBooking) {
-            await setDoc(rcptRef, {
+            batch.set(rcptRef, {
               ...buildBookingReceiptFields({
                 id: existingBooking.id,
                 tripId: existingBooking.tripId,
@@ -2332,9 +2369,12 @@ export function useWaslaFirebase() {
               }),
               createdAt: serverTimestamp(),
               updatedAt: serverTimestamp(),
-            }).catch(() => {});
+            });
           }
         }
+
+        await batch.commit();
+
         if (patch.status !== undefined) {
           const nextVerified = patch.status === 'Completed';
           setReceiptStatusByBookingId((prev) => ({ ...prev, [id]: patch.status as string }));
@@ -2359,10 +2399,14 @@ export function useWaslaFirebase() {
           }
         }
       } catch (err) {
+        // Roll back optimistic state if atomic batch failed
+        if (existingBooking) {
+          setBookings((prev) => prev.map((b) => (b.id === id ? existingBooking : b)));
+        }
         handleFirestoreError(err, OperationType.UPDATE, `bookings/${id}`);
       }
     },
-    [bookings, effectiveRole, syncSupplierDispatchDoc]
+    [bookings, effectiveRole, resolveBookingSupplierUid]
   );
 
   const sendChatMessageInDb = useCallback(
