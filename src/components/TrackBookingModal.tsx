@@ -400,173 +400,267 @@ export const TrackBookingModal: React.FC<TrackBookingModalProps> = ({
           </form>
 
           {/* Live Status Card */}
-          {liveReceipt && statusMeta && (
-            <div className="rounded-2xl border border-[#E2E8F0] bg-[#F8FAFC] p-4 sm:p-5 space-y-4">
-              <div className="flex flex-wrap items-start justify-between gap-2 border-b border-[#E2E8F0] pb-3">
-                <div>
-                  <p className="text-[11px] font-semibold uppercase tracking-wider text-[#64748B]">
-                    {tText({ en: 'Booking Reference', ar: 'رقم الحجز', de: 'Referenz' }, lang)}
-                  </p>
-                  <p className="font-mono text-lg font-bold text-[#0F172A] tabular-nums">
-                    {liveReceipt.id}
-                  </p>
-                </div>
-                <span
-                  className={`inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-xs font-semibold ${statusMeta.tone}`}
-                >
-                  <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />
-                  {statusMeta.label}
-                </span>
-              </div>
+          {liveReceipt && statusMeta && (() => {
+            const normStatus = liveReceipt.status.trim().toLowerCase();
+            const isVoucherUnlocked =
+              normStatus === 'confirmed' ||
+              normStatus === 'driver assigned' ||
+              normStatus === 'completed';
 
-              {/* 4-Step Horizontal Tracker */}
-              {!statusMeta.isCancelled && (
-                <div className="grid grid-cols-4 gap-1.5 pt-1">
-                  {steps.map((label, idx) => {
-                    const reached = idx <= statusMeta.stepIndex;
-                    return (
-                      <div key={label} className="space-y-1.5">
-                        <div
-                          className={`h-1.5 rounded-full transition-colors ${
-                            reached ? 'bg-[#EA580C]' : 'bg-[#CBD5E1]'
-                          }`}
-                        />
-                        <p
-                          className={`text-[10.5px] font-semibold leading-tight ${
-                            reached ? 'text-[#0F172A]' : 'text-[#94A3B8]'
-                          }`}
-                        >
-                          {label}
-                        </p>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-
-              {/* Trip Summary Details */}
-              <div className="space-y-2 text-xs text-[#334155]">
-                <p className="text-sm font-semibold text-[#0F172A]">
-                  {localMatch?.tripTitle ||
-                    (matchedTrip ? tText(matchedTrip.name, lang) : liveReceipt.tripId)}
-                </p>
-                <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 tabular-nums">
-                  {liveReceipt.tripDate && (
-                    <span className="inline-flex items-center gap-1">
-                      <Calendar className="h-3.5 w-3.5 text-[#EA580C]" />
-                      {liveReceipt.tripDate}
-                    </span>
-                  )}
-                  {localMatch?.tripStartTime && (
-                    <>
-                      <span aria-hidden="true">·</span>
-                      <span className="inline-flex items-center gap-1">
-                        <Clock className="h-3.5 w-3.5 text-[#EA580C]" />
-                        {localMatch.tripStartTime}
-                      </span>
-                    </>
-                  )}
-                  {localMatch?.hotel && (
-                    <>
-                      <span aria-hidden="true">·</span>
-                      <span className="inline-flex items-center gap-1">
-                        <MapPin className="h-3.5 w-3.5 text-[#EA580C]" />
-                        {localMatch.hotel}
-                        {localMatch.roomNumber ? ` (${localMatch.roomNumber})` : ''}
-                      </span>
-                    </>
-                  )}
-                </div>
-
-                {localMatch && (
-                  <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-[#E2E8F0] bg-white px-3.5 py-2.5 text-xs">
-                    <span className="text-[#475569]">
-                      {localMatch.adults}{' '}
-                      {tText({ en: 'Adult(s)', ar: 'بالغ', de: 'Erw.' }, lang)}
-                      {localMatch.children > 0
-                        ? ` · ${localMatch.children} ${tText({ en: 'Child(ren)', ar: 'طفل', de: 'Kind(er)' }, lang)}`
-                        : ''}
-                      {localMatch.infants && localMatch.infants > 0
-                        ? ` · ${localMatch.infants} INF`
-                        : ''}
-                    </span>
-                    <span className="font-bold text-[#0F172A] tabular-nums">
-                      {localMatch.totalEur > 0
-                        ? formatCurrencyPrice(localMatch.totalEur, currency, currency !== 'EUR')
+            return (
+              <div
+                className={`rounded-2xl border-2 p-4 sm:p-5 space-y-4 ${
+                  isVoucherUnlocked
+                    ? 'border-[#16A34A]/65 bg-white shadow-md'
+                    : 'border-[#E2E8F0] bg-[#F8FAFC]'
+                }`}
+              >
+                <div className="flex flex-wrap items-start justify-between gap-2 border-b border-[#E2E8F0] pb-3">
+                  <div>
+                    <p className="text-[11px] font-bold uppercase tracking-wider text-[#EA580C]">
+                      {isVoucherUnlocked
+                        ? tText(
+                            {
+                              en: 'Official Digital Boarding Voucher · Wasla Travel',
+                              ar: 'تذكرة صعود رقمية معتمدة · وصلة ترافيل',
+                              de: 'Offizieller Digitaler Boarding-Voucher · Wasla Travel',
+                            },
+                            lang
+                          )
                         : tText(
-                            { en: 'Custom Quote', ar: 'عرض سعر مخصص', de: 'Individuelles Angebot' },
+                            {
+                              en: 'Booking Request Reference',
+                              ar: 'رقم طلب الحجز (قيد المراجعة)',
+                              de: 'Buchungsanfrage-Referenz',
+                            },
                             lang
                           )}
-                    </span>
+                    </p>
+                    <p className="font-mono text-lg font-bold text-[#0F172A] tabular-nums">
+                      {liveReceipt.id}
+                    </p>
+                  </div>
+                  <span
+                    className={`inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-xs font-semibold ${statusMeta.tone}`}
+                  >
+                    <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />
+                    {statusMeta.label}
+                  </span>
+                </div>
+
+                {/* 4-Step Horizontal Tracker */}
+                {!statusMeta.isCancelled && (
+                  <div className="grid grid-cols-4 gap-1.5 pt-1">
+                    {steps.map((label, idx) => {
+                      const reached = idx <= statusMeta.stepIndex;
+                      return (
+                        <div key={label} className="space-y-1.5">
+                          <div
+                            className={`h-1.5 rounded-full transition-colors ${
+                              reached ? 'bg-[#EA580C]' : 'bg-[#CBD5E1]'
+                            }`}
+                          />
+                          <p
+                            className={`text-[10.5px] font-semibold leading-tight ${
+                              reached ? 'text-[#0F172A]' : 'text-[#94A3B8]'
+                            }`}
+                          >
+                            {label}
+                          </p>
+                        </div>
+                      );
+                    })}
                   </div>
                 )}
 
-                <p className="text-[11px] text-[#64748B] leading-relaxed">
-                  {tText(
-                    {
-                      en: 'Payment is collected in cash on pickup or via an official payment link sent by our Operations Desk once seats are verified. Free cancellation up to 24 hours before pickup.',
-                      ar: 'يتم الدفع كاش عند الاستلام من الفندق أو عبر رابط الدفع الرسمي الذي يرسله فريق العمليات بعد تأكيد المقاعد. الإلغاء مجاني قبل 24 ساعة من موعد التوصيل.',
-                      de: 'Die Zahlung erfolgt bar bei Abholung oder über einen offiziellen Zahlungslink nach Platzbestätigung. Kostenlose Stornierung bis 24 Stunden vor Abholung.',
-                    },
-                    lang
+                {/* Trip Summary & Digital Voucher Body */}
+                <div className="space-y-2.5 text-xs text-[#334155]">
+                  <p className="text-sm font-bold text-[#0F172A]">
+                    {localMatch?.tripTitle ||
+                      (matchedTrip ? tText(matchedTrip.name, lang) : liveReceipt.tripId)}
+                  </p>
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 tabular-nums">
+                    {liveReceipt.tripDate && (
+                      <span className="inline-flex items-center gap-1 font-semibold text-[#0F172A]">
+                        <Calendar className="h-3.5 w-3.5 text-[#EA580C]" />
+                        {liveReceipt.tripDate}
+                      </span>
+                    )}
+                    {localMatch?.tripStartTime && (
+                      <>
+                        <span aria-hidden="true">·</span>
+                        <span className="inline-flex items-center gap-1 font-medium">
+                          <Clock className="h-3.5 w-3.5 text-[#EA580C]" />
+                          {localMatch.tripStartTime}
+                        </span>
+                      </>
+                    )}
+                    {localMatch?.hotel && (
+                      <>
+                        <span aria-hidden="true">·</span>
+                        <span className="inline-flex items-center gap-1 font-medium">
+                          <MapPin className="h-3.5 w-3.5 text-[#EA580C]" />
+                          {localMatch.hotel}
+                          {localMatch.roomNumber ? ` (Room ${localMatch.roomNumber})` : ''}
+                        </span>
+                      </>
+                    )}
+                  </div>
+
+                  {localMatch && (
+                    <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-[#CBD5E1] bg-[#F8FAFC] px-3.5 py-2.5 text-xs">
+                      <div className="space-y-0.5">
+                        <span className="block font-semibold text-[#0F172A]">
+                          {localMatch.guestName}
+                          {localMatch.guestCountry ? ` · ${localMatch.guestCountry}` : ''}
+                        </span>
+                        <span className="block text-[#475569]">
+                          {localMatch.adults}{' '}
+                          {tText({ en: 'Adult(s)', ar: 'بالغ', de: 'Erw.' }, lang)}
+                          {localMatch.children > 0
+                            ? ` · ${localMatch.children} ${tText({ en: 'Child(ren)', ar: 'طفل', de: 'Kind(er)' }, lang)}`
+                            : ''}
+                          {localMatch.infants && localMatch.infants > 0
+                            ? ` · ${localMatch.infants} INF`
+                            : ''}
+                        </span>
+                      </div>
+                      <div className="text-end">
+                        <span className="block font-extrabold text-sm text-[#15803D] tabular-nums">
+                          {localMatch.totalEur > 0
+                            ? formatCurrencyPrice(localMatch.totalEur, currency, currency !== 'EUR')
+                            : tText(
+                                { en: 'Custom Quote', ar: 'عرض سعر مخصص', de: 'Individuelles Angebot' },
+                                lang
+                              )}
+                        </span>
+                        <span className="block text-[10px] font-medium text-[#64748B]">
+                          {tText(
+                            {
+                              en: 'Payable in EUR / USD / EGP',
+                              ar: 'يُقبل الدفع باليورو أو الدولار أو الجنيه',
+                              de: 'Zahlbar in EUR / USD / EGP',
+                            },
+                            lang
+                          )}
+                        </span>
+                      </div>
+                    </div>
                   )}
-                </p>
+
+                  {isVoucherUnlocked ? (
+                    <div className="rounded-xl border border-[#BBF7D0] bg-[#F0FDF4] p-3 text-[11.5px] text-[#14532D] space-y-1 leading-relaxed">
+                      <p className="font-bold text-[#15803D]">
+                        {tText(
+                          {
+                            en: '✓ Boarding Pass Confirmed — Present this Digital Voucher to your driver or tour representative at hotel pickup.',
+                            ar: '✓ تذكرة الصعود مؤكدة — يرجى إبراز هذه التذكرة الرقمية للسائق أو مندوب الرحلة عند الاستلام من الفندق.',
+                            de: '✓ Boarding-Pass bestätigt — Zeigen Sie diesen digitalen Voucher Ihrem Fahrer bei der Hotelabholung.',
+                          },
+                          lang
+                        )}
+                      </p>
+                      <p className="text-[11px] text-[#166534]">
+                        {tText(
+                          {
+                            en: 'If paying cash on pickup, you may pay in EUR, USD, or EGP according to your preference. Free cancellation up to 24 hours before pickup.',
+                            ar: 'في حال الدفع كاش عند الاستلام، يمكنك السداد بأي عملة (يورو، دولار، أو جنيه مصري). الإلغاء مجاني قبل 24 ساعة من التحرك.',
+                            de: 'Bei Barzahlung bei Abholung können Sie in EUR, USD oder EGP zahlen. Kostenlose Stornierung bis 24h vor Abholung.',
+                          },
+                          lang
+                        )}
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="rounded-xl border border-[#FED7AA] bg-[#FFF7ED] p-3 text-[11.5px] text-[#9A3412] space-y-1 leading-relaxed">
+                      <p className="font-bold text-[#C2410C]">
+                        {tText(
+                          {
+                            en: '🔒 Final Boarding Voucher Locked Until Operator Confirmation',
+                            ar: '🔒 التذكرة النهائية للرحلة مغلقة لحين تأكيد موظف الحجوزات والتشغيل',
+                            de: '🔒 Endgültiger Boarding-Voucher bis zur Einsatzbestätigung gesperrt',
+                          },
+                          lang
+                        )}
+                      </p>
+                      <p className="text-[11px] text-[#7C2D12]">
+                        {tText(
+                          {
+                            en: 'Our Reservations & Dispatch team is verifying availability and assigning your exact hotel pickup time. Once confirmed, your printable Digital Boarding Voucher will unlock here automatically.',
+                            ar: 'يقوم فريق الحجوزات والتشغيل حالياً بتأكيد الإتاحة وتحديد موعد البيك أب الدقيق لفندقك. فور التأكيد ستُفتح هنا التذكرة الرقمية النهائية القابلة للطباعة.',
+                            de: 'Unser Dispatch-Team prüft die Verfügbarkeit und weist Ihre genaue Abholzeit zu. Nach Bestätigung wird Ihr druckbarer Voucher hier automatisch freigeschaltet.',
+                          },
+                          lang
+                        )}
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Actions */}
+                <div className="flex flex-wrap items-center gap-2 pt-1">
+                  <a
+                    href={waFollowUpUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="wasla-wa-glare inline-flex min-h-[40px] flex-1 items-center justify-center gap-1.5 rounded-full px-4 text-xs font-semibold text-white cursor-pointer"
+                  >
+                    <MessageCircle className="h-3.5 w-3.5" />
+                    <span>
+                      {tText(
+                        { en: 'Message Operations', ar: 'تواصل مع العمليات', de: 'Team schreiben' },
+                        lang
+                      )}
+                    </span>
+                    <ExternalLink className="h-3 w-3 opacity-80" />
+                  </a>
+
+                  {isVoucherUnlocked && (
+                    <button
+                      type="button"
+                      onClick={() => window.print()}
+                      className="inline-flex min-h-[40px] items-center justify-center gap-1.5 rounded-full border border-[#16A34A] bg-[#F0FDF4] px-3.5 text-xs font-bold text-[#15803D] hover:bg-[#DCFCE7] cursor-pointer"
+                    >
+                      <Printer className="h-3.5 w-3.5 text-[#15803D]" />
+                      <span>
+                        {tText(
+                          {
+                            en: 'Print Official Voucher',
+                            ar: 'طباعة التذكرة النهائية',
+                            de: 'Voucher drucken',
+                          },
+                          lang
+                        )}
+                      </span>
+                    </button>
+                  )}
+                </div>
+
+                {isReviewEligible && matchedTrip && onOpenPostTripReview && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onClose();
+                      onOpenPostTripReview(matchedTrip, sanitizeBookingId(liveReceipt.id));
+                    }}
+                    className="inline-flex min-h-[40px] w-full items-center justify-center gap-1.5 rounded-full border border-[#FED7AA] bg-[#FFF7ED] px-4 text-xs font-semibold text-[#EA580C] hover:bg-[#FFEDD5] cursor-pointer"
+                  >
+                    <Star className="h-3.5 w-3.5 fill-[#F59E0B] text-[#F59E0B]" />
+                    <span>
+                      {tText(
+                        {
+                          en: 'Leave verified post-trip review & photo',
+                          ar: 'أضف تقييمك الموثق وصورة من الرحلة',
+                          de: 'Verifizierte Bewertung & Foto senden',
+                        },
+                        lang
+                      )}
+                    </span>
+                  </button>
+                )}
               </div>
-
-              {/* Actions */}
-              <div className="flex flex-wrap items-center gap-2 pt-1">
-                <a
-                  href={waFollowUpUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="wasla-wa-glare inline-flex min-h-[40px] flex-1 items-center justify-center gap-1.5 rounded-full px-4 text-xs font-semibold text-white cursor-pointer"
-                >
-                  <MessageCircle className="h-3.5 w-3.5" />
-                  <span>
-                    {tText(
-                      { en: 'Message Operations', ar: 'تواصل مع العمليات', de: 'Team schreiben' },
-                      lang
-                    )}
-                  </span>
-                  <ExternalLink className="h-3 w-3 opacity-80" />
-                </a>
-
-                <button
-                  type="button"
-                  onClick={() => window.print()}
-                  className="inline-flex min-h-[40px] items-center justify-center gap-1.5 rounded-full border border-[#CBD5E1] bg-white px-3.5 text-xs font-semibold text-[#0F172A] hover:bg-[#F1F5F9] cursor-pointer"
-                >
-                  <Printer className="h-3.5 w-3.5 text-[#475569]" />
-                  <span>
-                    {tText({ en: 'Print Ticket', ar: 'طباعة التذكرة', de: 'Drucken' }, lang)}
-                  </span>
-                </button>
-              </div>
-
-              {isReviewEligible && matchedTrip && onOpenPostTripReview && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    onClose();
-                    onOpenPostTripReview(matchedTrip, sanitizeBookingId(liveReceipt.id));
-                  }}
-                  className="inline-flex min-h-[40px] w-full items-center justify-center gap-1.5 rounded-full border border-[#FED7AA] bg-[#FFF7ED] px-4 text-xs font-semibold text-[#EA580C] hover:bg-[#FFEDD5] cursor-pointer"
-                >
-                  <Star className="h-3.5 w-3.5 fill-[#F59E0B] text-[#F59E0B]" />
-                  <span>
-                    {tText(
-                      {
-                        en: 'Leave verified post-trip review & photo',
-                        ar: 'أضف تقييمك الموثق وصورة من الرحلة',
-                        de: 'Verifizierte Bewertung & Foto senden',
-                      },
-                      lang
-                    )}
-                  </span>
-                </button>
-              )}
-            </div>
-          )}
+            );
+          })()}
 
           {/* Locally Saved Bookings on This Device */}
           <div className="space-y-2.5 pt-1">

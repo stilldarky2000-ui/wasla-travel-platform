@@ -302,7 +302,7 @@ export const INITIAL_SUPPLIERS: SupplierProfile[] = [
     languages: ['English', 'German', 'French', 'Italian', 'Arabic'],
     status: 'Active',
     contactPhone: '+20 112 915 5520',
-    email: 'info@waslatravel.com',
+    email: 'booking@waslatravel.com',
     payoutSettledEur: 60,
   },
   {
@@ -616,7 +616,7 @@ export const INITIAL_EMAIL_LOGS: PlatformEmailLog[] = [
   {
     id: 'em-1',
     to: 'hannah.l@example.de',
-    from: 'info@waslatravel.com',
+    from: 'booking@waslatravel.com',
     bookingRef: 'WT-412',
     direction: 'outbound',
     subject: 'WT-412 Confirmed — Payment Receipt & Marina Details',
@@ -628,7 +628,7 @@ export const INITIAL_EMAIL_LOGS: PlatformEmailLog[] = [
   {
     id: 'em-2',
     to: 'martin.v@example.dk',
-    from: 'info@waslatravel.com',
+    from: 'booking@waslatravel.com',
     bookingRef: 'WT-413',
     direction: 'outbound',
     subject: 'WT-413 Payment Link Ready — Luxor Small-Van Day',
@@ -640,7 +640,7 @@ export const INITIAL_EMAIL_LOGS: PlatformEmailLog[] = [
   {
     id: 'em-3',
     to: 'dispatch@nilehorizon.example',
-    from: 'info@waslatravel.com',
+    from: 'booking@waslatravel.com',
     bookingRef: 'WT-417',
     direction: 'outbound',
     subject: 'New Seat Request WT-417 — Dutch Egyptologist Needed',
@@ -651,7 +651,7 @@ export const INITIAL_EMAIL_LOGS: PlatformEmailLog[] = [
   },
   {
     id: 'em-4-in',
-    to: 'info@waslatravel.com',
+    to: 'booking@waslatravel.com',
     from: 'jonas.berg@example.de',
     bookingRef: 'WT-398',
     direction: 'inbound',
@@ -664,7 +664,7 @@ export const INITIAL_EMAIL_LOGS: PlatformEmailLog[] = [
   {
     id: 'em-4',
     to: 'jonas.berg@example.de',
-    from: 'info@waslatravel.com',
+    from: 'booking@waslatravel.com',
     bookingRef: 'WT-398',
     direction: 'outbound',
     subject: 'WT-398 Case Update — Pickup Delay & €15 Goodwill Credit Review',
@@ -675,7 +675,7 @@ export const INITIAL_EMAIL_LOGS: PlatformEmailLog[] = [
   },
   {
     id: 'em-5-in',
-    to: 'info@waslatravel.com',
+    to: 'booking@waslatravel.com',
     from: 'elena.rossi@example.it',
     bookingRef: 'WT-401',
     direction: 'inbound',
@@ -688,7 +688,7 @@ export const INITIAL_EMAIL_LOGS: PlatformEmailLog[] = [
   {
     id: 'em-5',
     to: 'elena.rossi@example.it',
-    from: 'info@waslatravel.com',
+    from: 'booking@waslatravel.com',
     bookingRef: 'WT-401',
     direction: 'outbound',
     subject: 'WT-401 Full €76 Refund Processed — Sea Wind Cancellation',

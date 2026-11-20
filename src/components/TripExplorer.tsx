@@ -402,7 +402,7 @@ export const TripExplorer: React.FC<TripExplorerProps> = ({
 
                 {images.length > 1 && (
                   <>
-                    <span className="pointer-events-none absolute bottom-3 end-3 z-10 rounded-md bg-[#1C1008]/70 px-2 py-0.5 text-[11px] font-semibold text-white backdrop-blur-xs tabular-nums">
+                    <span className="pointer-events-none absolute bottom-3 end-3 z-10 rounded-md bg-[#0B1F2E]/78 px-2 py-0.5 text-[11px] font-semibold text-white backdrop-blur-xs tabular-nums">
                       {imageIndex + 1} / {images.length}
                     </span>
                     <button
@@ -518,7 +518,7 @@ export const TripExplorer: React.FC<TripExplorerProps> = ({
               <button
                 type="button"
                 onClick={() => onBookTrip(activeTrip)}
-                className="wasla-book-glare min-h-[44px] flex-1 sm:flex-none rounded-full px-7 py-2.5 text-sm font-semibold text-white active:scale-[0.98] whitespace-nowrap cursor-pointer"
+                className="wasla-book-glare min-h-[44px] flex-1 sm:flex-none rounded-lg px-7 py-2.5 text-sm font-semibold text-white active:scale-[0.98] whitespace-nowrap cursor-pointer"
               >
                 {t.bookNow}
               </button>

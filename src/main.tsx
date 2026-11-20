@@ -29,6 +29,7 @@ const prevAuthFailure = (window as unknown as {gm_authFailure?: () => void}).gm_
 };
 
 const origError = console.error;
+const origWarn = console.warn;
 console.error = (...args: unknown[]) => {
   if (
     args.some(
@@ -36,6 +37,16 @@ console.error = (...args: unknown[]) => {
     )
   ) {
     window.dispatchEvent(new CustomEvent('gmp-quota-exceeded'));
+  }
+  if (
+    args.some(
+      (a) =>
+        typeof a === 'string' &&
+        /Could not reach Cloud Firestore backend|The client will operate in offline mode/.test(a)
+    )
+  ) {
+    origWarn.apply(console, args);
+    return;
   }
   origError.apply(console, args);
 };

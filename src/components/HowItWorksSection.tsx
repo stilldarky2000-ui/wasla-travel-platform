@@ -250,15 +250,15 @@ export const HowItWorksSection: React.FC<HowItWorksSectionProps> = ({
           <button
             type="button"
             onClick={() => onOpenCustomTrip(['Photography Session', 'Professional Egyptian Guide'])}
-            className="inline-flex min-h-[42px] items-center gap-1.5 rounded-full border border-[#FED7AA] bg-white px-4 py-2 text-xs font-semibold text-[#0F172A] hover:border-[#EA580C] hover:text-[#EA580C] transition-colors whitespace-nowrap cursor-pointer"
+            className="inline-flex min-h-[42px] items-center gap-1.5 rounded-lg border border-[#E7E2DA] bg-white px-4 py-2 text-xs font-semibold text-[#0B1F2E] hover:border-[#EA580C] hover:text-[#EA580C] transition-colors whitespace-nowrap cursor-pointer"
           >
-            <Camera className="h-3.5 w-3.5 text-[#EA580C]" aria-hidden="true" />
+            <Camera className="h-3.5 w-3.5 text-[#0E7490]" aria-hidden="true" />
             <span>{t.footerAddonCta}</span>
           </button>
           <button
             type="button"
             onClick={() => onOpenCustomTrip(undefined)}
-            className="wasla-book-glare inline-flex min-h-[42px] items-center gap-1.5 rounded-full px-5 py-2 text-xs font-semibold text-white whitespace-nowrap cursor-pointer"
+            className="wasla-book-glare inline-flex min-h-[42px] items-center gap-1.5 rounded-lg px-5 py-2 text-xs font-semibold text-white whitespace-nowrap cursor-pointer"
           >
             <span>{t.quickJumpCustom}</span>
           </button>

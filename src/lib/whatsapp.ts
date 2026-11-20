@@ -194,7 +194,7 @@ export function buildGuestPickupMailtoUrl(params: {
     ``,
     `Best regards,`,
     `Wasla Travel Operations Desk`,
-    `WhatsApp: +20 112 915 5520 | info@waslatravel.com`,
+    `WhatsApp: +20 112 915 5520 | booking@waslatravel.com`,
   ]
     .filter((line, idx, arr) => line !== '' || (idx === 1 || idx === arr.length - 4))
     .join('\n');

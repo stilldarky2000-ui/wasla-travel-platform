@@ -1,9 +1,16 @@
 @import "tailwindcss";
 
 @theme {
-  --font-display: "Fraunces", "IBM Plex Sans Arabic", Georgia, serif;
+  --font-display: "Fraunces", "Cairo", "IBM Plex Sans Arabic", Georgia, serif;
   --font-sans: "Plus Jakarta Sans", "IBM Plex Sans Arabic", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --color-wasla-navy: #0B1F2E;
+  --color-wasla-sand: #FAF8F5;
+  --color-wasla-sand-border: #E7E2DA;
+  --color-wasla-terracotta: #EA580C;
+  --color-wasla-terracotta-dark: #C2410C;
+  --color-wasla-lagoon: #0E7490;
 }
 
 @layer base {
@@ -26,95 +33,37 @@
   }
 }
 
-@property --wasla-led-angle {
-  syntax: "<angle>";
-  initial-value: 0deg;
-  inherits: false;
-}
-
-@keyframes waslaLedRotate {
-  to {
-    --wasla-led-angle: 360deg;
-  }
-}
-
-/* Google-style rotating multi-color LED strip when hovering, pointing, or typing inside inputs */
+/* Calm, trustworthy hospitality form states (zero spinning LED borders) */
 input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not(.bg-transparent):not(.no-led),
 textarea:not(.no-led),
 select:not(.bg-transparent):not(.no-led) {
-  transition: box-shadow 180ms ease, border-color 180ms ease;
+  transition: border-color 160ms ease, box-shadow 160ms ease, background-color 160ms ease;
 }
 
 input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not(.bg-transparent):not(.no-led):hover,
 textarea:not(.no-led):hover,
 select:not(.bg-transparent):not(.no-led):hover {
-  border-color: transparent !important;
-  background-image:
-    linear-gradient(#ffffff, #ffffff),
-    conic-gradient(
-      from var(--wasla-led-angle, 0deg),
-      #ff7000 0deg,
-      #f54400 90deg,
-      #fbbc05 180deg,
-      #de1b00 270deg,
-      #ff7000 360deg
-    );
-  background-origin: border-box;
-  background-clip: padding-box, border-box;
-  animation: waslaLedRotate 2.8s linear infinite;
-  box-shadow: 0 0 0 2px rgba(245, 68, 0, 0.14);
+  border-color: #94A3B8;
 }
 
 input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not(.bg-transparent):not(.no-led):focus,
 textarea:not(.no-led):focus,
 select:not(.bg-transparent):not(.no-led):focus {
-  outline: none !important;
-  border-color: transparent !important;
-  background-image:
-    linear-gradient(#ffffff, #ffffff),
-    conic-gradient(
-      from var(--wasla-led-angle, 0deg),
-      #ff7000 0deg,
-      #f54400 75deg,
-      #fbbc05 155deg,
-      #ea580c 235deg,
-      #de1b00 305deg,
-      #ff7000 360deg
-    );
-  background-origin: border-box;
-  background-clip: padding-box, border-box;
-  animation: waslaLedRotate 1.9s linear infinite;
-  box-shadow: 0 0 0 3px rgba(245, 68, 0, 0.22), 0 4px 14px rgba(245, 68, 0, 0.14);
+  outline: none;
+  border-color: #EA580C;
+  box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.16);
 }
 
+/* Architectural Hero Search Bar Frame */
 .wasla-led-ring {
-  border: 2px solid transparent;
-  background-image:
-    linear-gradient(#ffffff, #ffffff),
-    conic-gradient(
-      from var(--wasla-led-angle, 0deg),
-      rgba(254, 215, 170, 0.9) 0deg,
-      rgba(254, 215, 170, 0.9) 360deg
-    );
-  background-origin: border-box;
-  background-clip: padding-box, border-box;
-  transition: box-shadow 200ms ease;
+  border: 1px solid rgba(11, 31, 46, 0.12);
+  box-shadow: 0 20px 44px -16px rgba(11, 31, 46, 0.38);
+  transition: border-color 180ms ease, box-shadow 180ms ease;
 }
 
-.wasla-led-ring:hover,
 .wasla-led-ring:focus-within {
-  background-image:
-    linear-gradient(#ffffff, #ffffff),
-    conic-gradient(
-      from var(--wasla-led-angle, 0deg),
-      #ff7000 0deg,
-      #f54400 90deg,
-      #fbbc05 180deg,
-      #de1b00 270deg,
-      #ff7000 360deg
-    );
-  animation: waslaLedRotate 2.2s linear infinite;
-  box-shadow: 0 0 0 3px rgba(245, 68, 0, 0.24), 0 12px 30px rgba(15, 23, 42, 0.18);
+  border-color: rgba(234, 88, 12, 0.55);
+  box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.18), 0 22px 48px -16px rgba(11, 31, 46, 0.42);
 }
 
 .tabular-nums {
@@ -245,336 +194,122 @@ select:not(.bg-transparent):not(.no-led):focus {
   );
 }
 
-/* Cheerful kinetic brand accent for "Travel" / "ترافل" inspired by modern live polish */
-@keyframes travelSheen {
-  0%, 100% {
-    background-position: 0% 50%;
-    transform: translateY(0px);
-  }
-  50% {
-    background-position: 100% 50%;
-    transform: translateY(-1.5px);
-  }
-}
-
-@keyframes sparkleFloat {
-  0%, 100% {
-    transform: translateY(0px) rotate(0deg) scale(1);
-    opacity: 0.9;
-  }
-  50% {
-    transform: translateY(-2.5px) rotate(12deg) scale(1.12);
-    opacity: 1;
-  }
-}
-
+/* Clean, authoritative brand typography accents (no rainbow sheen) */
 .wasla-brand-first {
   display: inline-block;
-  color: #ea580c;
-  background-image: linear-gradient(110deg, #de1b00 0%, #f54400 50%, #ff7000 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: #0B1F2E;
 }
 
 .wasla-brand-first-light {
   display: inline-block;
-  color: #ffffff;
-  background-image: linear-gradient(110deg, #ffffff 0%, #fff7ed 55%, #fde047 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: #FFFFFF;
 }
 
 .wasla-travel-word {
   display: inline-block;
-  color: #f54400;
-  background-image: linear-gradient(
-    110deg,
-    #ff7000 0%,
-    #f54400 35%,
-    #f59e0b 52%,
-    #de1b00 72%,
-    #ff7000 100%
-  );
-  background-size: 230% 100%;
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  animation: travelSheen 5.2s ease-in-out infinite;
+  color: #EA580C;
 }
 
 .wasla-travel-word-light {
   display: inline-block;
-  color: #fdba74;
-  background-image: linear-gradient(
-    110deg,
-    #ffffff 0%,
-    #fdba74 35%,
-    #fde68a 52%,
-    #fb923c 70%,
-    #ffffff 100%
-  );
-  background-size: 230% 100%;
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  animation: travelSheen 5.2s ease-in-out infinite;
+  color: #FDBA74;
 }
 
 .wasla-glint {
   display: inline-block;
-  animation: sparkleFloat 3.6s ease-in-out infinite;
 }
 
-/* Warm orange-to-red CTA button, Hero banner, & Image hover glossy glare sweep */
-@keyframes waslaBookGlare {
-  0%, 55% {
-    transform: translateX(-160%) skewX(-22deg);
-    opacity: 0;
-  }
-  65% {
-    opacity: 0.62;
-  }
-  88% {
-    transform: translateX(260%) skewX(-22deg);
-    opacity: 0;
-  }
-  100% {
-    transform: translateX(260%) skewX(-22deg);
-    opacity: 0;
-  }
-}
-
-@keyframes waslaHeroCalmGlare {
-  0%, 68% {
-    transform: translateX(-160%) skewX(-22deg);
-    opacity: 0;
-  }
-  76% {
-    opacity: 0.28;
-  }
-  94% {
-    transform: translateX(260%) skewX(-22deg);
-    opacity: 0;
-  }
-  100% {
-    transform: translateX(260%) skewX(-22deg);
-    opacity: 0;
-  }
-}
-
-@keyframes waslaImageHoverGlare {
-  0% {
-    transform: translateX(-160%) skewX(-22deg);
-    opacity: 0;
-  }
-  8% {
-    opacity: 0.62;
-  }
-  30% {
-    transform: translateX(260%) skewX(-22deg);
-    opacity: 0;
-  }
-  100% {
-    transform: translateX(260%) skewX(-22deg);
-    opacity: 0;
-  }
-}
-
+/* Disciplined Wasla Travel Primary CTA, WhatsApp Action, Hero & Deep Red Sea Navy Footer */
 @layer components {
   .wasla-book-glare,
   .wasla-wa-glare {
     position: relative;
-    overflow: hidden;
-    transition: transform 180ms ease, box-shadow 200ms ease, filter 200ms ease;
+    transition:
+      background-color 160ms cubic-bezier(0.16, 1, 0.3, 1),
+      transform 160ms cubic-bezier(0.16, 1, 0.3, 1),
+      box-shadow 180ms cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .wasla-book-glare {
-    background: linear-gradient(110deg, #ff7000 0%, #f54400 48%, #de1b00 100%);
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.38),
-      inset 0 -1px 0 rgba(120, 14, 0, 0.25),
-      0 8px 20px -6px rgba(229, 46, 0, 0.55);
-  }
-
-  .wasla-wa-glare {
-    background: linear-gradient(110deg, #25d366 0%, #16a34a 50%, #0f8a3c 100%);
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.38),
-      inset 0 -1px 0 rgba(5, 68, 25, 0.28),
-      0 8px 20px -6px rgba(22, 163, 74, 0.52);
-  }
-
-  .wasla-book-glare::before,
-  .wasla-wa-glare::before {
-    content: "";
-    position: absolute;
-    inset: 0 0 52% 0;
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.26) 0%, rgba(255, 255, 255, 0) 100%);
-    pointer-events: none;
-  }
-
-  .wasla-book-glare::after,
-  .wasla-wa-glare::after {
-    content: "";
-    position: absolute;
-    top: -20%;
-    left: 0;
-    width: 38%;
-    height: 140%;
-    background: linear-gradient(
-      90deg,
-      rgba(255, 255, 255, 0) 0%,
-      rgba(255, 255, 255, 0.48) 50%,
-      rgba(255, 255, 255, 0) 100%
-    );
-    transform: translateX(-160%) skewX(-22deg);
-    animation: waslaBookGlare 8.5s ease-in-out infinite;
-    pointer-events: none;
+    background-color: #EA580C;
+    box-shadow: 0 1px 2px rgba(11, 31, 46, 0.12), 0 6px 16px -6px rgba(234, 88, 12, 0.42);
   }
 
   .wasla-book-glare:hover {
-    filter: brightness(1.06);
+    background-color: #C2410C;
     transform: translateY(-1px);
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.45),
-      0 12px 24px -6px rgba(229, 46, 0, 0.68);
+    box-shadow: 0 2px 4px rgba(11, 31, 46, 0.14), 0 10px 20px -6px rgba(194, 65, 12, 0.45);
+  }
+
+  .wasla-book-glare:active {
+    transform: translateY(0);
+  }
+
+  .wasla-wa-glare {
+    background-color: #15803D;
+    box-shadow: 0 1px 2px rgba(11, 31, 46, 0.12), 0 6px 16px -6px rgba(21, 128, 61, 0.38);
   }
 
   .wasla-wa-glare:hover {
-    filter: brightness(1.06);
+    background-color: #166534;
     transform: translateY(-1px);
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.45),
-      0 12px 24px -6px rgba(22, 163, 74, 0.65);
+    box-shadow: 0 2px 4px rgba(11, 31, 46, 0.14), 0 10px 20px -6px rgba(22, 101, 52, 0.42);
   }
 
-  .wasla-book-glare:hover::after,
-  .wasla-wa-glare:hover::after {
-    animation-duration: 4.5s;
+  .wasla-wa-glare:active {
+    transform: translateY(0);
   }
 
-  /* Hero section & Footer calm, occasional glossy glare sweep */
-  .wasla-hero-glare,
-  .wasla-footer-glare {
+  /* Clean Hero Banner & Deep Red Sea Navy Footer (zero glossy sweep overlays) */
+  .wasla-hero-glare {
     position: relative;
     overflow: hidden;
   }
 
   .wasla-footer-glare {
-    background: linear-gradient(110deg, #ff7000 0%, #f54400 48%, #de1b00 100%);
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.38),
-      inset 0 -1px 0 rgba(120, 14, 0, 0.25),
-      0 -10px 28px -8px rgba(229, 46, 0, 0.38);
-  }
-
-  .wasla-hero-glare::before,
-  .wasla-footer-glare::before {
-    content: "";
-    position: absolute;
-    inset: 0 0 55% 0;
-    z-index: 2;
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0) 100%);
-    pointer-events: none;
-  }
-
-  .wasla-hero-glare::after,
-  .wasla-footer-glare::after {
-    content: "";
-    position: absolute;
-    top: -25%;
-    left: 0;
-    width: 38%;
-    height: 150%;
-    z-index: 2;
-    background: linear-gradient(
-      90deg,
-      rgba(255, 255, 255, 0) 0%,
-      rgba(255, 255, 255, 0.28) 50%,
-      rgba(255, 255, 255, 0) 100%
+    position: relative;
+    overflow: hidden;
+    background-color: #0B1F2E;
+    background-image: radial-gradient(
+      900px 360px at 85% 0%,
+      rgba(14, 116, 144, 0.22) 0%,
+      rgba(11, 31, 46, 0) 70%
     );
-    transform: translateX(-160%) skewX(-22deg);
-    animation: waslaHeroCalmGlare 12s ease-in-out infinite;
-    pointer-events: none;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
   }
 
-  /* Image hover calm glossy glare sweep (one gentle sweep, then long pause) */
+  /* Clean image frame (no plastic hover glare) */
   .wasla-img-glare {
     position: relative;
     overflow: hidden;
   }
 
-  .wasla-img-glare::before {
-    content: "";
-    position: absolute;
-    inset: 0 0 52% 0;
-    z-index: 25;
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0) 100%);
-    opacity: 0;
-    transition: opacity 350ms ease;
-    pointer-events: none;
-  }
-
-  .wasla-img-glare::after {
-    content: "";
-    position: absolute;
-    top: -25%;
-    left: 0;
-    width: 40%;
-    height: 150%;
-    z-index: 26;
-    background: linear-gradient(
-      90deg,
-      rgba(255, 255, 255, 0) 0%,
-      rgba(255, 255, 255, 0.46) 50%,
-      rgba(255, 255, 255, 0) 100%
-    );
-    transform: translateX(-160%) skewX(-22deg);
-    opacity: 0;
-    pointer-events: none;
-  }
-
-  .wasla-img-glare:hover::before,
-  .group:hover .wasla-img-glare::before {
-    opacity: 1;
-  }
-
-  .wasla-img-glare:hover::after,
-  .group:hover .wasla-img-glare::after {
-    animation: waslaImageHoverGlare 7.5s ease-in-out infinite;
-  }
-
-  /* TripCard subtle scale-up animation and smooth shadow elevation on hover */
+  /* TripCard calm tactile lift on hover (single elevation depth) */
   .wasla-storefront-root .wasla-trip-card {
     will-change: transform, box-shadow;
     transition:
-      transform 320ms cubic-bezier(0.22, 1, 0.36, 1),
-      box-shadow 320ms cubic-bezier(0.22, 1, 0.36, 1),
-      border-color 220ms ease;
+      transform 220ms cubic-bezier(0.16, 1, 0.3, 1),
+      box-shadow 220ms cubic-bezier(0.16, 1, 0.3, 1),
+      border-color 180ms ease;
   }
 
   .wasla-storefront-root .wasla-trip-card:hover {
-    transform: translate3d(0, -4px, 0) scale(1.02);
-    box-shadow:
-      0 20px 36px -12px rgba(15, 23, 42, 0.16),
-      0 8px 18px -6px rgba(234, 88, 12, 0.18);
+    transform: translate3d(0, -3px, 0);
+    box-shadow: 0 16px 32px -14px rgba(11, 31, 46, 0.16);
   }
 
   .wasla-storefront-root .wasla-trip-card:active {
-    transform: translate3d(0, -1px, 0) scale(0.99);
+    transform: translate3d(0, -1px, 0);
   }
 }
 
 [data-wasla-theme="dark"] .wasla-storefront-root .wasla-trip-card:hover {
-  box-shadow:
-    0 22px 40px -12px rgba(0, 0, 0, 0.65),
-    0 8px 20px -6px rgba(234, 88, 12, 0.28);
+  box-shadow: 0 18px 36px -12px rgba(0, 0, 0, 0.65);
 }
 
+/* Disciplined 3-Font Brand Hierarchy (Fraunces + Cairo, Plus Jakarta Sans + IBM Plex Sans Arabic, IBM Plex Mono) */
 .font-hero-editorial {
-  font-family: "Fraunces", "IBM Plex Sans Arabic", Georgia, serif;
+  font-family: "Fraunces", "Cairo", "IBM Plex Sans Arabic", Georgia, serif;
 }
 
 .font-hero-modern {
@@ -582,19 +317,19 @@ select:not(.bg-transparent):not(.no-led):focus {
 }
 
 .font-hero-clean {
-  font-family: "DM Sans", "IBM Plex Sans Arabic", ui-sans-serif, system-ui, sans-serif;
+  font-family: "Plus Jakarta Sans", "IBM Plex Sans Arabic", ui-sans-serif, system-ui, sans-serif;
 }
 
 .font-hero-luxury {
-  font-family: "Playfair Display", "IBM Plex Sans Arabic", Georgia, serif;
+  font-family: "Fraunces", "Cairo", "IBM Plex Sans Arabic", Georgia, serif;
 }
 
 .font-hero-bold {
-  font-family: "Outfit", "Cairo", "IBM Plex Sans Arabic", ui-sans-serif, system-ui, sans-serif;
+  font-family: "Plus Jakarta Sans", "Cairo", "IBM Plex Sans Arabic", ui-sans-serif, system-ui, sans-serif;
 }
 
 .font-hero-architectural {
-  font-family: "Manrope", "IBM Plex Sans Arabic", ui-sans-serif, system-ui, sans-serif;
+  font-family: "Plus Jakarta Sans", "IBM Plex Sans Arabic", ui-sans-serif, system-ui, sans-serif;
 }
 
 /* System-Wide Dark Mode Theme ([data-wasla-theme="dark"]) for Storefront, Operations Desk, Supplier Portal, and Owner Control */
@@ -691,8 +426,9 @@ select:not(.bg-transparent):not(.no-led):focus {
   border-color: rgba(255, 255, 255, 0.2) !important;
 }
 
-/* Secondary Muted Surfaces & Chat Feeds across all 4 pages */
+/* Secondary Muted & Warm Sand Surfaces across all 4 pages */
 [data-wasla-theme="dark"] .wasla-storefront-root .bg-\[\#FAFCFF\],
+[data-wasla-theme="dark"] .wasla-storefront-root .bg-\[\#FAF8F5\],
 [data-wasla-theme="dark"] .wasla-storefront-root .bg-\[\#FAF7F2\],
 [data-wasla-theme="dark"] .wasla-storefront-root .bg-\[\#F8FAFC\],
 [data-wasla-theme="dark"] .wasla-storefront-root .bg-\[\#F8FAFC\]\/60,
@@ -700,10 +436,11 @@ select:not(.bg-transparent):not(.no-led):focus {
 [data-wasla-theme="dark"] .wasla-storefront-root .bg-\[\#E8EEF0\],
 [data-wasla-theme="dark"] .wasla-storefront-root .bg-\[\#E8EEF5\],
 [data-wasla-theme="dark"] [role="dialog"] .bg-\[\#FAFCFF\],
+[data-wasla-theme="dark"] [role="dialog"] .bg-\[\#FAF8F5\],
 [data-wasla-theme="dark"] [role="dialog"] .bg-\[\#F8FAFC\],
 [data-wasla-theme="dark"] [role="dialog"] .bg-\[\#EEF2F6\],
 [data-wasla-theme="dark"] [role="dialog"] .bg-\[\#F1F5F9\] {
-  background-color: #0D1422 !important;
+  background-color: #0D1626 !important;
 }
 
 /* Warm Orange / Amber / Yellow Pastel Surfaces in Dark Mode */
@@ -810,8 +547,11 @@ select:not(.bg-transparent):not(.no-led):focus {
 
 /* Typography Hierarchy across all 4 pages */
 [data-wasla-theme="dark"] .wasla-storefront-root .text-\[\#0F172A\],
+[data-wasla-theme="dark"] .wasla-storefront-root .text-\[\#0B1F2E\],
 [data-wasla-theme="dark"] [role="dialog"] .text-\[\#0F172A\],
-[data-wasla-theme="dark"] [role="listbox"] .text-\[\#0F172A\] {
+[data-wasla-theme="dark"] [role="dialog"] .text-\[\#0B1F2E\],
+[data-wasla-theme="dark"] [role="listbox"] .text-\[\#0F172A\],
+[data-wasla-theme="dark"] [role="listbox"] .text-\[\#0B1F2E\] {
   color: #F8FAFC !important;
 }
 
@@ -946,50 +686,33 @@ select:not(.bg-transparent):not(.no-led):focus {
   border-color: rgba(248, 113, 113, 0.32) !important;
 }
 
-[data-wasla-theme="dark"] .wasla-led-ring {
-  background-color: transparent !important;
-  background-image:
-    linear-gradient(#111827, #111827),
-    conic-gradient(
-      from var(--wasla-led-angle, 0deg),
-      rgba(251, 146, 60, 0.35) 0deg,
-      rgba(251, 146, 60, 0.35) 360deg
-    );
+[data-wasla-theme="dark"] .wasla-storefront-root .border-\[\#E7E2DA\],
+[data-wasla-theme="dark"] [role="dialog"] .border-\[\#E7E2DA\] {
+  border-color: rgba(148, 163, 184, 0.22) !important;
 }
 
-[data-wasla-theme="dark"] .wasla-led-ring:hover,
+[data-wasla-theme="dark"] .wasla-led-ring {
+  background-color: #0E1A2B !important;
+  border-color: rgba(148, 163, 184, 0.24) !important;
+  box-shadow: 0 20px 44px -16px rgba(0, 0, 0, 0.65);
+}
+
 [data-wasla-theme="dark"] .wasla-led-ring:focus-within {
-  background-color: transparent !important;
-  background-image:
-    linear-gradient(#111827, #111827),
-    conic-gradient(
-      from var(--wasla-led-angle, 0deg),
-      #ff7000 0deg,
-      #f54400 90deg,
-      #fbbc05 180deg,
-      #de1b00 270deg,
-      #ff7000 360deg
-    );
+  border-color: rgba(234, 88, 12, 0.65) !important;
+  box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.22), 0 22px 48px -16px rgba(0, 0, 0, 0.7);
 }
 
 [data-wasla-theme="dark"] input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not(.bg-transparent):not(.no-led):hover,
 [data-wasla-theme="dark"] textarea:not(.no-led):hover,
-[data-wasla-theme="dark"] select:not(.bg-transparent):not(.no-led):hover,
+[data-wasla-theme="dark"] select:not(.bg-transparent):not(.no-led):hover {
+  border-color: rgba(148, 163, 184, 0.45) !important;
+}
+
 [data-wasla-theme="dark"] input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not(.bg-transparent):not(.no-led):focus,
 [data-wasla-theme="dark"] textarea:not(.no-led):focus,
 [data-wasla-theme="dark"] select:not(.bg-transparent):not(.no-led):focus {
-  background-color: transparent !important;
-  background-image:
-    linear-gradient(#0F172A, #0F172A),
-    conic-gradient(
-      from var(--wasla-led-angle, 0deg),
-      #ff7000 0deg,
-      #f54400 75deg,
-      #fbbc05 155deg,
-      #ea580c 235deg,
-      #de1b00 305deg,
-      #ff7000 360deg
-    );
+  border-color: #EA580C !important;
+  box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.22) !important;
   color: #F8FAFC !important;
 }
 

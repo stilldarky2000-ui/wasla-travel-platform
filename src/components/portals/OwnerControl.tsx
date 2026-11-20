@@ -284,6 +284,103 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
   const [savingSettings, setSavingSettings] = useState(false);
   const [settingsSaved, setSettingsSaved] = useState(false);
 
+  // Automatic Owner Booking Alert Channel Status (Email + WhatsApp server delivery)
+  const [alertChannelStatus, setAlertChannelStatus] = useState<{
+    emailConfigured: boolean;
+    emailProvider: string;
+    whatsappConfigured: boolean;
+    whatsappProvider: string;
+    webhookConfigured: boolean;
+  } | null>(null);
+  const [testingOwnerAlerts, setTestingOwnerAlerts] = useState(false);
+  const [testAlertResult, setTestAlertResult] = useState<{
+    emailSent: boolean;
+    emailTo: string;
+    emailProvider: string;
+    emailError?: string;
+    whatsappSent: boolean;
+    whatsappTo: string;
+    whatsappProvider: string;
+    whatsappError?: string;
+  } | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    fetch('/api/notifications/status')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (active && data) setAlertChannelStatus(data);
+      })
+      .catch(() => {});
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const handleSendTestOwnerAlert = async () => {
+    if (testingOwnerAlerts) return;
+    setTestingOwnerAlerts(true);
+    setTestAlertResult(null);
+    const targetEmail = publicSettings?.email || SITE_CONFIG.email;
+    const targetWaDigits = normalizeWhatsAppDigits(
+      publicSettings?.whatsappNumber || SITE_CONFIG.whatsappNumber
+    );
+    try {
+      const res = await fetch('/api/notifications/new-booking', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: `WT-TEST-${Math.floor(1000 + Math.random() * 8999)}`,
+          tripTitle: 'Orange Bay & Giftun Reef Small-Group Boat Day',
+          destination: 'Hurghada',
+          category: 'sea',
+          date: new Date(Date.now() + 86400000).toISOString().slice(0, 10),
+          tripStartTime: '08:30 AM',
+          guestName: 'Test Owner Notification',
+          guestCountry: 'Germany',
+          guestWhatsapp: targetWaDigits ? `+${targetWaDigits}` : '+201129155520',
+          guestEmail: targetEmail,
+          hotel: 'Steigenberger ALDAU Beach Hotel',
+          roomNumber: '412',
+          adults: 2,
+          children: 0,
+          infants: 0,
+          grossEur: 90,
+          supplierName: 'Captain Karim Marine',
+          paymentStatus: 'Cash on pickup',
+          notes: 'Live delivery verification from Owner Command Center',
+          officialEmail: targetEmail,
+          ownerWhatsapp: targetWaDigits,
+          isTest: true,
+        }),
+      });
+      const data = await res.json();
+      setTestAlertResult({
+        emailSent: Boolean(data?.email?.sent),
+        emailTo: data?.email?.to || targetEmail,
+        emailProvider: data?.email?.provider || 'none',
+        emailError: data?.email?.error,
+        whatsappSent: Boolean(data?.whatsapp?.sent),
+        whatsappTo: data?.whatsapp?.to || targetWaDigits,
+        whatsappProvider: data?.whatsapp?.provider || 'none',
+        whatsappError: data?.whatsapp?.error,
+      });
+    } catch {
+      setTestAlertResult({
+        emailSent: false,
+        emailTo: targetEmail,
+        emailProvider: 'none',
+        emailError: 'Could not reach server notification endpoint.',
+        whatsappSent: false,
+        whatsappTo: targetWaDigits,
+        whatsappProvider: 'none',
+        whatsappError: 'Could not reach server notification endpoint.',
+      });
+    } finally {
+      setTestingOwnerAlerts(false);
+    }
+  };
+
   // Interactive Booking Ticket & Edit Modal state
   const [bookingModalDraft, setBookingModalDraft] = useState<PlatformBooking | null>(null);
   const [bookingModalMode, setBookingModalMode] = useState<'ticket' | 'edit'>('ticket');
@@ -3361,6 +3458,169 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                 </div>
               )}
             </form>
+
+            {/* Automatic Owner New-Booking Alerts (Official Email + WhatsApp Push) */}
+            <section
+              className="rounded-xl border border-[#CBD5E1] bg-white p-5 sm:p-6 space-y-4 shadow-xs"
+              dir={isAr ? 'rtl' : 'ltr'}
+            >
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#E2E8F0] pb-4">
+                <div className="space-y-0.5">
+                  <div className="flex items-center gap-2">
+                    <Bell className="h-4 w-4 text-[#EA580C]" aria-hidden="true" />
+                    <h2 className="text-base font-bold text-[#0F172A]">
+                      {isAr
+                        ? 'تنبيهات الحجوزات الجديدة التلقائية للمالك (واتساب + الإيميل الرسمي)'
+                        : 'Automatic Owner Booking Alerts (WhatsApp + Official Email)'}
+                    </h2>
+                  </div>
+                  <p className="text-xs text-[#475569]">
+                    {isAr
+                      ? 'فور إتمام أي عميل لحجز جديد، يقوم السيرفر بإرسال تنبيه فوري على واتساب المالك وإيميل رسمي كامل إلى بريد الشركة.'
+                      : 'On every new customer booking, the server automatically dispatches an instant WhatsApp alert to the owner and a complete booking email to your official inbox.'}
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => void handleSendTestOwnerAlert()}
+                  disabled={testingOwnerAlerts}
+                  className="inline-flex min-h-[38px] items-center gap-1.5 rounded-lg bg-[#0F172A] px-4 py-2 text-xs font-bold text-white hover:bg-[#1E293B] disabled:opacity-60 transition-colors cursor-pointer shrink-0"
+                >
+                  <Send className="h-3.5 w-3.5" aria-hidden="true" />
+                  <span>
+                    {testingOwnerAlerts
+                      ? isAr
+                        ? 'جاري إرسال التجربة...'
+                        : 'Sending Test...'
+                      : isAr
+                      ? 'إرسال تنبيه تجريبي (واتساب + إيميل)'
+                      : 'Send Test Alert (WhatsApp + Email)'}
+                  </span>
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                {/* Official Email Delivery Card */}
+                <div className="rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] p-4 space-y-2">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="inline-flex items-center gap-1.5 font-bold text-[#0F172A]">
+                      <Mail className="h-4 w-4 text-[#EA580C]" aria-hidden="true" />
+                      <span>
+                        {isAr ? 'إيميل الحجز الرسمي للمالك' : 'Official Owner Booking Email'}
+                      </span>
+                    </span>
+                    <span
+                      className={`rounded-md px-2 py-0.5 text-[10.5px] font-extrabold ${
+                        alertChannelStatus?.emailConfigured
+                          ? 'bg-[#DCFCE7] text-[#15803D]'
+                          : 'bg-[#FEF3C7] text-[#92400E]'
+                      }`}
+                    >
+                      {alertChannelStatus?.emailConfigured
+                        ? isAr
+                          ? `مفعّل (${alertChannelStatus.emailProvider.toUpperCase()})`
+                          : `Active (${alertChannelStatus.emailProvider.toUpperCase()})`
+                        : isAr
+                        ? 'بانتظار إعداد SMTP في Secrets'
+                        : 'Configure SMTP in Secrets'}
+                    </span>
+                  </div>
+                  <div className="font-mono font-semibold text-[#0F172A]" dir="ltr">
+                    {liveContactEmail}
+                  </div>
+                  <p className="text-[11px] text-[#475569] leading-relaxed">
+                    {alertChannelStatus?.emailConfigured
+                      ? isAr
+                        ? 'يصل كل حجز جديد فوراً إلى الإيميل الرسمي بكافة تفاصيل العميل والفندق والسعر وزر الرد المباشر.'
+                        : 'Every new booking arrives automatically in your official inbox with full guest, hotel, pricing, and direct reply-to details.'
+                      : isAr
+                      ? 'لتفعيل الإرسال الفعلي لإيميل الدومين (booking@waslatravel.com)، أضف SMTP_HOST و SMTP_USER و SMTP_PASS (أو RESEND_API_KEY) في AI Studio Secrets.'
+                      : 'To activate live delivery to your official domain email, add SMTP_HOST, SMTP_USER, and SMTP_PASS (or RESEND_API_KEY) in AI Studio Settings > Secrets.'}
+                  </p>
+                </div>
+
+                {/* Owner WhatsApp Push Alert Card */}
+                <div className="rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] p-4 space-y-2">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="inline-flex items-center gap-1.5 font-bold text-[#0F172A]">
+                      <MessageCircle className="h-4 w-4 text-[#16A34A]" aria-hidden="true" />
+                      <span>
+                        {isAr ? 'تنبيه واتساب الفوري للمالك' : 'Instant Owner WhatsApp Push Alert'}
+                      </span>
+                    </span>
+                    <span
+                      className={`rounded-md px-2 py-0.5 text-[10.5px] font-extrabold ${
+                        alertChannelStatus?.whatsappConfigured
+                          ? 'bg-[#DCFCE7] text-[#15803D]'
+                          : 'bg-[#FEF3C7] text-[#92400E]'
+                      }`}
+                    >
+                      {alertChannelStatus?.whatsappConfigured
+                        ? isAr
+                          ? `مفعّل (${alertChannelStatus.whatsappProvider})`
+                          : `Active (${alertChannelStatus.whatsappProvider})`
+                        : isAr
+                        ? 'بانتظار مفتاح واتساب في Secrets'
+                        : 'Configure WhatsApp in Secrets'}
+                    </span>
+                  </div>
+                  <div className="font-mono font-semibold text-[#0F172A]" dir="ltr">
+                    {liveWhatsappDisplay}
+                  </div>
+                  <p className="text-[11px] text-[#475569] leading-relaxed">
+                    {alertChannelStatus?.whatsappConfigured
+                      ? isAr
+                        ? 'يتم إرسال رسالة واتساب تلقائية لك فور تسجيل أي حجز جديد على الموقع.'
+                        : 'An automated WhatsApp message is pushed to you the moment any new customer booking is submitted.'
+                      : isAr
+                      ? 'لتفعيل تنبيه الواتساب التلقائي، أضف أحد الخيارات في Secrets: (CallMeBot مجاني عبر CALLMEBOT_API_KEY، أو Meta WhatsApp Cloud عبر WHATSAPP_CLOUD_TOKEN + WHATSAPP_PHONE_NUMBER_ID، أو Twilio).'
+                      : 'To activate instant WhatsApp alerts, add ONE option in AI Studio Secrets: free personal alerts via CALLMEBOT_API_KEY, official Meta Cloud API (WHATSAPP_CLOUD_TOKEN + WHATSAPP_PHONE_NUMBER_ID), or Twilio WhatsApp.'}
+                  </p>
+                </div>
+              </div>
+
+              {testAlertResult && (
+                <div className="rounded-xl border border-[#CBD5E1] bg-white p-3.5 text-xs space-y-1.5">
+                  <div className="font-bold text-[#0F172A]">
+                    {isAr ? 'نتيجة الإرسال التجريبي:' : 'Test Delivery Result:'}
+                  </div>
+                  <div className="flex flex-wrap gap-3">
+                    <span
+                      className={`font-semibold ${
+                        testAlertResult.emailSent ? 'text-[#15803D]' : 'text-[#B45309]'
+                      }`}
+                    >
+                      {isAr ? 'الإيميل الرسمي:' : 'Official Email:'}{' '}
+                      {testAlertResult.emailSent
+                        ? isAr
+                          ? `تم الإرسال بنجاح إلى ${testAlertResult.emailTo} (${testAlertResult.emailProvider})`
+                          : `Delivered to ${testAlertResult.emailTo} (${testAlertResult.emailProvider})`
+                        : testAlertResult.emailError ||
+                          (isAr
+                            ? 'لم يتم ضبط بيانات SMTP/Resend في Secrets بعد'
+                            : 'SMTP/Resend secrets not set yet')}
+                    </span>
+                    <span className="text-[#CBD5E1]">|</span>
+                    <span
+                      className={`font-semibold ${
+                        testAlertResult.whatsappSent ? 'text-[#15803D]' : 'text-[#B45309]'
+                      }`}
+                    >
+                      {isAr ? 'واتساب المالك:' : 'Owner WhatsApp:'}{' '}
+                      {testAlertResult.whatsappSent
+                        ? isAr
+                          ? `تم الإرسال بنجاح (${testAlertResult.whatsappProvider})`
+                          : `Delivered (${testAlertResult.whatsappProvider})`
+                        : testAlertResult.whatsappError ||
+                          (isAr
+                            ? 'لم يتم ضبط مفتاح WhatsApp في Secrets بعد'
+                            : 'WhatsApp provider secret not set yet')}
+                    </span>
+                  </div>
+                </div>
+              )}
+            </section>
 
             {/* Hero & Visual Identity Studio */}
             <OwnerHeroStudio

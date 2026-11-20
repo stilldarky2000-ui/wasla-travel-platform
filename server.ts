@@ -5,6 +5,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { createServer as createViteServer } from 'vite';
 import { GoogleGenAI, ThinkingLevel, Type } from '@google/genai';
+import nodemailer from 'nodemailer';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -34,6 +35,406 @@ async function startServer() {
       process.env.GOOGLE_MAPS_API_KEY ||
       '';
     res.json({ apiKey });
+  });
+
+  // ============================================================================
+  // OWNER NEW-BOOKING NOTIFICATIONS (OFFICIAL EMAIL + WHATSAPP PUSH ALERTS)
+  // ============================================================================
+  const getNotificationChannelStatus = () => {
+    const hasSmtp = Boolean(
+      process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS
+    );
+    const hasResend = Boolean(process.env.RESEND_API_KEY);
+    const hasMetaWa = Boolean(
+      process.env.WHATSAPP_CLOUD_TOKEN && process.env.WHATSAPP_PHONE_NUMBER_ID
+    );
+    const hasTwilioWa = Boolean(
+      process.env.TWILIO_ACCOUNT_SID &&
+        process.env.TWILIO_AUTH_TOKEN &&
+        process.env.TWILIO_WHATSAPP_FROM
+    );
+    const hasCallMeBot = Boolean(process.env.CALLMEBOT_API_KEY);
+    const hasWebhook = Boolean(process.env.OWNER_ALERT_WEBHOOK_URL);
+
+    return {
+      emailConfigured: hasSmtp || hasResend,
+      emailProvider: hasSmtp ? 'smtp' : hasResend ? 'resend' : 'none',
+      whatsappConfigured: hasMetaWa || hasTwilioWa || hasCallMeBot || hasWebhook,
+      whatsappProvider: hasMetaWa
+        ? 'whatsapp-cloud'
+        : hasTwilioWa
+        ? 'twilio'
+        : hasCallMeBot
+        ? 'callmebot'
+        : hasWebhook
+        ? 'webhook'
+        : 'none',
+      webhookConfigured: hasWebhook,
+    };
+  };
+
+  app.get('/api/notifications/status', (_req, res) => {
+    res.json(getNotificationChannelStatus());
+  });
+
+  app.post('/api/notifications/new-booking', async (req, res) => {
+    const body = (req.body ?? {}) as {
+      id?: string;
+      tripTitle?: string;
+      destination?: string;
+      category?: string;
+      date?: string;
+      tripStartTime?: string;
+      guestName?: string;
+      guestCountry?: string;
+      guestWhatsapp?: string;
+      guestEmail?: string;
+      guestContact?: string;
+      hotel?: string;
+      roomNumber?: string;
+      adults?: number;
+      children?: number;
+      infants?: number;
+      grossEur?: number;
+      supplierName?: string;
+      paymentStatus?: string;
+      notes?: string;
+      officialEmail?: string;
+      ownerWhatsapp?: string;
+      isTest?: boolean;
+    };
+
+    const bookingId = String(body.id || 'WT-TEST').trim();
+    const tripTitle = String(body.tripTitle || 'Wasla Travel Excursion').trim();
+    const destination = String(body.destination || 'Hurghada').trim();
+    const tripDate = String(body.date || new Date().toISOString().slice(0, 10)).trim();
+    const startTime = String(body.tripStartTime || '').trim();
+    const guestName = String(body.guestName || 'Guest').trim();
+    const guestCountry = String(body.guestCountry || 'Guest').trim();
+    const guestWa = String(body.guestWhatsapp || '').trim();
+    const guestEmail = String(body.guestEmail || '').trim();
+    const guestContact = String(body.guestContact || guestWa || guestEmail || 'N/A').trim();
+    const hotel = String(body.hotel || 'Hotel Pickup').trim();
+    const roomNumber = String(body.roomNumber || '').trim();
+    const adults = Math.max(1, Number(body.adults) || 1);
+    const children = Math.max(0, Number(body.children) || 0);
+    const infants = Math.max(0, Number(body.infants) || 0);
+    const grossEur = Math.max(0, Number(body.grossEur) || 0);
+    const supplierName = String(body.supplierName || 'Wasla Operations').trim();
+    const paymentStatus = String(body.paymentStatus || 'Awaiting link').trim();
+    const notes = String(body.notes || '').trim();
+    const isTest = Boolean(body.isTest);
+
+    const targetOwnerEmail = String(
+      process.env.OWNER_ALERT_EMAIL || body.officialEmail || 'booking@waslatravel.com'
+    ).trim();
+    const targetOwnerWaDigits = String(
+      process.env.OWNER_WHATSAPP_TO || body.ownerWhatsapp || '201129155520'
+    ).replace(/\D/g, '');
+    const appUrl = (process.env.APP_URL || 'https://waslatravel.com').replace(/\/$/, '');
+
+    const bookedAtStr = new Date().toLocaleString('en-GB', {
+      timeZone: 'Africa/Cairo',
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    });
+
+    const paxLine = `${adults} Adults${children > 0 ? ` + ${children} Children` : ''}${
+      infants > 0 ? ` + ${infants} Infants` : ''
+    }`;
+
+    const guestWaDigits = guestWa.replace(/\D/g, '');
+    const guestWaLink = guestWaDigits ? `https://wa.me/${guestWaDigits}` : '';
+
+    const whatsappAlertText = [
+      isTest
+        ? `🧪 *TEST ALERT — Wasla Travel Owner Desk*`
+        : `🔔 *NEW BOOKING ALERT — ${bookingId}*`,
+      `━━━━━━━━━━━━━━━━━━`,
+      `🎫 *Excursion:* ${tripTitle} (${destination})`,
+      `📅 *Trip Date:* ${tripDate}${startTime ? ` · ${startTime}` : ''}`,
+      `🕒 *Booked At:* ${bookedAtStr} (Egypt Time)`,
+      `👤 *Guest:* ${guestName} (${guestCountry})`,
+      `🏨 *Hotel:* ${hotel}${roomNumber ? ` · Room ${roomNumber}` : ''}`,
+      `👥 *Pax:* ${paxLine}`,
+      `💶 *Total:* €${grossEur} (${paymentStatus} · EUR/USD/EGP)`,
+      `🚐 *Supplier:* ${supplierName}`,
+      `📞 *Guest Contact:* ${guestContact}`,
+      notes ? `📝 *Notes:* ${notes}` : '',
+      guestWaLink ? `💬 *Message Guest:* ${guestWaLink}` : '',
+      `🔗 *Dispatch Desk:* ${appUrl}`,
+    ]
+      .filter(Boolean)
+      .join('\n');
+
+    const emailSubject = isTest
+      ? `[TEST] Wasla Travel Owner Booking Alert — ${bookingId}`
+      : `🔔 New Booking ${bookingId} — ${tripTitle} (${tripDate}) · €${grossEur}`;
+
+    const escapeHtml = (str: string) =>
+      str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+
+    const emailHtml = `
+      <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; max-width: 620px; margin: 0 auto; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 14px; overflow: hidden;">
+        <div style="background: #0f172a; color: #ffffff; padding: 20px 24px;">
+          <div style="font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: #fdba74; font-weight: 700;">
+            ${isTest ? 'TEST NOTIFICATION · WASLA TRAVEL' : 'NEW CUSTOMER BOOKING · WASLA TRAVEL'}
+          </div>
+          <h1 style="margin: 6px 0 0; font-size: 20px; font-weight: 800;">
+            ${escapeHtml(bookingId)} — ${escapeHtml(tripTitle)}
+          </h1>
+          <div style="margin-top: 6px; font-size: 13px; color: #cbd5e1;">
+            Booked at ${escapeHtml(bookedAtStr)} (Cairo Time) · ${escapeHtml(destination)}
+          </div>
+        </div>
+
+        <div style="padding: 22px 24px; color: #0f172a; font-size: 14px; line-height: 1.5;">
+          <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+            <tr><td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0; color: #475569; width: 38%;">Guest Name</td><td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0; font-weight: 700;">${escapeHtml(guestName)} (${escapeHtml(guestCountry)})</td></tr>
+            <tr><td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0; color: #475569;">Trip Date & Time</td><td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0; font-weight: 700;">${escapeHtml(tripDate)}${startTime ? ` · ${escapeHtml(startTime)}` : ''}</td></tr>
+            <tr><td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0; color: #475569;">Hotel & Room</td><td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0; font-weight: 700;">${escapeHtml(hotel)}${roomNumber ? ` · Room ${escapeHtml(roomNumber)}` : ''}</td></tr>
+            <tr><td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0; color: #475569;">Passengers</td><td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0; font-weight: 700;">${escapeHtml(paxLine)}</td></tr>
+            <tr><td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0; color: #475569;">Gross Total</td><td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0; font-weight: 800; color: #15803d;">€${grossEur} (${escapeHtml(paymentStatus)} · EUR/USD/EGP accepted)</td></tr>
+            <tr><td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0; color: #475569;">Assigned Supplier</td><td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0; font-weight: 700;">${escapeHtml(supplierName)}</td></tr>
+            <tr><td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0; color: #475569;">Guest WhatsApp</td><td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0; font-weight: 700;">${escapeHtml(guestWa || 'Not provided')}</td></tr>
+            <tr><td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0; color: #475569;">Guest Email</td><td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0; font-weight: 700;">${escapeHtml(guestEmail || 'Not provided')}</td></tr>
+            ${notes ? `<tr><td style="padding: 8px 0; color: #475569;">Special Notes</td><td style="padding: 8px 0; font-weight: 600;">${escapeHtml(notes)}</td></tr>` : ''}
+          </table>
+
+          <div style="margin-top: 20px; padding: 12px 14px; background: #fff7ed; border: 1px solid #fed7aa; border-radius: 10px; font-size: 12px; color: #9a3412;">
+            <strong>Voucher Lock Status:</strong> The customer's final printable Digital Boarding Voucher remains locked until you confirm the booking and set the manual hotel pickup time inside Reservations &amp; Dispatch.
+          </div>
+
+          <div style="margin-top: 20px;">
+            <a href="${escapeHtml(appUrl)}" style="display: inline-block; background: #ea580c; color: #ffffff; text-decoration: none; font-weight: 700; font-size: 13px; padding: 11px 18px; border-radius: 8px; margin-right: 10px;">
+              Open Reservations &amp; Dispatch
+            </a>
+            ${
+              guestWaLink
+                ? `<a href="${escapeHtml(guestWaLink)}" style="display: inline-block; background: #16a34a; color: #ffffff; text-decoration: none; font-weight: 700; font-size: 13px; padding: 11px 18px; border-radius: 8px;">Message Guest on WhatsApp</a>`
+                : ''
+            }
+          </div>
+        </div>
+      </div>
+    `;
+
+    const result: {
+      ok: boolean;
+      email: { sent: boolean; provider: string; to: string; error?: string };
+      whatsapp: { sent: boolean; provider: string; to: string; error?: string };
+      webhook: { sent: boolean; error?: string };
+    } = {
+      ok: true,
+      email: { sent: false, provider: 'none', to: targetOwnerEmail },
+      whatsapp: { sent: false, provider: 'none', to: targetOwnerWaDigits },
+      webhook: { sent: false },
+    };
+
+    // 1. Official Email Delivery (SMTP first, then Resend fallback)
+    if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
+      result.email.provider = 'smtp';
+      try {
+        const port = Number(process.env.SMTP_PORT || 465);
+        const secure =
+          process.env.SMTP_SECURE !== undefined
+            ? process.env.SMTP_SECURE === 'true'
+            : port === 465;
+        const transporter = nodemailer.createTransport({
+          host: process.env.SMTP_HOST,
+          port,
+          secure,
+          auth: {
+            user: process.env.SMTP_USER,
+            pass: process.env.SMTP_PASS,
+          },
+        });
+        await transporter.sendMail({
+          from: process.env.SMTP_FROM || `Wasla Travel Bookings <${process.env.SMTP_USER}>`,
+          to: targetOwnerEmail,
+          ...(guestEmail && guestEmail.includes('@') ? { replyTo: guestEmail } : {}),
+          subject: emailSubject,
+          text: whatsappAlertText,
+          html: emailHtml,
+        });
+        result.email.sent = true;
+      } catch (err) {
+        result.email.error = err instanceof Error ? err.message : 'SMTP delivery failed';
+      }
+    } else if (process.env.RESEND_API_KEY) {
+      result.email.provider = 'resend';
+      try {
+        const resendRes = await fetch('https://api.resend.com/emails', {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            from: process.env.RESEND_FROM_EMAIL || 'Wasla Travel <onboarding@resend.dev>',
+            to: [targetOwnerEmail],
+            ...(guestEmail && guestEmail.includes('@') ? { reply_to: guestEmail } : {}),
+            subject: emailSubject,
+            text: whatsappAlertText,
+            html: emailHtml,
+          }),
+        });
+        if (!resendRes.ok) {
+          const errText = await resendRes.text();
+          result.email.error = `Resend API ${resendRes.status}: ${errText.slice(0, 180)}`;
+        } else {
+          result.email.sent = true;
+        }
+      } catch (err) {
+        result.email.error = err instanceof Error ? err.message : 'Resend delivery failed';
+      }
+    }
+
+    // 2. Automatic Owner WhatsApp Alert (Meta Cloud API -> Twilio -> CallMeBot)
+    if (
+      process.env.WHATSAPP_CLOUD_TOKEN &&
+      process.env.WHATSAPP_PHONE_NUMBER_ID &&
+      targetOwnerWaDigits
+    ) {
+      result.whatsapp.provider = 'whatsapp-cloud';
+      try {
+        const waRes = await fetch(
+          `https://graph.facebook.com/v21.0/${process.env.WHATSAPP_PHONE_NUMBER_ID}/messages`,
+          {
+            method: 'POST',
+            headers: {
+              Authorization: `Bearer ${process.env.WHATSAPP_CLOUD_TOKEN}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              messaging_product: 'whatsapp',
+              to: targetOwnerWaDigits,
+              type: 'text',
+              text: { body: whatsappAlertText },
+            }),
+          }
+        );
+        if (!waRes.ok) {
+          const errText = await waRes.text();
+          result.whatsapp.error = `Meta WhatsApp API ${waRes.status}: ${errText.slice(0, 180)}`;
+        } else {
+          result.whatsapp.sent = true;
+        }
+      } catch (err) {
+        result.whatsapp.error =
+          err instanceof Error ? err.message : 'Meta WhatsApp delivery failed';
+      }
+    } else if (
+      process.env.TWILIO_ACCOUNT_SID &&
+      process.env.TWILIO_AUTH_TOKEN &&
+      process.env.TWILIO_WHATSAPP_FROM &&
+      targetOwnerWaDigits
+    ) {
+      result.whatsapp.provider = 'twilio';
+      try {
+        const twilioUrl = `https://api.twilio.com/2010-04-01/Accounts/${process.env.TWILIO_ACCOUNT_SID}/Messages.json`;
+        const authHeader = Buffer.from(
+          `${process.env.TWILIO_ACCOUNT_SID}:${process.env.TWILIO_AUTH_TOKEN}`
+        ).toString('base64');
+        const form = new URLSearchParams({
+          From: process.env.TWILIO_WHATSAPP_FROM.startsWith('whatsapp:')
+            ? process.env.TWILIO_WHATSAPP_FROM
+            : `whatsapp:+${process.env.TWILIO_WHATSAPP_FROM.replace(/\D/g, '')}`,
+          To: `whatsapp:+${targetOwnerWaDigits}`,
+          Body: whatsappAlertText,
+        });
+        const twRes = await fetch(twilioUrl, {
+          method: 'POST',
+          headers: {
+            Authorization: `Basic ${authHeader}`,
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: form.toString(),
+        });
+        if (!twRes.ok) {
+          const errText = await twRes.text();
+          result.whatsapp.error = `Twilio API ${twRes.status}: ${errText.slice(0, 180)}`;
+        } else {
+          result.whatsapp.sent = true;
+        }
+      } catch (err) {
+        result.whatsapp.error = err instanceof Error ? err.message : 'Twilio delivery failed';
+      }
+    } else if (process.env.CALLMEBOT_API_KEY && targetOwnerWaDigits) {
+      result.whatsapp.provider = 'callmebot';
+      try {
+        const cmUrl = `https://api.callmebot.com/whatsapp.php?phone=+${encodeURIComponent(
+          targetOwnerWaDigits
+        )}&text=${encodeURIComponent(whatsappAlertText)}&apikey=${encodeURIComponent(
+          process.env.CALLMEBOT_API_KEY
+        )}`;
+        const cmRes = await fetch(cmUrl, { method: 'GET' });
+        if (!cmRes.ok) {
+          result.whatsapp.error = `CallMeBot HTTP ${cmRes.status}`;
+        } else {
+          result.whatsapp.sent = true;
+        }
+      } catch (err) {
+        result.whatsapp.error =
+          err instanceof Error ? err.message : 'CallMeBot delivery failed';
+      }
+    }
+
+    // 3. Optional Automation Webhook (Make.com / Zapier / n8n)
+    if (process.env.OWNER_ALERT_WEBHOOK_URL) {
+      try {
+        const hookRes = await fetch(process.env.OWNER_ALERT_WEBHOOK_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            event: isTest ? 'test_booking_alert' : 'new_booking',
+            bookingId,
+            bookedAt: bookedAtStr,
+            tripTitle,
+            destination,
+            tripDate,
+            startTime,
+            guestName,
+            guestCountry,
+            guestWhatsapp: guestWa,
+            guestEmail,
+            hotel,
+            roomNumber,
+            adults,
+            children,
+            infants,
+            grossEur,
+            supplierName,
+            paymentStatus,
+            notes,
+            ownerEmail: targetOwnerEmail,
+            ownerWhatsapp: targetOwnerWaDigits,
+            formattedWhatsappMessage: whatsappAlertText,
+          }),
+        });
+        if (hookRes.ok) {
+          result.webhook.sent = true;
+          if (!result.whatsapp.sent && result.whatsapp.provider === 'none') {
+            result.whatsapp.provider = 'webhook';
+            result.whatsapp.sent = true;
+          }
+        } else {
+          result.webhook.error = `Webhook HTTP ${hookRes.status}`;
+        }
+      } catch (err) {
+        result.webhook.error = err instanceof Error ? err.message : 'Webhook failed';
+      }
+    }
+
+    res.json(result);
   });
 
   app.get('/dev-sw.js', (_req, res) => {

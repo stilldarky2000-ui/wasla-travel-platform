@@ -1723,6 +1723,46 @@ export function useWaslaFirebase() {
         showDesktopBookingNotification(booking);
       }
 
+      const dispatchOwnerNotifications = async (targetBooking: PlatformBooking) => {
+        const officialEmail = publicSettings.email || SITE_CONFIG.email;
+        const ownerWhatsapp = publicSettings.whatsappNumber || SITE_CONFIG.whatsappNumber;
+        try {
+          await fetch('/api/notifications/new-booking', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              id: targetBooking.id,
+              tripTitle: targetBooking.tripTitle,
+              destination: targetBooking.destination,
+              category: targetBooking.category,
+              date: targetBooking.date,
+              tripStartTime: targetBooking.tripStartTime,
+              guestName: targetBooking.guestName,
+              guestCountry: targetBooking.guestCountry,
+              guestWhatsapp: targetBooking.guestWhatsapp,
+              guestEmail: targetBooking.guestEmail,
+              guestContact: targetBooking.guestContact,
+              hotel: targetBooking.hotel,
+              roomNumber: targetBooking.roomNumber,
+              adults: targetBooking.adults,
+              children: targetBooking.children,
+              infants: targetBooking.infants ?? 0,
+              grossEur: targetBooking.grossEur,
+              supplierName: targetBooking.supplierName,
+              paymentStatus: targetBooking.paymentStatus,
+              notes: targetBooking.notes,
+              officialEmail,
+              ownerWhatsapp,
+            }),
+          });
+        } catch {
+          // Non-blocking network alert call should never break booking submission
+        }
+      };
+
+      // Always fire real-time Owner WhatsApp + Official Email alert via backend
+      void dispatchOwnerNotifications(bookingWithTs);
+
       if (!firestoreSeeded && effectiveRole === 'none') {
         // Allow instant WhatsApp confirmation if storefront database hasn't been seeded yet
         return;
@@ -1748,17 +1788,62 @@ export function useWaslaFirebase() {
           updatedAt: serverTimestamp(),
         }).catch(() => {});
 
-        const recipient = booking.guestEmail || booking.guestContact || publicSettings.email;
+        const officialInbox = publicSettings.email || SITE_CONFIG.email;
+        const summaryBody = [
+          `New Booking Reference: ${bookingId}`,
+          `Excursion: ${booking.tripTitle} (${booking.destination})`,
+          `Date: ${booking.date}${booking.tripStartTime ? ` · ${booking.tripStartTime}` : ''}`,
+          `Guest: ${booking.guestName} (${booking.guestCountry || 'Guest'})`,
+          `Hotel: ${booking.hotel}${booking.roomNumber ? ` · Room ${booking.roomNumber}` : ''}`,
+          `Pax: ${booking.adults} Adults${booking.children > 0 ? ` + ${booking.children} Children` : ''}${(booking.infants ?? 0) > 0 ? ` + ${booking.infants} Infants` : ''}`,
+          `Gross Total: €${booking.grossEur} (${booking.paymentStatus} · EUR/USD/EGP accepted)`,
+          `Supplier: ${booking.supplierName}`,
+          `Guest WhatsApp: ${booking.guestWhatsapp || 'N/A'}`,
+          `Guest Email: ${booking.guestEmail || 'N/A'}`,
+          booking.notes ? `Notes: ${booking.notes}` : '',
+        ]
+          .filter(Boolean)
+          .join('\n');
+
+        // 1. Log official owner booking email sent to Official Inbox (booking@waslatravel.com)
         await logDispatchEmailInDb(
-          recipient,
-          `${bookingId} Request Logged — ${booking.tripTitle} (${booking.date})`,
-          'Booking Confirmation'
+          officialInbox,
+          `New Booking ${bookingId} — ${booking.tripTitle} (${booking.date}) · €${booking.grossEur}`,
+          'Booking Confirmation',
+          {
+            body: summaryBody,
+            bookingRef: bookingId,
+            from: booking.guestEmail || booking.guestContact || 'storefront@waslatravel.com',
+            direction: 'inbound',
+          }
         );
+
+        // 2. If guest provided an email, also log their customer request receipt
+        if (booking.guestEmail && booking.guestEmail.includes('@')) {
+          await logDispatchEmailInDb(
+            booking.guestEmail,
+            `${bookingId} Request Logged — ${booking.tripTitle} (${booking.date})`,
+            'Booking Confirmation',
+            {
+              body: summaryBody,
+              bookingRef: bookingId,
+              from: officialInbox,
+              direction: 'outbound',
+            }
+          );
+        }
       } catch (err) {
         handleFirestoreError(err, OperationType.CREATE, `bookings/${bookingId}`);
       }
     },
-    [firestoreSeeded, effectiveRole, trips, publicSettings.email, logDispatchEmailInDb]
+    [
+      firestoreSeeded,
+      effectiveRole,
+      trips,
+      publicSettings.email,
+      publicSettings.whatsappNumber,
+      logDispatchEmailInDb,
+    ]
   );
 
   const createChatInDb = useCallback(

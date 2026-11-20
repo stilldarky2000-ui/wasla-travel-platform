@@ -115,10 +115,10 @@ export const TripCard: React.FC<TripCardProps> = ({
       data-wasla-revealed="1"
       style={{ '--reveal-delay': `${Math.min(revealIndex, 4) * 70}ms` } as React.CSSProperties}
       onClick={() => onSelect(trip)}
-      className={`wasla-trip-card reveal-item is-revealed snap-start shrink-0 basis-[82%] sm:basis-[calc((100%-20px)/2)] lg:basis-[calc((100%-60px)/4)] flex flex-col justify-between rounded-2xl border bg-white overflow-hidden cursor-pointer group ${
+      className={`wasla-trip-card reveal-item is-revealed snap-start shrink-0 basis-[82%] sm:basis-[calc((100%-20px)/2)] lg:basis-[calc((100%-60px)/4)] flex flex-col justify-between rounded-xl border bg-white overflow-hidden cursor-pointer group ${
         isFavorite
           ? 'border-[#E11D48] ring-2 ring-[#E11D48]/20'
-          : 'border-[#E2E8F0] hover:border-[#FED7AA]'
+          : 'border-[#E2E8F0] hover:border-[#CBD5E1]'
       }`}
     >
       <div>
@@ -128,13 +128,13 @@ export const TripCard: React.FC<TripCardProps> = ({
             fallbackSrc={CATEGORY_FALLBACK_IMAGE[trip.category]}
             alt={tText(trip.name, lang)}
             loading="eager"
-            className="h-full w-full group-hover:scale-[1.05] transition-transform duration-500 ease-out"
+            className="h-full w-full group-hover:scale-[1.04] transition-transform duration-500 ease-out"
             placeholderLabel={tText(trip.name, lang)}
           />
 
-          {/* Top-Start Category Tag */}
+          {/* Top-Start Subtle Category Label */}
           <div className="pointer-events-none absolute top-2.5 start-2.5 z-20">
-            <span className="inline-flex items-center rounded-md bg-[#0F172A]/75 px-2.5 py-1 text-[10.5px] font-semibold tracking-wide text-[#FFF7ED] backdrop-blur-xs">
+            <span className="inline-flex items-center rounded-md bg-[#0B1F2E]/78 px-2.5 py-1 text-[10.5px] font-semibold tracking-wide text-white backdrop-blur-xs">
               {categoryLabel}
             </span>
           </div>
@@ -146,10 +146,10 @@ export const TripCard: React.FC<TripCardProps> = ({
               onClick={handleShare}
               aria-label={shareLabel}
               title={shareLabel}
-              className={`inline-flex h-9 items-center justify-center gap-1 rounded-full transition-all duration-200 active:scale-90 cursor-pointer ${
+              className={`inline-flex h-8 items-center justify-center gap-1 rounded-lg transition-all duration-150 active:scale-95 cursor-pointer ${
                 shareCopied
-                  ? 'border border-emerald-300/60 bg-emerald-600 px-2.5 text-[11px] font-bold text-white shadow-md'
-                  : 'w-9 border border-white/40 bg-[#0F172A]/65 text-white hover:bg-[#EA580C] hover:border-white/75 backdrop-blur-xs shadow-xs'
+                  ? 'border border-emerald-300/60 bg-[#15803D] px-2.5 text-[11px] font-bold text-white shadow-sm'
+                  : 'w-8 border border-white/30 bg-[#0B1F2E]/70 text-white hover:bg-[#EA580C] hover:border-transparent backdrop-blur-xs'
               }`}
             >
               {shareCopied ? (
@@ -172,15 +172,15 @@ export const TripCard: React.FC<TripCardProps> = ({
                 aria-pressed={isFavorite}
                 aria-label={favoriteLabel}
                 title={favoriteLabel}
-                className={`inline-flex h-9 w-9 items-center justify-center rounded-full transition-all duration-200 active:scale-90 cursor-pointer ${
+                className={`inline-flex h-8 w-8 items-center justify-center rounded-lg transition-all duration-150 active:scale-95 cursor-pointer ${
                   isFavorite
-                    ? 'border border-white/50 bg-[#E11D48] text-white shadow-[0_6px_18px_rgba(225,29,72,0.55)] scale-105'
-                    : 'border border-white/40 bg-[#0F172A]/65 text-white hover:bg-[#E11D48]/90 hover:border-white/75 backdrop-blur-xs shadow-xs'
+                    ? 'border border-white/40 bg-[#E11D48] text-white shadow-sm'
+                    : 'border border-white/30 bg-[#0B1F2E]/70 text-white hover:bg-[#E11D48] hover:border-transparent backdrop-blur-xs'
                 }`}
               >
                 <Heart
-                  className={`h-4 w-4 transition-transform duration-200 ${
-                    isFavorite ? 'fill-white text-white scale-110' : 'text-white'
+                  className={`h-4 w-4 transition-transform duration-150 ${
+                    isFavorite ? 'fill-white text-white scale-105' : 'text-white'
                   }`}
                   aria-hidden="true"
                 />
@@ -188,15 +188,15 @@ export const TripCard: React.FC<TripCardProps> = ({
             )}
           </div>
 
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-[#1C1008]/90 via-[#1C1008]/40 to-transparent" />
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-18 bg-gradient-to-t from-[#0B1F2E]/82 via-[#0B1F2E]/28 to-transparent" />
           <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 px-3.5 pb-2.5 pt-4 text-white">
-            <div className="flex items-center justify-between gap-2 text-[11.5px] text-[#FFF7ED] tabular-nums">
+            <div className="flex items-center justify-between gap-2 text-[11.5px] text-white/95 tabular-nums">
               <span className="inline-flex items-center gap-1 font-semibold text-white">
-                <Star className="h-3.5 w-3.5 fill-[#F0B85A] text-[#F0B85A]" aria-hidden="true" />
+                <Star className="h-3.5 w-3.5 fill-[#F59E0B] text-[#F59E0B]" aria-hidden="true" />
                 {safeRating}
-                <span className="font-normal text-[#FED7AA]">({trip.reviewCount})</span>
+                <span className="font-normal text-white/75">({trip.reviewCount})</span>
               </span>
-              <span className="inline-flex items-center gap-1 text-[#FFF7ED] truncate">
+              <span className="inline-flex items-center gap-1 text-white/95 truncate">
                 <MapPin className="h-3 w-3 text-[#FDBA74] shrink-0" aria-hidden="true" />
                 <span className="truncate">{trip.destination}</span>
               </span>
@@ -205,17 +205,17 @@ export const TripCard: React.FC<TripCardProps> = ({
         </div>
 
         <div className="p-4 sm:p-5 space-y-2">
-          <div className="flex items-center justify-between gap-2 text-xs font-medium text-[#52525B] tabular-nums">
+          <div className="flex items-center justify-between gap-2 text-xs font-medium text-[#475569] tabular-nums">
             <span className="inline-flex items-center gap-1 shrink-0">
-              <Clock className="h-3.5 w-3.5 text-[#EA580C]" aria-hidden="true" />
+              <Clock className="h-3.5 w-3.5 text-[#0E7490]" aria-hidden="true" />
               {tText(trip.duration, lang)}
             </span>
-            <span className="truncate text-[11.5px] text-[#475569]">
+            <span className="truncate text-[11.5px] text-[#64748B]">
               {formatTripScheduleSummary(trip, lang, true)}
             </span>
           </div>
 
-          <h3 className="text-[15.5px] font-semibold tracking-[-0.01em] text-[#0F172A] leading-snug line-clamp-2 group-hover:text-[#EA580C] transition-colors">
+          <h3 className="text-[15.5px] font-semibold tracking-[-0.01em] text-[#0B1F2E] leading-snug line-clamp-2 group-hover:text-[#EA580C] transition-colors">
             {tText(trip.name, lang)}
           </h3>
 
@@ -227,14 +227,14 @@ export const TripCard: React.FC<TripCardProps> = ({
         </div>
       </div>
 
-      <div className="border-t border-[#E2E8F0] bg-white px-4 sm:px-5 py-3 flex items-center justify-between gap-2">
+      <div className="border-t border-[#E2E8F0] bg-[#FAF8F5]/65 px-4 sm:px-5 py-3 flex items-center justify-between gap-2">
         <div className="inline-flex items-baseline gap-1 tabular-nums tracking-normal">
           <span className="text-[11px] font-medium text-[#64748B]">{fromWord}</span>
-          <span className="text-[16px] font-bold text-[#0F172A]">{displayPrice}</span>
+          <span className="font-mono text-[16px] font-bold text-[#0B1F2E]">{displayPrice}</span>
           <span className="text-[11px] font-medium text-[#64748B]">/ {perShort}</span>
         </div>
 
-        <span className="wasla-book-glare inline-flex items-center gap-1 rounded-full px-3.5 py-1.5 text-[12px] font-semibold tracking-normal text-white whitespace-nowrap shrink-0">
+        <span className="wasla-book-glare inline-flex items-center gap-1 rounded-lg px-3.5 py-1.5 text-[12px] font-semibold tracking-normal text-white whitespace-nowrap shrink-0">
           <span>{t.viewTrip}</span>
           <span aria-hidden="true">→</span>
         </span>

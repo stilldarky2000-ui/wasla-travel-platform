@@ -173,6 +173,66 @@ export const OUTER_TRANSFER_ZONES: TransferZoneOption[] = [
   },
 ];
 
+const ZONE_BASE_NAMES: Record<string, { en: string; ar: string; de: string }> = {
+  hurghada: { en: 'Hurghada City', ar: 'مدينة الغردقة', de: 'Hurghada Stadt' },
+  'el-gouna': { en: 'El Gouna', ar: 'الجونة', de: 'El Gouna' },
+  'sahl-hasheesh': { en: 'Sahl Hasheesh', ar: 'سهل حشيش', de: 'Sahl Hasheesh' },
+  makadi: { en: 'Makadi Bay', ar: 'خليج مكادي', de: 'Makadi Bay' },
+  'soma-bay': { en: 'Soma Bay', ar: 'سوما باي', de: 'Soma Bay' },
+  safaga: { en: 'Safaga', ar: 'سفاجا', de: 'Safaga' },
+};
+
+/**
+ * Directional Extra Transfer Fee per person (EUR):
+ * - Cairo trips (Northbound): Extra transfer applies ONLY to Sahl Hasheesh (+€10/pp), Makadi Bay (+€10/pp), Soma Bay (+€15/pp), and Safaga (+€15/pp). El Gouna & Hurghada City = €0.
+ * - Luxor trips (Southbound): Extra transfer applies ONLY to El Gouna (+€10/pp, opposite direction). Hurghada, Sahl Hasheesh, Makadi Bay, Soma Bay, and Safaga = €0.
+ * - Hurghada / other trips (when outer transfer applies): El Gouna, Sahl Hasheesh, Makadi Bay (+€10/pp); Soma Bay, Safaga (+€15/pp); Hurghada City = €0.
+ */
+export function getZoneTransferFeePerPerson(
+  zoneId: string,
+  destination?: DestinationRegion | string,
+  hasOuterZoneTransfer: boolean = true
+): number {
+  if (!hasOuterZoneTransfer || !zoneId || zoneId === 'hurghada') return 0;
+
+  if (destination === 'Cairo') {
+    if (zoneId === 'sahl-hasheesh' || zoneId === 'makadi') return 10;
+    if (zoneId === 'soma-bay' || zoneId === 'safaga') return 15;
+    return 0; // El Gouna & Hurghada are on the way north to Cairo
+  }
+
+  if (destination === 'Luxor') {
+    if (zoneId === 'el-gouna') return 10; // Opposite direction (north of Hurghada)
+    return 0; // Sahl Hasheesh, Makadi, Soma Bay, Safaga are on the southbound route
+  }
+
+  const zone = OUTER_TRANSFER_ZONES.find((z) => z.id === zoneId);
+  return zone ? zone.feePerPersonEur : 0;
+}
+
+export function getZoneTransferLabel(
+  zoneId: string,
+  destination: DestinationRegion | string | undefined,
+  lang: Lang,
+  hasOuterZoneTransfer: boolean = true
+): string {
+  const base = ZONE_BASE_NAMES[zoneId] || ZONE_BASE_NAMES.hurghada;
+  const zoneName = lang === 'ar' ? base.ar : lang === 'de' ? base.de : base.en;
+  const fee = getZoneTransferFeePerPerson(zoneId, destination, hasOuterZoneTransfer);
+  if (fee === 0) {
+    return lang === 'ar'
+      ? `${zoneName} (التوصيل مشمول · 0€)`
+      : lang === 'de'
+      ? `${zoneName} (Abholung inklusive · 0 €)`
+      : `${zoneName} (Pickup Included · €0)`;
+  }
+  return lang === 'ar'
+    ? `${zoneName} (+${fee}€ للفرد توصيل إضافي)`
+    : lang === 'de'
+    ? `${zoneName} (+${fee} € / Person Transferzuschlag)`
+    : `${zoneName} (+€${fee} / person extra transfer)`;
+}
+
 export interface TripOption {
   id: string;
   title: LocalizedText;
@@ -327,7 +387,7 @@ export const SITE_CONFIG = {
   domain: 'waslatravel.com',
   whatsappNumber: '+201129155520',
   whatsappDisplay: '+20 112 915 5520',
-  email: 'info@waslatravel.com',
+  email: 'booking@waslatravel.com',
   heroBackground: heroRedSeaVibrantImg,
 };
 

@@ -44,6 +44,8 @@ import {
   formatTripScheduleSummary,
   getNextOperatingDate,
   getTripStartTimeOptions,
+  getZoneTransferFeePerPerson,
+  getZoneTransferLabel,
   isTripOperatingOnDate,
   tText,
 } from '../data/marketplaceData';
@@ -82,6 +84,7 @@ export interface BookingRequest {
   email: string;
   contact: string;
   notes: string;
+  locationImageUrl?: string;
   createdAt: string;
 }
 
@@ -143,6 +146,49 @@ function computeChildUnitPrice(adultUnitPrice: number, trip: Trip): number {
   return Math.round(adultUnitPrice * 0.5);
 }
 
+async function compressPassportImageFile(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error('Failed to read passport photo file'));
+    reader.onload = () => {
+      const img = new Image();
+      img.onerror = () => reject(new Error('Invalid image file'));
+      img.onload = () => {
+        const maxDim = 960;
+        let width = img.width || 800;
+        let height = img.height || 600;
+        if (width > maxDim || height > maxDim) {
+          if (width >= height) {
+            height = Math.round((height * maxDim) / width);
+            width = maxDim;
+          } else {
+            width = Math.round((width * maxDim) / height);
+            height = maxDim;
+          }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          reject(new Error('Canvas context unavailable'));
+          return;
+        }
+        ctx.drawImage(img, 0, 0, width, height);
+        let quality = 0.76;
+        let dataUrl = canvas.toDataURL('image/jpeg', quality);
+        while (dataUrl.length > 210000 && quality > 0.35) {
+          quality -= 0.12;
+          dataUrl = canvas.toDataURL('image/jpeg', quality);
+        }
+        resolve(dataUrl);
+      };
+      img.src = String(reader.result || '');
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
 export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
   trip,
   initialDate,
@@ -178,6 +224,9 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
   const [infants, setInfants] = useState(0);
   const [hotel, setHotel] = useState('');
   const [roomNumber, setRoomNumber] = useState('');
+  const [passportPhotoDataUrl, setPassportPhotoDataUrl] = useState<string>('');
+  const [passportPhotoName, setPassportPhotoName] = useState<string>('');
+  const [passportUploading, setPassportUploading] = useState(false);
   const [promoCode, setPromoCode] = useState('');
   const [guestName, setGuestName] = useState('');
   const [whatsapp, setWhatsapp] = useState('');
@@ -215,6 +264,8 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
     setChildren(0);
     setInfants(0);
     setRoomNumber('');
+    setPassportPhotoDataUrl('');
+    setPassportPhotoName('');
     setPromoCode('');
     setPendingTicketRequest(null);
     setPendingReceipt(null);
@@ -244,10 +295,21 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
     return () => window.removeEventListener('keydown', handleKey, true);
   }, [lightboxOpen, galleryImages.length]);
 
-  const hasOuterZoneTransfer = trip.destination === 'Hurghada' || trip.outerTransferEnabled === true;
+  const hasOuterZoneTransfer =
+    trip.destination === 'Hurghada' ||
+    trip.destination === 'Cairo' ||
+    trip.destination === 'Luxor' ||
+    trip.outerTransferEnabled === true;
   const activeZone =
     OUTER_TRANSFER_ZONES.find((z) => z.id === transferZoneId) ?? OUTER_TRANSFER_ZONES[0];
-  const zoneFeePerPerson = hasOuterZoneTransfer ? activeZone.feePerPersonEur : 0;
+  const zoneFeePerPerson = getZoneTransferFeePerPerson(
+    transferZoneId,
+    trip.destination,
+    hasOuterZoneTransfer
+  );
+  const directionalZoneLabel = hasOuterZoneTransfer
+    ? getZoneTransferLabel(activeZone.id, trip.destination, lang, hasOuterZoneTransfer)
+    : undefined;
 
   const selectedOption = trip.options?.find((o) => o.id === selectedOptionId) || trip.options?.[0];
   const activeUnitPrice = selectedOption ? selectedOption.price : trip.price;
@@ -288,7 +350,7 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
     payingGuestsCount,
     transferSurchargeTotalEur: transferSurchargeTotal,
     totalEur,
-    zoneLabel: hasOuterZoneTransfer ? tText(activeZone.label, lang) : undefined,
+    zoneLabel: directionalZoneLabel,
   };
 
   const title = tText(trip.name, lang);
@@ -359,10 +421,33 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
   const suggestedNextOperatingDate = !isSelectedDateOperating
     ? getNextOperatingDate(trip, date)
     : null;
-  const requiresPassportNotice =
-    trip.destination === 'Luxor' ||
-    trip.destination === 'Cairo' ||
-    trip.destination === 'Marsa Alam';
+  const isMarsaAlamTrip = trip.destination === 'Marsa Alam';
+  const requiresPassportNotice = isMarsaAlamTrip;
+
+  const handlePassportFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setPassportUploading(true);
+    setError('');
+    try {
+      const compressed = await compressPassportImageFile(file);
+      setPassportPhotoDataUrl(compressed);
+      setPassportPhotoName(file.name);
+    } catch {
+      setError(
+        tText(
+          {
+            en: 'Could not process passport image. Please select a valid JPG or PNG photo.',
+            ar: 'تعذر معالجة صورة جواز السفر. يرجى اختيار صورة واضحة بصيغة JPG أو PNG.',
+            de: 'Passfoto konnte nicht verarbeitet werden. Bitte wählen Sie ein gültiges JPG/PNG.',
+          },
+          lang
+        )
+      );
+    } finally {
+      setPassportUploading(false);
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -393,6 +478,21 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
       setError(t.modalValidationErr);
       return;
     }
+
+    if (isMarsaAlamTrip && (!cleanRoom || !passportPhotoDataUrl)) {
+      setError(
+        tText(
+          {
+            en: 'For Marsa Alam trips, both your Hotel Room Number and Passport Photo upload are required for coast guard & permit clearance.',
+            ar: 'في رحلات مرسى علم، يُشترط إدخال رقم الغرفة ورفع صورة جواز السفر لإصدار تصاريح حرس الحدود والمارينا.',
+            de: 'Für Ausflüge in Marsa Alam sind Zimmernummer und das Hochladen eines Passfotos für die Genehmigung zwingend erforderlich.',
+          },
+          lang
+        )
+      );
+      return;
+    }
+
     setError('');
     const autoCountry = detectGuestCountry({
       whatsapp: cleanWhatsapp,
@@ -402,10 +502,12 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
       zoneFeePerPerson > 0
         ? `Transfer Zone: ${activeZone.id.toUpperCase()} (+€${zoneFeePerPerson}/pp = +€${transferSurchargeTotal})`
         : hasOuterZoneTransfer
-        ? 'Transfer Zone: Hurghada City (Included €0)'
+        ? `Transfer Zone: ${activeZone.id.toUpperCase()} (Included €0)`
         : '';
+    const passportTag =
+      isMarsaAlamTrip && passportPhotoDataUrl ? 'Passport Photo Uploaded ✓' : '';
     const promoTag = cleanPromo ? `Promo/Partner Code: ${cleanPromo}` : '';
-    const mergedNotes = [zoneTag, promoTag, notes.trim()].filter(Boolean).join(' · ');
+    const mergedNotes = [zoneTag, passportTag, promoTag, notes.trim()].filter(Boolean).join(' · ');
 
     const req: BookingRequest = {
       id:
@@ -416,7 +518,7 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
       supplierName: trip.supplierName,
       destination: trip.destination,
       duration: tText(trip.duration, lang),
-      transferZoneLabel: hasOuterZoneTransfer ? tText(activeZone.label, lang) : undefined,
+      transferZoneLabel: directionalZoneLabel,
       date,
       tripStartTime: resolvedTripStartTime,
       adults: safeAdults,
@@ -431,6 +533,7 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
       email: cleanEmail,
       contact: `${cleanWhatsapp} · ${cleanEmail}`,
       notes: mergedNotes,
+      locationImageUrl: passportPhotoDataUrl || undefined,
       createdAt: 'Just now',
     };
     setPendingTicketRequest(req);
@@ -1710,15 +1813,45 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
                 </div>
               </div>
             ) : confirmedRequest ? (
+              (() => {
+                const liveStatus = bookingStatusById?.[confirmedRequest.id] || 'Pending';
+                const isOperatorConfirmed =
+                  liveStatus === 'Confirmed' ||
+                  liveStatus === 'Driver assigned' ||
+                  liveStatus === 'Completed';
+                return (
               <div
                 ref={confirmedCardRef}
-                className="space-y-4 rounded-2xl bg-white p-5 sm:p-6 border-2 border-[#16A34A]/60 shadow-lg"
+                className={`space-y-4 rounded-2xl bg-white p-5 sm:p-6 border-2 shadow-lg ${
+                  isOperatorConfirmed ? 'border-[#16A34A]/70' : 'border-[#EA580C]/70'
+                }`}
               >
                 <div className="flex items-center justify-between gap-2 flex-wrap">
-                  <div className="inline-flex items-center gap-2 text-xs font-bold text-[#15803D]">
+                  <div
+                    className={`inline-flex items-center gap-2 text-xs font-bold ${
+                      isOperatorConfirmed ? 'text-[#15803D]' : 'text-[#C2410C]'
+                    }`}
+                  >
                     <ShieldCheck className="h-4 w-4 shrink-0" aria-hidden="true" />
                     <span>
-                      {t.modalConfirmedBadge} · <span className="font-mono">{confirmedRequest.id}</span>
+                      {isOperatorConfirmed
+                        ? tText(
+                            {
+                              en: 'OFFICIAL CONFIRMED BOARDING VOUCHER',
+                              ar: 'تذكرة صعود رقمية مؤكدة نهائياً',
+                              de: 'OFFIZIELL BESTÄTIGTER BOARDING-VOUCHER',
+                            },
+                            lang
+                          )
+                        : tText(
+                            {
+                              en: 'BOOKING REQUEST RECEIVED · PENDING OPERATOR CONFIRMATION',
+                              ar: 'تم استلام طلب الحجز · بانتظار تأكيد العمليات وتحديد موعد البيك أب',
+                              de: 'BUCHUNGSANFRAGE ERHALTEN · WARTET AUF BESTÄTIGUNG',
+                            },
+                            lang
+                          )}{' '}
+                      · <span className="font-mono">{confirmedRequest.id}</span>
                     </span>
                   </div>
                   <button
@@ -1728,7 +1861,7 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
                       setRefCopied(true);
                       window.setTimeout(() => setRefCopied(false), 2000);
                     }}
-                    className="inline-flex items-center gap-1 rounded-lg border border-[#16A34A]/40 bg-[#F8FAFC] px-2.5 py-1 text-[11px] font-semibold text-[#15803D] hover:bg-[#DCFCE7] cursor-pointer"
+                    className="inline-flex items-center gap-1 rounded-lg border border-[#CBD5E1] bg-[#F8FAFC] px-2.5 py-1 text-[11px] font-semibold text-[#0F172A] hover:bg-[#FFF7ED] cursor-pointer"
                   >
                     <Check className="h-3 w-3" aria-hidden="true" />
                     <span>
@@ -1739,19 +1872,44 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
                   </button>
                 </div>
 
-                <div className="space-y-1">
+                <div className="space-y-1.5">
                   <h3 className="font-display text-xl sm:text-2xl font-bold text-[#0F172A]">
-                    {t.modalConfirmedTitle}
+                    {isOperatorConfirmed
+                      ? tText(
+                          {
+                            en: 'Your Digital Boarding Voucher is Unlocked',
+                            ar: 'تذكرتك الرقمية النهائية جاهزة ومؤكدة',
+                            de: 'Ihr digitaler Boarding-Voucher ist freigeschaltet',
+                          },
+                          lang
+                        )
+                      : tText(
+                          {
+                            en: 'Request Registered — Awaiting Dispatch Confirmation',
+                            ar: 'تم تسجيل طلبك — بانتظار تأكيد قسم الحجوزات والتشغيل',
+                            de: 'Anfrage registriert — Wartet auf Einsatzbestätigung',
+                          },
+                          lang
+                        )}
                   </h3>
-                  <p className="text-xs sm:text-sm leading-relaxed text-[#475569]">
-                    {tText(
-                      {
-                        en: 'Your booking ticket is confirmed and registered! Our operations team will confirm your exact pickup time and contact you shortly via WhatsApp or Email.',
-                        ar: 'تم تأكيد وتسجيل تيكت حجزك بنجاح! سيقوم فريق العمليات بمراجعة التيكت والتواصل معك فوراً لتأكيد موعد التحرك وبوابة الاستلام.',
-                        de: 'Ihr Buchungsticket wurde erfolgreich bestätigt! Unser Team bestätigt Ihre Abholzeit in Kürze per WhatsApp oder E-Mail.',
-                      },
-                      lang
-                    )}
+                  <p className="text-xs sm:text-sm leading-relaxed text-[#334155]">
+                    {isOperatorConfirmed
+                      ? tText(
+                          {
+                            en: 'Your reservation has been verified and confirmed by Wasla Reservations & Dispatch. Present this digital voucher at pickup (payable in EUR, USD, or EGP if Cash on Pickup).',
+                            ar: 'تمت مراجعة وتأكيد حجزك من قسم الحجوزات والتشغيل في وصلة ترافيل. يمكنك إبراز هذه التذكرة الرقمية عند الاستلام (الدفع متاح باليورو أو الدولار أو الجنيه المصري).',
+                            de: 'Ihre Reservierung wurde von Wasla Dispatch bestätigt. Zeigen Sie diesen digitalen Voucher bei der Abholung vor.',
+                          },
+                          lang
+                        )
+                      : tText(
+                          {
+                            en: 'Your final boarding voucher is locked until our Reservations & Dispatch team confirms availability and assigns your exact hotel pickup time. You can track and print your final voucher anytime using your Booking Reference.',
+                            ar: 'التذكرة النهائية للرحلة تظل مغلقة لحين قيام موظف الحجوزات والتشغيل بتأكيد الحجز وتحديد موعد البيك أب الدقيق لفندقك. يمكنك متابعة حالة التذكرة وطباعتها فور تأكيدها برقم الحجز.',
+                            de: 'Ihr endgültiger Boarding-Voucher bleibt gesperrt, bis unser Dispatch-Team die Verfügbarkeit und Ihre genaue Hotelabholzeit bestätigt.',
+                          },
+                          lang
+                        )}
                   </p>
                 </div>
 
@@ -1920,23 +2078,39 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
                       </span>
                     </a>
 
-                    <button
-                      type="button"
-                      onClick={() => window.print()}
-                      className="min-h-[40px] w-full inline-flex items-center justify-center gap-2 rounded-full border border-[#CBD5E1] bg-[#F8FAFC] px-4 py-2 text-xs font-semibold text-[#334155] hover:bg-[#F1F5F9] transition-colors cursor-pointer"
-                    >
-                      <Printer className="h-3.5 w-3.5 text-[#475569]" aria-hidden="true" />
-                      <span>
-                        {tText(
-                          {
-                            en: 'Print or Save Ticket PDF',
-                            ar: 'طباعة أو حفظ التذكرة كملف PDF',
-                            de: 'Ticket drucken / als PDF speichern',
-                          },
-                          lang
-                        )}
-                      </span>
-                    </button>
+                    {isOperatorConfirmed ? (
+                      <button
+                        type="button"
+                        onClick={() => window.print()}
+                        className="min-h-[40px] w-full inline-flex items-center justify-center gap-2 rounded-full border border-[#16A34A] bg-[#F0FDF4] px-4 py-2 text-xs font-bold text-[#15803D] hover:bg-[#DCFCE7] transition-colors cursor-pointer"
+                      >
+                        <Printer className="h-3.5 w-3.5 text-[#15803D]" aria-hidden="true" />
+                        <span>
+                          {tText(
+                            {
+                              en: 'Print Confirmed Boarding Voucher (PDF)',
+                              ar: 'طباعة تذكرة الصعود المؤكدة (PDF)',
+                              de: 'Bestätigten Boarding-Voucher drucken (PDF)',
+                            },
+                            lang
+                          )}
+                        </span>
+                      </button>
+                    ) : (
+                      <div className="rounded-xl border border-[#FED7AA] bg-[#FFF7ED] px-3.5 py-2.5 text-[11px] font-semibold text-[#9A3412] flex items-center gap-2">
+                        <Clock className="h-4 w-4 text-[#EA580C] shrink-0" aria-hidden="true" />
+                        <span>
+                          {tText(
+                            {
+                              en: 'Final printable voucher unlocks automatically once Reservations & Dispatch confirms your booking and sets your pickup time.',
+                              ar: 'تُفتح التذكرة النهائية القابلة للطباعة تلقائياً فور قيام موظف الحجوزات بتأكيد الحجز وتحديد موعد البيك أب.',
+                              de: 'Der druckbare End-Voucher wird automatisch freigeschaltet, sobald unser Team Ihre Buchung und Abholzeit bestätigt.',
+                            },
+                            lang
+                          )}
+                        </span>
+                      </div>
+                    )}
                   </div>
                 )}
 
@@ -1960,6 +2134,8 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
                   </button>
                 </div>
               </div>
+                );
+              })()
             ) : (
               <form id="trip-booking-form" onSubmit={handleSubmit} className="space-y-4 scroll-mt-24">
                 <div className="flex items-center justify-between border-b-[1.5px] border-[#94A3B8] pb-3">
@@ -2312,18 +2488,32 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
                     <span className="text-xs font-semibold text-[#0F172A] leading-snug">
                       {tText(
                         {
-                          en: trip.destination === 'Marsa Alam' ? 'Hotel Room No. (Recommended)' : 'Hotel Room No. (Optional)',
-                          ar: trip.destination === 'Marsa Alam' ? 'رقم الغرفة (موصى به لمرسى علم)' : 'رقم الغرفة (اختياري)',
-                          de: trip.destination === 'Marsa Alam' ? 'Zimmernummer (Empfohlen)' : 'Zimmernummer (Optional)',
+                          en: isMarsaAlamTrip
+                            ? 'Hotel Room No. * (Required for Marsa Alam)'
+                            : 'Hotel Room No. (Optional)',
+                          ar: isMarsaAlamTrip
+                            ? 'رقم الغرفة * (إلزامي لرحلات مرسى علم)'
+                            : 'رقم الغرفة (اختياري)',
+                          de: isMarsaAlamTrip
+                            ? 'Zimmernummer * (Pflicht für Marsa Alam)'
+                            : 'Zimmernummer (Optional)',
                         },
                         lang
                       )}
                     </span>
                     <input
                       type="text"
+                      required={isMarsaAlamTrip}
                       value={roomNumber}
                       onChange={(e) => setRoomNumber(e.target.value)}
-                      placeholder={tText({ en: 'e.g. 214 or TBD', ar: 'مثال: 214 أو عند الوصول', de: 'z. B. 214' }, lang)}
+                      placeholder={tText(
+                        {
+                          en: isMarsaAlamTrip ? 'e.g. 214 (Required)' : 'e.g. 214 or TBD',
+                          ar: isMarsaAlamTrip ? 'مثال: 214 (أساسي للتصريح)' : 'مثال: 214 أو عند الوصول',
+                          de: 'z. B. 214',
+                        },
+                        lang
+                      )}
                       className="min-h-[44px] w-full rounded-lg border-[1.5px] border-[#94A3B8] bg-white px-3.5 text-sm text-[#0F172A] placeholder:text-[#7B8E95] focus:border-[#EA580C] focus:outline-none tabular-nums"
                     />
                   </label>
@@ -2350,18 +2540,70 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
                 </div>
 
                 {requiresPassportNotice && (
-                  <div className="rounded-xl border border-[#FDE68A] bg-[#FFFBEB] px-3.5 py-2.5 text-xs text-[#92400E] leading-relaxed">
-                    <strong className="font-semibold">
-                      {tText({ en: 'Travel Permit Notice:', ar: 'تنبيه تصريح السفر:', de: 'Genehmigungshinweis:' }, lang)}
-                    </strong>{' '}
-                    {tText(
-                      {
-                        en: 'Egyptian tourism checkpoints require a passport photo copy for Luxor, Cairo, and Marsa Alam excursions. Our Operations Desk will request it safely via WhatsApp after confirmation.',
-                        ar: 'تتطلب نقاط التفتيش السياحي صورة من صفحة جواز السفر لرحلات الأقصر والقاهرة ومرسى علم. سيطلبها فريق العمليات عبر واتساب بعد التأكيد.',
-                        de: 'Für Ausflüge nach Luxor, Kairo und Marsa Alam ist behördlich ein Foto der Passseite erforderlich. Unser Team fragt dies sicher nach Bestätigung per WhatsApp an.',
-                      },
-                      lang
-                    )}
+                  <div className="rounded-xl border-[1.5px] border-[#EA580C] bg-[#FFF7ED] p-3.5 space-y-2.5 text-xs text-[#0F172A]">
+                    <div className="flex items-start justify-between gap-2">
+                      <div>
+                        <strong className="font-bold text-[#9A3412] block">
+                          {tText(
+                            {
+                              en: 'Passport Photo Upload * (Required for Marsa Alam Permits)',
+                              ar: 'رفع صورة جواز السفر * (أساسي لتصاريح رحلات مرسى علم)',
+                              de: 'Passfoto hochladen * (Pflicht für Marsa Alam Genehmigung)',
+                            },
+                            lang
+                          )}
+                        </strong>
+                        <p className="text-[11px] text-[#475569] mt-0.5">
+                          {tText(
+                            {
+                              en: 'Coast Guard & Marina permits in Marsa Alam require a clear photo of your passport data page along with your room number.',
+                              ar: 'تتطلب تصاريح حرس الحدود والمارينا في مرسى علم رفع صورة واضحة لصفحة جواز السفر مع رقم الغرفة على التطبيق.',
+                              de: 'Für die Küstenwache in Marsa Alam ist ein Foto der Passdatenseite sowie Ihre Zimmernummer erforderlich.',
+                            },
+                            lang
+                          )}
+                        </p>
+                      </div>
+                      <Camera className="h-4 w-4 text-[#EA580C] shrink-0 mt-0.5" aria-hidden="true" />
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-2.5">
+                      <label className="inline-flex min-h-[38px] items-center gap-2 rounded-lg bg-[#EA580C] hover:bg-[#C2410C] px-3.5 py-1.5 text-xs font-bold text-white cursor-pointer transition-colors">
+                        <Camera className="h-3.5 w-3.5" aria-hidden="true" />
+                        <span>
+                          {passportUploading
+                            ? tText({ en: 'Processing...', ar: 'جاري المعالجة...', de: 'Lädt...' }, lang)
+                            : passportPhotoDataUrl
+                            ? tText({ en: 'Change Passport Photo', ar: 'تغيير صورة جواز السفر', de: 'Passfoto ändern' }, lang)
+                            : tText({ en: 'Upload Passport Photo', ar: 'ارفع صورة جواز السفر', de: 'Passfoto auswählen' }, lang)}
+                        </span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => void handlePassportFileChange(e)}
+                          className="hidden"
+                        />
+                      </label>
+                      {passportPhotoDataUrl && (
+                        <div className="inline-flex items-center gap-2 rounded-lg border border-[#16A34A]/40 bg-[#F0FDF4] px-2.5 py-1 text-[11px] font-semibold text-[#15803D]">
+                          <Check className="h-3.5 w-3.5 shrink-0" />
+                          <span className="truncate max-w-[160px]">
+                            {passportPhotoName ||
+                              tText({ en: 'Passport attached', ar: 'تم إرفاق الجواز', de: 'Pass beigefügt' }, lang)}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setPassportPhotoDataUrl('');
+                              setPassportPhotoName('');
+                            }}
+                            className="text-[#DC2626] hover:underline ms-1 cursor-pointer"
+                          >
+                            ×
+                          </button>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 )}
 

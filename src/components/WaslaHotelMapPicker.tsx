@@ -2,7 +2,12 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { APIProvider, useMapsLibrary } from '@vis.gl/react-google-maps';
 import { Building2, Check, Loader2, MapPin, Search, Sparkles, X } from 'lucide-react';
 import { Lang } from '../data/i18n';
-import { DestinationRegion, OUTER_TRANSFER_ZONES, tText } from '../data/marketplaceData';
+import {
+  DestinationRegion,
+  OUTER_TRANSFER_ZONES,
+  getZoneTransferFeePerPerson,
+  getZoneTransferLabel,
+} from '../data/marketplaceData';
 
 const INITIAL_ENV_KEY =
   (typeof process !== 'undefined' &&
@@ -275,19 +280,23 @@ export const WaslaHotelMapPicker: React.FC<WaslaHotelMapPickerProps> = ({
   // Filter curated hotels immediately when user opens the tab or types
   const filteredCuratedHotels = useMemo(() => {
     const q = value.trim().toLowerCase();
-    const regionalPool = CURATED_EGYPT_HOTELS.filter((h) => h.destination === destination);
+    const regionalPool = CURATED_EGYPT_HOTELS.filter(
+      (h) =>
+        h.destination === destination ||
+        (hasOuterZoneTransfer && h.destination === 'Hurghada')
+    );
     const pool = regionalPool.length > 0 ? regionalPool : CURATED_EGYPT_HOTELS;
     if (!q) {
-      return pool.slice(0, 8);
+      return pool.slice(0, 12);
     }
     const matches = pool.filter(
       (h) => h.name.toLowerCase().includes(q) || h.area.toLowerCase().includes(q)
     );
-    if (matches.length > 0) return matches.slice(0, 6);
+    if (matches.length > 0) return matches.slice(0, 8);
     return CURATED_EGYPT_HOTELS.filter(
       (h) => h.name.toLowerCase().includes(q) || h.area.toLowerCase().includes(q)
-    ).slice(0, 6);
-  }, [value, destination]);
+    ).slice(0, 8);
+  }, [value, destination, hasOuterZoneTransfer]);
 
   // Fetch Places API (New) Autocomplete suggestions when user types 2+ characters
   useEffect(() => {
@@ -478,6 +487,11 @@ export const WaslaHotelMapPicker: React.FC<WaslaHotelMapPickerProps> = ({
               const secondaryText = pred.secondaryText?.text || '';
               const previewZone = detectRedSeaTransferZone(fullText);
               const zoneObj = OUTER_TRANSFER_ZONES.find((z) => z.id === previewZone);
+              const directionalFee = getZoneTransferFeePerPerson(
+                previewZone,
+                destination,
+                hasOuterZoneTransfer
+              );
 
               return (
                 <li
@@ -504,16 +518,16 @@ export const WaslaHotelMapPicker: React.FC<WaslaHotelMapPickerProps> = ({
                   {hasOuterZoneTransfer && zoneObj && (
                     <span
                       className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold tabular-nums ${
-                        zoneObj.feePerPersonEur === 0
+                        directionalFee === 0
                           ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
                           : 'bg-[#FFF7ED] text-[#C2410C] border border-[#FED7AA]'
                       }`}
                     >
-                      {zoneObj.feePerPersonEur === 0
+                      {directionalFee === 0
                         ? lang === 'ar'
                           ? 'مجاناً 0€'
                           : 'Free €0'
-                        : `+€${zoneObj.feePerPersonEur}/pp`}
+                        : `+€${directionalFee}/pp`}
                     </span>
                   )}
                 </li>
@@ -523,6 +537,11 @@ export const WaslaHotelMapPicker: React.FC<WaslaHotelMapPickerProps> = ({
             {/* Curated Popular Red Sea & Egypt Hotels */}
             {filteredCuratedHotels.map((hotelItem) => {
               const zoneObj = OUTER_TRANSFER_ZONES.find((z) => z.id === hotelItem.zoneId);
+              const directionalFee = getZoneTransferFeePerPerson(
+                hotelItem.zoneId,
+                destination,
+                hasOuterZoneTransfer
+              );
               return (
                 <li
                   key={`curated-${hotelItem.name}`}
@@ -546,16 +565,16 @@ export const WaslaHotelMapPicker: React.FC<WaslaHotelMapPickerProps> = ({
                   {hasOuterZoneTransfer && zoneObj && (
                     <span
                       className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold tabular-nums ${
-                        zoneObj.feePerPersonEur === 0
+                        directionalFee === 0
                           ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
                           : 'bg-[#FFF7ED] text-[#C2410C] border border-[#FED7AA]'
                       }`}
                     >
-                      {zoneObj.feePerPersonEur === 0
+                      {directionalFee === 0
                         ? lang === 'ar'
                           ? 'مجاناً 0€'
                           : 'Free €0'
-                        : `+€${zoneObj.feePerPersonEur}/pp`}
+                        : `+€${directionalFee}/pp`}
                     </span>
                   )}
                 </li>
@@ -576,7 +595,14 @@ export const WaslaHotelMapPicker: React.FC<WaslaHotelMapPickerProps> = ({
                 : lang === 'de'
                 ? 'Hotelzone automatisch erkannt:'
                 : 'Hotel pickup zone auto-detected:'}{' '}
-              <strong className="font-bold">{tText(activeZoneObj.label, lang)}</strong>
+              <strong className="font-bold">
+                {getZoneTransferLabel(
+                  activeZoneObj.id,
+                  destination,
+                  lang,
+                  hasOuterZoneTransfer
+                )}
+              </strong>
             </span>
           </span>
           <Check className="h-3.5 w-3.5 text-emerald-600 shrink-0" aria-hidden="true" />

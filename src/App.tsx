@@ -46,8 +46,14 @@ import { TripCard } from './components/TripCard';
 import { BookingRequest, TripDetailModal } from './components/TripDetailModal';
 import { TripExplorer } from './components/TripExplorer';
 import { PostTripReviewModal } from './components/TripReview';
+import { WaslaBrandMark } from './components/WaslaBrandMark';
 import { WaslaMapsProvider } from './components/WaslaHotelMapPicker';
 import { WhatsAppInquiryModal } from './components/WhatsAppInquiryModal';
+import {
+  PrivateMaintenanceGate,
+  isPrivateGateUnlocked,
+  lockPrivateGate,
+} from './components/PrivateMaintenanceGate';
 
 import { OperationsDesk } from './components/portals/OperationsDesk';
 import { OwnerControl } from './components/portals/OwnerControl';
@@ -96,8 +102,8 @@ const HERO_THEME_CLASSES: Record<
   { bg: string; overlay: string; accent: string }
 > = {
   'red-sea': {
-    bg: 'bg-[#0F172A]',
-    overlay: 'from-[#0F172A]/74 via-[#0F172A]/42 to-[#1C1008]/78',
+    bg: 'bg-[#0B1F2E]',
+    overlay: 'from-[#0B1F2E]/78 via-[#0B1F2E]/42 to-[#0B1F2E]/78',
     accent: 'text-[#FDBA74]',
   },
   midnight: {
@@ -138,6 +144,7 @@ const HERO_THEME_CLASSES: Record<
 };
 
 export default function App() {
+  const [isSiteUnlocked, setIsSiteUnlocked] = useState<boolean>(() => isPrivateGateUnlocked());
   const [workspace, setWorkspace] = useState<WorkspaceRole>('storefront');
   const [lang, setLang] = useState<Lang>('en');
   const [, setLocalePackVersion] = useState(0);
@@ -929,6 +936,7 @@ export default function App() {
       paymentStatus: 'Awaiting link',
       status: 'Pending',
       notes: req.notes,
+      locationImageUrl: req.locationImageUrl,
     };
 
     void createBookingInDb(newBooking);
@@ -1055,39 +1063,28 @@ export default function App() {
 
   const renderAnimatedBrand = (variant: 'header' | 'footer' = 'header') => {
     const isDarkSurface = variant === 'footer' || darkMode;
-    const primaryTextCls = isDarkSurface ? 'text-white' : 'text-[#0F172A]';
+    const primaryTextCls = isDarkSurface ? 'text-white' : 'text-[#0B1F2E]';
     const accentTextCls =
       variant === 'footer'
-        ? 'text-[#FEF08A]'
+        ? 'text-[#FDBA74]'
         : darkMode
-        ? 'text-[#FF6B00]'
+        ? 'text-[#FB923C]'
         : 'text-[#EA580C]';
     const dividerCls =
       variant === 'footer'
-        ? 'bg-white/35'
+        ? 'bg-white/25'
         : darkMode
-        ? 'bg-[#2E3A52]'
+        ? 'bg-white/20'
         : 'bg-[#CBD5E1]';
-    const iconShadowCls =
+    const iconRingCls =
       variant === 'footer'
-        ? 'ring-1 ring-white/40 shadow-sm'
-        : darkMode
-        ? 'shadow-[0_4px_14px_rgba(234,88,12,0.38)]'
-        : 'shadow-[0_4px_12px_rgba(234,88,12,0.28)]';
+        ? 'ring-1 ring-white/20'
+        : '';
 
     return (
       <span dir="ltr" className="inline-flex items-center select-none">
-        {/* Official Squircle Brand Icon */}
-        <span
-          className={`wasla-img-glare inline-flex h-9 w-9 sm:h-11 sm:w-11 shrink-0 items-center justify-center rounded-[22%] overflow-hidden ${iconShadowCls} me-2 sm:me-3`}
-          aria-hidden="true"
-        >
-          <img
-            src="/assets/aistudio/wasla-brand-icon-1024x1024_c9251908.png"
-            alt="Wasla Travel"
-            className="h-full w-full object-cover scale-[1.18]"
-          />
-        </span>
+        {/* Official Vector Geometric Brand Emblem */}
+        <WaslaBrandMark size="lg" className={`me-2 sm:me-3 ${iconRingCls}`} />
 
         {/* English Column: Wasla / T R A V E L (flush width alignment) */}
         <span className="inline-flex flex-col items-stretch justify-center leading-none">
@@ -1159,6 +1156,10 @@ export default function App() {
       ? publicSettings.heroSubDe
       : publicSettings.heroSubEn;
 
+  if (!isSiteUnlocked) {
+    return <PrivateMaintenanceGate onUnlock={() => setIsSiteUnlocked(true)} />;
+  }
+
   return (
     <WaslaMapsProvider lang={lang}>
     <div
@@ -1168,6 +1169,28 @@ export default function App() {
           : 'wasla-storefront-root bg-[#FFFFFF] text-[#0F172A]'
       }`}
     >
+      {/* Discreet Owner Private Gate Control Banner */}
+      <div
+        dir="rtl"
+        className="sticky top-0 z-[60] flex items-center justify-between gap-3 border-b border-[#EA580C]/40 bg-[#0B1F2E] px-4 py-2 text-xs text-slate-200 shadow-md"
+      >
+        <div className="flex items-center gap-2">
+          <span className="inline-flex h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+          <span className="font-semibold text-white">🔒 وضع الإغلاق مفعّل للجمهور (Passcode: 4004)</span>
+          <span className="hidden sm:inline text-slate-400">— أنت تتصفح حالياً بصلاحية الإدارة</span>
+        </div>
+        <button
+          type="button"
+          onClick={() => {
+            lockPrivateGate();
+            setIsSiteUnlocked(false);
+          }}
+          className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[#EA580C] hover:bg-[#C2410C] text-white font-bold transition-colors cursor-pointer"
+        >
+          <Lock className="h-3.5 w-3.5" />
+          <span>قفل الموقع مجدداً</span>
+        </button>
+      </div>
       {quotaExceeded && (
         <div
           role="alert"
@@ -1228,7 +1251,7 @@ export default function App() {
               .filter(Boolean)
               .join(' · ') || latestNewBooking.guestContact}
           </div>
-          <div className="flex items-center gap-2 pt-1">
+          <div className="flex flex-wrap items-center gap-2 pt-1">
             {(effectiveRole === 'owner' || effectiveRole === 'operations') && (
               <button
                 type="button"
@@ -1242,6 +1265,23 @@ export default function App() {
                 Open Reservations &amp; Dispatch
               </button>
             )}
+            {(() => {
+              const guestDigits = (latestNewBooking.guestWhatsapp || latestNewBooking.guestContact || '').replace(/\D/g, '');
+              if (guestDigits.length < 7) return null;
+              return (
+                <a
+                  href={`https://wa.me/${guestDigits}?text=${encodeURIComponent(
+                    `Hello ${latestNewBooking.guestName}, we received your booking ${latestNewBooking.id} for ${latestNewBooking.tripTitle} on ${latestNewBooking.date}.`
+                  )}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 rounded-lg bg-[#16A34A] px-2.5 py-1.5 text-xs font-semibold text-white hover:bg-[#15803D]"
+                >
+                  <MessageCircle className="h-3.5 w-3.5" aria-hidden="true" />
+                  <span>WA Guest</span>
+                </a>
+              );
+            })()}
             <button
               type="button"
               onClick={toggleSoundMuted}
@@ -1560,13 +1600,13 @@ export default function App() {
                 <button
                   type="button"
                   onClick={() => setTrackBookingOpen(true)}
-                  className={`hidden md:inline-flex min-h-[38px] items-center gap-1.5 rounded-full px-2.5 py-1.5 text-xs font-semibold transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                  className={`hidden md:inline-flex min-h-[38px] items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-semibold transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                     darkMode
                       ? 'text-slate-200 hover:bg-white/10 hover:text-white'
-                      : 'text-[#334155] hover:bg-[#FFF7ED] hover:text-[#EA580C]'
+                      : 'text-[#334155] hover:bg-[#FAF8F5] hover:text-[#0B1F2E]'
                   }`}
                 >
-                  <Ticket className="h-3.5 w-3.5 text-[#EA580C]" aria-hidden="true" />
+                  <Ticket className="h-3.5 w-3.5 text-[#0E7490]" aria-hidden="true" />
                   <span>
                     {tText({ en: 'Track Booking', ar: 'تتبّع حجزك', de: 'Buchung prüfen' }, lang)}
                   </span>
@@ -1587,7 +1627,7 @@ export default function App() {
                 <button
                   type="button"
                   onClick={() => setWhatsappOpen(true)}
-                  className="wasla-book-glare inline-flex min-h-[36px] sm:min-h-[40px] items-center gap-1.5 sm:gap-2 rounded-full px-3 sm:px-4.5 py-1.5 text-[13px] font-semibold tracking-[-0.01em] text-white active:scale-[0.98] whitespace-nowrap shrink-0 cursor-pointer tabular-nums"
+                  className="wasla-book-glare inline-flex min-h-[36px] sm:min-h-[40px] items-center gap-1.5 sm:gap-2 rounded-lg px-3 sm:px-4 py-1.5 text-[13px] font-semibold tracking-[-0.01em] text-white active:scale-[0.98] whitespace-nowrap shrink-0 cursor-pointer tabular-nums"
                 >
                   <MessageCircle className="h-4 w-4" aria-hidden="true" />
                   <span className="hidden sm:inline">
@@ -1752,7 +1792,7 @@ export default function App() {
                 <form
                   onSubmit={handleHeroSearch}
                   role="search"
-                  className="wasla-led-ring hero-enter-delayed max-w-5xl rounded-2xl lg:rounded-full bg-white p-2.5 sm:p-3 lg:px-4 lg:py-2.5 shadow-xl text-[#0F172A]"
+                  className="wasla-led-ring hero-enter-delayed max-w-5xl rounded-xl bg-white p-2.5 sm:p-3 lg:px-4 lg:py-2.5 text-[#0B1F2E]"
                 >
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[1.05fr_1.3fr_1fr_1fr_auto] gap-2.5 items-center">
                     <label className="block px-2 py-1">
@@ -1845,7 +1885,7 @@ export default function App() {
                     <div className="sm:col-span-2 lg:col-span-1">
                       <button
                         type="submit"
-                        className="wasla-book-glare inline-flex min-h-[46px] w-full items-center justify-center gap-2 rounded-full px-6 text-sm font-bold text-white active:scale-[0.98] transition-all whitespace-nowrap cursor-pointer"
+                        className="wasla-book-glare inline-flex min-h-[46px] w-full items-center justify-center gap-2 rounded-lg px-6 text-sm font-bold text-white active:scale-[0.98] transition-all whitespace-nowrap cursor-pointer"
                       >
                         <Search className="h-4 w-4" aria-hidden="true" />
                         <span>{t.searchButton}</span>
@@ -1941,7 +1981,7 @@ export default function App() {
             {/* Quick Destination & Service Filter Strip (Visually separated Destinations vs Trip Types) */}
             <nav
               aria-label="Quick destinations and services"
-              className="border-b border-[#FED7AA]/60 bg-[#FFF7ED]/50"
+              className="border-b border-[#E7E2DA] bg-[#FAF8F5]"
             >
               <div className="mx-auto max-w-[1200px] px-4 sm:px-6 py-3">
                 <div className="no-scrollbar carousel-track flex items-center gap-2 overflow-x-auto snap-x snap-proximity py-0.5">
@@ -1949,7 +1989,7 @@ export default function App() {
                     <button
                       type="button"
                       onClick={() => setFavoritesModalOpen(true)}
-                      className="snap-start shrink-0 inline-flex min-h-[36px] items-center gap-1.5 rounded-full border border-[#E11D48] bg-[#E11D48] px-3.5 py-1.5 text-xs font-bold text-white shadow-xs active:scale-95 transition-all whitespace-nowrap cursor-pointer"
+                      className="snap-start shrink-0 inline-flex min-h-[36px] items-center gap-1.5 rounded-lg border border-[#E11D48] bg-[#E11D48] px-3.5 py-1.5 text-xs font-bold text-white shadow-xs active:scale-95 transition-all whitespace-nowrap cursor-pointer"
                     >
                       <Heart className="h-3.5 w-3.5 fill-white text-white" aria-hidden="true" />
                       <span>
@@ -1978,20 +2018,23 @@ export default function App() {
                             if (match) setSelectedExplorerTripId(match.id);
                             smoothScrollTo('all-trips');
                           }}
-                          className={`snap-start shrink-0 inline-flex min-h-[36px] items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-xs font-semibold active:scale-95 transition-all whitespace-nowrap cursor-pointer ${
+                          className={`snap-start shrink-0 inline-flex min-h-[36px] items-center gap-1.5 rounded-lg border px-3.5 py-1.5 text-xs font-semibold active:scale-95 transition-all whitespace-nowrap cursor-pointer ${
                             active
-                              ? 'border-[#EA580C] bg-[#FFF7ED] text-[#EA580C]'
-                              : 'border-[#E2E8F0] bg-white text-[#0F172A] hover:border-[#EA580C] hover:bg-[#FFF7ED] hover:text-[#EA580C]'
+                              ? 'border-[#0B1F2E] bg-[#0B1F2E] text-white'
+                              : 'border-[#E2E8F0] bg-white text-[#0B1F2E] hover:border-[#0B1F2E]/40 hover:bg-white'
                           }`}
                         >
-                          <MapPin className="h-3.5 w-3.5 text-[#EA580C] shrink-0" aria-hidden="true" />
+                          <MapPin
+                            className={`h-3.5 w-3.5 shrink-0 ${active ? 'text-[#FDBA74]' : 'text-[#EA580C]'}`}
+                            aria-hidden="true"
+                          />
                           <span>{item.label}</span>
                         </button>
                       );
                     })}
                   </div>
 
-                  <span aria-hidden="true" className="mx-1 h-5 w-px bg-[#CBD5E1] shrink-0" />
+                  <span aria-hidden="true" className="mx-1 h-5 w-px bg-[#D6D0C6] shrink-0" />
 
                   {/* Group 2: Trip Types */}
                   <div className="flex items-center gap-2 shrink-0">
@@ -2012,13 +2055,16 @@ export default function App() {
                             if (match) setSelectedExplorerTripId(match.id);
                             smoothScrollTo('all-trips');
                           }}
-                          className={`snap-start shrink-0 inline-flex min-h-[36px] items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-xs font-semibold active:scale-95 transition-all whitespace-nowrap cursor-pointer ${
+                          className={`snap-start shrink-0 inline-flex min-h-[36px] items-center gap-1.5 rounded-lg border px-3.5 py-1.5 text-xs font-semibold active:scale-95 transition-all whitespace-nowrap cursor-pointer ${
                             active
-                              ? 'border-[#EA580C] bg-[#FFF7ED] text-[#EA580C]'
-                              : 'border-[#E2E8F0] bg-[#F8FAFC] text-[#334155] hover:border-[#EA580C] hover:bg-[#FFF7ED] hover:text-[#EA580C]'
+                              ? 'border-[#0B1F2E] bg-[#0B1F2E] text-white'
+                              : 'border-[#E2E8F0] bg-white text-[#334155] hover:border-[#0B1F2E]/40 hover:text-[#0B1F2E]'
                           }`}
                         >
-                          <Icon className="h-3.5 w-3.5 text-[#64748B] shrink-0" aria-hidden="true" />
+                          <Icon
+                            className={`h-3.5 w-3.5 shrink-0 ${active ? 'text-[#FDBA74]' : 'text-[#0E7490]'}`}
+                            aria-hidden="true"
+                          />
                           <span>{item.label}</span>
                         </button>
                       );
@@ -2030,7 +2076,7 @@ export default function App() {
                         setCustomInitialServices(undefined);
                         setCustomTripOpen(true);
                       }}
-                      className="wasla-book-glare snap-start shrink-0 inline-flex min-h-[36px] items-center gap-1.5 rounded-full px-4 py-1.5 text-xs font-semibold text-white active:scale-95 transition-all whitespace-nowrap cursor-pointer"
+                      className="wasla-book-glare snap-start shrink-0 inline-flex min-h-[36px] items-center gap-1.5 rounded-lg px-4 py-1.5 text-xs font-semibold text-white active:scale-95 transition-all whitespace-nowrap cursor-pointer"
                     >
                       <SlidersHorizontal className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
                       <span>{t.quickJumpCustom}</span>
@@ -2154,13 +2200,13 @@ export default function App() {
                           className="h-full w-full group-hover:scale-[1.06] transition-transform duration-500 ease-out"
                           placeholderLabel={catTitle}
                         />
-                        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#1C1008]/88 via-[#1C1008]/25 to-transparent" />
+                        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#0B1F2E]/86 via-[#0B1F2E]/22 to-transparent" />
                         <div className="absolute inset-x-0 bottom-0 p-5 text-white space-y-1">
                           <span className="inline-block opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-200 text-[11px] font-medium text-[#FDBA74]">
                             {t.scrollToSectionHint} →
                           </span>
                           <h3 className="font-display text-xl font-semibold text-white">{catTitle}</h3>
-                          <p className="text-xs font-medium text-[#FED7AA] tabular-nums">
+                          <p className="text-xs font-medium text-white/80 tabular-nums">
                             {count} {count === 1 ? t.tripsCountSingle : t.tripsCountPlural}
                           </p>
                         </div>
@@ -2313,18 +2359,18 @@ export default function App() {
               {/* 9. QUIET PRE-FOOTER: NEWSLETTER & QUICK EXPLORE DIRECTORY */}
               <div className="space-y-10 border-t border-[#E2E8F0] pt-10">
                 <section className="reveal-item">
-                  <div className="rounded-2xl border border-[#FED7AA] bg-[#FFF7ED]/70 p-6 sm:p-8 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+                  <div className="rounded-xl border border-[#E7E2DA] bg-[#FAF8F5] p-6 sm:p-8 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
                     <div className="space-y-1.5 max-w-xl">
-                      <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#EA580C]">
+                      <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#0E7490]">
                         <Mail className="h-3.5 w-3.5" aria-hidden="true" />
                         <span>{t.newsletterEyebrow}</span>
                       </div>
-                      <h2 className="font-display text-2xl font-semibold text-[#0F172A]">{t.newsletterTitle}</h2>
+                      <h2 className="font-display text-2xl font-semibold text-[#0B1F2E]">{t.newsletterTitle}</h2>
                       <p className="text-sm text-[#475569]">{t.newsletterSub}</p>
                     </div>
 
                     {newsletterConfirmed ? (
-                      <div className="rounded-lg border border-[#EA580C]/25 bg-white px-4 py-3 text-sm font-medium text-[#EA580C]">
+                      <div className="rounded-lg border border-[#0E7490]/25 bg-white px-4 py-3 text-sm font-medium text-[#0B1F2E]">
                         {t.newsletterSuccess}{' '}
                         <span className="tabular-nums text-[#475569]">
                           ({lastSubscribedEmail || subscribedEmails[subscribedEmails.length - 1]})
@@ -2338,12 +2384,12 @@ export default function App() {
                           value={newsletterEmail}
                           onChange={(e) => setNewsletterEmail(e.target.value)}
                           placeholder={t.newsletterPlaceholder}
-                          className="min-h-[44px] w-full sm:w-64 rounded-full border border-[#CBD5E1] bg-white px-4 text-sm text-[#0F172A] placeholder:text-[#7B8E95] focus:border-[#EA580C] focus:outline-none"
+                          className="min-h-[44px] w-full sm:w-64 rounded-lg border border-[#CBD5E1] bg-white px-4 text-sm text-[#0B1F2E] placeholder:text-[#64748B] focus:border-[#EA580C] focus:outline-none"
                           aria-label={t.newsletterTitle}
                         />
                         <button
                           type="submit"
-                          className="wasla-book-glare min-h-[44px] rounded-full px-6 py-2.5 text-sm font-semibold text-white active:scale-[0.98] transition-all whitespace-nowrap cursor-pointer"
+                          className="wasla-book-glare min-h-[44px] rounded-lg px-6 py-2.5 text-sm font-semibold text-white active:scale-[0.98] transition-all whitespace-nowrap cursor-pointer"
                         >
                           {t.newsletterButton}
                         </button>
@@ -2360,7 +2406,7 @@ export default function App() {
                         style={{ '--reveal-delay': `${idx * 60}ms` } as React.CSSProperties}
                         className="reveal-item space-y-3"
                       >
-                        <h3 className="text-sm font-bold text-[#EA580C]">{t.topLinksColumns[col.key]}</h3>
+                        <h3 className="text-sm font-bold text-[#0B1F2E]">{t.topLinksColumns[col.key]}</h3>
                         <ul className="space-y-2">
                           {col.links.map((entry, lIdx) => (
                             <li key={lIdx}>
@@ -2389,20 +2435,20 @@ export default function App() {
             </div>
           </main>
 
-          {/* 10B. FOOTER */}
-          <footer className="wasla-footer-glare border-t border-white/25 text-white pb-20 md:pb-0">
-            <div className="relative z-10 mx-auto max-w-[1200px] px-4 sm:px-6 pt-10 pb-7">
+          {/* 10B. DEEP RED SEA NAVY FOOTER */}
+          <footer className="wasla-footer-glare border-t border-white/10 text-white pb-20 md:pb-0">
+            <div className="relative z-10 mx-auto max-w-[1200px] px-4 sm:px-6 pt-12 pb-8">
               <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
                 {/* Brand & Direct Contact */}
-                <div className="md:col-span-5 space-y-3">
-                  <div className="inline-block font-display text-2xl font-bold text-white drop-shadow-xs">
+                <div className="md:col-span-5 space-y-3.5">
+                  <div className="inline-block font-display text-2xl font-bold text-white">
                     {renderAnimatedBrand('footer')}
                   </div>
-                  <p className="text-xs leading-relaxed text-white/85 max-w-sm">
+                  <p className="text-xs leading-relaxed text-slate-300 max-w-sm">
                     {t.heroEyebrow} ·{' '}
                     <a
                       href={`mailto:${publicSettings.email}`}
-                      className="font-bold text-[#FDE047] hover:text-white underline-offset-4 hover:underline transition-colors"
+                      className="font-semibold text-[#FDBA74] hover:text-white underline-offset-4 hover:underline transition-colors"
                     >
                       {publicSettings.email}
                     </a>
@@ -2411,7 +2457,7 @@ export default function App() {
                     <button
                       type="button"
                       onClick={() => setWhatsappOpen(true)}
-                      className="wasla-wa-glare inline-flex min-h-[40px] items-center gap-2 rounded-xl px-4 py-2 text-xs font-bold text-white cursor-pointer"
+                      className="wasla-wa-glare inline-flex min-h-[40px] items-center gap-2 rounded-lg px-4 py-2 text-xs font-bold text-white cursor-pointer"
                     >
                       <MessageCircle className="h-4 w-4" aria-hidden="true" />
                       <span>{t.askWhatsapp}</span>
@@ -2419,9 +2465,9 @@ export default function App() {
                     <button
                       type="button"
                       onClick={() => setTrackBookingOpen(true)}
-                      className="inline-flex min-h-[40px] items-center gap-1.5 rounded-xl border border-white/25 bg-white/12 px-3.5 py-2 text-xs font-semibold text-white hover:bg-white/22 hover:border-white/50 transition-colors cursor-pointer"
+                      className="inline-flex min-h-[40px] items-center gap-1.5 rounded-lg border border-white/20 bg-white/8 px-3.5 py-2 text-xs font-semibold text-white hover:bg-white/15 hover:border-white/35 transition-colors cursor-pointer"
                     >
-                      <Ticket className="h-4 w-4" aria-hidden="true" />
+                      <Ticket className="h-4 w-4 text-[#FDBA74]" aria-hidden="true" />
                       <span>
                         {tText({ en: 'Track Booking', ar: 'تتبّع حجزك', de: 'Buchung prüfen' }, lang)}
                       </span>
@@ -2430,7 +2476,7 @@ export default function App() {
                       href={`mailto:${publicSettings.email}`}
                       aria-label={publicSettings.email}
                       title={publicSettings.email}
-                      className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-white/25 bg-white/12 text-white hover:bg-white/22 hover:border-white/50 transition-colors"
+                      className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-white/20 bg-white/8 text-white hover:bg-white/15 hover:border-white/35 transition-colors"
                     >
                       <Mail className="h-4 w-4" aria-hidden="true" />
                     </a>
@@ -2528,7 +2574,7 @@ export default function App() {
                           <button
                             type="button"
                             onClick={() => setTouristPreviewOnly(false)}
-                            className="inline-flex min-h-[36px] items-center rounded-lg border border-white bg-white px-3 py-1.5 text-[11px] font-bold text-[#DE1B00] hover:bg-[#FFF7ED] cursor-pointer shadow-xs transition-colors"
+                            className="inline-flex min-h-[36px] items-center rounded-lg border border-white bg-white px-3 py-1.5 text-[11px] font-bold text-[#0B1F2E] hover:bg-[#FAF8F5] cursor-pointer shadow-xs transition-colors"
                           >
                             Team Portals
                           </button>
@@ -2536,7 +2582,7 @@ export default function App() {
                           <button
                             type="button"
                             onClick={() => setPortalAuthOpen(true)}
-                            className="inline-flex min-h-[36px] items-center gap-1.5 rounded-lg border border-white/25 bg-white/12 px-3 py-1.5 text-[11px] font-semibold text-white hover:bg-white/22 hover:border-white/50 cursor-pointer transition-colors"
+                            className="inline-flex min-h-[36px] items-center gap-1.5 rounded-lg border border-white/20 bg-white/8 px-3 py-1.5 text-[11px] font-semibold text-white hover:bg-white/15 hover:border-white/35 cursor-pointer transition-colors"
                           >
                             <Lock className="h-3 w-3 shrink-0" aria-hidden="true" />
                             <span>{t.staffPortalLogin}</span>
@@ -2554,9 +2600,9 @@ export default function App() {
               </div>
 
               {/* Bottom Hairline Bar */}
-              <div className="mt-8 pt-5 border-t border-white/20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-[11px] font-medium text-white/85">
+              <div className="mt-8 pt-5 border-t border-white/12 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-[11px] font-medium text-slate-300">
                 <span>{t.footerRights}</span>
-                <span className="font-mono text-white/75">{publicSettings.domain}</span>
+                <span className="font-mono text-slate-400">{publicSettings.domain}</span>
               </div>
             </div>
           </footer>
@@ -2566,13 +2612,13 @@ export default function App() {
             className={`md:hidden fixed inset-x-0 bottom-0 z-40 border-t backdrop-blur-sm px-3 py-2 flex items-center gap-2 shadow-lg transition-colors ${
               darkMode
                 ? 'border-white/10 bg-[#090D16]/95'
-                : 'border-[#FED7AA] bg-white/95'
+                : 'border-[#E2E8F0] bg-white/95'
             }`}
           >
             <button
               type="button"
               onClick={() => smoothScrollTo('all-trips')}
-              className="wasla-book-glare flex-1 min-h-[40px] rounded-full px-3 text-xs font-bold text-white active:scale-[0.98] transition-all cursor-pointer"
+              className="wasla-book-glare flex-1 min-h-[40px] rounded-lg px-3 text-xs font-bold text-white active:scale-[0.98] transition-all cursor-pointer"
             >
               {t.mobileBarExplore}
             </button>
@@ -2581,7 +2627,7 @@ export default function App() {
                 type="button"
                 onClick={() => setFavoritesModalOpen(true)}
                 aria-label={tText({ en: 'Saved Favorites', ar: 'المفضلة', de: 'Favoriten' }, lang)}
-                className="inline-flex min-h-[40px] items-center justify-center gap-1 rounded-full border border-[#E11D48] bg-[#E11D48] px-3 text-xs font-bold text-white cursor-pointer tabular-nums shrink-0"
+                className="inline-flex min-h-[40px] items-center justify-center gap-1 rounded-lg border border-[#E11D48] bg-[#E11D48] px-3 text-xs font-bold text-white cursor-pointer tabular-nums shrink-0"
               >
                 <Heart className="h-3.5 w-3.5 fill-white text-white" />
                 <span>{favoriteTrips.length}</span>
@@ -2590,7 +2636,7 @@ export default function App() {
             <button
               type="button"
               onClick={() => setWhatsappOpen(true)}
-              className="wasla-wa-glare flex-1 inline-flex min-h-[40px] items-center justify-center gap-1.5 rounded-full px-3.5 text-xs font-semibold text-white active:scale-[0.98] cursor-pointer"
+              className="wasla-wa-glare flex-1 inline-flex min-h-[40px] items-center justify-center gap-1.5 rounded-lg px-3.5 text-xs font-semibold text-white active:scale-[0.98] cursor-pointer"
             >
               <MessageCircle className="h-4 w-4" aria-hidden="true" />
               <span>{t.mobileBarWhatsapp}</span>
