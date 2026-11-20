@@ -1,4 +1,6 @@
 import 'dotenv/config';
+import crypto from 'crypto';
+import fs from 'fs';
 import express from 'express';
 import http from 'http';
 import path from 'path';
@@ -11,6 +13,282 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const PORT = 3000;
+const BOOTSTRAPPED_OWNER_EMAIL = 'stilldarky2000@gmail.com';
+const GOOGLE_CERTS_URL =
+  'https://www.googleapis.com/robot/v1/metadata/x509/securetoken@system.gserviceaccount.com';
+
+interface FirebaseAppletConfig {
+  projectId: string;
+  firestoreDatabaseId?: string;
+}
+
+const firebaseConfig: FirebaseAppletConfig = (() => {
+  try {
+    const raw = fs.readFileSync(path.join(__dirname, 'firebase-applet-config.json'), 'utf8');
+    return JSON.parse(raw) as FirebaseAppletConfig;
+  } catch {
+    return { projectId: '', firestoreDatabaseId: '(default)' };
+  }
+})();
+
+const FIREBASE_PROJECT_ID = firebaseConfig.projectId || '';
+const FIRESTORE_DATABASE_ID = firebaseConfig.firestoreDatabaseId || '(default)';
+const FIRESTORE_DOCS_BASE = `https://firestore.googleapis.com/v1/projects/${encodeURIComponent(
+  FIREBASE_PROJECT_ID
+)}/databases/${encodeURIComponent(FIRESTORE_DATABASE_ID)}/documents`;
+
+type ServerRole = 'owner' | 'operations' | 'supplier' | 'none';
+
+interface VerifiedFirebaseUser {
+  uid: string;
+  email: string;
+  emailVerified: boolean;
+  idToken: string;
+}
+
+let cachedGoogleCerts: Record<string, string> = {};
+let cachedCertsExpiresAt = 0;
+
+async function getGooglePublicCerts(forceRefresh = false): Promise<Record<string, string>> {
+  const now = Date.now();
+  if (!forceRefresh && cachedCertsExpiresAt > now && Object.keys(cachedGoogleCerts).length > 0) {
+    return cachedGoogleCerts;
+  }
+  const resp = await fetch(GOOGLE_CERTS_URL);
+  if (!resp.ok) {
+    throw new Error(`Failed to fetch Firebase public keys (HTTP ${resp.status})`);
+  }
+  const certs = (await resp.json()) as Record<string, string>;
+  const cacheControl = resp.headers.get('cache-control') || '';
+  const maxAgeMatch = cacheControl.match(/max-age=(\d+)/i);
+  const maxAgeSec = maxAgeMatch ? Number(maxAgeMatch[1]) : 3600;
+  cachedGoogleCerts = certs;
+  cachedCertsExpiresAt = now + Math.max(60, maxAgeSec) * 1000;
+  return certs;
+}
+
+function decodeBase64UrlJson<T>(segment: string): T {
+  const padded = segment.replace(/-/g, '+').replace(/_/g, '/');
+  const padLen = (4 - (padded.length % 4)) % 4;
+  const raw = Buffer.from(padded + '='.repeat(padLen), 'base64').toString('utf8');
+  return JSON.parse(raw) as T;
+}
+
+async function verifyFirebaseIdToken(idToken: string): Promise<VerifiedFirebaseUser | null> {
+  if (!FIREBASE_PROJECT_ID || !idToken) return null;
+  const parts = idToken.split('.');
+  if (parts.length !== 3) return null;
+
+  try {
+    const header = decodeBase64UrlJson<{ alg?: string; kid?: string }>(parts[0]);
+    const payload = decodeBase64UrlJson<{
+      aud?: string;
+      iss?: string;
+      sub?: string;
+      exp?: number;
+      iat?: number;
+      email?: string;
+      email_verified?: boolean;
+    }>(parts[1]);
+
+    if (header.alg !== 'RS256' || !header.kid) return null;
+    if (payload.aud !== FIREBASE_PROJECT_ID) return null;
+    if (payload.iss !== `https://securetoken.google.com/${FIREBASE_PROJECT_ID}`) return null;
+    if (!payload.sub || typeof payload.sub !== 'string' || payload.sub.length > 128) return null;
+
+    const nowSec = Math.floor(Date.now() / 1000);
+    if (typeof payload.exp !== 'number' || payload.exp <= nowSec) return null;
+    if (typeof payload.iat !== 'number' || payload.iat > nowSec + 300) return null;
+    if (payload.email_verified !== true) return null;
+
+    let certs = await getGooglePublicCerts(false);
+    let cert = certs[header.kid];
+    if (!cert) {
+      certs = await getGooglePublicCerts(true);
+      cert = certs[header.kid];
+    }
+    if (!cert) return null;
+
+    const verifier = crypto.createVerify('RSA-SHA256');
+    verifier.update(`${parts[0]}.${parts[1]}`);
+    verifier.end();
+
+    const sigB64 = parts[2].replace(/-/g, '+').replace(/_/g, '/');
+    const sigPad = (4 - (sigB64.length % 4)) % 4;
+    const signatureBuf = Buffer.from(sigB64 + '='.repeat(sigPad), 'base64');
+    if (!verifier.verify(cert, signatureBuf)) return null;
+
+    return {
+      uid: payload.sub,
+      email: String(payload.email || '').toLowerCase(),
+      emailVerified: true,
+      idToken,
+    };
+  } catch {
+    return null;
+  }
+}
+
+const roleCache = new Map<string, { role: ServerRole; expiresAt: number }>();
+
+async function resolveCallerRole(user: VerifiedFirebaseUser): Promise<ServerRole> {
+  if (!user.emailVerified) return 'none';
+  if (user.email === BOOTSTRAPPED_OWNER_EMAIL) return 'owner';
+
+  const cached = roleCache.get(user.uid);
+  if (cached && cached.expiresAt > Date.now()) {
+    return cached.role;
+  }
+
+  let resolved: ServerRole = 'none';
+  const authHeaders = { Authorization: `Bearer ${user.idToken}` };
+
+  try {
+    const adminResp = await fetch(
+      `${FIRESTORE_DOCS_BASE}/admins/${encodeURIComponent(user.uid)}`,
+      { headers: authHeaders }
+    );
+    if (adminResp.ok) {
+      resolved = 'owner';
+    } else {
+      const roleResp = await fetch(
+        `${FIRESTORE_DOCS_BASE}/staff_roles/${encodeURIComponent(user.uid)}`,
+        { headers: authHeaders }
+      );
+      if (roleResp.ok) {
+        const docJson = (await roleResp.json()) as {
+          fields?: {
+            status?: { stringValue?: string };
+            role?: { stringValue?: string };
+          };
+        };
+        const status = docJson.fields?.status?.stringValue;
+        const roleVal = docJson.fields?.role?.stringValue;
+        if (status === 'Active') {
+          if (roleVal === 'owner') resolved = 'owner';
+          else if (roleVal === 'operations') resolved = 'operations';
+          else if (roleVal === 'supplier') resolved = 'supplier';
+        }
+      }
+    }
+  } catch {
+    resolved = 'none';
+  }
+
+  roleCache.set(user.uid, { role: resolved, expiresAt: Date.now() + 30_000 });
+  return resolved;
+}
+
+function extractBearerToken(req: express.Request): string {
+  const header = String(req.headers.authorization || '').trim();
+  if (!header.toLowerCase().startsWith('bearer ')) return '';
+  return header.slice(7).trim();
+}
+
+function getClientIp(req: express.Request): string {
+  const fwd = req.headers['x-forwarded-for'];
+  if (typeof fwd === 'string' && fwd.trim()) {
+    return fwd.split(',')[0].trim();
+  }
+  return req.ip || req.socket.remoteAddress || 'unknown';
+}
+
+function createRateLimiter(options: {
+  windowMs: number;
+  maxRequests: number;
+  keyPrefix: string;
+}): express.RequestHandler {
+  const hits = new Map<string, number[]>();
+  return (req, res, next) => {
+    const now = Date.now();
+    const uid = (req as express.Request & { authUser?: VerifiedFirebaseUser }).authUser?.uid;
+    const key = `${options.keyPrefix}:${uid || getClientIp(req)}`;
+    const recent = (hits.get(key) || []).filter((ts) => now - ts < options.windowMs);
+    if (recent.length >= options.maxRequests) {
+      const retryAfterSec = Math.max(1, Math.ceil((options.windowMs - (now - recent[0])) / 1000));
+      res.setHeader('Retry-After', String(retryAfterSec));
+      res.status(429).json({
+        error: 'Too many requests. Please wait a moment and try again.',
+        retryAfterSec,
+      });
+      return;
+    }
+    recent.push(now);
+    hits.set(key, recent);
+    if (hits.size > 5000) {
+      for (const [k, timestamps] of hits.entries()) {
+        if (timestamps.every((ts) => now - ts >= options.windowMs)) {
+          hits.delete(k);
+        }
+      }
+    }
+    next();
+  };
+}
+
+function requireRole(allowedRoles: ServerRole[]): express.RequestHandler {
+  return async (req, res, next) => {
+    const token = extractBearerToken(req);
+    if (!token) {
+      res.status(401).json({ error: 'Authentication required. Please sign in to access this endpoint.' });
+      return;
+    }
+    const verified = await verifyFirebaseIdToken(token);
+    if (!verified) {
+      res.status(401).json({ error: 'Invalid or expired Firebase authentication token.' });
+      return;
+    }
+    const role = await resolveCallerRole(verified);
+    if (!allowedRoles.includes(role)) {
+      res.status(403).json({ error: 'Insufficient permissions for this action.' });
+      return;
+    }
+    (req as express.Request & { authUser?: VerifiedFirebaseUser; authRole?: ServerRole }).authUser =
+      verified;
+    (req as express.Request & { authUser?: VerifiedFirebaseUser; authRole?: ServerRole }).authRole =
+      role;
+    next();
+  };
+}
+
+const notifiedBookingIds = new Map<string, number>();
+
+async function verifyBookingReceiptExists(
+  bookingId: string,
+  expectedDate?: string
+): Promise<{ exists: boolean; reason?: string }> {
+  if (!/^[a-zA-Z0-9_-]{3,64}$/.test(bookingId)) {
+    return { exists: false, reason: 'Invalid booking ID format.' };
+  }
+  try {
+    const resp = await fetch(
+      `${FIRESTORE_DOCS_BASE}/booking_receipts/${encodeURIComponent(bookingId)}`
+    );
+    if (!resp.ok) {
+      return { exists: false, reason: 'Booking record not found in Firestore.' };
+    }
+    const docJson = (await resp.json()) as {
+      createTime?: string;
+      fields?: {
+        tripDate?: { stringValue?: string };
+        status?: { stringValue?: string };
+      };
+    };
+    const receiptDate = docJson.fields?.tripDate?.stringValue || '';
+    if (expectedDate && receiptDate && receiptDate !== expectedDate) {
+      return { exists: false, reason: 'Booking date mismatch.' };
+    }
+    if (docJson.createTime) {
+      const createdMs = Date.parse(docJson.createTime);
+      if (Number.isFinite(createdMs) && Date.now() - createdMs > 15 * 60 * 1000) {
+        return { exists: false, reason: 'Booking notification window expired.' };
+      }
+    }
+    return { exists: true };
+  } catch {
+    return { exists: false, reason: 'Unable to verify booking record.' };
+  }
+}
 
 function parseModelJson<T>(rawText: string | undefined, contextLabel: string): T {
   const cleaned = (rawText ?? '')
@@ -73,13 +351,25 @@ async function startServer() {
     };
   };
 
-  app.get('/api/notifications/status', (_req, res) => {
+  const aiRateLimiter = createRateLimiter({
+    windowMs: 60_000,
+    maxRequests: 25,
+    keyPrefix: 'ai',
+  });
+  const notificationRateLimiter = createRateLimiter({
+    windowMs: 10 * 60_000,
+    maxRequests: 6,
+    keyPrefix: 'notify-booking',
+  });
+
+  app.get('/api/notifications/status', requireRole(['owner']), (_req, res) => {
     res.json(getNotificationChannelStatus());
   });
 
-  app.post('/api/notifications/new-booking', async (req, res) => {
+  app.post('/api/notifications/new-booking', notificationRateLimiter, async (req, res) => {
     const body = (req.body ?? {}) as {
       id?: string;
+      tripId?: string;
       tripTitle?: string;
       destination?: string;
       category?: string;
@@ -99,37 +389,79 @@ async function startServer() {
       supplierName?: string;
       paymentStatus?: string;
       notes?: string;
-      officialEmail?: string;
-      ownerWhatsapp?: string;
       isTest?: boolean;
     };
 
-    const bookingId = String(body.id || 'WT-TEST').trim();
-    const tripTitle = String(body.tripTitle || 'Wasla Travel Excursion').trim();
-    const destination = String(body.destination || 'Hurghada').trim();
-    const tripDate = String(body.date || new Date().toISOString().slice(0, 10)).trim();
-    const startTime = String(body.tripStartTime || '').trim();
-    const guestName = String(body.guestName || 'Guest').trim();
-    const guestCountry = String(body.guestCountry || 'Guest').trim();
-    const guestWa = String(body.guestWhatsapp || '').trim();
-    const guestEmail = String(body.guestEmail || '').trim();
-    const guestContact = String(body.guestContact || guestWa || guestEmail || 'N/A').trim();
-    const hotel = String(body.hotel || 'Hotel Pickup').trim();
-    const roomNumber = String(body.roomNumber || '').trim();
-    const adults = Math.max(1, Number(body.adults) || 1);
-    const children = Math.max(0, Number(body.children) || 0);
-    const infants = Math.max(0, Number(body.infants) || 0);
-    const grossEur = Math.max(0, Number(body.grossEur) || 0);
-    const supplierName = String(body.supplierName || 'Wasla Operations').trim();
-    const paymentStatus = String(body.paymentStatus || 'Awaiting link').trim();
-    const notes = String(body.notes || '').trim();
     const isTest = Boolean(body.isTest);
+    const bookingId = String(body.id || '').trim();
 
+    if (isTest) {
+      const token = extractBearerToken(req);
+      const verified = token ? await verifyFirebaseIdToken(token) : null;
+      const role = verified ? await resolveCallerRole(verified) : 'none';
+      if (role !== 'owner') {
+        res.status(verified ? 403 : 401).json({
+          ok: false,
+          error: 'Owner authentication is required to send test notifications.',
+        });
+        return;
+      }
+    } else {
+      if (!/^[a-zA-Z0-9_-]{3,64}$/.test(bookingId)) {
+        res.status(400).json({ ok: false, error: 'A valid saved booking ID is required.' });
+        return;
+      }
+
+      const now = Date.now();
+      const prevSentAt = notifiedBookingIds.get(bookingId);
+      if (prevSentAt && now - prevSentAt < 24 * 60 * 60 * 1000) {
+        res.json({ ok: true, deduplicated: true });
+        return;
+      }
+
+      const receiptCheck = await verifyBookingReceiptExists(bookingId, String(body.date || '').trim());
+      if (!receiptCheck.exists) {
+        res.status(400).json({
+          ok: false,
+          error: receiptCheck.reason || 'Booking must be persisted before triggering notifications.',
+        });
+        return;
+      }
+
+      notifiedBookingIds.set(bookingId, now);
+      if (notifiedBookingIds.size > 2000) {
+        for (const [k, ts] of notifiedBookingIds.entries()) {
+          if (now - ts > 24 * 60 * 60 * 1000) notifiedBookingIds.delete(k);
+        }
+      }
+    }
+
+    const safeBookingId = bookingId || 'WT-TEST';
+    const tripTitle = String(body.tripTitle || 'Wasla Travel Excursion').trim().slice(0, 240);
+    const destination = String(body.destination || 'Hurghada').trim().slice(0, 60);
+    const tripDate = String(body.date || new Date().toISOString().slice(0, 10)).trim().slice(0, 20);
+    const startTime = String(body.tripStartTime || '').trim().slice(0, 80);
+    const guestName = String(body.guestName || 'Guest').trim().slice(0, 120);
+    const guestCountry = String(body.guestCountry || 'Guest').trim().slice(0, 80);
+    const guestWa = String(body.guestWhatsapp || '').trim().slice(0, 60);
+    const guestEmail = String(body.guestEmail || '').trim().slice(0, 160);
+    const guestContact = String(body.guestContact || guestWa || guestEmail || 'N/A').trim().slice(0, 160);
+    const hotel = String(body.hotel || 'Hotel Pickup').trim().slice(0, 200);
+    const roomNumber = String(body.roomNumber || '').trim().slice(0, 40);
+    const adults = Math.min(50, Math.max(1, Math.round(Number(body.adults) || 1)));
+    const children = Math.min(50, Math.max(0, Math.round(Number(body.children) || 0)));
+    const infants = Math.min(50, Math.max(0, Math.round(Number(body.infants) || 0)));
+    const grossEur = Math.min(100000, Math.max(0, Math.round(Number(body.grossEur) || 0)));
+    const supplierName = String(body.supplierName || 'Wasla Operations').trim().slice(0, 120);
+    const paymentStatus = String(body.paymentStatus || 'Awaiting link').trim().slice(0, 40);
+    const notes = String(body.notes || '').trim().slice(0, 800);
+
+    // Recipients are ALWAYS controlled exclusively by server config (never client payload)
     const targetOwnerEmail = String(
-      process.env.OWNER_ALERT_EMAIL || body.officialEmail || 'booking@waslatravel.com'
+      process.env.OWNER_ALERT_EMAIL || 'booking@waslatravel.com'
     ).trim();
     const targetOwnerWaDigits = String(
-      process.env.OWNER_WHATSAPP_TO || body.ownerWhatsapp || '201129155520'
+      process.env.OWNER_WHATSAPP_TO || '201129155520'
     ).replace(/\D/g, '');
     const appUrl = (process.env.APP_URL || 'https://waslatravel.com').replace(/\/$/, '');
 
@@ -153,7 +485,7 @@ async function startServer() {
     const whatsappAlertText = [
       isTest
         ? `🧪 *TEST ALERT — Wasla Travel Owner Desk*`
-        : `🔔 *NEW BOOKING ALERT — ${bookingId}*`,
+        : `🔔 *NEW BOOKING ALERT — ${safeBookingId}*`,
       `━━━━━━━━━━━━━━━━━━`,
       `🎫 *Excursion:* ${tripTitle} (${destination})`,
       `📅 *Trip Date:* ${tripDate}${startTime ? ` · ${startTime}` : ''}`,
@@ -172,8 +504,8 @@ async function startServer() {
       .join('\n');
 
     const emailSubject = isTest
-      ? `[TEST] Wasla Travel Owner Booking Alert — ${bookingId}`
-      : `🔔 New Booking ${bookingId} — ${tripTitle} (${tripDate}) · €${grossEur}`;
+      ? `[TEST] Wasla Travel Owner Booking Alert — ${safeBookingId}`
+      : `🔔 New Booking ${safeBookingId} — ${tripTitle} (${tripDate}) · €${grossEur}`;
 
     const escapeHtml = (str: string) =>
       str
@@ -189,7 +521,7 @@ async function startServer() {
             ${isTest ? 'TEST NOTIFICATION · WASLA TRAVEL' : 'NEW CUSTOMER BOOKING · WASLA TRAVEL'}
           </div>
           <h1 style="margin: 6px 0 0; font-size: 20px; font-weight: 800;">
-            ${escapeHtml(bookingId)} — ${escapeHtml(tripTitle)}
+            ${escapeHtml(safeBookingId)} — ${escapeHtml(tripTitle)}
           </h1>
           <div style="margin-top: 6px; font-size: 13px; color: #cbd5e1;">
             Booked at ${escapeHtml(bookedAtStr)} (Cairo Time) · ${escapeHtml(destination)}
@@ -396,7 +728,7 @@ async function startServer() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             event: isTest ? 'test_booking_alert' : 'new_booking',
-            bookingId,
+            bookingId: safeBookingId,
             bookedAt: bookedAtStr,
             tripTitle,
             destination,
@@ -450,7 +782,7 @@ self.addEventListener('activate', (e) => {
     );
   });
 
-  app.post('/api/assistant', async (req, res) => {
+  app.post('/api/assistant', requireRole(['owner', 'operations']), aiRateLimiter, async (req, res) => {
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey || apiKey === 'MY_GEMINI_API_KEY') {
       res.status(503).json({
@@ -621,7 +953,7 @@ self.addEventListener('activate', (e) => {
     }
   });
 
-  app.post('/api/translate', async (req, res) => {
+  app.post('/api/translate', requireRole(['owner', 'operations']), aiRateLimiter, async (req, res) => {
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey || apiKey === 'MY_GEMINI_API_KEY') {
       res.status(503).json({
@@ -695,7 +1027,7 @@ self.addEventListener('activate', (e) => {
     }
   });
 
-  app.post('/api/ads/generate', async (req, res) => {
+  app.post('/api/ads/generate', requireRole(['owner']), aiRateLimiter, async (req, res) => {
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey || apiKey === 'MY_GEMINI_API_KEY') {
       res.status(503).json({
@@ -796,7 +1128,7 @@ self.addEventListener('activate', (e) => {
     }
   });
 
-  app.post('/api/owner/copilot', async (req, res) => {
+  app.post('/api/owner/copilot', requireRole(['owner']), aiRateLimiter, async (req, res) => {
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey || apiKey === 'MY_GEMINI_API_KEY') {
       res.status(503).json({
@@ -1121,7 +1453,7 @@ self.addEventListener('activate', (e) => {
     }
   });
 
-  app.post('/api/owner/transcribe', async (req, res) => {
+  app.post('/api/owner/transcribe', requireRole(['owner']), aiRateLimiter, async (req, res) => {
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey || apiKey === 'MY_GEMINI_API_KEY') {
       res.status(503).json({
@@ -1212,7 +1544,7 @@ self.addEventListener('activate', (e) => {
     }
   });
 
-  app.post('/api/owner/tts', async (req, res) => {
+  app.post('/api/owner/tts', requireRole(['owner']), aiRateLimiter, async (req, res) => {
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey || apiKey === 'MY_GEMINI_API_KEY') {
       res.status(503).json({
@@ -1316,7 +1648,7 @@ self.addEventListener('activate', (e) => {
     }
   });
 
-  app.post('/api/trips/translate', async (req, res) => {
+  app.post('/api/trips/translate', requireRole(['owner', 'operations', 'supplier']), aiRateLimiter, async (req, res) => {
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey || apiKey === 'MY_GEMINI_API_KEY') {
       res.status(503).json({

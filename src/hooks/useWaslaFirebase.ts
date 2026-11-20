@@ -559,6 +559,100 @@ function buildBookingReceiptFields(booking: {
   };
 }
 
+type SupplierDispatchStatus = 'Confirmed' | 'Driver assigned' | 'Completed';
+
+function isSupplierVisibleBookingStatus(
+  status: PlatformBooking['status']
+): status is SupplierDispatchStatus {
+  return status === 'Confirmed' || status === 'Driver assigned' || status === 'Completed';
+}
+
+function buildSupplierDispatchFields(
+  booking: PlatformBooking,
+  supplierUid: string
+): Record<string, unknown> {
+  const safeId = sanitizeDocId(booking.id, 'WT');
+  const safeTripId = truncateText(booking.tripId, 128, 'custom-itinerary');
+  const safeTripTitle = truncateText(booking.tripTitle, 240, 'Wasla Excursion');
+  const safeSupplier = truncateText(booking.supplierName, 120, 'Wasla City Hosts');
+  const safeDate = truncateText(booking.date, 20, new Date().toISOString().slice(0, 10));
+  const safePickupSpot =
+    booking.pickupSpot === 'Inside Reception' || booking.pickupSpot === 'Outside Main Gate'
+      ? booking.pickupSpot
+      : undefined;
+  const safeRoomNumber = booking.roomNumber ? truncateText(booking.roomNumber, 40, '') : undefined;
+  const safeTripStartTime =
+    booking.tripStartTime && booking.tripStartTime.trim().length > 0
+      ? truncateText(booking.tripStartTime, 80, '')
+      : undefined;
+
+  return stripUndefined({
+    id: safeId,
+    bookingId: safeId,
+    tripId: safeTripId.length >= 2 ? safeTripId : 'custom-itinerary',
+    tripTitle: safeTripTitle.length >= 2 ? safeTripTitle : 'Wasla Excursion',
+    category: booking.category,
+    destination: booking.destination,
+    date: safeDate.length >= 8 ? safeDate : new Date().toISOString().slice(0, 10),
+    tripStartTime: safeTripStartTime || undefined,
+    pickupTime: truncateText(booking.pickupTime, 24, ''),
+    pickupSpot: safePickupSpot,
+    guestName: truncateText(booking.guestName, 120, 'Guest'),
+    guestCountry: truncateText(booking.guestCountry, 80, ''),
+    hotel: truncateText(booking.hotel, 200, 'Hurghada Hotel'),
+    roomNumber: safeRoomNumber || undefined,
+    adults: clampNumber(booking.adults, 1, 50, 1),
+    children: clampNumber(booking.children, 0, 50, 0),
+    infants: clampNumber(booking.infants ?? 0, 0, 50, 0),
+    supplierName: safeSupplier.length >= 2 ? safeSupplier : 'Wasla City Hosts',
+    supplierUid: supplierUid.slice(0, 128),
+    assignedDriverOrGuide: truncateText(booking.assignedDriverOrGuide, 160, ''),
+    status: isSupplierVisibleBookingStatus(booking.status) ? booking.status : 'Confirmed',
+    notes: truncateText(booking.notes, 800, ''),
+  });
+}
+
+function mapSupplierDispatchToBooking(
+  raw: Record<string, unknown>,
+  createdAtMs: number
+): PlatformBooking {
+  const rawStatus = String(raw.status || 'Confirmed');
+  const status: SupplierDispatchStatus =
+    rawStatus === 'Driver assigned' || rawStatus === 'Completed' ? rawStatus : 'Confirmed';
+  return {
+    id: String(raw.bookingId || raw.id || ''),
+    tripId: String(raw.tripId || 'custom-itinerary'),
+    tripTitle: String(raw.tripTitle || 'Wasla Excursion'),
+    category: (raw.category as PlatformBooking['category']) || 'sea',
+    destination: (raw.destination as PlatformBooking['destination']) || 'Hurghada',
+    date: String(raw.date || ''),
+    ...(raw.tripStartTime ? { tripStartTime: String(raw.tripStartTime) } : {}),
+    pickupTime: String(raw.pickupTime || ''),
+    ...(raw.pickupSpot === 'Inside Reception' || raw.pickupSpot === 'Outside Main Gate'
+      ? { pickupSpot: raw.pickupSpot }
+      : {}),
+    guestName: String(raw.guestName || 'Guest'),
+    guestCountry: String(raw.guestCountry || ''),
+    guestContact: '',
+    guestWhatsapp: '',
+    guestEmail: '',
+    guestLang: 'en',
+    hotel: String(raw.hotel || ''),
+    ...(raw.roomNumber ? { roomNumber: String(raw.roomNumber) } : {}),
+    adults: Number(raw.adults || 1),
+    children: Number(raw.children || 0),
+    infants: Number(raw.infants || 0),
+    grossEur: 0,
+    supplierName: String(raw.supplierName || ''),
+    supplierUid: String(raw.supplierUid || ''),
+    assignedDriverOrGuide: String(raw.assignedDriverOrGuide || ''),
+    paymentStatus: 'Paid online',
+    status,
+    notes: String(raw.notes || ''),
+    createdAtMs,
+  };
+}
+
 function sanitizeChatForFirestore(chat: ChatThread): Record<string, unknown> {
   const safeBookingRef = truncateText(chat.bookingRef, 64, 'WT-000');
   const safeMessages =
@@ -915,10 +1009,11 @@ export function useWaslaFirebase() {
           }
         }
 
-        // Seed missing zero-PII booking verification receipts for review gating
+        // Seed missing zero-PII booking verification receipts & confirmed supplier dispatches
         for (const bk of existingBookingsList) {
+          const safeBkId = sanitizeDocId(bk.id, 'WT');
           try {
-            const rcptRef = doc(db, 'booking_receipts', sanitizeDocId(bk.id, 'WT'));
+            const rcptRef = doc(db, 'booking_receipts', safeBkId);
             const rcptSnap = await getDoc(rcptRef);
             if (!rcptSnap.exists()) {
               await setDoc(rcptRef, {
@@ -929,6 +1024,21 @@ export function useWaslaFirebase() {
             }
           } catch {
             // Non-fatal if receipt sync already exists
+          }
+          if (isSupplierVisibleBookingStatus(bk.status) && bk.supplierUid) {
+            try {
+              const dispRef = doc(db, 'supplier_dispatches', safeBkId);
+              const dispSnap = await getDoc(dispRef);
+              if (!dispSnap.exists()) {
+                await setDoc(dispRef, {
+                  ...buildSupplierDispatchFields(bk, bk.supplierUid),
+                  createdAt: serverTimestamp(),
+                  updatedAt: serverTimestamp(),
+                });
+              }
+            } catch {
+              // Non-fatal if dispatch doc already exists
+            }
           }
         }
 
@@ -1101,6 +1211,62 @@ export function useWaslaFirebase() {
 
       unsubscribers.push(
         onSnapshot(
+          collection(db, 'supplier_dispatches'),
+          (snap) => {
+            if (snap.empty) return;
+            const dispatchDriverMap = new Map<
+              string,
+              { assignedDriverOrGuide: string; status: SupplierDispatchStatus }
+            >();
+            snap.docs.forEach((d) => {
+              const data = d.data() as Record<string, unknown>;
+              const driver = String(data.assignedDriverOrGuide || '').trim();
+              const status = String(data.status || '') as SupplierDispatchStatus;
+              if (driver || status === 'Driver assigned') {
+                dispatchDriverMap.set(d.id, {
+                  assignedDriverOrGuide: driver,
+                  status,
+                });
+              }
+            });
+            if (dispatchDriverMap.size === 0) return;
+            setBookings((prev) => {
+              let changed = false;
+              const next = prev.map((bk) => {
+                const disp = dispatchDriverMap.get(bk.id);
+                if (!disp) return bk;
+                const needsDriverSync =
+                  Boolean(disp.assignedDriverOrGuide) &&
+                  disp.assignedDriverOrGuide !== bk.assignedDriverOrGuide;
+                const needsStatusSync =
+                  disp.status === 'Driver assigned' && bk.status === 'Confirmed';
+                if (!needsDriverSync && !needsStatusSync) return bk;
+                changed = true;
+                const syncPatch: Record<string, unknown> = {
+                  updatedAt: serverTimestamp(),
+                };
+                if (needsDriverSync) {
+                  syncPatch.assignedDriverOrGuide = disp.assignedDriverOrGuide;
+                }
+                if (needsStatusSync) {
+                  syncPatch.status = 'Driver assigned';
+                }
+                void updateDoc(doc(db, 'bookings', bk.id), syncPatch).catch(() => {});
+                return {
+                  ...bk,
+                  ...(needsDriverSync ? { assignedDriverOrGuide: disp.assignedDriverOrGuide } : {}),
+                  ...(needsStatusSync ? { status: 'Driver assigned' as const } : {}),
+                };
+              });
+              return changed ? next : prev;
+            });
+          },
+          (err) => console.warn('Supplier dispatches sync warning:', err)
+        )
+      );
+
+      unsubscribers.push(
+        onSnapshot(
           collection(db, 'suppliers'),
           (snap) => {
             if (!snap.empty) setSuppliers(snap.docs.map((d) => d.data() as SupplierProfile));
@@ -1237,10 +1403,14 @@ export function useWaslaFirebase() {
 
       unsubscribers.push(
         onSnapshot(
-          query(collection(db, 'bookings'), where('supplierUid', '==', user.uid)),
+          query(
+            collection(db, 'supplier_dispatches'),
+            where('supplierUid', '==', user.uid),
+            where('status', 'in', ['Confirmed', 'Driver assigned', 'Completed'])
+          ),
           (snap) => {
             const rawList = snap.docs.map((d) => {
-              const raw = d.data() as PlatformBooking & {
+              const raw = d.data() as Record<string, unknown> & {
                 createdAt?: { toMillis?: () => number; seconds?: number } | null;
               };
               const createdAtMs =
@@ -1248,12 +1418,10 @@ export function useWaslaFirebase() {
                   ? raw.createdAt.toMillis()
                   : typeof raw.createdAt?.seconds === 'number'
                   ? raw.createdAt.seconds * 1000
-                  : typeof raw.createdAtMs === 'number' && raw.createdAtMs > 0
-                  ? raw.createdAtMs
                   : d.metadata.hasPendingWrites
                   ? Date.now()
                   : 0;
-              return { ...raw, createdAtMs };
+              return mapSupplierDispatchToBooking(raw, createdAtMs);
             });
             const list = sortBookingsNewestFirst(rawList);
             if (!bookingsLoadedRef.current) {
@@ -1271,7 +1439,7 @@ export function useWaslaFirebase() {
             }
             setBookings(list);
           },
-          (err) => console.warn('Supplier bookings warning:', err)
+          (err) => console.warn('Supplier dispatches warning:', err)
         )
       );
 
@@ -1712,6 +1880,42 @@ export function useWaslaFirebase() {
     []
   );
 
+  const syncSupplierDispatchDoc = useCallback(
+    async (targetBooking: PlatformBooking, explicitSupplierUid?: string) => {
+      const dispatchId = sanitizeDocId(targetBooking.id, 'WT');
+      const linkedTrip = trips.find((t) => t.id === targetBooking.tripId);
+      const linkedSupplier = suppliers.find((s) => s.name === targetBooking.supplierName);
+      const resolvedUid = (
+        explicitSupplierUid ||
+        targetBooking.supplierUid ||
+        linkedTrip?.supplierUid ||
+        linkedSupplier?.linkedUid ||
+        ''
+      ).trim();
+
+      const dispRef = doc(db, 'supplier_dispatches', dispatchId);
+      if (isSupplierVisibleBookingStatus(targetBooking.status) && resolvedUid) {
+        const dispatchFields = buildSupplierDispatchFields(targetBooking, resolvedUid);
+        const existingSnap = await getDoc(dispRef).catch(() => null);
+        if (existingSnap?.exists()) {
+          await updateDoc(dispRef, {
+            ...dispatchFields,
+            updatedAt: serverTimestamp(),
+          }).catch(() => {});
+        } else {
+          await setDoc(dispRef, {
+            ...dispatchFields,
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp(),
+          }).catch(() => {});
+        }
+      } else {
+        await deleteDoc(dispRef).catch(() => {});
+      }
+    },
+    [trips, suppliers]
+  );
+
   const createBookingInDb = useCallback(
     async (booking: PlatformBooking, options?: { suppressSelfAlert?: boolean }) => {
       const bookingWithTs: PlatformBooking = { ...booking, createdAtMs: Date.now() };
@@ -1723,15 +1927,17 @@ export function useWaslaFirebase() {
         showDesktopBookingNotification(booking);
       }
 
-      const dispatchOwnerNotifications = async (targetBooking: PlatformBooking) => {
-        const officialEmail = publicSettings.email || SITE_CONFIG.email;
-        const ownerWhatsapp = publicSettings.whatsappNumber || SITE_CONFIG.whatsappNumber;
+      const dispatchOwnerNotifications = async (
+        targetBooking: PlatformBooking,
+        persistedBookingId: string
+      ) => {
         try {
           await fetch('/api/notifications/new-booking', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              id: targetBooking.id,
+              id: persistedBookingId,
+              tripId: targetBooking.tripId,
               tripTitle: targetBooking.tripTitle,
               destination: targetBooking.destination,
               category: targetBooking.category,
@@ -1751,8 +1957,6 @@ export function useWaslaFirebase() {
               supplierName: targetBooking.supplierName,
               paymentStatus: targetBooking.paymentStatus,
               notes: targetBooking.notes,
-              officialEmail,
-              ownerWhatsapp,
             }),
           });
         } catch {
@@ -1760,15 +1964,14 @@ export function useWaslaFirebase() {
         }
       };
 
-      // Always fire real-time Owner WhatsApp + Official Email alert via backend
-      void dispatchOwnerNotifications(bookingWithTs);
-
       if (!firestoreSeeded && effectiveRole === 'none') {
         // Allow instant WhatsApp confirmation if storefront database hasn't been seeded yet
         return;
       }
       const linkedTrip = trips.find((t) => t.id === booking.tripId);
-      const sanitized = sanitizeBookingForFirestore(booking, linkedTrip?.supplierUid);
+      const linkedSupplier = suppliers.find((s) => s.name === booking.supplierName);
+      const resolvedSupplierUid = linkedTrip?.supplierUid || linkedSupplier?.linkedUid;
+      const sanitized = sanitizeBookingForFirestore(booking, resolvedSupplierUid);
       const bookingId = String(sanitized.id);
       try {
         await setDoc(doc(db, 'bookings', bookingId), {
@@ -1786,7 +1989,20 @@ export function useWaslaFirebase() {
           }),
           createdAt: serverTimestamp(),
           updatedAt: serverTimestamp(),
-        }).catch(() => {});
+        });
+
+        if (
+          (effectiveRole === 'owner' || effectiveRole === 'operations') &&
+          isSupplierVisibleBookingStatus(booking.status)
+        ) {
+          await syncSupplierDispatchDoc(
+            { ...bookingWithTs, id: bookingId, supplierUid: resolvedSupplierUid },
+            resolvedSupplierUid
+          );
+        }
+
+        // Fire real-time Owner WhatsApp + Official Email alert ONLY AFTER Firestore persistence succeeds
+        void dispatchOwnerNotifications(bookingWithTs, bookingId);
 
         const officialInbox = publicSettings.email || SITE_CONFIG.email;
         const summaryBody = [
@@ -1840,9 +2056,10 @@ export function useWaslaFirebase() {
       firestoreSeeded,
       effectiveRole,
       trips,
+      suppliers,
       publicSettings.email,
-      publicSettings.whatsappNumber,
       logDispatchEmailInDb,
+      syncSupplierDispatchDoc,
     ]
   );
 
@@ -1983,86 +2200,129 @@ export function useWaslaFirebase() {
     }
   }, []);
 
-  const updateBookingInDb = useCallback(async (id: string, patch: Partial<PlatformBooking>) => {
-    setBookings((prev) => prev.map((b) => (b.id === id ? { ...b, ...patch } : b)));
-    const safePatch: Record<string, unknown> = stripUndefined({
-      tripTitle:
-        patch.tripTitle !== undefined ? truncateText(patch.tripTitle, 240, 'Wasla Excursion') : undefined,
-      category: patch.category,
-      destination: patch.destination,
-      date:
-        patch.date !== undefined ? truncateText(patch.date, 20, new Date().toISOString().slice(0, 10)) : undefined,
-      tripStartTime:
-        patch.tripStartTime !== undefined
-          ? patch.tripStartTime.trim().length > 0
-            ? truncateText(patch.tripStartTime, 80, '')
-            : deleteField()
-          : undefined,
-      pickupTime:
-        patch.pickupTime !== undefined ? truncateText(patch.pickupTime, 24, '') : undefined,
-      pickupSpot:
-        patch.pickupSpot === 'Inside Reception' || patch.pickupSpot === 'Outside Main Gate'
-          ? patch.pickupSpot
-          : undefined,
-      guestName:
-        patch.guestName !== undefined ? truncateText(patch.guestName, 120, 'Guest') : undefined,
-      guestCountry:
-        patch.guestCountry !== undefined ? truncateText(patch.guestCountry, 80, '') : undefined,
-      guestWhatsapp:
-        patch.guestWhatsapp !== undefined ? truncateText(patch.guestWhatsapp, 60, '') : undefined,
-      guestEmail:
-        patch.guestEmail !== undefined ? truncateText(patch.guestEmail, 160, '') : undefined,
-      guestContact:
-        patch.guestContact !== undefined ? truncateText(patch.guestContact, 160, 'WhatsApp guest') : undefined,
-      hotel:
-        patch.hotel !== undefined ? truncateText(patch.hotel, 200, 'Hurghada Hotel') : undefined,
-      roomNumber:
-        patch.roomNumber !== undefined ? truncateText(patch.roomNumber, 40, '') : undefined,
-      locationImageUrl:
-        patch.locationImageUrl !== undefined
-          ? patch.locationImageUrl.length <= 250000
-            ? patch.locationImageUrl
-            : ''
-          : undefined,
-      adults:
-        patch.adults !== undefined ? clampNumber(patch.adults, 1, 50, 1) : undefined,
-      children:
-        patch.children !== undefined ? clampNumber(patch.children, 0, 50, 0) : undefined,
-      infants:
-        patch.infants !== undefined ? clampNumber(patch.infants, 0, 50, 0) : undefined,
-      grossEur:
-        patch.grossEur !== undefined ? clampNumber(patch.grossEur, 0, 100000, 0) : undefined,
-      supplierName:
-        patch.supplierName !== undefined ? truncateText(patch.supplierName, 120, 'Wasla City Hosts') : undefined,
-      assignedDriverOrGuide:
-        patch.assignedDriverOrGuide !== undefined
-          ? truncateText(patch.assignedDriverOrGuide, 160, '')
-          : undefined,
-      paymentStatus: patch.paymentStatus,
-      status: patch.status,
-      notes: patch.notes !== undefined ? truncateText(patch.notes, 800, '') : undefined,
-    });
-    try {
-      await updateDoc(doc(db, 'bookings', id), {
-        ...safePatch,
-        updatedAt: serverTimestamp(),
-      });
-      if (patch.status !== undefined || patch.date !== undefined) {
-        const rcptRef = doc(db, 'booking_receipts', id);
-        const rcptSnap = await getDoc(rcptRef).catch(() => null);
-        if (rcptSnap?.exists()) {
-          const receiptUpdate: Record<string, unknown> = {
+  const updateBookingInDb = useCallback(
+    async (id: string, patch: Partial<PlatformBooking>) => {
+      if (effectiveRole === 'supplier') {
+        const driverValue =
+          patch.assignedDriverOrGuide !== undefined
+            ? truncateText(patch.assignedDriverOrGuide, 160, '')
+            : undefined;
+        const allowedStatus =
+          patch.status === 'Driver assigned' && driverValue && driverValue.trim().length >= 2
+            ? 'Driver assigned'
+            : undefined;
+        const supplierSafePatch: Record<string, unknown> = stripUndefined({
+          assignedDriverOrGuide: driverValue,
+          status: allowedStatus,
+        });
+        if (Object.keys(supplierSafePatch).length === 0) return;
+
+        setBookings((prev) =>
+          prev.map((b) =>
+            b.id === id
+              ? {
+                  ...b,
+                  ...(driverValue !== undefined ? { assignedDriverOrGuide: driverValue } : {}),
+                  ...(allowedStatus ? { status: allowedStatus } : {}),
+                }
+              : b
+          )
+        );
+        try {
+          await updateDoc(doc(db, 'supplier_dispatches', sanitizeDocId(id, 'WT')), {
+            ...supplierSafePatch,
             updatedAt: serverTimestamp(),
-          };
-          if (patch.status !== undefined) receiptUpdate.status = patch.status;
-          if (patch.date !== undefined) {
-            receiptUpdate.tripDate = truncateText(patch.date, 20, '');
-            receiptUpdate.tripEndAt = buildTripEndTimestamp(patch.date);
-          }
-          await updateDoc(rcptRef, receiptUpdate).catch(() => {});
-        } else {
-          const existingBooking = bookings.find((b) => b.id === id);
-          if (existingBooking) {
+          });
+        } catch (err) {
+          handleFirestoreError(err, OperationType.UPDATE, `supplier_dispatches/${id}`);
+        }
+        return;
+      }
+
+      const existingBooking = bookings.find((b) => b.id === id);
+      setBookings((prev) => prev.map((b) => (b.id === id ? { ...b, ...patch } : b)));
+      const safePatch: Record<string, unknown> = stripUndefined({
+        tripTitle:
+          patch.tripTitle !== undefined ? truncateText(patch.tripTitle, 240, 'Wasla Excursion') : undefined,
+        category: patch.category,
+        destination: patch.destination,
+        date:
+          patch.date !== undefined ? truncateText(patch.date, 20, new Date().toISOString().slice(0, 10)) : undefined,
+        tripStartTime:
+          patch.tripStartTime !== undefined
+            ? patch.tripStartTime.trim().length > 0
+              ? truncateText(patch.tripStartTime, 80, '')
+              : deleteField()
+            : undefined,
+        pickupTime:
+          patch.pickupTime !== undefined ? truncateText(patch.pickupTime, 24, '') : undefined,
+        pickupSpot:
+          patch.pickupSpot === 'Inside Reception' || patch.pickupSpot === 'Outside Main Gate'
+            ? patch.pickupSpot
+            : undefined,
+        guestName:
+          patch.guestName !== undefined ? truncateText(patch.guestName, 120, 'Guest') : undefined,
+        guestCountry:
+          patch.guestCountry !== undefined ? truncateText(patch.guestCountry, 80, '') : undefined,
+        guestWhatsapp:
+          patch.guestWhatsapp !== undefined ? truncateText(patch.guestWhatsapp, 60, '') : undefined,
+        guestEmail:
+          patch.guestEmail !== undefined ? truncateText(patch.guestEmail, 160, '') : undefined,
+        guestContact:
+          patch.guestContact !== undefined ? truncateText(patch.guestContact, 160, 'WhatsApp guest') : undefined,
+        hotel:
+          patch.hotel !== undefined ? truncateText(patch.hotel, 200, 'Hurghada Hotel') : undefined,
+        roomNumber:
+          patch.roomNumber !== undefined ? truncateText(patch.roomNumber, 40, '') : undefined,
+        locationImageUrl:
+          patch.locationImageUrl !== undefined
+            ? patch.locationImageUrl.length <= 250000
+              ? patch.locationImageUrl
+              : ''
+            : undefined,
+        adults:
+          patch.adults !== undefined ? clampNumber(patch.adults, 1, 50, 1) : undefined,
+        children:
+          patch.children !== undefined ? clampNumber(patch.children, 0, 50, 0) : undefined,
+        infants:
+          patch.infants !== undefined ? clampNumber(patch.infants, 0, 50, 0) : undefined,
+        grossEur:
+          patch.grossEur !== undefined ? clampNumber(patch.grossEur, 0, 100000, 0) : undefined,
+        supplierName:
+          patch.supplierName !== undefined ? truncateText(patch.supplierName, 120, 'Wasla City Hosts') : undefined,
+        assignedDriverOrGuide:
+          patch.assignedDriverOrGuide !== undefined
+            ? truncateText(patch.assignedDriverOrGuide, 160, '')
+            : undefined,
+        paymentStatus: patch.paymentStatus,
+        status: patch.status,
+        notes: patch.notes !== undefined ? truncateText(patch.notes, 800, '') : undefined,
+      });
+      try {
+        await updateDoc(doc(db, 'bookings', id), {
+          ...safePatch,
+          updatedAt: serverTimestamp(),
+        });
+
+        if (existingBooking) {
+          const mergedBooking: PlatformBooking = { ...existingBooking, ...patch };
+          await syncSupplierDispatchDoc(mergedBooking);
+        }
+
+        if (patch.status !== undefined || patch.date !== undefined) {
+          const rcptRef = doc(db, 'booking_receipts', id);
+          const rcptSnap = await getDoc(rcptRef).catch(() => null);
+          if (rcptSnap?.exists()) {
+            const receiptUpdate: Record<string, unknown> = {
+              updatedAt: serverTimestamp(),
+            };
+            if (patch.status !== undefined) receiptUpdate.status = patch.status;
+            if (patch.date !== undefined) {
+              receiptUpdate.tripDate = truncateText(patch.date, 20, '');
+              receiptUpdate.tripEndAt = buildTripEndTimestamp(patch.date);
+            }
+            await updateDoc(rcptRef, receiptUpdate).catch(() => {});
+          } else if (existingBooking) {
             await setDoc(rcptRef, {
               ...buildBookingReceiptFields({
                 id: existingBooking.id,
@@ -2075,34 +2335,35 @@ export function useWaslaFirebase() {
             }).catch(() => {});
           }
         }
-      }
-      if (patch.status !== undefined) {
-        const nextVerified = patch.status === 'Completed';
-        setReceiptStatusByBookingId((prev) => ({ ...prev, [id]: patch.status as string }));
-        setTripReviews((prev) =>
-          prev.map((r) => (r.bookingId === id ? { ...r, verifiedBooking: nextVerified } : r))
-        );
-        try {
-          const linkedReviewsSnap = await getDocs(
-            query(collection(db, 'trip_reviews'), where('bookingId', '==', id))
+        if (patch.status !== undefined) {
+          const nextVerified = patch.status === 'Completed';
+          setReceiptStatusByBookingId((prev) => ({ ...prev, [id]: patch.status as string }));
+          setTripReviews((prev) =>
+            prev.map((r) => (r.bookingId === id ? { ...r, verifiedBooking: nextVerified } : r))
           );
-          for (const revDoc of linkedReviewsSnap.docs) {
-            const revData = revDoc.data() as TripReviewRecord;
-            if (Boolean(revData.verifiedBooking) !== nextVerified) {
-              await updateDoc(doc(db, 'trip_reviews', revDoc.id), {
-                verifiedBooking: nextVerified,
-                updatedAt: serverTimestamp(),
-              }).catch(() => {});
+          try {
+            const linkedReviewsSnap = await getDocs(
+              query(collection(db, 'trip_reviews'), where('bookingId', '==', id))
+            );
+            for (const revDoc of linkedReviewsSnap.docs) {
+              const revData = revDoc.data() as TripReviewRecord;
+              if (Boolean(revData.verifiedBooking) !== nextVerified) {
+                await updateDoc(doc(db, 'trip_reviews', revDoc.id), {
+                  verifiedBooking: nextVerified,
+                  updatedAt: serverTimestamp(),
+                }).catch(() => {});
+              }
             }
+          } catch {
+            // Non-fatal if static reviews haven't been seeded yet
           }
-        } catch {
-          // Non-fatal if static reviews haven't been seeded yet
         }
+      } catch (err) {
+        handleFirestoreError(err, OperationType.UPDATE, `bookings/${id}`);
       }
-    } catch (err) {
-      handleFirestoreError(err, OperationType.UPDATE, `bookings/${id}`);
-    }
-  }, [bookings]);
+    },
+    [bookings, effectiveRole, syncSupplierDispatchDoc]
+  );
 
   const sendChatMessageInDb = useCallback(
     async (threadId: string, text: string) => {

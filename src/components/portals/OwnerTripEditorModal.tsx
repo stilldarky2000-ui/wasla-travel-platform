@@ -1,4 +1,5 @@
 import React, { useMemo, useRef, useState } from 'react';
+import { authFetch } from '../../lib/apiAuth';
 import {
   Eye,
   ImagePlus,
@@ -461,7 +462,7 @@ export const OwnerTripEditorModal: React.FC<OwnerTripEditorModalProps> = ({
       const notAllowLines = splitLines(notAllowedText);
       const knowLines = splitLines(knowBeforeText);
 
-      const res = await fetch('/api/trips/translate', {
+      const res = await authFetch('/api/trips/translate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

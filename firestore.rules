@@ -282,6 +282,55 @@ service cloud.firestore {
         && data.updatedAt is timestamp;
     }
 
+    function isValidSupplierDispatch(data) {
+      return data.keys().hasAll([
+          'id', 'bookingId', 'tripId', 'tripTitle', 'category', 'destination', 'date', 'pickupTime',
+          'guestName', 'guestCountry', 'hotel', 'adults', 'children',
+          'supplierName', 'supplierUid', 'assignedDriverOrGuide', 'status', 'notes',
+          'createdAt', 'updatedAt'
+        ])
+        && data.keys().hasOnly([
+          'id', 'bookingId', 'tripId', 'tripTitle', 'category', 'destination', 'date', 'tripStartTime',
+          'pickupTime', 'pickupSpot', 'guestName', 'guestCountry', 'hotel', 'roomNumber',
+          'adults', 'children', 'infants', 'supplierName', 'supplierUid', 'assignedDriverOrGuide',
+          'status', 'notes', 'createdAt', 'updatedAt'
+        ])
+        && data.id is string && data.id.size() >= 1 && data.id.size() <= 128 && data.id.matches('^[a-zA-Z0-9_-]+$')
+        && data.bookingId is string && data.bookingId.size() >= 1 && data.bookingId.size() <= 128 && data.bookingId.matches('^[a-zA-Z0-9_-]+$')
+        && data.tripId is string && data.tripId.size() >= 2 && data.tripId.size() <= 128
+        && data.tripTitle is string && data.tripTitle.size() >= 2 && data.tripTitle.size() <= 240
+        && data.category in ['sea', 'desert', 'historical', 'horse', 'city', 'shopping', 'guides', 'transfers', 'custom']
+        && data.destination in ['Hurghada', 'Marsa Alam', 'Luxor', 'Cairo']
+        && data.date is string && data.date.size() >= 8 && data.date.size() <= 20
+        && (!('tripStartTime' in data) || (data.tripStartTime is string && data.tripStartTime.size() <= 80))
+        && data.pickupTime is string && data.pickupTime.size() <= 24
+        && (!('pickupSpot' in data) || data.pickupSpot in ['Inside Reception', 'Outside Main Gate'])
+        && data.guestName is string && data.guestName.size() >= 1 && data.guestName.size() <= 120
+        && data.guestCountry is string && data.guestCountry.size() <= 80
+        && data.hotel is string && data.hotel.size() >= 1 && data.hotel.size() <= 200
+        && (!('roomNumber' in data) || (data.roomNumber is string && data.roomNumber.size() <= 40))
+        && (
+          (data.adults is int && data.adults >= 1 && data.adults <= 50)
+          || (data.adults is float && data.adults >= 1.0 && data.adults <= 50.0)
+        )
+        && (
+          (data.children is int && data.children >= 0 && data.children <= 50)
+          || (data.children is float && data.children >= 0.0 && data.children <= 50.0)
+        )
+        && (
+          !('infants' in data)
+          || (data.infants is int && data.infants >= 0 && data.infants <= 50)
+          || (data.infants is float && data.infants >= 0.0 && data.infants <= 50.0)
+        )
+        && data.supplierName is string && data.supplierName.size() >= 2 && data.supplierName.size() <= 120
+        && data.supplierUid is string && data.supplierUid.size() >= 1 && data.supplierUid.size() <= 128
+        && data.assignedDriverOrGuide is string && data.assignedDriverOrGuide.size() <= 160
+        && data.status in ['Confirmed', 'Driver assigned', 'Completed']
+        && data.notes is string && data.notes.size() <= 800
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
     function isValidBookingReceipt(data) {
       return data.keys().hasAll(['id', 'tripId', 'tripDate', 'tripEndAt', 'status', 'createdAt', 'updatedAt'])
         && data.keys().hasOnly(['id', 'tripId', 'tripDate', 'tripEndAt', 'status', 'createdAt', 'updatedAt'])
@@ -456,9 +505,9 @@ service cloud.firestore {
         && isValidPublicSettings(request.resource.data);
     }
 
-    // 5. Private Owner Economics Settings
+    // 5. Private Owner Economics Settings (Owner & Operations only — never exposed to suppliers)
     match /owner_settings/{settingId} {
-      allow get: if isValidId(settingId) && (isBootstrappedOwner() || isOperations() || isSupplier());
+      allow get: if isValidId(settingId) && (isBootstrappedOwner() || isOperations());
       allow list: if isBootstrappedOwner();
       allow create, update: if isValidId(settingId) && isAdmin()
         && isValidOwnerSettings(request.resource.data);
@@ -475,7 +524,7 @@ service cloud.firestore {
       allow list: if isBootstrappedOwner()
         || resource.data.approvalStatus == 'Approved'
         || isOperations()
-        || (isEmailVerified() && resource.data.supplierUid == request.auth.uid);
+        || (isSupplier() && resource.data.supplierUid == request.auth.uid);
       allow create: if isValidId(tripId) && isValidTrip(request.resource.data)
         && request.resource.data.id == tripId
         && (
@@ -507,16 +556,14 @@ service cloud.firestore {
       allow delete: if isValidId(tripId) && isAdmin();
     }
 
-    // 7. Bookings (Strict PII Protection + Public Create Intake)
+    // 7. Bookings (Strict Owner/Operations PII & Financial Isolation + Public Create Intake)
     match /bookings/{bookingId} {
       allow get: if isValidId(bookingId) && (
         isBootstrappedOwner()
         || isOperations()
-        || (isSupplier() && resource != null && resource.data.supplierUid == request.auth.uid)
       );
       allow list: if isBootstrappedOwner()
-        || isOperations()
-        || (isEmailVerified() && resource.data.supplierUid == request.auth.uid);
+        || isOperations();
       allow create: if isValidId(bookingId) && isValidBooking(request.resource.data)
         && request.resource.data.id == bookingId
         && (
@@ -547,19 +594,58 @@ service cloud.firestore {
               'assignedDriverOrGuide', 'paymentStatus', 'status', 'notes', 'updatedAt'
             ])
           )
+        );
+      allow delete: if isValidId(bookingId) && isAdmin();
+    }
+
+    // 7C. Supplier Dispatches (Zero-PII, Zero-Financials Operational Projection for Active Suppliers)
+    match /supplier_dispatches/{dispatchId} {
+      allow get: if isValidId(dispatchId) && (
+        isBootstrappedOwner()
+        || isOperations()
+        || (
+          isSupplier()
+          && resource != null
+          && resource.data.supplierUid == request.auth.uid
+          && resource.data.status in ['Confirmed', 'Driver assigned', 'Completed']
+        )
+      );
+      allow list: if isBootstrappedOwner()
+        || isOperations()
+        || (
+          isSupplier()
+          && resource.data.supplierUid == request.auth.uid
+          && resource.data.status in ['Confirmed', 'Driver assigned', 'Completed']
+        );
+      allow create: if isValidId(dispatchId) && (isAdmin() || isOperations())
+        && isValidSupplierDispatch(request.resource.data)
+        && request.resource.data.id == dispatchId;
+      allow update: if isValidId(dispatchId) && isValidSupplierDispatch(request.resource.data)
+        && request.resource.data.id == resource.data.id
+        && (
+          isAdmin()
+          || isOperations()
           || (
             isSupplier()
             && resource.data.supplierUid == request.auth.uid
             && request.resource.data.supplierUid == resource.data.supplierUid
+            && request.resource.data.bookingId == resource.data.bookingId
+            && request.resource.data.tripId == resource.data.tripId
             && request.resource.data.createdAt == resource.data.createdAt
-            && !(resource.data.status in ['Completed', 'Refunded', 'Cancelled', 'No show'])
+            && resource.data.status in ['Confirmed', 'Driver assigned']
             && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
               'assignedDriverOrGuide', 'status', 'updatedAt'
             ])
-            && request.resource.data.status in ['Pending', 'Confirmed', 'Driver assigned']
+            && (
+              request.resource.data.status == resource.data.status
+              || (
+                request.resource.data.status == 'Driver assigned'
+                && request.resource.data.assignedDriverOrGuide.size() >= 2
+              )
+            )
           )
         );
-      allow delete: if isValidId(bookingId) && isAdmin();
+      allow delete: if isValidId(dispatchId) && (isAdmin() || isOperations());
     }
 
     // 8. Suppliers Directory
@@ -571,7 +657,7 @@ service cloud.firestore {
       );
       allow list: if isBootstrappedOwner()
         || isOperations()
-        || (isEmailVerified() && resource.data.linkedUid == request.auth.uid);
+        || (isSupplier() && resource.data.linkedUid == request.auth.uid);
       allow create: if isValidId(supplierId) && isAdmin() && isValidSupplier(request.resource.data)
         && request.resource.data.id == supplierId;
       allow update: if isValidId(supplierId) && isAdmin() && isValidSupplier(request.resource.data)
@@ -633,7 +719,7 @@ service cloud.firestore {
       allow delete: if isValidId(logId) && isAdmin();
     }
 
-    // 7B. Booking Verification Receipts (Zero-PII status lookup by exact ref; no public list)
+    // 7B. Booking Verification Receipts (Zero-PII status lookup by exact ref; Owner/Operations updates only)
     match /booking_receipts/{receiptId} {
       allow get: if isValidId(receiptId);
       allow list: if isBootstrappedOwner() || isOperations();
@@ -653,7 +739,7 @@ service cloud.firestore {
       allow update: if isValidId(receiptId) && isValidBookingReceipt(request.resource.data)
         && request.resource.data.id == resource.data.id
         && request.resource.data.tripId == resource.data.tripId
-        && (isAdmin() || isOperations() || isSupplier());
+        && (isAdmin() || isOperations());
       allow delete: if isValidId(receiptId) && isAdmin();
     }
 

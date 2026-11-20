@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { authFetch } from '../../lib/apiAuth';
 import {
   AlertTriangle,
   ArrowLeft,
@@ -816,7 +817,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
       [...activeThread.messages].reverse().find((m) => m.sender === 'customer')?.text || '';
 
     try {
-      const res = await fetch('/api/assistant', {
+      const res = await authFetch('/api/assistant', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -902,7 +903,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
       return next;
     });
     try {
-      const res = await fetch('/api/translate', {
+      const res = await authFetch('/api/translate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -988,7 +989,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
     setComplaintAiNote((prev) => ({ ...prev, [c.id]: '' }));
 
     try {
-      const res = await fetch('/api/assistant', {
+      const res = await authFetch('/api/assistant', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

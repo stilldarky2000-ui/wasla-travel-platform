@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { authFetch } from '../../lib/apiAuth';
 import {
   AlertTriangle,
   BadgeCheck,
@@ -306,7 +307,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
 
   useEffect(() => {
     let active = true;
-    fetch('/api/notifications/status')
+    authFetch('/api/notifications/status')
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
         if (active && data) setAlertChannelStatus(data);
@@ -326,7 +327,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
       publicSettings?.whatsappNumber || SITE_CONFIG.whatsappNumber
     );
     try {
-      const res = await fetch('/api/notifications/new-booking', {
+      const res = await authFetch('/api/notifications/new-booking', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -349,8 +350,6 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
           supplierName: 'Captain Karim Marine',
           paymentStatus: 'Cash on pickup',
           notes: 'Live delivery verification from Owner Command Center',
-          officialEmail: targetEmail,
-          ownerWhatsapp: targetWaDigits,
           isTest: true,
         }),
       });
@@ -699,7 +698,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
       return next;
     });
     try {
-      const res = await fetch('/api/translate', {
+      const res = await authFetch('/api/translate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -1045,7 +1044,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
             ].join('\n');
 
       const prompt = `Draft ONLY a warm, concise, ready-to-send customer reply (no intro, no quotes) in language "${targetLang}" for Wasla Travel Operations based on:\n${contextSummary}`;
-      const res = await fetch('/api/owner/copilot', {
+      const res = await authFetch('/api/owner/copilot', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -1437,7 +1436,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
     setBriefingLoading(true);
     setBriefingError(null);
     try {
-      const res = await fetch('/api/owner/copilot', {
+      const res = await authFetch('/api/owner/copilot', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -1497,7 +1496,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
     voiceAbortRef.current = controller;
 
     try {
-      const res = await fetch('/api/owner/copilot', {
+      const res = await authFetch('/api/owner/copilot', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         signal: controller.signal,
@@ -1770,7 +1769,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
           try {
             const audioBase64 = await blobToBase64(audioBlob);
             const activeVoiceMode = voiceActionModeRef.current;
-            const res = await fetch('/api/owner/copilot', {
+            const res = await authFetch('/api/owner/copilot', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               signal: controller.signal,
@@ -1870,7 +1869,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
     setCopiedAd(false);
 
     try {
-      const res = await fetch('/api/ads/generate', {
+      const res = await authFetch('/api/ads/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

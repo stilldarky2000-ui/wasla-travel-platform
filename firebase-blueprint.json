@@ -345,6 +345,59 @@
         "createdAt",
         "updatedAt"
       ]
+    },
+    "SupplierDispatch": {
+      "title": "SupplierDispatch",
+      "description": "Sanitized operational dispatch card for suppliers. Contains zero guest contact PII and zero selling prices, commissions, or payouts. Created and synced by Owner/Operations only for Confirmed, Driver assigned, or Completed bookings.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "bookingId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "tripId": { "type": "string", "minLength": 2, "maxLength": 128 },
+        "tripTitle": { "type": "string", "minLength": 2, "maxLength": 240 },
+        "category": { "type": "string", "enum": ["sea", "desert", "historical", "horse", "city", "shopping", "guides", "transfers", "custom"] },
+        "destination": { "type": "string", "enum": ["Hurghada", "Marsa Alam", "Luxor", "Cairo"] },
+        "date": { "type": "string", "minLength": 8, "maxLength": 20 },
+        "tripStartTime": { "type": "string", "maxLength": 80 },
+        "pickupTime": { "type": "string", "maxLength": 24 },
+        "pickupSpot": { "type": "string", "enum": ["Inside Reception", "Outside Main Gate"] },
+        "guestName": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "guestCountry": { "type": "string", "maxLength": 80 },
+        "hotel": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "roomNumber": { "type": "string", "maxLength": 40 },
+        "adults": { "type": "number" },
+        "children": { "type": "number" },
+        "infants": { "type": "number" },
+        "supplierName": { "type": "string", "minLength": 2, "maxLength": 120 },
+        "supplierUid": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "assignedDriverOrGuide": { "type": "string", "maxLength": 160 },
+        "status": { "type": "string", "enum": ["Confirmed", "Driver assigned", "Completed"] },
+        "notes": { "type": "string", "maxLength": 800 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": [
+        "id",
+        "bookingId",
+        "tripId",
+        "tripTitle",
+        "category",
+        "destination",
+        "date",
+        "pickupTime",
+        "guestName",
+        "guestCountry",
+        "hotel",
+        "adults",
+        "children",
+        "supplierName",
+        "supplierUid",
+        "assignedDriverOrGuide",
+        "status",
+        "notes",
+        "createdAt",
+        "updatedAt"
+      ]
     }
   },
   "firestore": {
@@ -379,6 +432,10 @@
     "/booking_receipts/{receiptId}": {
       "schema": { "$ref": "#/entities/BookingReceipt" },
       "description": "Zero-PII booking status receipts enabling server-verified post-trip reviews without leaking guest data."
+    },
+    "/supplier_dispatches/{dispatchId}": {
+      "schema": { "$ref": "#/entities/SupplierDispatch" },
+      "description": "Sanitized operational dispatch collection for active suppliers (Confirmed/Driver assigned/Completed only, zero guest contact PII, zero financial fields)."
     },
     "/suppliers/{supplierId}": {
       "schema": { "$ref": "#/entities/Supplier" },

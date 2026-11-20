@@ -1,5 +1,6 @@
 import React, { useMemo, useRef, useState } from 'react';
-import { Check, Clock, Eye, ImagePlus, Languages, Mail, MessageCircle, Pencil, Plus, Ship, Sparkles, Trash2, Upload, Wallet } from 'lucide-react';
+import { Check, Clock, Eye, ImagePlus, Languages, Pencil, Plus, ShieldCheck, Ship, Sparkles, Trash2, Upload } from 'lucide-react';
+import { authFetch } from '../../lib/apiAuth';
 import { I18N } from '../../data/i18n';
 import {
   ActivityCategoryId,
@@ -96,7 +97,7 @@ export const SupplierPortal: React.FC<SupplierPortalProps> = ({
   trips,
   bookings,
   suppliers,
-  commissionRate,
+  commissionRate: _commissionRate,
   lockedSupplierName = '',
   isOwnerUser = false,
   darkMode = false,
@@ -109,7 +110,8 @@ export const SupplierPortal: React.FC<SupplierPortalProps> = ({
     lockedSupplierName || suppliers[0]?.name || 'Captain Karim Marine'
   );
   const activeSupplierName = lockedSupplierName || selectedSupplierName;
-  const [activeTab, setActiveTab] = useState<'listings' | 'bookings' | 'payouts'>('listings');
+  const [activeTab, setActiveTab] = useState<'listings' | 'bookings'>('listings');
+  const [driverDrafts, setDriverDrafts] = useState<Record<string, string>>({});
   const [showAddForm, setShowAddForm] = useState(false);
 
   // Add Trip form state
@@ -186,19 +188,18 @@ export const SupplierPortal: React.FC<SupplierPortalProps> = ({
   );
 
   const supplierBookings = useMemo(
-    () => sortBookingsNewestFirst(bookings.filter((b) => b.supplierName === activeSupplierName)),
+    () =>
+      sortBookingsNewestFirst(
+        bookings.filter(
+          (b) =>
+            b.supplierName === activeSupplierName &&
+            (b.status === 'Confirmed' ||
+              b.status === 'Driver assigned' ||
+              b.status === 'Completed')
+        )
+      ),
     [bookings, activeSupplierName]
   );
-
-  const payoutTotals = useMemo(() => {
-    const valid = supplierBookings.filter(
-      (b) => b.status !== 'Refunded' && b.status !== 'Cancelled' && b.status !== 'No show'
-    );
-    const gross = valid.reduce((sum, b) => sum + b.grossEur, 0);
-    const comm = Math.round(gross * (commissionRate / 100));
-    const net = gross - comm;
-    return { gross, comm, net, count: valid.length };
-  }, [supplierBookings, commissionRate]);
 
   const compressImageFile = (file: File): Promise<string> =>
     new Promise((resolve, reject) => {
@@ -537,7 +538,7 @@ export const SupplierPortal: React.FC<SupplierPortalProps> = ({
     const rawKnow = splitLines(knowBeforeText);
 
     try {
-      const res = await fetch('/api/trips/translate', {
+      const res = await authFetch('/api/trips/translate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -693,16 +694,7 @@ export const SupplierPortal: React.FC<SupplierPortalProps> = ({
               activeTab === 'bookings' ? 'bg-white text-[#0F172A] shadow-xs' : 'text-[#475569]'
             }`}
           >
-            Incoming Bookings ({supplierBookings.length})
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveTab('payouts')}
-            className={`rounded-md px-4 py-2 text-xs font-semibold cursor-pointer ${
-              activeTab === 'payouts' ? 'bg-white text-[#0F172A] shadow-xs' : 'text-[#475569]'
-            }`}
-          >
-            My Payouts (€{payoutTotals.net})
+            Confirmed Dispatches ({supplierBookings.length})
           </button>
         </div>
 
@@ -1657,78 +1649,68 @@ export const SupplierPortal: React.FC<SupplierPortalProps> = ({
                         )}
                         <p className="text-xs text-[#475569]">
                           {b.guestName} ({b.adults}A{b.children > 0 ? `+${b.children}C` : ''}{(b.infants ?? 0) > 0 ? `+${b.infants}INF` : ''}) · {b.hotel}
+                          {b.roomNumber ? ` · Room ${b.roomNumber}` : ''}
+                          {b.pickupSpot ? ` · ${b.pickupSpot}` : ''}
                         </p>
-                        <div className="flex flex-wrap items-center gap-3 text-[11px] text-[#475569]">
-                          <span className="inline-flex items-center gap-1 tabular-nums">
-                            <MessageCircle className="h-3 w-3 text-[#16A34A]" aria-hidden="true" />
-                            {b.guestWhatsapp || b.guestContact}
+                        <div className="flex flex-wrap items-center gap-2 text-[11px] text-[#64748B]">
+                          <span className="inline-flex items-center gap-1">
+                            <ShieldCheck className="h-3 w-3 text-[#0E7490]" aria-hidden="true" />
+                            Guest contact &amp; payments are handled centrally by Wasla Operations.
                           </span>
-                          {b.guestEmail && (
-                            <span className="inline-flex items-center gap-1">
-                              <Mail className="h-3 w-3 text-[#EA580C]" aria-hidden="true" />
-                              {b.guestEmail}
-                            </span>
-                          )}
                         </div>
                         {b.notes && <p className="text-xs text-[#EA580C]">Note: {b.notes}</p>}
                       </div>
 
                       <div className="flex flex-wrap items-center gap-2.5">
-                        <input
-                          type="text"
-                          value={b.assignedDriverOrGuide}
-                          onChange={(e) =>
-                            onUpdateBooking(b.id, { assignedDriverOrGuide: e.target.value })
-                          }
-                          placeholder="Driver / boat / guide…"
-                          className="min-h-[38px] rounded-lg border border-[#CBD5E1] px-3 text-xs"
-                        />
-                        {b.status === 'Pending' && (
-                          <button
-                            type="button"
-                            onClick={() => onUpdateBooking(b.id, { status: 'Confirmed' })}
-                            className="inline-flex min-h-[38px] items-center gap-1.5 rounded-lg bg-[#EA580C] px-3.5 text-xs font-semibold text-white hover:bg-[#C2410C] cursor-pointer"
-                          >
-                            <Check className="h-3.5 w-3.5" aria-hidden="true" />
-                            <span>Confirm Seat</span>
-                          </button>
-                        )}
+                        {(() => {
+                          const currentDriver = driverDrafts[b.id] ?? b.assignedDriverOrGuide ?? '';
+                          const isCompleted = b.status === 'Completed';
+                          const trimmedDriver = currentDriver.trim();
+                          const hasDriverChanged = trimmedDriver !== (b.assignedDriverOrGuide || '').trim();
+                          const canMarkAssigned = b.status === 'Confirmed' && trimmedDriver.length >= 2;
+                          return (
+                            <>
+                              <input
+                                type="text"
+                                value={currentDriver}
+                                disabled={isCompleted}
+                                onChange={(e) =>
+                                  setDriverDrafts((prev) => ({ ...prev, [b.id]: e.target.value }))
+                                }
+                                placeholder="Driver / boat / guide…"
+                                className="min-h-[38px] rounded-lg border border-[#CBD5E1] px-3 text-xs disabled:bg-[#F1F5F9] disabled:text-[#64748B]"
+                              />
+                              {!isCompleted && (canMarkAssigned || (b.status === 'Driver assigned' && hasDriverChanged && trimmedDriver.length >= 2)) && (
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    onUpdateBooking(b.id, {
+                                      assignedDriverOrGuide: trimmedDriver,
+                                      status: 'Driver assigned',
+                                    });
+                                    setDriverDrafts((prev) => {
+                                      const next = { ...prev };
+                                      delete next[b.id];
+                                      return next;
+                                    });
+                                  }}
+                                  className="inline-flex min-h-[38px] items-center gap-1.5 rounded-lg bg-[#EA580C] px-3.5 text-xs font-semibold text-white hover:bg-[#C2410C] cursor-pointer"
+                                >
+                                  <Check className="h-3.5 w-3.5" aria-hidden="true" />
+                                  <span>
+                                    {b.status === 'Driver assigned' ? 'Update Driver' : 'Assign Driver'}
+                                  </span>
+                                </button>
+                              )}
+                            </>
+                          );
+                        })()}
                       </div>
                     </div>
                   );
                 })}
               </div>
             )}
-          </div>
-        )}
-
-        {activeTab === 'payouts' && (
-          <div className="rounded-xl border border-[#E2E8F0] bg-white p-6 space-y-5">
-            <div className="flex items-center gap-2 text-sm font-semibold text-[#0F172A]">
-              <Wallet className="h-4 w-4 text-[#EA580C]" aria-hidden="true" />
-              <span>Supplier Settlement Summary ({commissionRate}% marketplace fee)</span>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div className="rounded-lg border border-[#E2E8F0] bg-[#FFFFFF] p-4">
-                <div className="text-xs text-[#475569]">Guest Selling Total ({payoutTotals.count})</div>
-                <div className="font-mono text-2xl font-semibold text-[#0F172A] mt-1 tabular-nums">
-                  €{payoutTotals.gross}
-                </div>
-              </div>
-              <div className="rounded-lg border border-[#E2E8F0] bg-[#FFFFFF] p-4">
-                <div className="text-xs text-[#475569]">Wasla Platform Fee ({commissionRate}%)</div>
-                <div className="text-2xl font-semibold text-[#475569] mt-1 tabular-nums">
-                  -€{payoutTotals.comm}
-                </div>
-              </div>
-              <div className="rounded-lg border border-[#EA580C]/30 bg-[#EA580C]/[0.05] p-4">
-                <div className="text-xs font-medium text-[#EA580C]">Net Payout to Supplier</div>
-                <div className="text-2xl font-semibold text-[#EA580C] mt-1 tabular-nums">
-                  €{payoutTotals.net}
-                </div>
-              </div>
-            </div>
           </div>
         )}
       </div>
