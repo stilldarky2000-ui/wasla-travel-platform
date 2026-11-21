@@ -687,7 +687,13 @@ service cloud.firestore {
       allow delete: if isValidId(supplierId) && isAdmin();
     }
 
-    // 9. Customer Chat Threads
+    // Server-mediated conversations: guest capabilities and staff roles are checked
+    // by the API. Browser clients never access messages or private notes directly.
+    match /conversations/{document=**} {
+      allow read, write: if false;
+    }
+
+    // 9. Customer Chat Threads (legacy)
     match /chats/{chatId} {
       allow get: if isValidId(chatId) && (isBootstrappedOwner() || isOperations());
       allow list: if isBootstrappedOwner() || isOperations();

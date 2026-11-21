@@ -1,4 +1,5 @@
 import 'dotenv/config';
+import { installConversationRoutes } from './server/conversationRoutes';
 import { voucherToken, validVoucherToken } from './server/utils/voucherAccess';
 import crypto from 'crypto';
 import fs from 'fs';
@@ -523,6 +524,7 @@ async function startServer() {
   });
 
   const voucherLookupLimiter = createRateLimiter({windowMs:60000,maxRequests:40,keyPrefix:'voucher-lookup'});
+  installConversationRoutes(app, FIREBASE_PROJECT_ID, FIRESTORE_DATABASE_ID, requireRole(['owner', 'operations']), createRateLimiter({windowMs:60000,maxRequests:100,keyPrefix:'conversation'}));
   // Compatibility endpoint for older clients; payloads are no longer copied into a cache.
   app.post('/api/vouchers/sync', requireRole(['owner','operations']), (_req,res) => {
     res.json({ok:true,source:'firestore',synced:0});
@@ -609,6 +611,7 @@ self.addEventListener('activate', (e) => {
 
         const systemInstruction =
           'You are a high-precision multilingual translator and messaging assistant for Wasla Travel (waslatravel.com).\n' +
+          'You only draft text: never claim you sent a message, changed a booking, charged or refunded money. Never invent missing pickup times, prices, payment or confirmation states. If information is missing, ask for it. Never disclose internal notes, supplier costs or credentials.\n' +
           'CRITICAL FIDELITY RULE (HIGHEST PRIORITY):\n' +
           '1. When the operator provides specific words, sentences, facts, apologies, or instructions (e.g. "اعتذر له وقول له إنك في السكة", "قوله البيك أب الساعة 9 قدام البوابة", "I am 5 minutes away"), you MUST translate and express THAT EXACT SPECIFIC MEANING accurately and faithfully.\n' +
           '   - DO NOT invent extra sentences, unrequested apologies, extra promises, or extra booking details (like hotel/driver/price) unless the operator explicitly included them.\n' +

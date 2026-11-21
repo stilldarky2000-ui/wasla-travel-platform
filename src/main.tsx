@@ -1,6 +1,7 @@
 import './preamble';
 import {createRoot} from 'react-dom/client';
 import App from './App.tsx';
+import { GuestConversationPage } from './components/conversations/ConversationPanel';
 import {BrandThemeProvider} from './context/BrandThemeContext';
 import './index.css';
 
@@ -54,7 +55,7 @@ console.error = (...args: unknown[]) => {
 
 createRoot(document.getElementById('root')!).render(
   <BrandThemeProvider>
-    <App />
+    {new URLSearchParams(window.location.search).has('conversation') ? <GuestConversationPage /> : <App />}
   </BrandThemeProvider>
 );
 

@@ -1,5 +1,6 @@
 import { onDocumentWritten, onDocumentCreated } from 'firebase-functions/v2/firestore';
 import { onSchedule } from 'firebase-functions/v2/scheduler';
+import { notifyConversationMessage } from './conversationMail';
 import { initializeApp, getApps } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 import { enqueue, processJob } from './notificationOutbox';
@@ -18,6 +19,12 @@ interface PublicSiteSettings {
 
 const adminApp = getApps()[0] || initializeApp();
 const store = getFirestore(adminApp,FIRESTORE_DATABASE_ID);
+export const notifyBookingConversation = onDocumentCreated({
+  document: 'conversations/{bookingId}/messages/{messageId}', database: FIRESTORE_DATABASE_ID,
+  region: 'europe-west1', retry: true, timeoutSeconds: 60, memory: '256MiB', maxInstances: 5, concurrency: 1,
+}, async event => {
+  await notifyConversationMessage(store, event.params.bookingId, event.params.messageId);
+});
 async function fetchPublicSiteSettings(): Promise<PublicSiteSettings> {
   const snapshot = await store.doc('public_settings/storefront').get();
   return (snapshot.data() || {}) as PublicSiteSettings;
@@ -88,8 +95,9 @@ export const onBookingConfirmed = onDocumentWritten(
         : 'booking@waslatravel.com';
 
     const jobId = await enqueue(store,event.id,{payload:{
+        notificationCreatedAtMs: Date.parse(event.time),
         bookingId,
-        eventType: transitionedToConfirmed ? 'booking_confirmed' : 'booking_created',
+        eventType: transitionedToConfirmed || ['Confirmed', 'Driver assigned', 'Completed'].includes(nextStatus) ? 'booking_confirmed' : 'booking_created',
         tripTitle: String(afterData.tripTitle || 'Wasla Travel Excursion').slice(0, 240),
         destination: String(afterData.destination || 'Hurghada').slice(0, 60),
         tripDate: String(afterData.date || new Date().toISOString().slice(0, 10)).slice(0, 20),

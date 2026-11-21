@@ -1,0 +1,27 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { createRequire } from 'node:module';
+const require = createRequire(new URL('../functions/package.json', import.meta.url));
+const { notifyConversationMessage } = require('../functions/lib/conversationMail.js');
+test('conversation email is queued independently, has stable identity, and records acceptance rather than inbox delivery', async t => {
+  const previous = { ...process.env }; const original = globalThis.fetch;
+  t.after(() => { globalThis.fetch = original; for (const key of ['RESEND_API_KEY','VOUCHER_LINK_SECRET','APP_URL']) { if (previous[key] === undefined) delete process.env[key]; else process.env[key] = previous[key]; } });
+  process.env.RESEND_API_KEY = 'test'; process.env.VOUCHER_LINK_SECRET = 'x'.repeat(64); process.env.APP_URL = 'https://example.test';
+  let message = { sender: 'operator', internal: false, text: 'PRIVATE MESSAGE BODY', createdAt: { toMillis: () => 1800000000000 } }; const patches = []; const calls = [];
+  const store = { doc(path) { return { async get() { return { data: () => path.includes('/messages/') ? message : path.startsWith('bookings/') ? { guestEmail: 'guest@example.test', guestLang: 'en' } : { email: 'support@example.test' } }; }, async update(patch) { patches.push(patch); Object.assign(message, patch); } }; } };
+  globalThis.fetch = async (_url, options) => { calls.push(options); return new Response('{}', { status: 503 }); };
+  await assert.rejects(notifyConversationMessage(store, 'WT12345678', 'message-one'));
+  assert.equal(patches.at(-1).emailStatus, 'retry');
+  assert.equal(message.emailAcceptedAt, undefined);
+  globalThis.fetch = async (_url, options) => { calls.push(options); return new Response('{}', { status: 200 }); };
+  await notifyConversationMessage(store, 'WT12345678', 'message-one');
+  assert.equal(patches.at(-1).emailStatus, 'provider_accepted');
+  assert.ok(message.emailAcceptedAt);
+  assert.equal(calls[0].headers['Idempotency-Key'], calls[1].headers['Idempotency-Key']);
+  assert.equal(calls[0].body, calls[1].body);
+  assert.match(calls[1].body, /conversationToken=/);
+  assert.doesNotMatch(calls[1].body, /PRIVATE MESSAGE BODY/);
+  await notifyConversationMessage(store, 'WT12345678', 'message-one'); assert.equal(calls.length, 2);
+  message = { internal: true, sender: 'operator' };
+  await notifyConversationMessage(store, 'WT12345678', 'internal-note'); assert.equal(calls.length, 2);
+});

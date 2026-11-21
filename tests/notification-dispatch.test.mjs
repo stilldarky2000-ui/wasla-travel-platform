@@ -7,6 +7,7 @@ const payload={bookingId:'WT7K9M4X2P',eventType:'booking_created',tripTitle:'Sea
 const recipients={ownerEmails:['owner@example.test'],ownerWhatsappDigits:'201111111111',ownerWhatsappDisplay:'+201111111111',appUrl:'https://example.test'};
 const env={RESEND_API_KEY:'test',RESEND_FROM_EMAIL:'bookings@example.test',OWNER_ALERT_WEBHOOK_URL:'https://example.test/hook'};
 test('per-channel dispatch sends just that channel with a stable provider idempotency key',async t=>{
+ const previousSecret=process.env.VOUCHER_LINK_SECRET;process.env.VOUCHER_LINK_SECRET='x'.repeat(64);t.after(()=>{if(previousSecret===undefined)delete process.env.VOUCHER_LINK_SECRET;else process.env.VOUCHER_LINK_SECRET=previousSecret;});
  const calls=[];const original=globalThis.fetch;t.after(()=>globalThis.fetch=original);
  globalThis.fetch=async(url,options)=>{calls.push({url,options});return new Response('{}',{status:200});};
  assert.deepEqual(configuredNotificationChannels(payload,env),['email','guestEmail','webhook']);
@@ -14,6 +15,7 @@ test('per-channel dispatch sends just that channel with a stable provider idempo
  assert.equal(calls.length,1);assert.equal(calls[0].options.headers['Idempotency-Key'],'job:guestEmail');
  const email=JSON.parse(calls[0].options.body);
  assert.match(email.subject,/request saved/i);assert.doesNotMatch(email.subject,/confirmed/i);
+ assert.match(email.html,/conversation=WT7K9M4X2P#conversationToken=\d+\.[a-f0-9]{64}/);
  assert.equal(result.guestEmail.sent,true);assert.equal(result.email.sent,false);assert.equal(result.webhook.sent,false);
 });
 test('provider errors remain failures, not delivered records',async t=>{

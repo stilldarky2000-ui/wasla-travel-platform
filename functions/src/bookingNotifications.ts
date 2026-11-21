@@ -1,11 +1,13 @@
 import type { Channel } from './notificationOutbox';
 import { voucherToken } from './voucherAccess';
+import { conversationLink } from './conversationMail';
 import nodemailer, { type SendMailOptions } from 'nodemailer';
 import { buildSingleLangWaslaEmailHtml, buildWaslaEmailHtml } from './waslaEmailTemplate';
 
 export type BookingNotificationEventType = 'booking_created' | 'booking_confirmed' | 'test';
 
 export interface BookingNotificationPayload {
+  notificationCreatedAtMs?: number;
   bookingId: string;
   eventType: BookingNotificationEventType;
   tripTitle: string;
@@ -694,11 +696,14 @@ export async function dispatchBookingNotifications(
 
   const guestEmailSubject = isConfirmedUpdate ? gc.subjectConfirmed : gc.subjectNew;
 
-  let privateTrackUrl = appUrl;
+  const linkCreatedAt = payload.notificationCreatedAtMs || Date.parse(payload.tripDate + 'T00:00:00Z');
+  const privateConversationUrl = !delivery || delivery.channel === 'guestEmail' ? conversationLink(payload.bookingId, appUrl, linkCreatedAt + 30 * 86400000) : appUrl;
+  let privateTrackUrl = privateConversationUrl;
   if (isConfirmedUpdate) {
     try { privateTrackUrl = appUrl + '/?track=' + encodeURIComponent(payload.bookingId) + '#voucherToken=' + voucherToken(payload.bookingId); } catch { throw new Error('Private voucher links are not configured'); }
   }
   const guestEmailText = [
+    privateConversationUrl,
     privateTrackUrl !== appUrl ? privateTrackUrl : '',
     `${gc.greeting} ${payload.guestName},`,
     ``,
@@ -723,6 +728,7 @@ export async function dispatchBookingNotifications(
     .join('\n');
 
   const guestBodyHtml = `
+    <p><a href="${escapeHtml(privateConversationUrl)}">${isGuestRtl ? 'متابعة الحجز ومراسلة فريق العمليات' : 'View booking and message Operations'}</a></p>
     <p style="margin:0 0 12px;font-size:15px;color:#0F2233;">
       ${escapeHtml(gc.greeting)} <strong>${escapeHtml(payload.guestName)}</strong>,
     </p>

@@ -1,3 +1,4 @@
+import { OperationsInbox } from '../conversations/ConversationPanel';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { authFetch } from '../../lib/apiAuth';
 import {
@@ -1128,53 +1129,10 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
     });
 
     if (selectedInboxItem.kind === 'whatsapp') {
-      if (selectedInboxItem.chatThread && onSendChatMessage) {
-        onSendChatMessage(selectedInboxItem.chatThread.id, text);
-      } else if (selectedInboxItem.booking && onCreateChat) {
-        const bk = selectedInboxItem.booking;
-        const newChatId = `chat-${Date.now()}`;
-        const bkCreatedLabel = bk.createdAtMs
-          ? new Date(bk.createdAtMs).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-          : bk.date;
-        onCreateChat({
-          id: newChatId,
-          bookingRef: bk.id,
-          customerName: bk.guestName,
-          customerLang: bk.guestLang || 'en',
-          tripTitle: bk.tripTitle,
-          pickupInfo: `${bk.hotel} · ${bk.date}${bk.tripStartTime ? ` · Start: ${bk.tripStartTime}` : ''}${bk.pickupTime ? ` · Pickup: ${bk.pickupTime}` : ''}`,
-          unread: false,
-          messages: [
-            {
-              id: `msg-init-${Date.now()}`,
-              sender: 'customer',
-              text: `Booking request ${bk.id} for ${bk.tripTitle} on ${bk.date} (${bk.adults} adults${bk.children > 0 ? `, ${bk.children} children` : ''}) at ${bk.hotel}.`,
-              timestamp: bkCreatedLabel,
-            },
-            {
-              id: `msg-op-${Date.now() + 1}`,
-              sender: 'operator',
-              text,
-              timestamp: nowClock,
-            },
-          ],
-        });
-        setSelectedInboxKey(`chat:${newChatId}`);
-      }
-
-      const digits = getWhatsAppReplyDigits(selectedInboxItem);
-      if (digits.length >= 7) {
-        setLastSentWaLink(`https://wa.me/${digits}?text=${encodeURIComponent(text)}`);
-      } else {
-        setLastSentWaLink(null);
-      }
-      setConversationReplyDraft('');
-      setConversationFeedback(
-        copilotLang === 'ar'
-          ? `تم حفظ ردك في سجل المحادثة الساعة ${nowClock}`
-          : `Reply saved to conversation timeline at ${nowClock}`
-      );
-      window.setTimeout(() => setConversationFeedback(null), 4000);
+      const bookingId = selectedInboxItem.booking?.id || selectedInboxItem.chatThread?.bookingRef;
+      if (!bookingId) { setConversationFeedback(copilotLang === 'ar' ? 'اربط المحادثة بحجز أولاً؛ لم يتم إرسال شيء.' : 'Link this record to a booking first. Nothing was sent.'); return; }
+      window.dispatchEvent(new CustomEvent('wasla:open-conversation', { detail: { bookingId, text: conversationReplyDraft } }));
+      setConversationFeedback(copilotLang === 'ar' ? 'راجع المسودة وأرسلها من صندوق محادثات الحجوزات أعلاه.' : 'Review and send your draft in Booking conversations above.');
       return;
     }
 
@@ -3697,6 +3655,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
         {/* ============================================================ */}
         {/* TAB 3: UNIFIED INBOX, CONTACT DISPATCH & AI COPILOT          */}
         {/* ============================================================ */}
+        {activeTab === 'copilot' && <OperationsInbox bookings={bookings} ar={isAr} />}
         {activeTab === 'copilot' && (
           <div className="space-y-5" dir={isAr ? 'rtl' : 'ltr'}>
             {/* Clean Flat Conversations Hub Header + Sub-View Switcher (Inbox vs AI Radar) */}

@@ -11,7 +11,8 @@
     "clean": "rm -rf dist server.js",
     "lint": "tsc --noEmit",
     "pretest": "npm --prefix functions run build",
-    "test": "tsx --test tests/voucher-access.test.ts tests/notification-dispatch.test.mjs"
+    "test": "tsx --test tests/voucher-access.test.ts tests/notification-dispatch.test.mjs tests/conversation-access.test.ts tests/conversation-mail.test.mjs",
+    "test:conversations:emulator": "firebase emulators:exec --only firestore --project demo-wasla-outbox --config firebase.outbox-test.json \"node --import tsx --test tests/conversation-routes.test.ts\""
   },
   "dependencies": {
     "@firebase/eslint-plugin-security-rules": "^0.0.2",
