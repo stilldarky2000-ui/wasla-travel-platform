@@ -23,7 +23,7 @@ interface TripDetailModalProps {
   onToggleFavorite?: (trip: Trip) => void;
   onOpenPostTripReview?: (trip: Trip, bookingId?: string) => void;
   onClose: () => void;
-  onSubmitBooking: (request: BookingRequest) => void;
+  onSubmitBooking: (request: BookingRequest) => Promise<void> | void;
 }
 
 export const TripDetailModal: React.FC<TripDetailModalProps> = ({

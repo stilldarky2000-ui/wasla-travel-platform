@@ -468,6 +468,11 @@ service cloud.firestore {
         && data.updatedAt is timestamp;
     }
 
+    // Server-only durable notification jobs. Never readable by customer/supplier SDKs.
+    match /notification_outbox/{jobId} {
+      allow read, write: if false;
+    }
+
     // 1. Admins (Owner only; verified users may check their own admin doc)
     match /admins/{uid} {
       allow get: if isValidId(uid) && (isAdmin() || (isEmailVerified() && request.auth.uid == uid));

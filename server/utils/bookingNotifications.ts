@@ -1,3 +1,4 @@
+import { voucherToken } from './voucherAccess';
 import nodemailer, { type SendMailOptions } from 'nodemailer';
 import { buildSingleLangWaslaEmailHtml, buildWaslaEmailHtml } from './waslaEmailTemplate';
 
@@ -785,7 +786,12 @@ export async function dispatchBookingNotifications(
     ? gc.subjectConfirmed
     : gc.subjectNew;
 
+  let privateTrackUrl = appUrl;
+  if (isConfirmedUpdate) {
+    try { privateTrackUrl = appUrl + '/?track=' + encodeURIComponent(payload.bookingId) + '#voucherToken=' + voucherToken(payload.bookingId); } catch { /* Fail closed until configured. */ }
+  }
   const guestEmailText = [
+    privateTrackUrl !== appUrl ? privateTrackUrl : '',
     `${gc.greeting} ${payload.guestName},`,
     ``,
     isConfirmedUpdate ? gc.introConfirmed : gc.introNew,
@@ -849,7 +855,7 @@ export async function dispatchBookingNotifications(
     title: escapeHtml(isConfirmedUpdate ? gc.titleConfirmed : gc.titleNew),
     bodyHtml: guestBodyHtml,
     ctaText: escapeHtml(gc.ctaText),
-    ctaUrl: escapeHtml(appUrl),
+    ctaUrl: escapeHtml(privateTrackUrl),
     footerContactEmail: escapeHtml(publicSupportEmail),
   });
 

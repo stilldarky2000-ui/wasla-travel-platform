@@ -1,3 +1,5 @@
+import type { Channel } from './notificationOutbox';
+import { voucherToken } from './voucherAccess';
 import nodemailer, { type SendMailOptions } from 'nodemailer';
 import { buildSingleLangWaslaEmailHtml, buildWaslaEmailHtml } from './waslaEmailTemplate';
 
@@ -194,7 +196,8 @@ function escapeHtml(str: string): string {
 export async function dispatchBookingNotifications(
   payload: BookingNotificationPayload,
   recipients: BookingNotificationRecipients,
-  env: NodeJS.ProcessEnv = process.env
+  env: NodeJS.ProcessEnv = process.env,
+  delivery?: { channel: Channel; idempotencyKey: string }
 ): Promise<BookingNotificationResult> {
   const isConfirmedUpdate = payload.eventType === 'booking_confirmed';
 
@@ -611,7 +614,50 @@ export async function dispatchBookingNotifications(
     },
   };
 
-  const gc = GUEST_EMAIL_COPY[guestLangCode];
+  const pendingCopy: Record<GuestEmailLangCode, [string,string]> = {
+  "en": [
+    "Booking request saved",
+    "Your booking request is saved. Our team will review it and send confirmation separately."
+  ],
+  "ar": [
+    "تم حفظ طلب الحجز",
+    "تم حفظ طلب الحجز. سيراجعه فريقنا ويرسل التأكيد بشكل منفصل."
+  ],
+  "de": [
+    "Buchungsanfrage gespeichert",
+    "Ihre Anfrage wurde gespeichert. Unser Team prüft sie und sendet die Bestätigung separat."
+  ],
+  "fr": [
+    "Demande de réservation enregistrée",
+    "Votre demande est enregistrée. Notre équipe la vérifiera et vous enverra une confirmation séparée."
+  ],
+  "it": [
+    "Richiesta di prenotazione salvata",
+    "La richiesta è stata salvata. Il nostro team la verificherà e invierà una conferma separata."
+  ],
+  "es": [
+    "Solicitud de reserva guardada",
+    "Tu solicitud está guardada. Nuestro equipo la revisará y enviará la confirmación por separado."
+  ],
+  "nl": [
+    "Boekingsaanvraag opgeslagen",
+    "Uw aanvraag is opgeslagen. Ons team beoordeelt deze en stuurt de bevestiging apart."
+  ],
+  "pl": [
+    "Zapisano prośbę o rezerwację",
+    "Twoja prośba została zapisana. Nasz zespół ją sprawdzi i wyśle osobne potwierdzenie."
+  ],
+  "ru": [
+    "Заявка на бронирование сохранена",
+    "Ваша заявка сохранена. Наша команда проверит её и отправит подтверждение отдельно."
+  ]
+};
+  const pending = pendingCopy[guestLangCode];
+  const gc = {...GUEST_EMAIL_COPY[guestLangCode],
+    subjectNew: pending[0] + ' — ' + payload.bookingId,
+    titleNew: pending[0] + ' — ' + payload.bookingId,
+    introNew: pending[1],
+  };
   const isGuestRtl = guestLangCode === 'ar';
   const guestPaxLine = `${payload.adults} ${gc.adultsWord}${
     payload.children > 0 ? ` + ${payload.children} ${gc.childrenWord}` : ''
@@ -648,7 +694,12 @@ export async function dispatchBookingNotifications(
 
   const guestEmailSubject = isConfirmedUpdate ? gc.subjectConfirmed : gc.subjectNew;
 
+  let privateTrackUrl = appUrl;
+  if (isConfirmedUpdate) {
+    try { privateTrackUrl = appUrl + '/?track=' + encodeURIComponent(payload.bookingId) + '#voucherToken=' + voucherToken(payload.bookingId); } catch { throw new Error('Private voucher links are not configured'); }
+  }
   const guestEmailText = [
+    privateTrackUrl !== appUrl ? privateTrackUrl : '',
     `${gc.greeting} ${payload.guestName},`,
     ``,
     isConfirmedUpdate ? gc.introConfirmed : gc.introNew,
@@ -712,7 +763,7 @@ export async function dispatchBookingNotifications(
     title: escapeHtml(isConfirmedUpdate ? gc.titleConfirmed : gc.titleNew),
     bodyHtml: guestBodyHtml,
     ctaText: escapeHtml(gc.ctaText),
-    ctaUrl: escapeHtml(appUrl),
+    ctaUrl: escapeHtml(privateTrackUrl),
     footerContactEmail: escapeHtml(publicSupportEmail),
   });
 
@@ -762,6 +813,7 @@ export async function dispatchBookingNotifications(
           method: 'POST',
           headers: {
             Authorization: `Bearer ${resendApiKey}`,
+            ...(delivery ? {'Idempotency-Key': delivery.idempotencyKey} : {}),
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
@@ -806,6 +858,7 @@ export async function dispatchBookingNotifications(
           method: 'POST',
           headers: {
             Authorization: `Bearer ${resendApiKey}`,
+            ...(delivery ? {'Idempotency-Key': delivery.idempotencyKey} : {}),
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
@@ -953,16 +1006,26 @@ export async function dispatchBookingNotifications(
     }
   };
 
-  await Promise.allSettled([
-    sendOwnerEmailTask(),
-    sendCustomerEmailTask(),
-    sendOwnerWhatsappTask(),
-    sendWebhookTask(),
-  ]);
+  const tasks: Record<Channel, () => Promise<void>> = {
+    email:sendOwnerEmailTask, guestEmail:sendCustomerEmailTask,
+    whatsapp:sendOwnerWhatsappTask, webhook:sendWebhookTask,
+  };
+  await Promise.allSettled((delivery ? [delivery.channel] : Object.keys(tasks) as Channel[]).map(channel => tasks[channel]()));
 
   const anyDelivered =
     result.email.sent || result.guestEmail.sent || result.whatsapp.sent || result.webhook.sent;
   result.delivered = anyDelivered;
   result.ok = anyDelivered;
   return result;
+}
+
+export function configuredNotificationChannels(payload: BookingNotificationPayload, env: NodeJS.ProcessEnv = process.env): Channel[] {
+ const channels: Channel[] = [];
+ if (env.RESEND_API_KEY || resolveSmtpConfig(env)) {
+   channels.push('email');
+   if (EMAIL_REGEX.test(String(payload.guestEmail || ''))) channels.push('guestEmail');
+ }
+ if ((readEnvAny(env,META_WA_TOKEN_KEYS) && readEnvAny(env,META_WA_PHONE_ID_KEYS)) || (env.TWILIO_ACCOUNT_SID && env.TWILIO_AUTH_TOKEN && env.TWILIO_WHATSAPP_FROM) || env.CALLMEBOT_API_KEY) channels.push('whatsapp');
+ if (env.OWNER_ALERT_WEBHOOK_URL) channels.push('webhook');
+ return channels;
 }

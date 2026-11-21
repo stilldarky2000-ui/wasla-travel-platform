@@ -23,6 +23,7 @@ import {
   updateDoc,
   where,
   writeBatch,
+  runTransaction,
 } from 'firebase/firestore';
 import { Lang } from '../data/i18n';
 import {
@@ -1224,22 +1225,7 @@ export function useWaslaFirebase() {
             }
             if (list.length > 0) {
               setBookings(list);
-              void (async () => {
-                try {
-                  const idToken = await auth.currentUser?.getIdToken();
-                  if (!idToken) return;
-                  await fetch('/api/vouchers/sync', {
-                    method: 'POST',
-                    headers: {
-                      'Content-Type': 'application/json',
-                      Authorization: `Bearer ${idToken}`,
-                    },
-                    body: JSON.stringify({ bookings: list }),
-                  });
-                } catch {
-                  // Non-blocking voucher cache sync
-                }
-              })();
+
             }
           },
           (err) => console.warn('Bookings listener warning:', err)
@@ -1935,163 +1921,68 @@ export function useWaslaFirebase() {
   const createBookingInDb = useCallback(
     async (booking: PlatformBooking, options?: { suppressSelfAlert?: boolean }) => {
       const bookingWithTs: PlatformBooking = { ...booking, createdAtMs: Date.now() };
-      setBookings((prev) => [bookingWithTs, ...prev]);
-      knownBookingIdsRef.current.add(booking.id);
-      if (effectiveRole !== 'none' && !options?.suppressSelfAlert) {
-        setLatestNewBooking(booking);
-        playNewBookingChime();
-        showDesktopBookingNotification(booking);
-      }
-
-      const dispatchOwnerNotifications = async (
-        targetBooking: PlatformBooking,
-        persistedBookingId: string
-      ) => {
-        try {
-          const noteLangMatch = String(targetBooking.notes || '').match(
-            /Guide & Email Language:\s*([A-Za-z]+)/i
-          );
-          const resolvedGuestLanguage =
-            noteLangMatch?.[1] ||
-            (targetBooking.guestLang === 'de'
-              ? 'German'
-              : targetBooking.guestLang === 'ar'
-              ? 'Arabic'
-              : 'English');
-          await fetch('/api/notifications/new-booking', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              id: persistedBookingId,
-              tripId: targetBooking.tripId,
-              tripTitle: targetBooking.tripTitle,
-              destination: targetBooking.destination,
-              category: targetBooking.category,
-              date: targetBooking.date,
-              tripStartTime: targetBooking.tripStartTime,
-              guestName: targetBooking.guestName,
-              guestCountry: targetBooking.guestCountry,
-              guestLang: targetBooking.guestLang,
-              guestLanguage: resolvedGuestLanguage,
-              guestWhatsapp: targetBooking.guestWhatsapp,
-              guestEmail: targetBooking.guestEmail,
-              guestContact: targetBooking.guestContact,
-              hotel: targetBooking.hotel,
-              roomNumber: targetBooking.roomNumber,
-              adults: targetBooking.adults,
-              children: targetBooking.children,
-              infants: targetBooking.infants ?? 0,
-              grossEur: targetBooking.grossEur,
-              supplierName: targetBooking.supplierName,
-              paymentStatus: targetBooking.paymentStatus,
-              notes: targetBooking.notes,
-            }),
-          });
-        } catch {
-          // Non-blocking network alert call should never break booking submission
-        }
-      };
-
       if (!firestoreSeeded && effectiveRole === 'none') {
-        // Allow instant WhatsApp confirmation if storefront database hasn't been seeded yet
-        return;
+        throw new Error('Booking storage is not ready. Please try again.');
       }
       const resolvedSupplierUid = resolveBookingSupplierUid(booking);
       const sanitized = sanitizeBookingForFirestore(booking, resolvedSupplierUid || undefined);
       const bookingId = String(sanitized.id);
       try {
         // Atomic batch: bookings/{id} + booking_receipts/{id} (+ supplier_dispatches/{id} if already Confirmed by Owner/Ops)
-        const batch = writeBatch(db);
-        batch.set(doc(db, 'bookings', bookingId), {
-          ...sanitized,
-          createdAt: serverTimestamp(),
-          updatedAt: serverTimestamp(),
-        });
-
-        batch.set(doc(db, 'booking_receipts', bookingId), {
-          ...buildBookingReceiptFields({
-            id: bookingId,
-            tripId: String(sanitized.tripId),
-            date: String(sanitized.date),
-            status: booking.status,
-          }),
-          createdAt: serverTimestamp(),
-          updatedAt: serverTimestamp(),
-        });
-
-        if (
-          (effectiveRole === 'owner' || effectiveRole === 'operations') &&
-          isSupplierVisibleBookingStatus(booking.status) &&
-          resolvedSupplierUid
-        ) {
-          batch.set(doc(db, 'supplier_dispatches', bookingId), {
-            ...buildSupplierDispatchFields(
-              { ...bookingWithTs, id: bookingId, supplierUid: resolvedSupplierUid },
-              resolvedSupplierUid
-            ),
+        await runTransaction(db, async (batch) => {
+          if ((await batch.get(doc(db, 'booking_receipts', bookingId))).exists()) throw new Error('Booking reference already exists. Please try again.');
+          batch.set(doc(db, 'bookings', bookingId), {
+            ...sanitized,
             createdAt: serverTimestamp(),
             updatedAt: serverTimestamp(),
           });
-        }
 
-        await batch.commit();
+          batch.set(doc(db, 'booking_receipts', bookingId), {
+            ...buildBookingReceiptFields({
+              id: bookingId,
+              tripId: String(sanitized.tripId),
+              date: String(sanitized.date),
+              status: booking.status,
+            }),
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp(),
+          });
 
-        // Fire real-time Owner WhatsApp + Official Email alert ONLY AFTER atomic Firestore commit succeeds
-        void dispatchOwnerNotifications(bookingWithTs, bookingId);
-
-        const officialInbox = publicSettings.email || SITE_CONFIG.email;
-        const summaryBody = [
-          `New Booking Reference: ${bookingId}`,
-          `Excursion: ${booking.tripTitle} (${booking.destination})`,
-          `Date: ${booking.date}${booking.tripStartTime ? ` · ${booking.tripStartTime}` : ''}`,
-          `Guest: ${booking.guestName} (${booking.guestCountry || 'Guest'})`,
-          `Hotel: ${booking.hotel}${booking.roomNumber ? ` · Room ${booking.roomNumber}` : ''}`,
-          `Pax: ${booking.adults} Adults${booking.children > 0 ? ` + ${booking.children} Children` : ''}${(booking.infants ?? 0) > 0 ? ` + ${booking.infants} Infants` : ''}`,
-          `Gross Total: €${booking.grossEur} (${booking.paymentStatus} · EUR/USD/EGP accepted)`,
-          `Supplier: ${booking.supplierName}`,
-          `Guest WhatsApp: ${booking.guestWhatsapp || 'N/A'}`,
-          `Guest Email: ${booking.guestEmail || 'N/A'}`,
-          booking.notes ? `Notes: ${booking.notes}` : '',
-        ]
-          .filter(Boolean)
-          .join('\n');
-
-        // 1. Log official owner booking email sent to Official Inbox (booking@waslatravel.com)
-        await logDispatchEmailInDb(
-          officialInbox,
-          `New Booking ${bookingId} — ${booking.tripTitle} (${booking.date}) · €${booking.grossEur}`,
-          'Booking Confirmation',
-          {
-            body: summaryBody,
-            bookingRef: bookingId,
-            from: booking.guestEmail || booking.guestContact || 'storefront@waslatravel.com',
-            direction: 'inbound',
+          if (
+            (effectiveRole === 'owner' || effectiveRole === 'operations') &&
+            isSupplierVisibleBookingStatus(booking.status) &&
+            resolvedSupplierUid
+          ) {
+            batch.set(doc(db, 'supplier_dispatches', bookingId), {
+              ...buildSupplierDispatchFields(
+                { ...bookingWithTs, id: bookingId, supplierUid: resolvedSupplierUid },
+                resolvedSupplierUid
+              ),
+              createdAt: serverTimestamp(),
+              updatedAt: serverTimestamp(),
+            });
           }
-        );
 
-        // 2. If guest provided an email, also log their customer request receipt
-        if (booking.guestEmail && booking.guestEmail.includes('@')) {
-          await logDispatchEmailInDb(
-            booking.guestEmail,
-            `${bookingId} Request Logged — ${booking.tripTitle} (${booking.date})`,
-            'Booking Confirmation',
-            {
-              body: summaryBody,
-              bookingRef: bookingId,
-              from: officialInbox,
-              direction: 'outbound',
-            }
-          );
-        }
+        });
+
       } catch (err) {
         handleFirestoreError(err, OperationType.CREATE, `bookings/${bookingId}`);
+        throw err;
       }
+      setBookings((prev) => [bookingWithTs, ...prev.filter(b => b.id !== booking.id)]);
+      knownBookingIdsRef.current.add(booking.id);
+      if (effectiveRole !== 'none' && !options?.suppressSelfAlert) {
+        setLatestNewBooking(booking);
+        try {
+          playNewBookingChime();
+          showDesktopBookingNotification(booking);
+        } catch { /* Local alerts never turn a committed booking into a save failure. */ }
+      }
+
     },
     [
       firestoreSeeded,
       effectiveRole,
-      publicSettings.email,
-      logDispatchEmailInDb,
       resolveBookingSupplierUid,
     ]
   );
@@ -2404,85 +2295,6 @@ export function useWaslaFirebase() {
         }
 
         await batch.commit();
-
-        if (existingBooking) {
-          const mergedUpdated: PlatformBooking = { ...existingBooking, ...patch };
-          void (async () => {
-            try {
-              const idToken = await auth.currentUser?.getIdToken();
-              if (!idToken) return;
-              await fetch('/api/vouchers/sync', {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                  Authorization: `Bearer ${idToken}`,
-                },
-                body: JSON.stringify(mergedUpdated),
-              });
-            } catch {
-              // Non-blocking voucher cache sync
-            }
-          })();
-        }
-
-        if (
-          existingBooking &&
-          existingBooking.status !== 'Confirmed' &&
-          patch.status === 'Confirmed'
-        ) {
-          const mergedConfirmed: PlatformBooking = { ...existingBooking, ...patch };
-          void (async () => {
-            try {
-              const idToken = await auth.currentUser?.getIdToken();
-              if (!idToken) return;
-              const noteLangMatch = String(mergedConfirmed.notes || '').match(
-                /Guide & Email Language:\s*([A-Za-z]+)/i
-              );
-              const resolvedGuestLanguage =
-                noteLangMatch?.[1] ||
-                (mergedConfirmed.guestLang === 'de'
-                  ? 'German'
-                  : mergedConfirmed.guestLang === 'ar'
-                  ? 'Arabic'
-                  : 'English');
-              await fetch('/api/notifications/booking-confirmed', {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                  Authorization: `Bearer ${idToken}`,
-                },
-                body: JSON.stringify({
-                  id: mergedConfirmed.id,
-                  tripTitle: mergedConfirmed.tripTitle,
-                  destination: mergedConfirmed.destination,
-                  date: mergedConfirmed.date,
-                  tripStartTime: mergedConfirmed.tripStartTime,
-                  pickupTime: mergedConfirmed.pickupTime,
-                  pickupSpot: mergedConfirmed.pickupSpot,
-                  assignedDriverOrGuide: mergedConfirmed.assignedDriverOrGuide,
-                  guestName: mergedConfirmed.guestName,
-                  guestCountry: mergedConfirmed.guestCountry,
-                  guestLang: mergedConfirmed.guestLang,
-                  guestLanguage: resolvedGuestLanguage,
-                  guestWhatsapp: mergedConfirmed.guestWhatsapp,
-                  guestEmail: mergedConfirmed.guestEmail,
-                  guestContact: mergedConfirmed.guestContact,
-                  hotel: mergedConfirmed.hotel,
-                  roomNumber: mergedConfirmed.roomNumber,
-                  adults: mergedConfirmed.adults,
-                  children: mergedConfirmed.children,
-                  infants: mergedConfirmed.infants ?? 0,
-                  grossEur: mergedConfirmed.grossEur,
-                  supplierName: mergedConfirmed.supplierName,
-                  paymentStatus: mergedConfirmed.paymentStatus,
-                  notes: mergedConfirmed.notes,
-                }),
-              });
-            } catch {
-              // Non-blocking notification call should never break dispatch confirmation
-            }
-          })();
-        }
 
         if (patch.status !== undefined) {
           const nextVerified = patch.status === 'Completed';

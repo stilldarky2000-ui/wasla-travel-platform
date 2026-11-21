@@ -1,3 +1,4 @@
+import { createBookingReference } from '../lib/bookingReference';
 import React, { useEffect, useRef, useState } from 'react';
 import {
   AlertCircle,
@@ -108,7 +109,7 @@ export interface TripDetailTemplateProps {
   onToggleFavorite?: (trip: Trip) => void;
   onOpenPostTripReview?: (trip: Trip, bookingId?: string) => void;
   onClose: () => void;
-  onSubmitBooking: (request: BookingRequest) => void;
+  onSubmitBooking: (request: BookingRequest) => Promise<void> | void;
 }
 
 interface TicketReceiptSnapshot {
@@ -247,6 +248,7 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
   }, [lang, guestLanguageTouched]);
   const [notes, setNotes] = useState('');
   const [error, setError] = useState('');
+  const [bookingSaving, setBookingSaving] = useState(false);
   const [pendingTicketRequest, setPendingTicketRequest] = useState<BookingRequest | null>(null);
   const [pendingReceipt, setPendingReceipt] = useState<TicketReceiptSnapshot | null>(null);
   const [confirmedRequest, setConfirmedRequest] = useState<BookingRequest | null>(null);
@@ -532,7 +534,7 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
     const req: BookingRequest = {
       id:
         pendingTicketRequest?.id ||
-        `WT-${Date.now().toString(36).toUpperCase().slice(-5)}${Math.floor(10 + Math.random() * 89)}`,
+        createBookingReference(),
       tripId: trip.id,
       tripTitle: bookedTitleWithOption,
       supplierName: trip.supplierName,
@@ -566,24 +568,20 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
     }, 50);
   };
 
-  const handleConfirmTicket = () => {
-    if (!pendingTicketRequest) return;
-    setConfirmedRequest(pendingTicketRequest);
-    setConfirmedReceipt(pendingReceipt || currentReceipt);
-    setPendingTicketRequest(null);
+  const handleConfirmTicket = async () => {
+    if (!pendingTicketRequest || bookingSaving) return;
+    setBookingSaving(true);
+    setError('');
+    try {
+      if (!previewMode) await onSubmitBooking(pendingTicketRequest);
+      setConfirmedRequest(pendingTicketRequest);
+      setConfirmedReceipt(pendingReceipt || currentReceipt);
+      setPendingTicketRequest(null);
+      window.setTimeout(() => confirmedCardRef.current?.scrollIntoView({behavior:'smooth',block:'center'}),50);
+    } catch {
+      setError(tText({en:'Could not save your booking. Please try again.',ar:'تعذر حفظ الحجز. حاول مرة أخرى.',de:'Buchung konnte nicht gespeichert werden. Bitte erneut versuchen.'},lang));
+    } finally { setBookingSaving(false); }
 
-    if (!previewMode) {
-      persistStorefrontBookingHandoff({
-        bookingId: pendingTicketRequest.id,
-        tripId: trip.id,
-        tripDate: pendingTicketRequest.date,
-      });
-      onSubmitBooking(pendingTicketRequest);
-    }
-
-    window.setTimeout(() => {
-      confirmedCardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }, 50);
   };
 
   const jumpToSection = (sectionId: string) => {
@@ -1797,9 +1795,12 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
                   })()}
 
                   <div className="space-y-2.5 pt-1">
+                    {error && <p role="alert" className="text-sm text-red-700">{error}</p>}
                     <button
                       type="button"
                       onClick={handleConfirmTicket}
+                      disabled={bookingSaving}
+                      aria-busy={bookingSaving}
                       className="min-h-[48px] w-full inline-flex items-center justify-center gap-2 rounded-full bg-[#16A34A] hover:bg-[#15803D] px-6 py-3 text-sm font-bold text-white shadow-md active:scale-[0.99] transition-all cursor-pointer"
                     >
                       <Check className="h-4 w-4 shrink-0" aria-hidden="true" />
@@ -1863,9 +1864,9 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
                           )
                         : tText(
                             {
-                              en: 'BOOKING CONFIRMED',
-                              ar: 'تم تأكيد الحجز بنجاح',
-                              de: 'BUCHUNG BESTÄTIGT',
+                              en: 'REQUEST SAVED — PENDING REVIEW',
+                              ar: 'تم حفظ الطلب — قيد المراجعة',
+                              de: 'ANFRAGE GESPEICHERT — IN PRÜFUNG',
                             },
                             lang
                           )}{' '}
@@ -1903,9 +1904,9 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
                         )
                       : tText(
                           {
-                            en: 'Your booking is confirmed — we will contact you shortly',
-                            ar: 'تم تأكيد حجزك بنجاح — سنتواصل معك الآن',
-                            de: 'Ihre Buchung ist bestätigt — wir melden uns in Kürze',
+                            en: 'Your request is saved — confirmation will follow after review',
+                            ar: 'تم تسجيل طلبك — التأكيد ورسالة التفاصيل بعد المراجعة',
+                            de: 'Ihre Anfrage ist gespeichert — die Bestätigung folgt nach Prüfung',
                           },
                           lang
                         )}
@@ -1922,9 +1923,9 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
                         )
                       : tText(
                           {
-                            en: 'A confirmation email is on its way to your inbox and our team has been alerted immediately. We will reach out to you right now on WhatsApp and Email with your exact hotel pickup time and driver details.',
-                            ar: 'تم إرسال إيميل بتأكيد الحجز إلى بريدك الإلكتروني وإشعار فريقنا فوراً. سنتواصل معك الآن عبر واتساب والبريد الإلكتروني لتزويدك بموعد الاستلام الدقيق من الفندق وتفاصيل السائق.',
-                            de: 'Eine Bestätigungs-E-Mail wurde an Ihr Postfach gesendet und unser Team wurde sofort benachrichtigt. Wir melden uns gleich per WhatsApp und E-Mail mit Ihrer genauen Abholzeit.',
+                            en: 'Your request is saved. Our team will review it and contact you with the details. A delayed email does not mean your request failed.',
+                            ar: 'طلبك محفوظ. سيراجعه فريقنا ويتواصل معك بالتفاصيل. تأخر رسالة البريد لا يعني فشل تسجيل الطلب.',
+                            de: 'Ihre Anfrage ist gespeichert. Unser Team prüft sie und meldet sich mit den Details. Eine verzögerte E-Mail ändert daran nichts.',
                           },
                           lang
                         )}
@@ -2148,9 +2149,9 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
                             <p className="text-[11px] leading-relaxed text-[#475569]">
                               {tText(
                                 {
-                                  en: 'Your booking is already confirmed by email. Tap below only if you would like to open a direct WhatsApp chat with our concierge now.',
-                                  ar: 'حجزك مؤكد بالفعل وتم إرسال الإيميل. اضغط أدناه فقط إذا كنت تفضل فتح محادثة واتساب مباشرة معنا الآن.',
-                                  de: 'Ihre Buchung ist bereits per E-Mail bestätigt. Tippen Sie unten nur, wenn Sie direkt einen WhatsApp-Chat mit unserem Team starten möchten.',
+                                  en: 'Your request is saved. Confirmation will follow after review. You can also contact us on WhatsApp.',
+                                  ar: 'طلبك محفوظ والتأكيد بعد المراجعة. يمكنك أيضاً التواصل معنا عبر واتساب.',
+                                  de: 'Ihre Anfrage ist gespeichert. Die Bestätigung folgt nach Prüfung. Sie können uns auch per WhatsApp kontaktieren.',
                                 },
                                 lang
                               )}

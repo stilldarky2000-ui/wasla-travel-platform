@@ -1,8 +1,11 @@
-import { onDocumentWritten } from 'firebase-functions/v2/firestore';
+import { onDocumentWritten, onDocumentCreated } from 'firebase-functions/v2/firestore';
+import { onSchedule } from 'firebase-functions/v2/scheduler';
+import { initializeApp, getApps } from 'firebase-admin/app';
+import { getFirestore } from 'firebase-admin/firestore';
+import { enqueue, processJob } from './notificationOutbox';
 import { logger } from 'firebase-functions/v2';
-import { dispatchBookingNotifications } from './bookingNotifications';
+import { dispatchBookingNotifications, configuredNotificationChannels } from './bookingNotifications';
 
-const FIREBASE_PROJECT_ID = process.env.GCLOUD_PROJECT || 'platinum-rarity-67k72';
 const FIRESTORE_DATABASE_ID =
   process.env.FIRESTORE_DATABASE_ID ||
   'ai-studio-waslatravelhurgh-3fa1bc37-c47f-4aef-af93-bd53d7bb71d1';
@@ -13,28 +16,11 @@ interface PublicSiteSettings {
   whatsappDisplay?: string;
 }
 
+const adminApp = getApps()[0] || initializeApp();
+const store = getFirestore(adminApp,FIRESTORE_DATABASE_ID);
 async function fetchPublicSiteSettings(): Promise<PublicSiteSettings> {
-  try {
-    const url = `https://firestore.googleapis.com/v1/projects/${encodeURIComponent(
-      FIREBASE_PROJECT_ID
-    )}/databases/${encodeURIComponent(FIRESTORE_DATABASE_ID)}/documents/site_settings/public`;
-    const resp = await fetch(url);
-    if (!resp.ok) return {};
-    const docJson = (await resp.json()) as {
-      fields?: {
-        email?: { stringValue?: string };
-        whatsappNumber?: { stringValue?: string };
-        whatsappDisplay?: { stringValue?: string };
-      };
-    };
-    return {
-      email: docJson.fields?.email?.stringValue?.trim() || undefined,
-      whatsappNumber: docJson.fields?.whatsappNumber?.stringValue?.trim() || undefined,
-      whatsappDisplay: docJson.fields?.whatsappDisplay?.stringValue?.trim() || undefined,
-    };
-  } catch {
-    return {};
-  }
+  const snapshot = await store.doc('public_settings/storefront').get();
+  return (snapshot.data() || {}) as PublicSiteSettings;
 }
 
 /**
@@ -42,7 +28,7 @@ async function fetchPublicSiteSettings(): Promise<PublicSiteSettings> {
  *  1. When a new booking document is created (customer clicks "Confirm Booking"), OR
  *  2. When an existing booking transitions into `status === 'Confirmed'` (operator confirms pickup/voucher).
  *
- * Simultaneously dispatches via Promise.allSettled:
+ * Persists a server-only outbox event; a separate worker dispatches:
  *  - Bilingual AR/EN confirmation email to the customer (using waslaEmailTemplate.ts)
  *  - Bilingual booking alert email to the official owner email(s)
  *  - Instant WhatsApp push alert to the official owner WhatsApp contact
@@ -50,6 +36,7 @@ async function fetchPublicSiteSettings(): Promise<PublicSiteSettings> {
 export const onBookingConfirmed = onDocumentWritten(
   {
     document: 'bookings/{bookingId}',
+    retry:true,
     database: FIRESTORE_DATABASE_ID,
     region: 'europe-west1',
     timeoutSeconds: 60,
@@ -100,8 +87,7 @@ export const onBookingConfirmed = onDocumentWritten(
         ? publicSettings.email
         : 'booking@waslatravel.com';
 
-    const result = await dispatchBookingNotifications(
-      {
+    const jobId = await enqueue(store,event.id,{payload:{
         bookingId,
         eventType: transitionedToConfirmed ? 'booking_confirmed' : 'booking_created',
         tripTitle: String(afterData.tripTitle || 'Wasla Travel Excursion').slice(0, 240),
@@ -127,24 +113,43 @@ export const onBookingConfirmed = onDocumentWritten(
         grossEur: Math.min(100000, Math.max(0, Math.round(Number(afterData.grossEur) || 0))),
         paymentStatus: String(afterData.paymentStatus || 'Awaiting link').slice(0, 40),
         notes: rawNotes || undefined,
-      },
-      {
+      }, recipients: {
         ownerEmails: ownerEmails.length > 0 ? ownerEmails : ['booking@waslatravel.com'],
         publicSupportEmail,
         ownerWhatsappDigits,
         ownerWhatsappDisplay,
         appUrl: process.env.APP_URL || 'https://waslatravel.com',
-      }
+      }}
     );
 
-    logger.info('Wasla onBookingConfirmed notification dispatch completed', {
-      bookingId,
-      eventType: transitionedToConfirmed ? 'booking_confirmed' : 'booking_created',
-      delivered: result.delivered,
-      guestEmailSent: result.guestEmail.sent,
-      ownerEmailSent: result.email.sent,
-      ownerWhatsappSent: result.whatsapp.sent,
-      skipped: result.skipped || null,
-    });
+    logger.info('Booking notification queued', {jobId});
   }
 );
+
+const workerOptions = {
+ eligible:async (job: import("./notificationOutbox").JobInput) => {
+   const booking = (await store.doc("bookings/"+job.payload.bookingId).get()).data();
+   if (!booking) return false;
+   return job.payload.eventType === "booking_created" ? booking.status === "Pending" : ["Confirmed","Driver assigned","Completed"].includes(String(booking.status));
+ },
+ channels:configuredNotificationChannels,
+ send:async (job: import('./notificationOutbox').JobInput, channel: import('./notificationOutbox').Channel, idempotencyKey: string) => {
+   const result = await dispatchBookingNotifications(job.payload,job.recipients,process.env,{channel,idempotencyKey});
+   return result[channel].sent;
+ }
+};
+export const deliverBookingNotification = onDocumentCreated({
+ document:'notification_outbox/{jobId}',database:FIRESTORE_DATABASE_ID,
+ region:'europe-west1',timeoutSeconds:240,memory:'256MiB',retry:true,maxInstances:5,concurrency:1,
+},async event => {
+ await processJob(store,event.params.jobId,workerOptions);
+});
+// Cloud Run request CPU is not used for a background polling loop.
+// Scheduler rescues provider failures and workers that crashed with an outstanding lease.
+export const retryBookingNotifications = onSchedule({
+ schedule:'every 1 minutes',region:'europe-west1',timeoutSeconds:240,memory:'256MiB',
+},async () => {
+ const jobs = await store.collection('notification_outbox').where('nextAttemptAtMs','<=',Date.now()).orderBy('nextAttemptAtMs').limit(5).get();
+ const results = await Promise.allSettled(jobs.docs.map(job => processJob(store,job.id,workerOptions)));
+ logger.info('Notification retry sweep',{processed:results.length,failed:results.filter(r=>r.status==='rejected').length});
+});

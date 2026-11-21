@@ -1,3 +1,4 @@
+import { createBookingReference } from '../../lib/bookingReference';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { authFetch } from '../../lib/apiAuth';
 import {
@@ -440,7 +441,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
     setPickupClock('08:30');
     setPickupPeriod('AM');
     setModalDraft({
-      id: `WT-${Date.now().toString(36).toUpperCase().slice(-5)}${Math.floor(10 + Math.random() * 89)}`,
+      id: createBookingReference(),
       tripId: firstTrip?.id || 'custom-itinerary',
       tripTitle: firstTrip?.name.en || '',
       category: firstTrip?.category || 'sea',

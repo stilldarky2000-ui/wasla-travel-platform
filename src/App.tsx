@@ -1,3 +1,4 @@
+import { createBookingReference } from './lib/bookingReference';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Bell,
@@ -918,13 +919,7 @@ export default function App() {
     smoothScrollTo('all-trips');
   };
 
-  const handleCustomerBooking = (req: BookingRequest) => {
-    setCustomerRequests((prev) => [req, ...prev]);
-    persistStorefrontBookingHandoff({
-      bookingId: req.id,
-      tripId: req.tripId,
-      tripDate: req.date,
-    });
+  const handleCustomerBooking = async (req: BookingRequest) => {
     const tripObj = trips.find((tr) => tr.id === req.tripId);
 
     const newBooking: PlatformBooking = {
@@ -957,11 +952,18 @@ export default function App() {
       locationImageUrl: req.locationImageUrl,
     };
 
-    void createBookingInDb(newBooking);
+    await createBookingInDb(newBooking);
+    setCustomerRequests((prev) => [req, ...prev]);
+    persistStorefrontBookingHandoff({
+      bookingId: req.id,
+      tripId: req.tripId,
+      tripDate: req.date,
+    });
+
   };
 
-  const handleCustomTripSubmit = (sub: CustomTripSubmission): string => {
-    const newId = `WT-${Date.now().toString(36).toUpperCase().slice(-5)}${Math.floor(10 + Math.random() * 89)}`;
+  const handleCustomTripSubmit = async (sub: CustomTripSubmission): Promise<string> => {
+    const newId = createBookingReference();
     const customTitle = `Custom (${sub.destination}): ${sub.services.join(', ')} [${sub.guideLanguage} Guide]`;
     const mappedCustomLang: Lang =
       sub.guideLanguage === 'German' ? 'de' : sub.guideLanguage === 'Arabic' ? 'ar' : 'en';
@@ -992,6 +994,7 @@ export default function App() {
       status: 'Pending',
       notes: `Guide & Email Language: ${sub.guideLanguage} · ${sub.notes}`.trim(),
     };
+    await createBookingInDb(newBooking);
     setCustomerRequests((prev) => [
       {
         id: newId,
@@ -1016,7 +1019,6 @@ export default function App() {
       },
       ...prev,
     ]);
-    void createBookingInDb(newBooking);
     void createChatInDb({
       id: `chat-${Date.now()}`,
       bookingRef: newId,

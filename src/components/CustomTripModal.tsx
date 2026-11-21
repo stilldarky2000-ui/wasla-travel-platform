@@ -27,7 +27,7 @@ interface CustomTripModalProps {
   whatsappNumber?: string;
   initialServices?: string[];
   onClose: () => void;
-  onSubmit: (submission: CustomTripSubmission) => string;
+  onSubmit: (submission: CustomTripSubmission) => Promise<string>;
 }
 
 const SERVICE_OPTIONS: { id: string; label: { en: string; ar: string; de: string } }[] = [
@@ -89,6 +89,7 @@ export const CustomTripModal: React.FC<CustomTripModalProps> = ({
   );
   const [notes, setNotes] = useState('');
   const [formError, setFormError] = useState('');
+  const [saving, setSaving] = useState(false);
   const [createdRef, setCreatedRef] = useState<string | null>(null);
 
   useEffect(() => {
@@ -124,8 +125,9 @@ export const CustomTripModal: React.FC<CustomTripModalProps> = ({
     setServices((prev) => (prev.includes(svc) ? prev.filter((s) => s !== svc) : [...prev, svc]));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (saving) return;
     const cleanName = guestName.trim();
     const cleanWa = guestWhatsapp.trim();
     const cleanEmail = guestEmail.trim();
@@ -155,7 +157,9 @@ export const CustomTripModal: React.FC<CustomTripModalProps> = ({
     const combinedContact = `${cleanWa} · ${cleanEmail}`;
     const consentNote = whatsappOptIn ? 'WhatsApp Opt-in: Yes ✓' : 'WhatsApp Opt-in: Email only';
     const mergedNotes = [consentNote, notes.trim()].filter(Boolean).join(' · ');
-    const refId = onSubmit({
+    setSaving(true);
+    try {
+    const refId = await onSubmit({
       guestName: cleanName,
       guestCountry: autoCountry,
       guestWhatsapp: cleanWa,
@@ -171,6 +175,9 @@ export const CustomTripModal: React.FC<CustomTripModalProps> = ({
       notes: mergedNotes,
     });
     setCreatedRef(refId);
+    } catch {
+      setFormError(tText({en:"Could not save your request. Please try again.",ar:"تعذر حفظ الطلب. حاول مرة أخرى.",de:"Anfrage konnte nicht gespeichert werden. Bitte erneut versuchen."},lang));
+    } finally { setSaving(false); }
   };
 
   return (
@@ -236,9 +243,9 @@ export const CustomTripModal: React.FC<CustomTripModalProps> = ({
                 <h3 className="font-display text-xl font-semibold text-[#0F2233]">
                   {tText(
                     {
-                      en: 'Your booking request is confirmed — we will contact you shortly',
+                      en: 'Your request is saved — we will contact you after review',
                       ar: 'تم تأكيد استلام طلبك بنجاح — سنتواصل معك الآن',
-                      de: 'Ihre Anfrage ist bestätigt — wir melden uns in Kürze',
+                      de: 'Ihre Anfrage wurde gespeichert — wir melden uns nach der Prüfung',
                     },
                     lang
                   )}
@@ -246,9 +253,9 @@ export const CustomTripModal: React.FC<CustomTripModalProps> = ({
                 <p className="text-sm text-[#475569]">
                   {tText(
                     {
-                      en: 'A confirmation email has been sent to your inbox and our team has been alerted immediately. We will contact you right now via WhatsApp and Email with your tailored quote.',
-                      ar: 'تم إرسال إيميل بتأكيد الطلب إلى بريدك الإلكتروني وإشعار فريقنا فوراً. سنتواصل معك الآن عبر واتساب والبريد الإلكتروني بعرض السعر والتفاصيل.',
-                      de: 'Eine Bestätigungs-E-Mail wurde an Ihr Postfach gesendet und unser Team wurde sofort benachrichtigt. Wir melden uns gleich per WhatsApp und E-Mail.',
+                      en: 'Your request is saved. Our team will review it and contact you with the details. If email delivery is delayed, your request remains saved.',
+                      ar: 'طلبك محفوظ. سيراجعه فريقنا ويتواصل معك بالتفاصيل. تأخر رسالة البريد لا يعني فشل تسجيل الطلب.',
+                      de: 'Ihre Anfrage ist gespeichert. Unser Team prüft sie und meldet sich mit den Details. Eine verzögerte E-Mail ändert daran nichts.',
                     },
                     lang
                   )}
@@ -279,9 +286,9 @@ export const CustomTripModal: React.FC<CustomTripModalProps> = ({
                       <p className="text-[11px] leading-relaxed text-[#475569]">
                         {tText(
                           {
-                            en: 'Your request is already confirmed by email. Tap below only if you want to start a direct WhatsApp chat with our concierge.',
-                            ar: 'طلبك مؤكد بالفعل عبر البريد الإلكتروني. اضغط أدناه فقط إذا كنت تفضل بدء محادثة واتساب مباشرة معنا.',
-                            de: 'Ihre Anfrage ist bereits per E-Mail bestätigt. Tippen Sie unten nur, wenn Sie einen direkten WhatsApp-Chat starten möchten.',
+                            en: 'Your request is saved. Confirmation will follow after review. You can also contact us on WhatsApp.',
+                            ar: 'طلبك محفوظ والتأكيد بعد المراجعة. يمكنك أيضاً التواصل معنا عبر واتساب.',
+                            de: 'Ihre Anfrage ist gespeichert. Die Bestätigung folgt nach Prüfung. Sie können uns auch per WhatsApp kontaktieren.',
                           },
                           lang
                         )}
@@ -551,6 +558,8 @@ export const CustomTripModal: React.FC<CustomTripModalProps> = ({
 
               <button
                 type="submit"
+                disabled={saving}
+                aria-busy={saving}
                 className="btn-wasla-primary min-h-[44px] w-full rounded-full px-5 py-2.5 text-sm cursor-pointer"
               >
                 {tText(

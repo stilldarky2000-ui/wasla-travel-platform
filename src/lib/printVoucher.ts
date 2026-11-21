@@ -1,4 +1,5 @@
 import QRCode from 'qrcode';
+import { auth } from './firebase';
 import { Lang } from '../data/i18n';
 import { CurrencyCode, SITE_CONFIG, formatCurrencyPrice } from '../data/marketplaceData';
 import {
@@ -43,7 +44,15 @@ export function buildVoucherVerificationUrl(bookingId: string): string {
 }
 
 export async function generateVoucherQrDataUrl(bookingId: string): Promise<string> {
-  const verifyUrl = buildVoucherVerificationUrl(bookingId);
+  let token = new URLSearchParams(window.location.hash.slice(1)).get('voucherToken') || '';
+  if (auth.currentUser) {
+    const idToken = await auth.currentUser.getIdToken();
+    const response = await fetch('/api/vouchers/' + encodeURIComponent(bookingId) + '/link', {
+      method: 'POST', headers: {Authorization: 'Bearer ' + idToken}
+    });
+    if (response.ok) token = (await response.json()).token || '';
+  }
+  const verifyUrl = buildVoucherVerificationUrl(bookingId) + (token ? '#voucherToken=' + encodeURIComponent(token) : '');
   try {
     return await QRCode.toDataURL(verifyUrl, {
       errorCorrectionLevel: 'M',

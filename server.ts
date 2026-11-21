@@ -1,7 +1,8 @@
 import 'dotenv/config';
+import { voucherToken, validVoucherToken } from './server/utils/voucherAccess';
 import crypto from 'crypto';
 import fs from 'fs';
-import os from 'os';
+import { readBooking, guestVoucher } from './server/utils/bookingStore';
 import express from 'express';
 import http from 'http';
 import path from 'path';
@@ -16,7 +17,7 @@ import {
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const PORT = 3000;
+const PORT = Number(process.env.PORT) || 3000;
 const BOOTSTRAPPED_OWNER_EMAIL = 'stilldarky2000@gmail.com';
 const GOOGLE_CERTS_URL =
   'https://www.googleapis.com/robot/v1/metadata/x509/securetoken@system.gserviceaccount.com';
@@ -35,9 +36,11 @@ const firebaseConfig: FirebaseAppletConfig = (() => {
   }
 })();
 
-const FIREBASE_PROJECT_ID = firebaseConfig.projectId || '';
-const FIRESTORE_DATABASE_ID = firebaseConfig.firestoreDatabaseId || '(default)';
-const FIRESTORE_DOCS_BASE = `https://firestore.googleapis.com/v1/projects/${encodeURIComponent(
+const FIREBASE_PROJECT_ID = process.env.FIREBASE_PROJECT_ID || firebaseConfig.projectId || '';
+const FIRESTORE_DATABASE_ID = process.env.FIRESTORE_DATABASE_ID || firebaseConfig.firestoreDatabaseId || '(default)';
+const FIRESTORE_API_ORIGIN = process.env.FIRESTORE_EMULATOR_HOST && process.env.NODE_ENV !== 'production'
+  ? 'http://' + process.env.FIRESTORE_EMULATOR_HOST : 'https://firestore.googleapis.com';
+const FIRESTORE_DOCS_BASE = `${FIRESTORE_API_ORIGIN}/v1/projects/${encodeURIComponent(
   FIREBASE_PROJECT_ID
 )}/databases/${encodeURIComponent(FIRESTORE_DATABASE_ID)}/documents`;
 
@@ -262,138 +265,6 @@ function requireRole(allowedRoles: ServerRole[]): express.RequestHandler {
   };
 }
 
-const NOTIFIED_TTL_MS = 24 * 60 * 60 * 1000;
-const NOTIFICATION_OUTBOX_FILE = path.join(os.tmpdir(), 'wasla-notified-bookings.json');
-const inFlightBookingNotifications = new Set<string>();
-
-function loadDeliveredNotifications(): Map<string, number> {
-  const map = new Map<string, number>();
-  const now = Date.now();
-  try {
-    if (!fs.existsSync(NOTIFICATION_OUTBOX_FILE)) return map;
-    const raw = fs.readFileSync(NOTIFICATION_OUTBOX_FILE, 'utf8');
-    const parsed = JSON.parse(raw) as Record<string, number>;
-    for (const [id, ts] of Object.entries(parsed)) {
-      if (typeof ts === 'number' && now - ts < NOTIFIED_TTL_MS) {
-        map.set(id, ts);
-      }
-    }
-  } catch {
-    // Ignore corrupted cache file and start clean
-  }
-  return map;
-}
-
-const deliveredBookingNotifications = loadDeliveredNotifications();
-
-function persistDeliveredNotifications(): void {
-  const now = Date.now();
-  const payload: Record<string, number> = {};
-  for (const [id, ts] of deliveredBookingNotifications.entries()) {
-    if (now - ts < NOTIFIED_TTL_MS) {
-      payload[id] = ts;
-    } else {
-      deliveredBookingNotifications.delete(id);
-    }
-  }
-  try {
-    const tmpPath = `${NOTIFICATION_OUTBOX_FILE}.${process.pid}.tmp`;
-    fs.writeFileSync(tmpPath, JSON.stringify(payload), 'utf8');
-    fs.renameSync(tmpPath, NOTIFICATION_OUTBOX_FILE);
-  } catch {
-    // Non-fatal if tmpdir is read-only; in-memory map still guards current process
-  }
-}
-
-function isBookingNotificationDelivered(bookingId: string): boolean {
-  const sentAt = deliveredBookingNotifications.get(bookingId);
-  if (!sentAt) return false;
-  if (Date.now() - sentAt >= NOTIFIED_TTL_MS) {
-    deliveredBookingNotifications.delete(bookingId);
-    return false;
-  }
-  return true;
-}
-
-function markBookingNotificationDelivered(bookingId: string): void {
-  deliveredBookingNotifications.set(bookingId, Date.now());
-  persistDeliveredNotifications();
-}
-
-interface StoredVoucherSnapshot {
-  id: string;
-  tripId?: string;
-  tripTitle: string;
-  destination?: string;
-  date: string;
-  tripStartTime?: string;
-  pickupTime?: string;
-  pickupSpot?: string;
-  assignedDriverOrGuide?: string;
-  guestName?: string;
-  guestCountry?: string;
-  guestLang?: string;
-  guestLanguage?: string;
-  hotel?: string;
-  roomNumber?: string;
-  adults?: number;
-  children?: number;
-  infants?: number;
-  grossEur?: number;
-  paymentStatus?: string;
-  status?: string;
-  notes?: string;
-  updatedAtMs: number;
-}
-
-const VOUCHER_STORE_FILE = path.join(os.tmpdir(), 'wasla-vouchers-store.json');
-
-function loadVoucherStore(): Map<string, StoredVoucherSnapshot> {
-  const map = new Map<string, StoredVoucherSnapshot>();
-  try {
-    if (!fs.existsSync(VOUCHER_STORE_FILE)) return map;
-    const raw = fs.readFileSync(VOUCHER_STORE_FILE, 'utf8');
-    const parsed = JSON.parse(raw) as Record<string, StoredVoucherSnapshot>;
-    for (const [k, v] of Object.entries(parsed)) {
-      if (v && typeof v.id === 'string') {
-        map.set(k.toUpperCase(), v);
-      }
-    }
-  } catch {
-    // Ignore corrupted cache
-  }
-  return map;
-}
-
-const voucherStore = loadVoucherStore();
-
-function persistVoucherStore(): void {
-  const payload: Record<string, StoredVoucherSnapshot> = {};
-  for (const [k, v] of voucherStore.entries()) {
-    payload[k] = v;
-  }
-  try {
-    const tmpPath = `${VOUCHER_STORE_FILE}.${process.pid}.tmp`;
-    fs.writeFileSync(tmpPath, JSON.stringify(payload), 'utf8');
-    fs.renameSync(tmpPath, VOUCHER_STORE_FILE);
-  } catch {
-    // Non-fatal
-  }
-}
-
-function upsertVoucherSnapshot(snapshot: Omit<StoredVoucherSnapshot, 'updatedAtMs'>): void {
-  const key = String(snapshot.id || '').trim().toUpperCase();
-  if (!/^[A-Z0-9_-]{3,64}$/.test(key)) return;
-  const existing = voucherStore.get(key);
-  voucherStore.set(key, {
-    ...existing,
-    ...snapshot,
-    id: key,
-    updatedAtMs: Date.now(),
-  });
-  persistVoucherStore();
-}
-
 interface VerifiedBookingReceipt {
   exists: boolean;
   reason?: string;
@@ -505,7 +376,7 @@ async function getServerPublicSiteSettings(): Promise<{
 }> {
   if (!FIREBASE_PROJECT_ID) return {};
   try {
-    const resp = await fetch(`${FIRESTORE_DOCS_BASE}/site_settings/public`);
+    const resp = await fetch(`${FIRESTORE_DOCS_BASE}/public_settings/storefront`);
     if (!resp.ok) return {};
     const docJson = (await resp.json()) as {
       fields?: {
@@ -617,442 +488,65 @@ async function startServer() {
     }
   });
 
-  app.post(
-    '/api/notifications/new-booking',
-    notificationGlobalLimiter,
-    (req, res, next) => {
-      if (Boolean((req.body as { isTest?: boolean } | undefined)?.isTest)) {
-        ownerTestRateLimiter(req, res, next);
-        return;
-      }
-      notificationRateLimiter(req, res, next);
-    },
-    async (req, res) => {
-      let inFlightBookingId = '';
-      try {
-        const body = (req.body ?? {}) as {
-          id?: string;
-          tripId?: string;
-          tripTitle?: string;
-          destination?: string;
-          category?: string;
-          date?: string;
-          tripStartTime?: string;
-          guestName?: string;
-          guestCountry?: string;
-          guestLanguage?: string;
-          guestLang?: string;
-          guestWhatsapp?: string;
-          guestEmail?: string;
-          guestContact?: string;
-          hotel?: string;
-          roomNumber?: string;
-          adults?: number;
-          children?: number;
-          infants?: number;
-          grossEur?: number;
-          supplierName?: string;
-          paymentStatus?: string;
-          notes?: string;
-          isTest?: boolean;
-        };
-
-        const isTest = Boolean(body.isTest);
-        const bookingId = String(body.id || '').trim();
-        let verifiedReceipt: VerifiedBookingReceipt | null = null;
-
-        if (isTest) {
-          const token = extractBearerToken(req);
-          const verified = token ? await verifyFirebaseIdToken(token) : null;
-          const role = verified ? await resolveCallerRole(verified) : 'none';
-          if (role !== 'owner') {
-            res.status(verified ? 403 : 401).json({
-              ok: false,
-              error: 'Owner authentication is required to send test notifications.',
-            });
-            return;
-          }
-        } else {
-          if (!/^[a-zA-Z0-9_-]{3,64}$/.test(bookingId)) {
-            res.status(400).json({ ok: false, error: 'A valid saved booking ID is required.' });
-            return;
-          }
-
-          if (isBookingNotificationDelivered(bookingId)) {
-            res.json({ ok: true, deduplicated: true, delivered: true });
-            return;
-          }
-
-          if (inFlightBookingNotifications.has(bookingId)) {
-            res.status(409).json({
-              ok: false,
-              inFlight: true,
-              retryable: true,
-              error: 'Notification dispatch is already in progress for this booking.',
-            });
-            return;
-          }
-
-          verifiedReceipt = await verifyBookingReceiptAndTrip(
-            bookingId,
-            String(body.date || '').trim(),
-            String(body.tripId || '').trim()
-          );
-          if (!verifiedReceipt.exists) {
-            res.status(400).json({
-              ok: false,
-              error:
-                verifiedReceipt.reason ||
-                'Booking must be persisted before triggering notifications.',
-            });
-            return;
-          }
-        }
-
-        const safeBookingId = bookingId || 'WT-TEST';
-        const tripTitle = String(
-          verifiedReceipt?.verifiedTripTitle || body.tripTitle || 'Wasla Travel Excursion'
-        )
-          .trim()
-          .slice(0, 240);
-        const destination = String(
-          verifiedReceipt?.verifiedDestination || body.destination || 'Hurghada'
-        )
-          .trim()
-          .slice(0, 60);
-        const tripDate = String(
-          verifiedReceipt?.tripDate || body.date || new Date().toISOString().slice(0, 10)
-        )
-          .trim()
-          .slice(0, 20);
-        const supplierName = String(
-          verifiedReceipt?.verifiedSupplierName || body.supplierName || 'Wasla Operations'
-        )
-          .trim()
-          .slice(0, 120);
-        const catalogBasePriceEur = verifiedReceipt?.catalogBasePriceEur;
-        const startTime = String(body.tripStartTime || '').trim().slice(0, 80);
-        const guestName = String(body.guestName || 'Guest').trim().slice(0, 120);
-        const guestCountry = String(body.guestCountry || 'Guest').trim().slice(0, 80);
-        const guestLanguage = String(body.guestLanguage || body.guestLang || 'English')
-          .trim()
-          .slice(0, 40);
-        const guestWa = String(body.guestWhatsapp || '').trim().slice(0, 60);
-        const guestEmail = String(body.guestEmail || '').trim().slice(0, 160);
-        const guestContact = String(body.guestContact || guestWa || guestEmail || 'N/A')
-          .trim()
-          .slice(0, 160);
-        const hotel = String(body.hotel || 'Hotel Pickup').trim().slice(0, 200);
-        const roomNumber = String(body.roomNumber || '').trim().slice(0, 40);
-        const adults = Math.min(50, Math.max(1, Math.round(Number(body.adults) || 1)));
-        const children = Math.min(50, Math.max(0, Math.round(Number(body.children) || 0)));
-        const infants = Math.min(50, Math.max(0, Math.round(Number(body.infants) || 0)));
-        const grossEur = Math.min(100000, Math.max(0, Math.round(Number(body.grossEur) || 0)));
-        const paymentStatus = String(body.paymentStatus || 'Awaiting link').trim().slice(0, 40);
-        const notes = String(body.notes || '').trim().slice(0, 800);
-
+  app.post('/api/notifications/new-booking', notificationGlobalLimiter, (req,res,next) => (req.body?.isTest ? ownerTestRateLimiter : notificationRateLimiter)(req,res,next), async (req, res) => {
+    try {
+      const body = req.body || {};
+      if (body.isTest) {
+        const token = extractBearerToken(req);
+        const verified = token ? await verifyFirebaseIdToken(token) : null;
+        if (!verified) { res.status(401).json({ok:false}); return; }
+        if (await resolveCallerRole(verified) !== 'owner') { res.status(403).json({ok:false}); return; }
         const recipients = await resolveServerRecipients();
-
-        if (!isTest) {
-          inFlightBookingId = bookingId;
-          inFlightBookingNotifications.add(bookingId);
-          upsertVoucherSnapshot({
-            id: safeBookingId,
-            tripId: String(body.tripId || '').trim().slice(0, 120) || undefined,
-            tripTitle,
-            destination,
-            date: tripDate,
-            tripStartTime: startTime || undefined,
-            guestName,
-            guestCountry,
-            guestLang: String(body.guestLang || '').trim().slice(0, 12) || undefined,
-            guestLanguage,
-            hotel,
-            roomNumber: roomNumber || undefined,
-            adults,
-            children,
-            infants,
-            grossEur,
-            paymentStatus,
-            status: verifiedReceipt?.status || 'Pending',
-            notes: notes || undefined,
-          });
-        }
-
-        const result = await dispatchBookingNotifications(
-          {
-            bookingId: safeBookingId,
-            eventType: isTest ? 'test' : 'booking_created',
-            tripTitle,
-            destination,
-            tripDate,
-            startTime: startTime || undefined,
-            supplierName,
-            catalogBasePriceEur,
-            guestName,
-            guestCountry,
-            guestLanguage,
-            guestWhatsapp: guestWa || undefined,
-            guestEmail: guestEmail || undefined,
-            guestContact,
-            hotel,
-            roomNumber: roomNumber || undefined,
-            adults,
-            children,
-            infants,
-            grossEur,
-            paymentStatus,
-            notes: notes || undefined,
-          },
-          recipients
-        );
-
-        if (result.skipped === 'no_channels_configured') {
-          res.json(result);
-          return;
-        }
-
-        if (result.delivered) {
-          if (!isTest) {
-            markBookingNotificationDelivered(bookingId);
-          }
-          res.json(result);
-          return;
-        }
-
-        // For owner test diagnostics, return HTTP 200 with structured per-channel error details
-        // so reverse proxies never replace a 502 JSON payload with a generic proxy HTML page.
-        if (isTest) {
-          res.status(200).json(result);
-          return;
-        }
-
-        // All configured channels failed: do NOT poison dedupe cache; allow retry.
-        res.status(502).json(result);
-      } catch (err) {
-        const message = err instanceof Error ? err.message : 'Notification dispatch failed.';
-        res.status(500).json({
-          ok: false,
-          delivered: false,
-          error: message,
-        });
-      } finally {
-        if (inFlightBookingId) {
-          inFlightBookingNotifications.delete(inFlightBookingId);
-        }
+        const result = await dispatchBookingNotifications({
+          bookingId:'WTTEST', eventType:'test', tripTitle:'Notification test', destination:'Hurghada',
+          tripDate:new Date().toISOString().slice(0,10), supplierName:'Wasla Operations', guestName:'Owner test',
+          guestCountry:'', hotel:'Test only', adults:1, children:0, infants:0, grossEur:0, paymentStatus:'Test'
+        }, recipients);
+        res.json(result); return;
       }
-    }
-  );
-
-  // Triggered automatically when Operations/Owner confirms a booking (status -> Confirmed)
-  app.post(
-    '/api/notifications/booking-confirmed',
-    requireRole(['owner', 'operations']),
-    notificationGlobalLimiter,
-    async (req, res) => {
-      let activeDedupeKey = '';
-      try {
-        const body = (req.body ?? {}) as {
-          id?: string;
-          tripTitle?: string;
-          destination?: string;
-          date?: string;
-          tripStartTime?: string;
-          pickupTime?: string;
-          pickupSpot?: string;
-          assignedDriverOrGuide?: string;
-          guestName?: string;
-          guestCountry?: string;
-          guestLanguage?: string;
-          guestLang?: string;
-          guestWhatsapp?: string;
-          guestEmail?: string;
-          guestContact?: string;
-          hotel?: string;
-          roomNumber?: string;
-          adults?: number;
-          children?: number;
-          infants?: number;
-          grossEur?: number;
-          supplierName?: string;
-          paymentStatus?: string;
-          notes?: string;
-        };
-
-        const bookingId = String(body.id || '').trim();
-        if (!/^[a-zA-Z0-9_-]{3,64}$/.test(bookingId)) {
-          res.status(400).json({ ok: false, error: 'A valid booking ID is required.' });
-          return;
-        }
-
-        const dedupeKey = `confirmed:${bookingId}`;
-        if (isBookingNotificationDelivered(dedupeKey)) {
-          res.json({ ok: true, deduplicated: true, delivered: true });
-          return;
-        }
-        if (inFlightBookingNotifications.has(dedupeKey)) {
-          res.status(409).json({
-            ok: false,
-            inFlight: true,
-            retryable: true,
-            error: 'Confirmation notification is already in progress for this booking.',
-          });
-          return;
-        }
-
-        const recipients = await resolveServerRecipients();
-        activeDedupeKey = dedupeKey;
-        inFlightBookingNotifications.add(dedupeKey);
-
-        upsertVoucherSnapshot({
-          id: bookingId,
-          tripTitle: String(body.tripTitle || 'Wasla Travel Excursion').trim().slice(0, 240),
-          destination: String(body.destination || 'Hurghada').trim().slice(0, 60),
-          date: String(body.date || new Date().toISOString().slice(0, 10)).trim().slice(0, 20),
-          tripStartTime: String(body.tripStartTime || '').trim().slice(0, 80) || undefined,
-          pickupTime: String(body.pickupTime || '').trim().slice(0, 24) || undefined,
-          pickupSpot: String(body.pickupSpot || '').trim().slice(0, 40) || undefined,
-          assignedDriverOrGuide:
-            String(body.assignedDriverOrGuide || '').trim().slice(0, 160) || undefined,
-          guestName: String(body.guestName || 'Guest').trim().slice(0, 120),
-          guestCountry: String(body.guestCountry || 'Guest').trim().slice(0, 80),
-          guestLang: String(body.guestLang || '').trim().slice(0, 12) || undefined,
-          guestLanguage: String(body.guestLanguage || body.guestLang || 'English')
-            .trim()
-            .slice(0, 40),
-          hotel: String(body.hotel || 'Hotel Pickup').trim().slice(0, 200),
-          roomNumber: String(body.roomNumber || '').trim().slice(0, 40) || undefined,
-          adults: Math.min(50, Math.max(1, Math.round(Number(body.adults) || 1))),
-          children: Math.min(50, Math.max(0, Math.round(Number(body.children) || 0))),
-          infants: Math.min(50, Math.max(0, Math.round(Number(body.infants) || 0))),
-          grossEur: Math.min(100000, Math.max(0, Math.round(Number(body.grossEur) || 0))),
-          paymentStatus: String(body.paymentStatus || 'Awaiting link').trim().slice(0, 40),
-          status: 'Confirmed',
-          notes: String(body.notes || '').trim().slice(0, 800) || undefined,
-        });
-
-        const result = await dispatchBookingNotifications(
-          {
-            bookingId,
-            eventType: 'booking_confirmed',
-            tripTitle: String(body.tripTitle || 'Wasla Travel Excursion').trim().slice(0, 240),
-            destination: String(body.destination || 'Hurghada').trim().slice(0, 60),
-            tripDate: String(body.date || new Date().toISOString().slice(0, 10)).trim().slice(0, 20),
-            startTime: String(body.tripStartTime || '').trim().slice(0, 80) || undefined,
-            pickupTime: String(body.pickupTime || '').trim().slice(0, 24) || undefined,
-            pickupSpot: String(body.pickupSpot || '').trim().slice(0, 40) || undefined,
-            assignedDriverOrGuide:
-              String(body.assignedDriverOrGuide || '').trim().slice(0, 160) || undefined,
-            supplierName: String(body.supplierName || 'Wasla Operations').trim().slice(0, 120),
-            guestName: String(body.guestName || 'Guest').trim().slice(0, 120),
-            guestCountry: String(body.guestCountry || 'Guest').trim().slice(0, 80),
-            guestLanguage: String(body.guestLanguage || body.guestLang || 'English')
-              .trim()
-              .slice(0, 40),
-            guestWhatsapp: String(body.guestWhatsapp || '').trim().slice(0, 60) || undefined,
-            guestEmail: String(body.guestEmail || '').trim().slice(0, 160) || undefined,
-            guestContact: String(body.guestContact || '').trim().slice(0, 160) || undefined,
-            hotel: String(body.hotel || 'Hotel Pickup').trim().slice(0, 200),
-            roomNumber: String(body.roomNumber || '').trim().slice(0, 40) || undefined,
-            adults: Math.min(50, Math.max(1, Math.round(Number(body.adults) || 1))),
-            children: Math.min(50, Math.max(0, Math.round(Number(body.children) || 0))),
-            infants: Math.min(50, Math.max(0, Math.round(Number(body.infants) || 0))),
-            grossEur: Math.min(100000, Math.max(0, Math.round(Number(body.grossEur) || 0))),
-            paymentStatus: String(body.paymentStatus || 'Awaiting link').trim().slice(0, 40),
-            notes: String(body.notes || '').trim().slice(0, 800) || undefined,
-          },
-          recipients
-        );
-
-        if (result.skipped === 'no_channels_configured') {
-          res.json(result);
-          return;
-        }
-
-        if (result.delivered) {
-          markBookingNotificationDelivered(dedupeKey);
-          res.json(result);
-          return;
-        }
-
-        res.status(502).json(result);
-      } catch (err) {
-        const message = err instanceof Error ? err.message : 'Confirmation notification failed.';
-        res.status(500).json({ ok: false, delivered: false, error: message });
-      } finally {
-        if (activeDedupeKey) {
-          inFlightBookingNotifications.delete(activeDedupeKey);
-        }
-      }
-    }
-  );
-
-  const voucherLookupLimiter = createRateLimiter({
-    windowMs: 60_000,
-    maxRequests: 40,
-    keyPrefix: 'voucher-lookup',
+      const id = String(body.id || '').trim();
+      const receipt = await verifyBookingReceiptAndTrip(id);
+      if (!receipt.exists) { res.status(400).json({ok:false,error:'A saved booking is required.'}); return; }
+      // Firestore booking writes enqueue notifications. This endpoint never sends or trusts guest data.
+      res.status(202).json({ok:true,queued:true,delivered:false});
+    } catch { res.status(503).json({ok:false,retryable:true,error:'Notification status unavailable.'}); }
   });
 
-  app.post(
-    '/api/vouchers/sync',
-    requireRole(['owner', 'operations']),
-    (req, res) => {
-      try {
-        const rawList = Array.isArray((req.body as { bookings?: unknown[] })?.bookings)
-          ? ((req.body as { bookings: Record<string, unknown>[] }).bookings)
-          : req.body && typeof req.body === 'object'
-          ? [req.body as Record<string, unknown>]
-          : [];
-        let count = 0;
-        for (const item of rawList.slice(0, 250)) {
-          const id = String(item.id || '').trim().toUpperCase();
-          if (!/^[A-Z0-9_-]{3,64}$/.test(id)) continue;
-          upsertVoucherSnapshot({
-            id,
-            tripId: String(item.tripId || '').trim().slice(0, 120) || undefined,
-            tripTitle: String(item.tripTitle || 'Wasla Travel Excursion').trim().slice(0, 240),
-            destination: String(item.destination || 'Hurghada').trim().slice(0, 60),
-            date: String(item.date || '').trim().slice(0, 20),
-            tripStartTime: String(item.tripStartTime || '').trim().slice(0, 80) || undefined,
-            pickupTime: String(item.pickupTime || '').trim().slice(0, 24) || undefined,
-            pickupSpot: String(item.pickupSpot || '').trim().slice(0, 40) || undefined,
-            assignedDriverOrGuide:
-              String(item.assignedDriverOrGuide || '').trim().slice(0, 160) || undefined,
-            guestName: String(item.guestName || 'Guest').trim().slice(0, 120),
-            guestCountry: String(item.guestCountry || '').trim().slice(0, 80) || undefined,
-            guestLang: String(item.guestLang || '').trim().slice(0, 12) || undefined,
-            guestLanguage: String(item.guestLanguage || '').trim().slice(0, 40) || undefined,
-            hotel: String(item.hotel || '').trim().slice(0, 200) || undefined,
-            roomNumber: String(item.roomNumber || '').trim().slice(0, 40) || undefined,
-            adults: Math.min(50, Math.max(1, Math.round(Number(item.adults) || 1))),
-            children: Math.min(50, Math.max(0, Math.round(Number(item.children) || 0))),
-            infants: Math.min(50, Math.max(0, Math.round(Number(item.infants) || 0))),
-            grossEur: Math.min(100000, Math.max(0, Math.round(Number(item.grossEur) || 0))),
-            paymentStatus: String(item.paymentStatus || '').trim().slice(0, 40) || undefined,
-            status: String(item.status || '').trim().slice(0, 40) || undefined,
-            notes: String(item.notes || '').trim().slice(0, 400) || undefined,
-          });
-          count++;
-        }
-        res.json({ ok: true, synced: count });
-      } catch {
-        res.status(500).json({ ok: false, error: 'Failed to sync voucher cache.' });
+  app.post('/api/notifications/booking-confirmed', requireRole(['owner','operations']), notificationGlobalLimiter, async (req,res) => {
+    try {
+      const booking = await readBooking(FIREBASE_PROJECT_ID,FIRESTORE_DATABASE_ID,String(req.body?.id || '').trim());
+      if (!booking || !['Confirmed','Driver assigned','Completed'].includes(String(booking.status))) {
+        res.status(400).json({ok:false,error:'Confirmed booking required.'}); return;
       }
-    }
-  );
+      res.status(202).json({ok:true,queued:true,delivered:false});
+    } catch { res.status(503).json({ok:false,retryable:true,error:'Booking storage unavailable.'}); }
+  });
 
-  app.get('/api/vouchers/:bookingId', voucherLookupLimiter, (req, res) => {
-    const cleanId = String(req.params.bookingId || '').trim().toUpperCase();
-    if (!/^[A-Z0-9_-]{3,64}$/.test(cleanId)) {
-      res.status(400).json({ ok: false, error: 'Invalid booking reference.' });
-      return;
+  const voucherLookupLimiter = createRateLimiter({windowMs:60000,maxRequests:40,keyPrefix:'voucher-lookup'});
+  // Compatibility endpoint for older clients; payloads are no longer copied into a cache.
+  app.post('/api/vouchers/sync', requireRole(['owner','operations']), (_req,res) => {
+    res.json({ok:true,source:'firestore',synced:0});
+  });
+  app.post('/api/vouchers/:bookingId/link', requireRole(['owner','operations']), async (req,res) => {
+    res.set('Cache-Control','no-store');
+    try {
+      const id = String(req.params.bookingId || '').trim().toUpperCase();
+      const booking = await readBooking(FIREBASE_PROJECT_ID,FIRESTORE_DATABASE_ID,id);
+      if (!booking) { res.status(404).json({ok:false}); return; }
+      res.json({token:voucherToken(id)});
+    } catch { res.status(503).json({ok:false,error:'Private voucher links unavailable.'}); }
+  });
+  app.get('/api/vouchers/:bookingId', voucherLookupLimiter, async (req,res) => {
+    res.set('Cache-Control','no-store');
+    const id = String(req.params.bookingId || '').trim().toUpperCase();
+    if (!validVoucherToken(id,String(req.get('X-Voucher-Token') || ''))) {
+      res.status(403).json({ok:false,error:'Use the private booking link to view details.'}); return;
     }
-    const found = voucherStore.get(cleanId);
-    if (!found) {
-      res.status(404).json({ ok: false, error: 'Voucher snapshot not found.' });
-      return;
-    }
-    res.json({ ok: true, voucher: found });
+    try {
+      const booking = await readBooking(FIREBASE_PROJECT_ID,FIRESTORE_DATABASE_ID,id);
+      if (!booking) { res.status(404).json({ok:false,error:'Booking not found.'}); return; }
+      res.json({ok:true,voucher:guestVoucher(booking)});
+    } catch { res.status(503).json({ok:false,retryable:true,error:'Booking storage unavailable.'}); }
   });
 
   app.get('/dev-sw.js', (_req, res) => {

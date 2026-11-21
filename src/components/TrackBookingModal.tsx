@@ -224,9 +224,9 @@ export const TrackBookingModal: React.FC<TrackBookingModalProps> = ({
       setErrorMsg(
         tText(
           {
-            en: 'Please enter a valid booking reference (example: WT-4829).',
-            ar: 'يرجى إدخال رقم حجز صحيح (مثال: WT-4829).',
-            de: 'Bitte geben Sie eine gültige Buchungsnummer ein (Beispiel: WT-4829).',
+            en: 'Please enter a valid booking reference (example: WT7K9M4X2P).',
+            ar: 'يرجى إدخال رقم حجز صحيح (مثال: WT7K9M4X2P).',
+            de: 'Bitte geben Sie eine gültige Buchungsnummer ein (Beispiel: WT7K9M4X2P).',
           },
           lang
         )
@@ -238,7 +238,7 @@ export const TrackBookingModal: React.FC<TrackBookingModalProps> = ({
     try {
       const [snap, voucherResp] = await Promise.all([
         getDoc(doc(db, 'booking_receipts', cleanId)),
-        fetch(`/api/vouchers/${encodeURIComponent(cleanId)}`)
+        fetch(`/api/vouchers/${encodeURIComponent(cleanId)}`, { headers: { 'X-Voucher-Token': new URLSearchParams(window.location.hash.slice(1)).get('voucherToken') || '' } })
           .then(async (r) => (r.ok ? ((await r.json()) as { voucher?: ServerVoucherSnapshot }) : null))
           .catch(() => null),
       ]);
@@ -263,7 +263,7 @@ export const TrackBookingModal: React.FC<TrackBookingModalProps> = ({
           id: data.id || cleanId,
           tripId: data.tripId || fetchedVoucher?.tripId || '',
           tripDate: data.tripDate || fetchedVoucher?.date || '',
-          status: data.status || fetchedVoucher?.status || 'Pending',
+          status: fetchedVoucher?.status || data.status || 'Pending',
           tripEndAtMs: endMs,
         });
       } else {
@@ -449,7 +449,7 @@ export const TrackBookingModal: React.FC<TrackBookingModalProps> = ({
                   type="text"
                   value={queryId}
                   onChange={(e) => setQueryId(e.target.value.toUpperCase())}
-                  placeholder="WT-4829"
+                  placeholder="WT7K9M4X2P"
                   className="input-wasla min-h-[44px] ps-9 pe-3 text-sm font-mono uppercase"
                 />
               </div>
