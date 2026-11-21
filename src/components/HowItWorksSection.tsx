@@ -125,7 +125,7 @@ export const HowItWorksSection: React.FC<HowItWorksSectionProps> = ({
       {/* Section Heading */}
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div className="space-y-1.5 max-w-2xl">
-          <p className="text-xs font-semibold tracking-wide text-[#EA580C]">
+          <p className="text-xs font-semibold tracking-wide text-[#EE5426]">
             {tText(
               {
                 en: 'Simple, human-verified booking',
@@ -135,7 +135,7 @@ export const HowItWorksSection: React.FC<HowItWorksSectionProps> = ({
               lang
             )}
           </p>
-          <h2 className="font-display text-2xl sm:text-[32px] font-semibold tracking-[-0.02em] leading-tight text-[#0F172A]">
+          <h2 className="font-display text-2xl sm:text-[32px] font-semibold tracking-[-0.02em] leading-tight text-[#0F2233]">
             {tText(
               {
                 en: 'How booking with Wasla Travel works',
@@ -145,7 +145,7 @@ export const HowItWorksSection: React.FC<HowItWorksSectionProps> = ({
               lang
             )}
           </h2>
-          <p className="text-[15px] leading-relaxed text-[#52525B]">
+          <p className="text-[15px] leading-relaxed text-[#64748B]">
             {tText(
               {
                 en: 'Availability-first confirmation by our Hurghada team — clear pricing in whole euros, zero upfront guesswork.',
@@ -160,7 +160,7 @@ export const HowItWorksSection: React.FC<HowItWorksSectionProps> = ({
         <button
           type="button"
           onClick={onOpenPolicies}
-          className="self-start sm:self-auto text-xs font-semibold text-[#EA580C] hover:underline underline-offset-4 whitespace-nowrap cursor-pointer"
+          className="self-start sm:self-auto text-xs font-semibold text-[#EE5426] hover:underline underline-offset-4 whitespace-nowrap cursor-pointer"
         >
           {tText(
             {
@@ -178,18 +178,18 @@ export const HowItWorksSection: React.FC<HowItWorksSectionProps> = ({
         {steps.map((step) => (
           <div
             key={step.num}
-            className="rounded-2xl border border-[#E2E8F0] bg-white p-6 space-y-3 hover:border-[#FED7AA] transition-colors"
+            className="card-wasla space-y-3 hover:border-[#EE5426]/40 transition-colors"
           >
             <div className="flex items-center justify-between gap-2">
-              <span className="font-mono text-sm font-bold text-[#EA580C] tabular-nums">
+              <span className="font-mono text-sm font-bold text-[#EE5426] tabular-nums">
                 {step.num}.
               </span>
-              <span className="h-px flex-1 bg-[#E2E8F0]" aria-hidden="true" />
+              <span className="h-px flex-1 bg-[#C8C2B8]/50 dark:bg-[#334155]" aria-hidden="true" />
             </div>
-            <h3 className="text-[16px] font-semibold text-[#0F172A] leading-snug">
+            <h3 className="text-[16px] font-semibold text-[#0F2233] leading-snug">
               {step.title}
             </h3>
-            <p className="text-xs sm:text-[13.5px] leading-relaxed text-[#52525B]">
+            <p className="text-xs sm:text-[13.5px] leading-relaxed text-[#64748B]">
               {step.desc}
             </p>
           </div>
@@ -197,20 +197,20 @@ export const HowItWorksSection: React.FC<HowItWorksSectionProps> = ({
       </div>
 
       {/* Clean 4-Column Standards Row */}
-      <div className="rounded-2xl border border-[#E2E8F0] bg-[#F8FAFC] p-5 sm:p-6">
+      <div className="card-wasla bg-[#FAF4ED]/80 dark:bg-[#19354F]/50 p-5 sm:p-6">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
           {standards.map((item) => {
             const Icon = item.icon;
             return (
               <div key={item.title} className="flex items-start gap-3">
-                <div className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#FFF7ED] text-[#EA580C]">
+                <div className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#EE5426]/10 text-[#EE5426]">
                   <Icon className="h-4.5 w-4.5" aria-hidden="true" />
                 </div>
                 <div className="space-y-1 min-w-0">
-                  <h3 className="text-xs sm:text-[13.5px] font-semibold text-[#0F172A] leading-snug">
+                  <h3 className="text-xs sm:text-[13.5px] font-semibold text-[#0F2233] leading-snug">
                     {item.title}
                   </h3>
-                  <p className="text-xs leading-relaxed text-[#52525B]">{item.desc}</p>
+                  <p className="text-xs leading-relaxed text-[#64748B]">{item.desc}</p>
                 </div>
               </div>
             );
@@ -219,22 +219,22 @@ export const HowItWorksSection: React.FC<HowItWorksSectionProps> = ({
       </div>
 
       {/* Compact Bespoke Itinerary, Private Guide & Photography Strip */}
-      <div className="rounded-2xl border border-[#FED7AA] bg-[#FFF7ED]/70 px-5 py-5 sm:px-7 sm:py-6 flex flex-col lg:flex-row lg:items-center justify-between gap-5">
+      <div className="card-wasla bg-[#FAF4ED] dark:bg-[#19354F]/70 border-[#EE5426]/30 px-5 py-5 sm:px-7 sm:py-6 flex flex-col lg:flex-row lg:items-center justify-between gap-5">
         <div className="space-y-1.5 max-w-2xl">
-          <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-xs font-semibold text-[#EA580C]">
+          <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-xs font-semibold text-[#EE5426]">
             <span className="inline-flex items-center gap-1">
               <Compass className="h-3.5 w-3.5" aria-hidden="true" />
               <span>{t.footerAddonEyebrow}</span>
             </span>
-            <span aria-hidden="true" className="text-[#FDBA74]">·</span>
+            <span aria-hidden="true" className="text-[#C8C2B8]">·</span>
             <span>{t.footerGuideTitle}</span>
-            <span aria-hidden="true" className="text-[#FDBA74]">·</span>
+            <span aria-hidden="true" className="text-[#C8C2B8]">·</span>
             <span>{t.footerPhotoTitle}</span>
           </div>
-          <h3 className="font-display text-lg sm:text-xl font-semibold text-[#0F172A] leading-snug">
+          <h3 className="font-display text-lg sm:text-xl font-semibold text-[#0F2233] leading-snug">
             {t.footerAddonTitle}
           </h3>
-          <p className="text-xs sm:text-sm leading-relaxed text-[#52525B]">
+          <p className="text-xs sm:text-sm leading-relaxed text-[#64748B]">
             {tText(
               {
                 en: 'Planning a private family boat, multi-city Nile route, licensed Egyptologist in your language, or coastal photographer? Tell us your dates and we prepare a custom quote.',
@@ -250,15 +250,15 @@ export const HowItWorksSection: React.FC<HowItWorksSectionProps> = ({
           <button
             type="button"
             onClick={() => onOpenCustomTrip(['Photography Session', 'Professional Egyptian Guide'])}
-            className="inline-flex min-h-[42px] items-center gap-1.5 rounded-lg border border-[#E7E2DA] bg-white px-4 py-2 text-xs font-semibold text-[#0B1F2E] hover:border-[#EA580C] hover:text-[#EA580C] transition-colors whitespace-nowrap cursor-pointer"
+            className="btn-wasla-outline min-h-[42px] gap-1.5 rounded-lg bg-white dark:bg-[#0F2233] px-4 py-2 text-xs whitespace-nowrap cursor-pointer"
           >
-            <Camera className="h-3.5 w-3.5 text-[#0E7490]" aria-hidden="true" />
+            <Camera className="h-3.5 w-3.5 text-[#EE5426]" aria-hidden="true" />
             <span>{t.footerAddonCta}</span>
           </button>
           <button
             type="button"
             onClick={() => onOpenCustomTrip(undefined)}
-            className="wasla-book-glare inline-flex min-h-[42px] items-center gap-1.5 rounded-lg px-5 py-2 text-xs font-semibold text-white whitespace-nowrap cursor-pointer"
+            className="btn-wasla-primary min-h-[42px] gap-1.5 rounded-lg px-5 py-2 text-xs whitespace-nowrap cursor-pointer"
           >
             <span>{t.quickJumpCustom}</span>
           </button>

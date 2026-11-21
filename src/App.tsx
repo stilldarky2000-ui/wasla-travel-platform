@@ -46,7 +46,7 @@ import { TripCard } from './components/TripCard';
 import { BookingRequest, TripDetailModal } from './components/TripDetailModal';
 import { TripExplorer } from './components/TripExplorer';
 import { PostTripReviewModal } from './components/TripReview';
-import { WaslaBrandMark } from './components/WaslaBrandMark';
+import { WaslaLogo } from './components/brand/WaslaLogo';
 import { WaslaMapsProvider } from './components/WaslaHotelMapPicker';
 import { WhatsAppInquiryModal } from './components/WhatsAppInquiryModal';
 import {
@@ -102,8 +102,8 @@ const HERO_THEME_CLASSES: Record<
   { bg: string; overlay: string; accent: string }
 > = {
   'red-sea': {
-    bg: 'bg-[#0B1F2E]',
-    overlay: 'from-[#0B1F2E]/78 via-[#0B1F2E]/42 to-[#0B1F2E]/78',
+    bg: 'bg-[#0F2233]',
+    overlay: 'from-[#0F2233]/78 via-[#0F2233]/42 to-[#0F2233]/78',
     accent: 'text-[#FDBA74]',
   },
   midnight: {
@@ -137,8 +137,8 @@ const HERO_THEME_CLASSES: Record<
     accent: 'text-[#FCD34D]',
   },
   'obsidian-gold': {
-    bg: 'bg-[#090D16]',
-    overlay: 'from-[#05080F]/84 via-[#111827]/58 to-[#090D16]/88',
+    bg: 'bg-[#0F2233]',
+    overlay: 'from-[#0F2233]/88 via-[#19354F]/62 to-[#0F2233]/92',
     accent: 'text-[#FDE047]',
   },
 };
@@ -237,8 +237,10 @@ export default function App() {
     }
     if (darkMode) {
       document.documentElement.setAttribute('data-wasla-theme', 'dark');
+      document.documentElement.classList.add('dark');
     } else {
       document.documentElement.removeAttribute('data-wasla-theme');
+      document.documentElement.classList.remove('dark');
     }
   }, [themeMap, darkMode]);
 
@@ -382,6 +384,7 @@ export default function App() {
   const [policiesOpen, setPoliciesOpen] = useState(false);
   const [policiesTab, setPoliciesTab] = useState<LegalPolicyTab>('terms');
   const [trackBookingOpen, setTrackBookingOpen] = useState(false);
+  const [initialTrackBookingId, setInitialTrackBookingId] = useState<string>('');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [portalAuthOpen, setPortalAuthOpen] = useState(false);
   const [directReviewContext, setDirectReviewContext] = useState<{
@@ -535,9 +538,17 @@ export default function App() {
     const dateParam = params.get('date');
     const tripParam = params.get('trip');
     const reviewParam = sanitizeBookingId(params.get('review') || params.get('bookingId'));
+    const trackParam = sanitizeBookingId(
+      params.get('track') || params.get('voucher') || params.get('booking')
+    );
 
     if (params.get('portal') === '1' || window.location.hash === '#portal') {
       setPortalAuthOpen(true);
+    }
+
+    if (trackParam) {
+      setInitialTrackBookingId(trackParam);
+      setTrackBookingOpen(true);
     }
 
     const catalog = liveTrips.length > 0 ? liveTrips : TRIPS;
@@ -641,8 +652,15 @@ export default function App() {
   }, [publicSettings.metaPixelId, publicSettings.ga4Id]);
 
   useEffect(() => {
+    const activeDir = isRtl ? 'rtl' : 'ltr';
     document.documentElement.lang = workspace === 'storefront' ? lang : 'en';
-    document.documentElement.dir = isRtl ? 'rtl' : 'ltr';
+    document.documentElement.dir = activeDir;
+    document.body.dir = activeDir;
+    try {
+      window.localStorage.setItem('wasla_active_lang', lang);
+    } catch {
+      // Ignore storage failures
+    }
   }, [lang, isRtl, workspace]);
 
   useEffect(() => {
@@ -924,7 +942,7 @@ export default function App() {
       guestWhatsapp: req.whatsapp,
       guestEmail: req.email,
       guestContact: req.contact,
-      guestLang: lang,
+      guestLang: req.guestLang || lang,
       hotel: req.hotel,
       roomNumber: req.roomNumber,
       adults: req.adults,
@@ -945,6 +963,8 @@ export default function App() {
   const handleCustomTripSubmit = (sub: CustomTripSubmission): string => {
     const newId = `WT-${Date.now().toString(36).toUpperCase().slice(-5)}${Math.floor(10 + Math.random() * 89)}`;
     const customTitle = `Custom (${sub.destination}): ${sub.services.join(', ')} [${sub.guideLanguage} Guide]`;
+    const mappedCustomLang: Lang =
+      sub.guideLanguage === 'German' ? 'de' : sub.guideLanguage === 'Arabic' ? 'ar' : 'en';
     const newBooking: PlatformBooking = {
       id: newId,
       tripId: 'custom-itinerary',
@@ -960,7 +980,7 @@ export default function App() {
       guestWhatsapp: sub.guestWhatsapp,
       guestEmail: sub.guestEmail,
       guestContact: sub.guestContact,
-      guestLang: lang,
+      guestLang: mappedCustomLang,
       hotel: `${sub.destination} Custom Pickup`,
       adults: sub.adults,
       children: sub.children,
@@ -970,7 +990,7 @@ export default function App() {
       assignedDriverOrGuide: '',
       paymentStatus: 'Awaiting link',
       status: 'Pending',
-      notes: `[${sub.guideLanguage} Guide requested] ${sub.notes}`.trim(),
+      notes: `Guide & Email Language: ${sub.guideLanguage} · ${sub.notes}`.trim(),
     };
     setCustomerRequests((prev) => [
       {
@@ -1062,69 +1082,21 @@ export default function App() {
   const pendingOpsCount = bookings.filter((b) => b.status === 'Pending').length;
 
   const renderAnimatedBrand = (variant: 'header' | 'footer' = 'header') => {
-    const isDarkSurface = variant === 'footer' || darkMode;
-    const primaryTextCls = isDarkSurface ? 'text-white' : 'text-[#0B1F2E]';
-    const accentTextCls =
-      variant === 'footer'
-        ? 'text-[#FDBA74]'
-        : darkMode
-        ? 'text-[#FB923C]'
-        : 'text-[#EA580C]';
-    const dividerCls =
-      variant === 'footer'
-        ? 'bg-white/25'
-        : darkMode
-        ? 'bg-white/20'
-        : 'bg-[#CBD5E1]';
-    const iconRingCls =
-      variant === 'footer'
-        ? 'ring-1 ring-white/20'
-        : '';
+    if (variant === 'footer') {
+      return (
+        <span dir="ltr" className="inline-flex items-center select-none">
+          <WaslaLogo variant="full" theme="dark" className="h-10 sm:h-12 w-auto" />
+        </span>
+      );
+    }
 
     return (
       <span dir="ltr" className="inline-flex items-center select-none">
-        {/* Official Vector Geometric Brand Emblem */}
-        <WaslaBrandMark size="lg" className={`me-2 sm:me-3 ${iconRingCls}`} />
-
-        {/* English Column: Wasla / T R A V E L (flush width alignment) */}
-        <span className="inline-flex flex-col items-stretch justify-center leading-none">
-          <span
-            className={`font-sans text-[15.5px] sm:text-[21px] font-extrabold tracking-[-0.02em] ${primaryTextCls} leading-none`}
-          >
-            Wasla
-          </span>
-          <span
-            className={`mt-1 sm:mt-1.5 flex w-full items-center justify-between font-sans text-[8px] sm:text-[10px] font-bold uppercase ${accentTextCls} leading-none`}
-            aria-label="TRAVEL"
-          >
-            <span>T</span>
-            <span>R</span>
-            <span>A</span>
-            <span>V</span>
-            <span>E</span>
-            <span>L</span>
-          </span>
-        </span>
-
-        {/* Vertical Divider */}
-        <span
-          className={`mx-2 sm:mx-3.5 h-7 sm:h-9 w-[1.5px] shrink-0 ${dividerCls}`}
-          aria-hidden="true"
+        <WaslaLogo
+          variant="full"
+          theme={darkMode ? 'dark' : 'light'}
+          className="h-8 sm:h-11 w-auto"
         />
-
-        {/* Arabic Column: وصلة / ترافيل (matched width & visual harmony) */}
-        <span dir="rtl" className="inline-flex flex-col items-center justify-center leading-none">
-          <span
-            className={`font-sans text-[15.5px] sm:text-[21px] font-extrabold ${primaryTextCls} leading-none`}
-          >
-            وصلة
-          </span>
-          <span
-            className={`font-sans text-[11px] sm:text-[14.5px] font-extrabold ${accentTextCls} mt-0.5 sm:mt-1 leading-none`}
-          >
-            ترافيل
-          </span>
-        </span>
       </span>
     );
   };
@@ -1163,16 +1135,17 @@ export default function App() {
   return (
     <WaslaMapsProvider lang={lang}>
     <div
+      dir={isRtl ? 'rtl' : 'ltr'}
       className={`min-h-screen overflow-x-hidden transition-colors duration-200 ${
         darkMode
-          ? 'wasla-storefront-root bg-[#090D16] text-slate-100'
-          : 'wasla-storefront-root bg-[#FFFFFF] text-[#0F172A]'
+          ? 'wasla-storefront-root bg-[#0F2233] text-slate-100'
+          : 'wasla-storefront-root bg-[#FFFFFF] text-[#0F2233]'
       }`}
     >
       {/* Discreet Owner Private Gate Control Banner */}
       <div
         dir="rtl"
-        className="sticky top-0 z-[60] flex items-center justify-between gap-3 border-b border-[#EA580C]/40 bg-[#0B1F2E] px-4 py-2 text-xs text-slate-200 shadow-md"
+        className="sticky top-0 z-[60] flex items-center justify-between gap-3 border-b border-[#EE5426]/40 bg-[#0F2233] px-4 py-2 text-xs text-slate-200 shadow-md"
       >
         <div className="flex items-center gap-2">
           <span className="inline-flex h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
@@ -1185,7 +1158,7 @@ export default function App() {
             lockPrivateGate();
             setIsSiteUnlocked(false);
           }}
-          className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[#EA580C] hover:bg-[#C2410C] text-white font-bold transition-colors cursor-pointer"
+          className="btn-wasla-primary gap-1.5 px-3 py-1 rounded-lg text-xs font-bold cursor-pointer"
         >
           <Lock className="h-3.5 w-3.5" />
           <span>قفل الموقع مجدداً</span>
@@ -1224,29 +1197,29 @@ export default function App() {
           dir="ltr"
           role="status"
           aria-live="polite"
-          className="fixed top-14 end-4 z-50 w-[calc(100%-2rem)] max-w-sm rounded-xl border border-[#EA580C] bg-white p-4 shadow-2xl space-y-2"
+          className="card-wasla fixed top-14 end-4 z-50 w-[calc(100%-2rem)] max-w-sm rounded-xl border-[#EE5426] p-4 shadow-2xl space-y-2"
         >
           <div className="flex items-center justify-between gap-2">
-            <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#EA580C]">
+            <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#EE5426]">
               <Bell className="h-4 w-4 animate-bounce" aria-hidden="true" />
               <span>New Booking Received · {latestNewBooking.id}</span>
             </span>
             <button
               type="button"
               onClick={dismissNewBookingAlert}
-              className="rounded p-1 text-[#475569] hover:text-[#0F172A] cursor-pointer"
+              className="rounded p-1 text-[#64748B] hover:text-[#0F2233] cursor-pointer"
               aria-label="Dismiss booking alert"
             >
               <X className="h-4 w-4" />
             </button>
           </div>
-          <div className="text-sm font-semibold text-[#0F172A]">
+          <div className="text-sm font-semibold text-[#0F2233]">
             {latestNewBooking.guestName} · €{latestNewBooking.grossEur}
           </div>
-          <div className="text-xs text-[#475569] line-clamp-1">
+          <div className="text-xs text-[#64748B] line-clamp-1">
             {latestNewBooking.tripTitle} ({latestNewBooking.date})
           </div>
-          <div className="text-[11px] text-[#475569] truncate">
+          <div className="text-[11px] text-[#64748B] truncate">
             {[latestNewBooking.guestWhatsapp, latestNewBooking.guestEmail]
               .filter(Boolean)
               .join(' · ') || latestNewBooking.guestContact}
@@ -1260,7 +1233,7 @@ export default function App() {
                   setTouristPreviewOnly(false);
                   dismissNewBookingAlert();
                 }}
-                className="wasla-book-glare flex-1 rounded-full px-3 py-1.5 text-xs font-semibold text-white cursor-pointer"
+                className="btn-wasla-primary flex-1 rounded-full px-3 py-1.5 text-xs cursor-pointer"
               >
                 Open Reservations &amp; Dispatch
               </button>
@@ -1285,7 +1258,7 @@ export default function App() {
             <button
               type="button"
               onClick={toggleSoundMuted}
-              className="rounded-lg border border-[#CBD5E1] px-2.5 py-1.5 text-xs font-semibold text-[#475569] hover:text-[#0F172A] cursor-pointer"
+              className="rounded-lg border border-[#C8C2B8] px-2.5 py-1.5 text-xs font-semibold text-[#64748B] hover:text-[#0F2233] cursor-pointer"
             >
               {soundMuted ? 'Unmute' : 'Mute'}
             </button>
@@ -1295,11 +1268,11 @@ export default function App() {
 
       {/* Authenticated Staff & Partner Role Bar (completely hidden from public tourists) */}
       {effectiveRole !== 'none' && !touristPreviewOnly && (
-        <div className="bg-[#FFF7ED]/70 text-[#0F172A] border-b border-[#FED7AA]" dir="ltr">
+        <div className="bg-[#FAF4ED] text-[#0F2233] border-b border-[#C8C2B8]/70" dir="ltr">
           <div className="mx-auto max-w-[1400px] px-4 sm:px-6 py-2 flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-3">
             <div className="flex items-center justify-between gap-2 text-xs font-medium text-[#475569]">
               <div className="flex items-center gap-2">
-                <span className="font-semibold text-[#EA580C]">Wasla Team Bar</span>
+                <span className="font-semibold text-[#EE5426]">Wasla Team Bar</span>
                 <span aria-hidden="true" className="hidden sm:inline">·</span>
                 <span className="hidden sm:inline">{user?.email || publicSettings.domain}</span>
               </div>
@@ -1318,8 +1291,8 @@ export default function App() {
                 onClick={() => setWorkspace('storefront')}
                 className={`shrink-0 inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors whitespace-nowrap cursor-pointer ${
                   workspace === 'storefront'
-                    ? 'wasla-book-glare text-white shadow-xs'
-                    : 'text-[#475569] hover:bg-[#FFEDD5] hover:text-[#0F172A]'
+                    ? 'btn-wasla-primary rounded-full px-3.5 py-1.5 text-xs'
+                    : 'text-[#475569] hover:bg-[#C8C2B8]/30 hover:text-[#0F2233]'
                 }`}
               >
                 <Store className="h-3.5 w-3.5" aria-hidden="true" />
@@ -1334,8 +1307,8 @@ export default function App() {
                   onClick={() => setWorkspace('operations')}
                   className={`shrink-0 inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors whitespace-nowrap cursor-pointer tabular-nums ${
                     workspace === 'operations'
-                      ? 'wasla-book-glare text-white shadow-xs'
-                      : 'text-[#475569] hover:bg-[#FFEDD5] hover:text-[#0F172A]'
+                      ? 'btn-wasla-primary rounded-full px-3.5 py-1.5 text-xs'
+                      : 'text-[#475569] hover:bg-[#C8C2B8]/30 hover:text-[#0F2233]'
                   }`}
                 >
                   <Headphones className="h-3.5 w-3.5" aria-hidden="true" />
@@ -1351,8 +1324,8 @@ export default function App() {
                   onClick={() => setWorkspace('supplier')}
                   className={`shrink-0 inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors whitespace-nowrap cursor-pointer ${
                     workspace === 'supplier'
-                      ? 'wasla-book-glare text-white shadow-xs'
-                      : 'text-[#475569] hover:bg-[#FFEDD5] hover:text-[#0F172A]'
+                      ? 'btn-wasla-primary rounded-full px-3.5 py-1.5 text-xs'
+                      : 'text-[#475569] hover:bg-[#C8C2B8]/30 hover:text-[#0F2233]'
                   }`}
                 >
                   <Briefcase className="h-3.5 w-3.5" aria-hidden="true" />
@@ -1368,8 +1341,8 @@ export default function App() {
                   onClick={() => setWorkspace('owner')}
                   className={`shrink-0 inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors whitespace-nowrap cursor-pointer ${
                     workspace === 'owner'
-                      ? 'wasla-book-glare text-white shadow-xs'
-                      : 'text-[#475569] hover:bg-[#FFEDD5] hover:text-[#0F172A]'
+                      ? 'btn-wasla-primary rounded-full px-3.5 py-1.5 text-xs'
+                      : 'text-[#475569] hover:bg-[#C8C2B8]/30 hover:text-[#0F2233]'
                   }`}
                 >
                   <LayoutDashboard className="h-3.5 w-3.5" aria-hidden="true" />
@@ -1393,13 +1366,13 @@ export default function App() {
               <button
                 type="button"
                 onClick={toggleSoundMuted}
-                className="shrink-0 inline-flex items-center gap-1 rounded-lg border border-[#CBD5E1] bg-white px-2.5 py-1.5 text-xs font-semibold text-[#0F172A] hover:bg-[#F1F5F9] whitespace-nowrap cursor-pointer"
+                className="shrink-0 inline-flex items-center gap-1 rounded-lg border border-[#C8C2B8] bg-white px-2.5 py-1.5 text-xs font-semibold text-[#0F2233] hover:bg-[#FAF4ED] whitespace-nowrap cursor-pointer"
                 title="Toggle sound alerts for new bookings"
               >
                 {soundMuted ? (
-                  <VolumeX className="h-3.5 w-3.5 text-[#B91C1C]" aria-hidden="true" />
+                  <VolumeX className="h-3.5 w-3.5 text-[#EF4444]" aria-hidden="true" />
                 ) : (
-                  <Volume2 className="h-3.5 w-3.5 text-[#16A34A]" aria-hidden="true" />
+                  <Volume2 className="h-3.5 w-3.5 text-[#10B981]" aria-hidden="true" />
                 )}
               </button>
 
@@ -1410,7 +1383,7 @@ export default function App() {
                     const res = await requestDesktopAlertPermission();
                     setNotifPerm(res);
                   }}
-                  className="shrink-0 inline-flex items-center gap-1 rounded-lg border border-[#EA580C]/30 bg-[#FFF7ED] px-2.5 py-1.5 text-xs font-semibold text-[#EA580C] hover:bg-[#FFEDD5] whitespace-nowrap cursor-pointer"
+                  className="shrink-0 inline-flex items-center gap-1 rounded-lg border border-[#EE5426]/30 bg-[#FAF4ED] px-2.5 py-1.5 text-xs font-semibold text-[#EE5426] hover:bg-[#EE5426]/10 whitespace-nowrap cursor-pointer"
                   title="Allow desktop popup notifications"
                 >
                   <Bell className="h-3.5 w-3.5" aria-hidden="true" />
@@ -1422,7 +1395,7 @@ export default function App() {
                 <button
                   type="button"
                   onClick={testBookingAlert}
-                  className="shrink-0 inline-flex items-center rounded-lg border border-[#CBD5E1] bg-white px-2.5 py-1.5 text-xs font-semibold text-[#475569] hover:text-[#0F172A] hover:bg-[#F1F5F9] whitespace-nowrap cursor-pointer"
+                  className="shrink-0 inline-flex items-center rounded-lg border border-[#C8C2B8] bg-white px-2.5 py-1.5 text-xs font-semibold text-[#64748B] hover:text-[#0F2233] hover:bg-[#FAF4ED] whitespace-nowrap cursor-pointer"
                   title="Test booking alert sound & notification"
                 >
                   Test Alert
@@ -1435,10 +1408,10 @@ export default function App() {
                   setWorkspace('storefront');
                   setTouristPreviewOnly(true);
                 }}
-                className="shrink-0 inline-flex items-center gap-1 rounded-lg border border-[#CBD5E1] bg-white px-2.5 py-1.5 text-xs font-semibold text-[#0F172A] hover:bg-[#F1F5F9] whitespace-nowrap cursor-pointer"
+                className="shrink-0 inline-flex items-center gap-1 rounded-lg border border-[#C8C2B8] bg-white px-2.5 py-1.5 text-xs font-semibold text-[#0F2233] hover:bg-[#FAF4ED] whitespace-nowrap cursor-pointer"
                 title="Hide role bar to preview live tourist site"
               >
-                <Eye className="h-3.5 w-3.5 text-[#EA580C]" aria-hidden="true" />
+                <Eye className="h-3.5 w-3.5 text-[#EE5426]" aria-hidden="true" />
                 <span>{t.previewTouristBtn}</span>
               </button>
 
@@ -1448,7 +1421,7 @@ export default function App() {
                   void signOutUser();
                   setWorkspace('storefront');
                 }}
-                className="shrink-0 inline-flex items-center gap-1 rounded-lg border border-[#CBD5E1] bg-white px-2.5 py-1.5 text-xs font-semibold text-[#475569] hover:text-[#0F172A] hover:bg-[#F1F5F9] whitespace-nowrap cursor-pointer"
+                className="shrink-0 inline-flex items-center gap-1 rounded-lg border border-[#C8C2B8] bg-white px-2.5 py-1.5 text-xs font-semibold text-[#64748B] hover:text-[#0F2233] hover:bg-[#FAF4ED] whitespace-nowrap cursor-pointer"
                 title="Sign out"
               >
                 <LogOut className="h-3.5 w-3.5" aria-hidden="true" />
@@ -1547,8 +1520,8 @@ export default function App() {
           <header
             className={`sticky top-0 z-30 border-b backdrop-blur-md transition-colors duration-200 ${
               darkMode
-                ? 'border-white/10 bg-[#090D16]/95 shadow-[0_4px_24px_-4px_rgba(0,0,0,0.45)]'
-                : 'border-[#E2E8F0] bg-[#FFFFFF]/95 shadow-[0_1px_12px_-4px_rgba(15,23,42,0.06)]'
+                ? 'border-[#334155] bg-[#0F2233]/95 shadow-[0_4px_24px_-4px_rgba(0,0,0,0.45)]'
+                : 'border-[#C8C2B8]/50 bg-[#FFFFFF]/95 shadow-[0_1px_12px_-4px_rgba(15,34,51,0.06)]'
             }`}
           >
             <div className="mx-auto flex h-16 sm:h-[70px] max-w-[1200px] items-center justify-between gap-2 sm:gap-6 px-3 sm:px-6">
@@ -1562,7 +1535,7 @@ export default function App() {
 
               <nav
                 className={`hidden lg:flex items-center gap-5 xl:gap-7 text-[14px] font-semibold tracking-[-0.01em] transition-colors ${
-                  darkMode ? 'text-slate-100' : 'text-[#334155]'
+                  darkMode ? 'text-slate-100' : 'text-[#0F2233]'
                 }`}
                 aria-label="Primary"
               >
@@ -1577,8 +1550,8 @@ export default function App() {
                     href={navLink.href}
                     className={`relative py-1.5 transition-colors whitespace-nowrap shrink-0 after:absolute after:inset-x-0 after:bottom-0 after:h-[2px] after:origin-left after:scale-x-0 after:rounded-full after:transition-transform after:duration-200 hover:after:scale-x-100 ${
                       darkMode
-                        ? 'hover:text-[#FF6B00] after:bg-[#FF6B00]'
-                        : 'hover:text-[#EA580C] after:bg-[#F54400]'
+                        ? 'hover:text-[#EE5426] after:bg-[#EE5426]'
+                        : 'hover:text-[#EE5426] after:bg-[#EE5426]'
                     }`}
                   >
                     {navLink.label}
@@ -1603,10 +1576,10 @@ export default function App() {
                   className={`hidden md:inline-flex min-h-[38px] items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-semibold transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                     darkMode
                       ? 'text-slate-200 hover:bg-white/10 hover:text-white'
-                      : 'text-[#334155] hover:bg-[#FAF8F5] hover:text-[#0B1F2E]'
+                      : 'text-[#334155] hover:bg-[#FAF4ED] hover:text-[#0F2233]'
                   }`}
                 >
-                  <Ticket className="h-3.5 w-3.5 text-[#0E7490]" aria-hidden="true" />
+                  <Ticket className="h-3.5 w-3.5 text-[#EE5426]" aria-hidden="true" />
                   <span>
                     {tText({ en: 'Track Booking', ar: 'تتبّع حجزك', de: 'Buchung prüfen' }, lang)}
                   </span>
@@ -1627,7 +1600,7 @@ export default function App() {
                 <button
                   type="button"
                   onClick={() => setWhatsappOpen(true)}
-                  className="wasla-book-glare inline-flex min-h-[36px] sm:min-h-[40px] items-center gap-1.5 sm:gap-2 rounded-lg px-3 sm:px-4 py-1.5 text-[13px] font-semibold tracking-[-0.01em] text-white active:scale-[0.98] whitespace-nowrap shrink-0 cursor-pointer tabular-nums"
+                  className="btn-wasla-primary min-h-[36px] sm:min-h-[40px] gap-1.5 sm:gap-2 rounded-lg px-3 sm:px-4 py-1.5 text-[13px] tracking-[-0.01em] whitespace-nowrap shrink-0 cursor-pointer tabular-nums"
                 >
                   <MessageCircle className="h-4 w-4" aria-hidden="true" />
                   <span className="hidden sm:inline">
@@ -1645,8 +1618,8 @@ export default function App() {
                   aria-label={tText({ en: 'Menu', ar: 'القائمة', de: 'Menü' }, lang)}
                   className={`lg:hidden inline-flex h-9 w-9 items-center justify-center rounded-lg border transition-colors cursor-pointer ${
                     darkMode
-                      ? 'border-white/15 bg-[#131B2E] text-slate-100'
-                      : 'border-[#E2E8F0] bg-white text-[#0F172A]'
+                      ? 'border-[#334155] bg-[#19354F] text-slate-100'
+                      : 'border-[#C8C2B8]/60 bg-white text-[#0F2233]'
                   }`}
                 >
                   {mobileMenuOpen ? <X className="h-4.5 w-4.5" /> : <Menu className="h-4.5 w-4.5" />}
@@ -1659,8 +1632,8 @@ export default function App() {
               <div
                 className={`lg:hidden border-t px-4 py-4 space-y-4 ${
                   darkMode
-                    ? 'border-white/10 bg-[#090D16] text-slate-100'
-                    : 'border-[#E2E8F0] bg-white text-[#0F172A]'
+                    ? 'border-[#334155] bg-[#0F2233] text-slate-100'
+                    : 'border-[#C8C2B8]/50 bg-white text-[#0F2233]'
                 }`}
               >
                 <div className="grid grid-cols-2 gap-2 text-sm font-semibold">
@@ -1678,8 +1651,8 @@ export default function App() {
                       onClick={() => setMobileMenuOpen(false)}
                       className={`rounded-xl border px-3 py-2.5 text-xs font-semibold ${
                         darkMode
-                          ? 'border-white/10 bg-white/5 hover:border-[#FF6B00]'
-                          : 'border-[#E2E8F0] bg-[#F8FAFC] hover:border-[#EA580C]'
+                          ? 'border-[#334155] bg-[#19354F]/60 hover:border-[#EE5426]'
+                          : 'border-[#C8C2B8]/50 bg-[#FAF4ED] hover:border-[#EE5426]'
                       }`}
                     >
                       {item.label}
@@ -1691,7 +1664,7 @@ export default function App() {
                       setMobileMenuOpen(false);
                       setTrackBookingOpen(true);
                     }}
-                    className="rounded-xl border border-[#FED7AA] bg-[#FFF7ED] px-3 py-2.5 text-start text-xs font-semibold text-[#EA580C] cursor-pointer inline-flex items-center gap-1.5"
+                    className="rounded-xl border border-[#EE5426]/30 bg-[#FAF4ED] px-3 py-2.5 text-start text-xs font-semibold text-[#EE5426] cursor-pointer inline-flex items-center gap-1.5"
                   >
                     <Ticket className="h-3.5 w-3.5 shrink-0" />
                     <span>
@@ -1709,7 +1682,7 @@ export default function App() {
                         setCustomInitialServices(undefined);
                         setCustomTripOpen(true);
                       }}
-                      className="rounded-full border border-[#EA580C] px-3 py-1.5 text-xs font-semibold text-[#EA580C] cursor-pointer"
+                      className="rounded-full border border-[#EE5426] px-3 py-1.5 text-xs font-semibold text-[#EE5426] cursor-pointer"
                     >
                       {t.quickJumpCustom}
                     </button>
@@ -1730,7 +1703,7 @@ export default function App() {
                       setMobileMenuOpen(false);
                       setPortalAuthOpen(true);
                     }}
-                    className="inline-flex items-center gap-1 text-xs font-semibold text-[#64748B] hover:text-[#EA580C] cursor-pointer"
+                    className="inline-flex items-center gap-1 text-xs font-semibold text-[#64748B] hover:text-[#EE5426] cursor-pointer"
                   >
                     <Lock className="h-3 w-3" />
                     <span>{t.staffPortalLogin}</span>
@@ -1792,7 +1765,7 @@ export default function App() {
                 <form
                   onSubmit={handleHeroSearch}
                   role="search"
-                  className="wasla-led-ring hero-enter-delayed max-w-5xl rounded-xl bg-white p-2.5 sm:p-3 lg:px-4 lg:py-2.5 text-[#0B1F2E]"
+                  className="wasla-led-ring hero-enter-delayed max-w-5xl rounded-xl bg-white p-2.5 sm:p-3 lg:px-4 lg:py-2.5 text-[#0F2233]"
                 >
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[1.05fr_1.3fr_1fr_1fr_auto] gap-2.5 items-center">
                     <label className="block px-2 py-1">
@@ -1803,7 +1776,7 @@ export default function App() {
                         <select
                           value={searchDestination}
                           onChange={(e) => setSearchDestination(e.target.value as DestinationRegion | 'all')}
-                          className="w-full appearance-none bg-transparent pe-6 text-sm font-medium text-[#0F172A] focus:outline-none cursor-pointer"
+                          className="w-full appearance-none bg-transparent pe-6 text-sm font-medium text-[#0F2233] focus:outline-none cursor-pointer"
                         >
                           <option value="all">{t.searchAllDestinations}</option>
                           <option value="Hurghada">Hurghada</option>
@@ -1818,15 +1791,15 @@ export default function App() {
                       </div>
                     </label>
 
-                    <label className="block px-2 py-1 sm:border-s sm:border-[#E2E8F0]">
-                      <span className="block text-[11px] font-semibold text-[#475569]">
+                    <label className="block px-2 py-1 sm:border-s sm:border-[#C8C2B8]/60">
+                      <span className="block text-[11px] font-semibold text-[#64748B]">
                         {t.searchActivityLabel}
                       </span>
                       <div className="relative mt-0.5">
                         <select
                           value={searchActivity}
                           onChange={(e) => setSearchActivity(e.target.value as ActivityCategoryId | 'all')}
-                          className="w-full appearance-none bg-transparent pe-6 text-sm font-medium text-[#0F172A] focus:outline-none cursor-pointer"
+                          className="w-full appearance-none bg-transparent pe-6 text-sm font-medium text-[#0F2233] focus:outline-none cursor-pointer"
                         >
                           <option value="all">{t.searchAllActivities}</option>
                           {CATEGORIES.map((cat) => (
@@ -1842,8 +1815,8 @@ export default function App() {
                       </div>
                     </label>
 
-                    <label className="block px-2 py-1 lg:border-s lg:border-[#E2E8F0]">
-                      <span className="block text-[11px] font-semibold text-[#475569]">
+                    <label className="block px-2 py-1 lg:border-s lg:border-[#C8C2B8]/60">
+                      <span className="block text-[11px] font-semibold text-[#64748B]">
                         {tText({ en: 'Start date', ar: 'من تاريخ', de: 'Startdatum' }, lang)}
                       </span>
                       <div className="relative mt-0.5">
@@ -1853,7 +1826,7 @@ export default function App() {
                           min={todayIso}
                           aria-label={tText({ en: 'Start date', ar: 'من تاريخ', de: 'Startdatum' }, lang)}
                           onChange={(e) => handleStartDateChange(e.target.value)}
-                          className="w-full bg-transparent pe-6 text-sm font-medium text-[#0F172A] focus:outline-none tabular-nums [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:inset-0 [&::-webkit-calendar-picker-indicator]:h-full [&::-webkit-calendar-picker-indicator]:w-full [&::-webkit-calendar-picker-indicator]:cursor-pointer [&::-webkit-calendar-picker-indicator]:opacity-0"
+                          className="w-full bg-transparent pe-6 text-sm font-medium text-[#0F2233] focus:outline-none tabular-nums [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:inset-0 [&::-webkit-calendar-picker-indicator]:h-full [&::-webkit-calendar-picker-indicator]:w-full [&::-webkit-calendar-picker-indicator]:cursor-pointer [&::-webkit-calendar-picker-indicator]:opacity-0"
                         />
                         <CalendarDays
                           className="pointer-events-none absolute end-0 top-1/2 h-4 w-4 -translate-y-1/2 text-[#64748B] stroke-[1.75]"
@@ -1862,8 +1835,8 @@ export default function App() {
                       </div>
                     </label>
 
-                    <label className="block px-2 py-1 sm:border-s sm:border-[#E2E8F0]">
-                      <span className="block text-[11px] font-semibold text-[#475569]">
+                    <label className="block px-2 py-1 sm:border-s sm:border-[#C8C2B8]/60">
+                      <span className="block text-[11px] font-semibold text-[#64748B]">
                         {tText({ en: 'End date', ar: 'إلى تاريخ', de: 'Enddatum' }, lang)}
                       </span>
                       <div className="relative mt-0.5">
@@ -1873,7 +1846,7 @@ export default function App() {
                           min={searchStartDate || todayIso}
                           aria-label={tText({ en: 'End date', ar: 'إلى تاريخ', de: 'Enddatum' }, lang)}
                           onChange={(e) => handleEndDateChange(e.target.value)}
-                          className="w-full bg-transparent pe-6 text-sm font-medium text-[#0F172A] focus:outline-none tabular-nums [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:inset-0 [&::-webkit-calendar-picker-indicator]:h-full [&::-webkit-calendar-picker-indicator]:w-full [&::-webkit-calendar-picker-indicator]:cursor-pointer [&::-webkit-calendar-picker-indicator]:opacity-0"
+                          className="w-full bg-transparent pe-6 text-sm font-medium text-[#0F2233] focus:outline-none tabular-nums [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:inset-0 [&::-webkit-calendar-picker-indicator]:h-full [&::-webkit-calendar-picker-indicator]:w-full [&::-webkit-calendar-picker-indicator]:cursor-pointer [&::-webkit-calendar-picker-indicator]:opacity-0"
                         />
                         <CalendarDays
                           className="pointer-events-none absolute end-0 top-1/2 h-4 w-4 -translate-y-1/2 text-[#64748B] stroke-[1.75]"
@@ -1885,7 +1858,7 @@ export default function App() {
                     <div className="sm:col-span-2 lg:col-span-1">
                       <button
                         type="submit"
-                        className="wasla-book-glare inline-flex min-h-[46px] w-full items-center justify-center gap-2 rounded-lg px-6 text-sm font-bold text-white active:scale-[0.98] transition-all whitespace-nowrap cursor-pointer"
+                        className="btn-wasla-primary min-h-[46px] w-full rounded-lg px-6 text-sm font-bold whitespace-nowrap cursor-pointer"
                       >
                         <Search className="h-4 w-4" aria-hidden="true" />
                         <span>{t.searchButton}</span>
@@ -1981,7 +1954,7 @@ export default function App() {
             {/* Quick Destination & Service Filter Strip (Visually separated Destinations vs Trip Types) */}
             <nav
               aria-label="Quick destinations and services"
-              className="border-b border-[#E7E2DA] bg-[#FAF8F5]"
+              className="border-b border-[#C8C2B8]/60 bg-[#FAF4ED]"
             >
               <div className="mx-auto max-w-[1200px] px-4 sm:px-6 py-3">
                 <div className="no-scrollbar carousel-track flex items-center gap-2 overflow-x-auto snap-x snap-proximity py-0.5">
@@ -2020,12 +1993,12 @@ export default function App() {
                           }}
                           className={`snap-start shrink-0 inline-flex min-h-[36px] items-center gap-1.5 rounded-lg border px-3.5 py-1.5 text-xs font-semibold active:scale-95 transition-all whitespace-nowrap cursor-pointer ${
                             active
-                              ? 'border-[#0B1F2E] bg-[#0B1F2E] text-white'
-                              : 'border-[#E2E8F0] bg-white text-[#0B1F2E] hover:border-[#0B1F2E]/40 hover:bg-white'
+                              ? 'border-[#0F2233] bg-[#0F2233] text-white'
+                              : 'border-[#E2E8F0] bg-white text-[#0F2233] hover:border-[#0F2233]/40 hover:bg-white'
                           }`}
                         >
                           <MapPin
-                            className={`h-3.5 w-3.5 shrink-0 ${active ? 'text-[#FDBA74]' : 'text-[#EA580C]'}`}
+                            className={`h-3.5 w-3.5 shrink-0 ${active ? 'text-[#FDBA74]' : 'text-[#EE5426]'}`}
                             aria-hidden="true"
                           />
                           <span>{item.label}</span>
@@ -2034,7 +2007,7 @@ export default function App() {
                     })}
                   </div>
 
-                  <span aria-hidden="true" className="mx-1 h-5 w-px bg-[#D6D0C6] shrink-0" />
+                  <span aria-hidden="true" className="mx-1 h-5 w-px bg-[#C8C2B8] shrink-0" />
 
                   {/* Group 2: Trip Types */}
                   <div className="flex items-center gap-2 shrink-0">
@@ -2057,12 +2030,12 @@ export default function App() {
                           }}
                           className={`snap-start shrink-0 inline-flex min-h-[36px] items-center gap-1.5 rounded-lg border px-3.5 py-1.5 text-xs font-semibold active:scale-95 transition-all whitespace-nowrap cursor-pointer ${
                             active
-                              ? 'border-[#0B1F2E] bg-[#0B1F2E] text-white'
-                              : 'border-[#E2E8F0] bg-white text-[#334155] hover:border-[#0B1F2E]/40 hover:text-[#0B1F2E]'
+                              ? 'border-[#0F2233] bg-[#0F2233] text-white'
+                              : 'border-[#C8C2B8]/60 bg-white text-[#0F2233] hover:border-[#0F2233]/40'
                           }`}
                         >
                           <Icon
-                            className={`h-3.5 w-3.5 shrink-0 ${active ? 'text-[#FDBA74]' : 'text-[#0E7490]'}`}
+                            className={`h-3.5 w-3.5 shrink-0 ${active ? 'text-[#FDBA74]' : 'text-[#EE5426]'}`}
                             aria-hidden="true"
                           />
                           <span>{item.label}</span>
@@ -2076,7 +2049,7 @@ export default function App() {
                         setCustomInitialServices(undefined);
                         setCustomTripOpen(true);
                       }}
-                      className="wasla-book-glare snap-start shrink-0 inline-flex min-h-[36px] items-center gap-1.5 rounded-lg px-4 py-1.5 text-xs font-semibold text-white active:scale-95 transition-all whitespace-nowrap cursor-pointer"
+                      className="btn-wasla-primary snap-start shrink-0 min-h-[36px] gap-1.5 rounded-lg px-4 py-1.5 text-xs whitespace-nowrap cursor-pointer"
                     >
                       <SlidersHorizontal className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
                       <span>{t.quickJumpCustom}</span>
@@ -2095,7 +2068,7 @@ export default function App() {
                   ariaLabel={t.sectionHurghadaMarsa}
                   isLoading={tripsLoading}
                   headerTitle={
-                    <h2 className="font-display text-2xl sm:text-[32px] font-semibold tracking-[-0.02em] leading-tight text-[#0F172A]">
+                    <h2 className="font-display text-2xl sm:text-[32px] font-semibold tracking-[-0.02em] leading-tight text-[#0F2233]">
                       {t.sectionHurghadaMarsa}
                     </h2>
                   }
@@ -2127,12 +2100,12 @@ export default function App() {
                   ariaLabel={t.sectionCairoLuxor}
                   isLoading={tripsLoading}
                   headerTitle={
-                    <h2 className="font-display text-2xl sm:text-[32px] font-semibold tracking-[-0.02em] leading-tight text-[#0F172A]">
+                    <h2 className="font-display text-2xl sm:text-[32px] font-semibold tracking-[-0.02em] leading-tight text-[#0F2233]">
                       {t.sectionCairoLuxor}
                     </h2>
                   }
                   headerSubtitle={
-                    <p className="text-[15px] leading-relaxed text-[#52525B]">{t.sectionCairoLuxorSub}</p>
+                    <p className="text-[15px] leading-relaxed text-[#64748B]">{t.sectionCairoLuxorSub}</p>
                   }
                 >
                   {cairoLuxorTrips.map((trip, idx) => (
@@ -2160,7 +2133,7 @@ export default function App() {
                   headerTitle={
                     <h2
                       id="all-activities-heading"
-                      className="font-display text-2xl sm:text-[32px] font-semibold tracking-[-0.02em] leading-tight text-[#0F172A]"
+                      className="font-display text-2xl sm:text-[32px] font-semibold tracking-[-0.02em] leading-tight text-[#0F2233]"
                     >
                       {t.sectionAllActivities}
                     </h2>
@@ -2188,7 +2161,7 @@ export default function App() {
                         }}
                         className={`reveal-item is-revealed snap-start shrink-0 basis-[78%] sm:basis-[calc((100%-20px)/2)] lg:basis-[calc((100%-60px)/4)] group relative h-[280px] sm:h-[300px] rounded-xl overflow-hidden border text-start cursor-pointer hover:-translate-y-1 hover:shadow-md transition-all duration-200 ${
                           isCatActive
-                            ? 'border-[#EA580C] ring-2 ring-[#EA580C]/40'
+                            ? 'border-[#EE5426] ring-2 ring-[#EE5426]/40'
                             : 'border-[#E2E8F0]'
                         }`}
                       >
@@ -2200,7 +2173,7 @@ export default function App() {
                           className="h-full w-full group-hover:scale-[1.06] transition-transform duration-500 ease-out"
                           placeholderLabel={catTitle}
                         />
-                        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#0B1F2E]/86 via-[#0B1F2E]/22 to-transparent" />
+                        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#0F2233]/86 via-[#0F2233]/22 to-transparent" />
                         <div className="absolute inset-x-0 bottom-0 p-5 text-white space-y-1">
                           <span className="inline-block opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-200 text-[11px] font-medium text-[#FDBA74]">
                             {t.scrollToSectionHint} →
@@ -2220,10 +2193,10 @@ export default function App() {
               <section id="all-trips" className="space-y-5 scroll-mt-20">
                 <div className="reveal-item flex flex-col sm:flex-row sm:items-end justify-between gap-3">
                   <div className="space-y-1.5">
-                    <h2 className="font-display text-2xl sm:text-[32px] font-semibold tracking-[-0.02em] leading-tight text-[#0F172A]">
+                    <h2 className="font-display text-2xl sm:text-[32px] font-semibold tracking-[-0.02em] leading-tight text-[#0F2233]">
                       {t.sectionAllTrips}
                     </h2>
-                    <p className="text-[15px] leading-relaxed text-[#52525B]">{t.sectionAllTripsSub}</p>
+                    <p className="text-[15px] leading-relaxed text-[#64748B]">{t.sectionAllTripsSub}</p>
                   </div>
                   <button
                     type="button"
@@ -2231,7 +2204,7 @@ export default function App() {
                       setCustomInitialServices(undefined);
                       setCustomTripOpen(true);
                     }}
-                    className="self-start sm:self-auto text-sm font-semibold text-[#EA580C] hover:underline underline-offset-4 cursor-pointer"
+                    className="self-start sm:self-auto text-sm font-semibold text-[#EE5426] hover:underline underline-offset-4 cursor-pointer"
                   >
                     {tText(
                       {
@@ -2245,9 +2218,9 @@ export default function App() {
                 </div>
 
                 {hasCustomSearchFilters && (
-                  <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[#FED7AA] bg-[#FFF7ED]/75 px-4 py-2.5 text-xs text-[#0F172A]">
+                  <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[#EE5426]/25 bg-[#FAF4ED] px-4 py-2.5 text-xs text-[#0F2233]">
                     <div className="flex flex-wrap items-center gap-2 tabular-nums">
-                      <CalendarDays className="h-4 w-4 text-[#EA580C] shrink-0" aria-hidden="true" />
+                      <CalendarDays className="h-4 w-4 text-[#EE5426] shrink-0" aria-hidden="true" />
                       <span className="font-semibold">
                         {heroFilteredTrips.length} / {liveTrips.length}{' '}
                         {heroFilteredTrips.length === 1 ? t.tripsCountSingle : t.tripsCountPlural}
@@ -2265,20 +2238,20 @@ export default function App() {
                       {searchDestination !== 'all' && (
                         <>
                           <span aria-hidden="true" className="text-[#94A3B8]">·</span>
-                          <span className="font-semibold text-[#EA580C]">{searchDestination}</span>
+                          <span className="font-semibold text-[#EE5426]">{searchDestination}</span>
                         </>
                       )}
                       {searchActivity !== 'all' && (
                         <>
                           <span aria-hidden="true" className="text-[#94A3B8]">·</span>
-                          <span className="font-semibold text-[#EA580C]">{getCategoryLabel(searchActivity)}</span>
+                          <span className="font-semibold text-[#EE5426]">{getCategoryLabel(searchActivity)}</span>
                         </>
                       )}
                     </div>
                     <button
                       type="button"
                       onClick={resetHeroFilters}
-                      className="inline-flex items-center gap-1.5 font-semibold text-[#EA580C] hover:underline underline-offset-4 cursor-pointer"
+                      className="inline-flex items-center gap-1.5 font-semibold text-[#EE5426] hover:underline underline-offset-4 cursor-pointer"
                     >
                       <RotateCcw className="h-3.5 w-3.5" aria-hidden="true" />
                       <span>
@@ -2357,22 +2330,22 @@ export default function App() {
               />
 
               {/* 9. QUIET PRE-FOOTER: NEWSLETTER & QUICK EXPLORE DIRECTORY */}
-              <div className="space-y-10 border-t border-[#E2E8F0] pt-10">
+              <div className="space-y-10 border-t border-[#C8C2B8]/50 pt-10">
                 <section className="reveal-item">
-                  <div className="rounded-xl border border-[#E7E2DA] bg-[#FAF8F5] p-6 sm:p-8 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+                  <div className="card-wasla bg-[#FAF4ED] p-6 sm:p-8 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
                     <div className="space-y-1.5 max-w-xl">
-                      <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#0E7490]">
+                      <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#EE5426]">
                         <Mail className="h-3.5 w-3.5" aria-hidden="true" />
                         <span>{t.newsletterEyebrow}</span>
                       </div>
-                      <h2 className="font-display text-2xl font-semibold text-[#0B1F2E]">{t.newsletterTitle}</h2>
-                      <p className="text-sm text-[#475569]">{t.newsletterSub}</p>
+                      <h2 className="font-display text-2xl font-semibold text-[#0F2233]">{t.newsletterTitle}</h2>
+                      <p className="text-sm text-[#64748B]">{t.newsletterSub}</p>
                     </div>
 
                     {newsletterConfirmed ? (
-                      <div className="rounded-lg border border-[#0E7490]/25 bg-white px-4 py-3 text-sm font-medium text-[#0B1F2E]">
+                      <div className="rounded-xl border border-[#EE5426]/25 bg-white px-4 py-3 text-sm font-medium text-[#0F2233]">
                         {t.newsletterSuccess}{' '}
-                        <span className="tabular-nums text-[#475569]">
+                        <span className="tabular-nums text-[#64748B]">
                           ({lastSubscribedEmail || subscribedEmails[subscribedEmails.length - 1]})
                         </span>
                       </div>
@@ -2384,12 +2357,12 @@ export default function App() {
                           value={newsletterEmail}
                           onChange={(e) => setNewsletterEmail(e.target.value)}
                           placeholder={t.newsletterPlaceholder}
-                          className="min-h-[44px] w-full sm:w-64 rounded-lg border border-[#CBD5E1] bg-white px-4 text-sm text-[#0B1F2E] placeholder:text-[#64748B] focus:border-[#EA580C] focus:outline-none"
+                          className="input-wasla min-h-[44px] w-full sm:w-64 text-sm"
                           aria-label={t.newsletterTitle}
                         />
                         <button
                           type="submit"
-                          className="wasla-book-glare min-h-[44px] rounded-lg px-6 py-2.5 text-sm font-semibold text-white active:scale-[0.98] transition-all whitespace-nowrap cursor-pointer"
+                          className="btn-wasla-primary min-h-[44px] px-6 py-2.5 text-sm whitespace-nowrap cursor-pointer"
                         >
                           {t.newsletterButton}
                         </button>
@@ -2406,7 +2379,7 @@ export default function App() {
                         style={{ '--reveal-delay': `${idx * 60}ms` } as React.CSSProperties}
                         className="reveal-item space-y-3"
                       >
-                        <h3 className="text-sm font-bold text-[#0B1F2E]">{t.topLinksColumns[col.key]}</h3>
+                        <h3 className="text-sm font-bold text-[#0F2233]">{t.topLinksColumns[col.key]}</h3>
                         <ul className="space-y-2">
                           {col.links.map((entry, lIdx) => (
                             <li key={lIdx}>
@@ -2420,7 +2393,7 @@ export default function App() {
                                     smoothScrollTo(entry.sectionId);
                                   }
                                 }}
-                                className="text-start text-sm text-[#475569] hover:text-[#EA580C] hover:underline underline-offset-4 transition-colors cursor-pointer"
+                                className="text-start text-sm text-[#475569] hover:text-[#EE5426] hover:underline underline-offset-4 transition-colors cursor-pointer"
                               >
                                 {tText(entry.label, lang)}
                               </button>
@@ -2574,7 +2547,7 @@ export default function App() {
                           <button
                             type="button"
                             onClick={() => setTouristPreviewOnly(false)}
-                            className="inline-flex min-h-[36px] items-center rounded-lg border border-white bg-white px-3 py-1.5 text-[11px] font-bold text-[#0B1F2E] hover:bg-[#FAF8F5] cursor-pointer shadow-xs transition-colors"
+                            className="inline-flex min-h-[36px] items-center rounded-lg border border-white bg-white px-3 py-1.5 text-[11px] font-bold text-[#0F2233] hover:bg-[#FAF4ED] cursor-pointer shadow-xs transition-colors"
                           >
                             Team Portals
                           </button>
@@ -2611,14 +2584,14 @@ export default function App() {
           <div
             className={`md:hidden fixed inset-x-0 bottom-0 z-40 border-t backdrop-blur-sm px-3 py-2 flex items-center gap-2 shadow-lg transition-colors ${
               darkMode
-                ? 'border-white/10 bg-[#090D16]/95'
-                : 'border-[#E2E8F0] bg-white/95'
+                ? 'border-[#334155] bg-[#0F2233]/95'
+                : 'border-[#C8C2B8]/50 bg-white/95'
             }`}
           >
             <button
               type="button"
               onClick={() => smoothScrollTo('all-trips')}
-              className="wasla-book-glare flex-1 min-h-[40px] rounded-lg px-3 text-xs font-bold text-white active:scale-[0.98] transition-all cursor-pointer"
+              className="btn-wasla-primary flex-1 min-h-[40px] rounded-lg px-3 py-2 text-xs font-bold cursor-pointer"
             >
               {t.mobileBarExplore}
             </button>
@@ -2673,24 +2646,48 @@ export default function App() {
             currency={currency}
             whatsappNumber={publicSettings.whatsappNumber}
             contactEmail={publicSettings.email}
+            initialBookingId={initialTrackBookingId}
             bookingRequests={customerRequests}
+            platformBookings={bookings}
             trips={liveTrips}
             onOpenPostTripReview={(reviewTrip, bookingId) => {
               setTrackBookingOpen(false);
+              setInitialTrackBookingId('');
               handleOpenVerifiedReview(reviewTrip, bookingId);
             }}
-            onClose={() => setTrackBookingOpen(false)}
+            onClose={() => {
+              setTrackBookingOpen(false);
+              setInitialTrackBookingId('');
+              if (typeof window !== 'undefined') {
+                const nextUrl = new URL(window.location.href);
+                if (
+                  nextUrl.searchParams.has('track') ||
+                  nextUrl.searchParams.has('voucher') ||
+                  nextUrl.searchParams.has('booking')
+                ) {
+                  nextUrl.searchParams.delete('track');
+                  nextUrl.searchParams.delete('voucher');
+                  nextUrl.searchParams.delete('booking');
+                  const qs = nextUrl.searchParams.toString();
+                  window.history.replaceState(
+                    null,
+                    '',
+                    `${nextUrl.pathname}${qs ? `?${qs}` : ''}${nextUrl.hash}`
+                  );
+                }
+              }
+            }}
           />
 
           {/* Floating Saved Favorites Dock (Desktop only to prevent mobile bottom bar stacking) */}
           {favoriteTrips.length > 0 && (
-            <div className="hidden md:flex fixed bottom-5 left-1/2 -translate-x-1/2 z-40 w-[calc(100%-1.5rem)] max-w-2xl rounded-2xl border border-[#FDA4AF]/60 bg-[#0F172A]/95 backdrop-blur-md px-3.5 py-2.5 text-white shadow-[0_20px_50px_rgba(15,23,42,0.45)] items-center justify-between gap-3">
+            <div className="hidden md:flex fixed bottom-5 left-1/2 -translate-x-1/2 z-40 w-[calc(100%-1.5rem)] max-w-2xl rounded-2xl border border-[#EE5426]/40 bg-[#0F2233]/95 backdrop-blur-md px-3.5 py-2.5 text-white shadow-[0_20px_50px_rgba(15,34,51,0.45)] items-center justify-between gap-3">
               <div className="flex items-center gap-2.5 min-w-0">
                 <div className="flex -space-x-2 rtl:space-x-reverse shrink-0">
                   {favoriteTrips.slice(0, 4).map((tr) => (
                     <div
                       key={tr.id}
-                      className="relative h-9 w-9 rounded-lg overflow-hidden border-2 border-[#0F172A] bg-slate-800 shrink-0"
+                      className="relative h-9 w-9 rounded-lg overflow-hidden border-2 border-[#0F2233] bg-[#19354F] shrink-0"
                       title={tText(tr.name, lang)}
                     >
                       <SmartImage
@@ -2703,7 +2700,7 @@ export default function App() {
                 </div>
                 <div className="min-w-0">
                   <div className="flex items-center gap-1.5 text-xs font-bold text-white whitespace-nowrap">
-                    <Heart className="h-3.5 w-3.5 fill-[#FB7185] text-[#FB7185] shrink-0" />
+                    <Heart className="h-3.5 w-3.5 fill-[#EE5426] text-[#EE5426] shrink-0" />
                     <span>
                       {tText({ en: 'Saved Favorites', ar: 'المفضلة', de: 'Favoriten' }, lang)} ({favoriteTrips.length})
                     </span>
@@ -2725,7 +2722,7 @@ export default function App() {
                 <button
                   type="button"
                   onClick={() => setFavoritesModalOpen(true)}
-                  className="wasla-book-glare inline-flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-bold text-white cursor-pointer whitespace-nowrap"
+                  className="btn-wasla-primary gap-1.5 rounded-xl px-3.5 py-2 text-xs font-bold cursor-pointer whitespace-nowrap"
                 >
                   <Heart className="h-3.5 w-3.5 fill-white text-white" />
                   <span>

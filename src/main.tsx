@@ -1,6 +1,7 @@
 import './preamble';
 import {createRoot} from 'react-dom/client';
 import App from './App.tsx';
+import {BrandThemeProvider} from './context/BrandThemeContext';
 import './index.css';
 
 // Clean up any stale dev-sw.js workers and register standalone /sw.js
@@ -51,6 +52,10 @@ console.error = (...args: unknown[]) => {
   origError.apply(console, args);
 };
 
-createRoot(document.getElementById('root')!).render(<App />);
+createRoot(document.getElementById('root')!).render(
+  <BrandThemeProvider>
+    <App />
+  </BrandThemeProvider>
+);
 
 

@@ -1,16 +1,34 @@
 @import "tailwindcss";
+@config "../tailwind.config.js";
+@custom-variant dark (&:where(.dark, .dark *, [data-wasla-theme="dark"], [data-wasla-theme="dark"] *));
 
 @theme {
   --font-display: "Fraunces", "Cairo", "IBM Plex Sans Arabic", Georgia, serif;
-  --font-sans: "Plus Jakarta Sans", "IBM Plex Sans Arabic", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Plus Jakarta Sans", "Inter", "IBM Plex Sans Arabic", ui-sans-serif, system-ui, sans-serif;
+  --font-arabic: "Cairo", system-ui, sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
 
-  --color-wasla-navy: #0B1F2E;
-  --color-wasla-sand: #FAF8F5;
-  --color-wasla-sand-border: #E7E2DA;
-  --color-wasla-terracotta: #EA580C;
-  --color-wasla-terracotta-dark: #C2410C;
-  --color-wasla-lagoon: #0E7490;
+  --color-wasla-navy: #0F2233;
+  --color-wasla-navy-light: #19354F;
+  --color-wasla-orange: #EE5426;
+  --color-wasla-orange-hover: #D9461B;
+  --color-wasla-cream: #FAF4ED;
+  --color-wasla-divider: #C8C2B8;
+  --color-wasla-divider-dark: #334155;
+  --color-wasla-sand: #FAF4ED;
+  --color-wasla-sand-border: #C8C2B8;
+  --color-wasla-terracotta: #EE5426;
+  --color-wasla-terracotta-dark: #D9461B;
+
+  --shadow-brand: 0 8px 30px rgba(15, 34, 51, 0.06);
+  --shadow-cta: 0 4px 14px rgba(238, 84, 38, 0.32);
+}
+
+:root {
+  --wasla-navy: #0F2233;
+  --wasla-orange: #EE5426;
+  --wasla-cream: #FAF4ED;
+  --wasla-white: #FFFFFF;
 }
 
 @layer base {
@@ -22,7 +40,16 @@
     text-rendering: optimizeLegibility;
   }
 
+  html[dir='ltr'] body {
+    font-family: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
+  }
+
+  html[dir='rtl'] body {
+    font-family: 'Cairo', system-ui, sans-serif;
+  }
+
   body {
+    @apply bg-[#FAF4ED] text-[#0F2233] dark:bg-[#0F2233] dark:text-white antialiased transition-colors duration-200;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
 
@@ -30,6 +57,24 @@
   h2,
   h3 {
     text-wrap: balance;
+  }
+}
+
+@layer components {
+  .btn-wasla-primary {
+    @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-[#EE5426] hover:bg-[#D9461B] text-white font-semibold shadow-cta transition-all duration-150 active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none;
+  }
+  .btn-wasla-secondary {
+    @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-[#0F2233] hover:bg-[#19354F] dark:bg-white dark:text-[#0F2233] dark:hover:bg-[#FAF4ED] text-white font-semibold transition-all duration-150 active:scale-[0.98];
+  }
+  .btn-wasla-outline {
+    @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl border-2 border-[#0F2233]/15 dark:border-white/20 hover:border-[#EE5426] hover:text-[#EE5426] font-semibold transition-all duration-150;
+  }
+  .card-wasla {
+    @apply bg-white dark:bg-[#19354F]/60 rounded-2xl border border-[#C8C2B8]/40 dark:border-[#334155] shadow-brand p-6;
+  }
+  .input-wasla {
+    @apply w-full rounded-xl border border-[#C8C2B8] dark:border-[#334155] bg-white dark:bg-[#0F2233] px-4 py-2.5 text-[#0F2233] dark:text-white placeholder:text-slate-400 focus:border-[#EE5426] focus:outline-none focus:ring-2 focus:ring-[#EE5426]/25 transition;
   }
 }
 
@@ -50,20 +95,20 @@ input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not(.bg-tran
 textarea:not(.no-led):focus,
 select:not(.bg-transparent):not(.no-led):focus {
   outline: none;
-  border-color: #EA580C;
-  box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.16);
+  border-color: #EE5426;
+  box-shadow: 0 0 0 3px rgba(238, 84, 38, 0.16);
 }
 
 /* Architectural Hero Search Bar Frame */
 .wasla-led-ring {
-  border: 1px solid rgba(11, 31, 46, 0.12);
-  box-shadow: 0 20px 44px -16px rgba(11, 31, 46, 0.38);
+  border: 1px solid rgba(15, 34, 51, 0.12);
+  box-shadow: 0 20px 44px -16px rgba(15, 34, 51, 0.38);
   transition: border-color 180ms ease, box-shadow 180ms ease;
 }
 
 .wasla-led-ring:focus-within {
-  border-color: rgba(234, 88, 12, 0.55);
-  box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.18), 0 22px 48px -16px rgba(11, 31, 46, 0.42);
+  border-color: rgba(238, 84, 38, 0.55);
+  box-shadow: 0 0 0 3px rgba(238, 84, 38, 0.18), 0 22px 48px -16px rgba(15, 34, 51, 0.42);
 }
 
 .tabular-nums {
@@ -197,7 +242,7 @@ select:not(.bg-transparent):not(.no-led):focus {
 /* Clean, authoritative brand typography accents (no rainbow sheen) */
 .wasla-brand-first {
   display: inline-block;
-  color: #0B1F2E;
+  color: #0F2233;
 }
 
 .wasla-brand-first-light {
@@ -207,7 +252,7 @@ select:not(.bg-transparent):not(.no-led):focus {
 
 .wasla-travel-word {
   display: inline-block;
-  color: #EA580C;
+  color: #EE5426;
 }
 
 .wasla-travel-word-light {
@@ -231,14 +276,14 @@ select:not(.bg-transparent):not(.no-led):focus {
   }
 
   .wasla-book-glare {
-    background-color: #EA580C;
-    box-shadow: 0 1px 2px rgba(11, 31, 46, 0.12), 0 6px 16px -6px rgba(234, 88, 12, 0.42);
+    background-color: #EE5426;
+    box-shadow: 0 4px 14px rgba(238, 84, 38, 0.32);
   }
 
   .wasla-book-glare:hover {
-    background-color: #C2410C;
+    background-color: #D9461B;
     transform: translateY(-1px);
-    box-shadow: 0 2px 4px rgba(11, 31, 46, 0.14), 0 10px 20px -6px rgba(194, 65, 12, 0.45);
+    box-shadow: 0 6px 18px rgba(217, 70, 27, 0.38);
   }
 
   .wasla-book-glare:active {
@@ -247,13 +292,13 @@ select:not(.bg-transparent):not(.no-led):focus {
 
   .wasla-wa-glare {
     background-color: #15803D;
-    box-shadow: 0 1px 2px rgba(11, 31, 46, 0.12), 0 6px 16px -6px rgba(21, 128, 61, 0.38);
+    box-shadow: 0 1px 2px rgba(15, 34, 51, 0.12), 0 6px 16px -6px rgba(21, 128, 61, 0.38);
   }
 
   .wasla-wa-glare:hover {
     background-color: #166534;
     transform: translateY(-1px);
-    box-shadow: 0 2px 4px rgba(11, 31, 46, 0.14), 0 10px 20px -6px rgba(22, 101, 52, 0.42);
+    box-shadow: 0 2px 4px rgba(15, 34, 51, 0.14), 0 10px 20px -6px rgba(22, 101, 52, 0.42);
   }
 
   .wasla-wa-glare:active {
@@ -269,11 +314,11 @@ select:not(.bg-transparent):not(.no-led):focus {
   .wasla-footer-glare {
     position: relative;
     overflow: hidden;
-    background-color: #0B1F2E;
+    background-color: #0F2233;
     background-image: radial-gradient(
       900px 360px at 85% 0%,
-      rgba(14, 116, 144, 0.22) 0%,
-      rgba(11, 31, 46, 0) 70%
+      rgba(25, 53, 79, 0.45) 0%,
+      rgba(15, 34, 51, 0) 70%
     );
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
   }
@@ -295,7 +340,7 @@ select:not(.bg-transparent):not(.no-led):focus {
 
   .wasla-storefront-root .wasla-trip-card:hover {
     transform: translate3d(0, -3px, 0);
-    box-shadow: 0 16px 32px -14px rgba(11, 31, 46, 0.16);
+    box-shadow: 0 16px 32px -14px rgba(15, 34, 51, 0.16);
   }
 
   .wasla-storefront-root .wasla-trip-card:active {
@@ -339,24 +384,25 @@ select:not(.bg-transparent):not(.no-led):focus {
 
 [data-wasla-theme="dark"] body,
 [data-wasla-theme="dark"] .wasla-storefront-root {
-  background-color: #090D16 !important;
-  color: #F1F5F9 !important;
+  background-color: #0F2233 !important;
+  color: #FFFFFF !important;
 }
 
 [data-wasla-theme="dark"] .wasla-storefront-root main,
 [data-wasla-theme="dark"] .wasla-storefront-root > div.bg-\[\#F8FAFC\],
-[data-wasla-theme="dark"] .wasla-storefront-root > div.bg-\[\#E8EEF5\] {
-  background-color: #090D16 !important;
-  color: #F1F5F9 !important;
+[data-wasla-theme="dark"] .wasla-storefront-root > div.bg-\[\#FAF4ED\],
+[data-wasla-theme="dark"] .wasla-storefront-root > div.bg-\[\#FAF4ED\]\/55 {
+  background-color: #0F2233 !important;
+  color: #FFFFFF !important;
 }
 
 [data-wasla-theme="dark"] nav[aria-label="Quick destinations and services"] {
-  background-color: #0F1624 !important;
-  border-color: rgba(255, 255, 255, 0.09) !important;
+  background-color: #19354F !important;
+  border-color: #334155 !important;
 }
 
 /* Primary Cards, Panels, Sticky Modal Headers, Sidebars, Thread Cards & Modals across all 4 pages */
-[data-wasla-theme="dark"] .wasla-storefront-root .bg-white:not(.wasla-book-glare):not(.wasla-wa-glare):not(.wasla-led-ring),
+[data-wasla-theme="dark"] .wasla-storefront-root .bg-white:not(.btn-wasla-primary):not(.wasla-book-glare):not(.wasla-wa-glare):not(.wasla-led-ring),
 [data-wasla-theme="dark"] .wasla-storefront-root .bg-white\/50,
 [data-wasla-theme="dark"] .wasla-storefront-root .bg-white\/60,
 [data-wasla-theme="dark"] .wasla-storefront-root .bg-white\/65,
@@ -367,7 +413,7 @@ select:not(.bg-transparent):not(.no-led):focus {
 [data-wasla-theme="dark"] .wasla-storefront-root .bg-white\/95:not(.rounded-full),
 [data-wasla-theme="dark"] .wasla-storefront-root .bg-\[\#FFFFFF\],
 [data-wasla-theme="dark"] .wasla-storefront-root .bg-\[\#FFFFFF\]\/95,
-[data-wasla-theme="dark"] [role="dialog"] .bg-white:not(.wasla-book-glare):not(.wasla-wa-glare):not(.wasla-led-ring),
+[data-wasla-theme="dark"] [role="dialog"] .bg-white:not(.btn-wasla-primary):not(.wasla-book-glare):not(.wasla-wa-glare):not(.wasla-led-ring),
 [data-wasla-theme="dark"] [role="dialog"] .bg-white\/65,
 [data-wasla-theme="dark"] [role="dialog"] .bg-white\/75,
 [data-wasla-theme="dark"] [role="dialog"] .bg-white\/80,
@@ -376,30 +422,30 @@ select:not(.bg-transparent):not(.no-led):focus {
 [data-wasla-theme="dark"] [role="dialog"] .bg-white\/95:not(.rounded-full),
 [data-wasla-theme="dark"] [role="dialog"] .bg-\[\#FFFFFF\],
 [data-wasla-theme="dark"] [role="listbox"].bg-white {
-  background-color: #111827 !important;
-  color: #F1F5F9;
+  background-color: #19354F !important;
+  color: #FFFFFF;
 }
 
-/* White/80 unselected list/thread rows slightly offset from #111827 cards */
+/* White/80 unselected list/thread rows slightly offset from #19354F cards */
 [data-wasla-theme="dark"] .wasla-storefront-root button.bg-white\/80,
 [data-wasla-theme="dark"] .wasla-storefront-root tr.bg-white\/65 {
-  background-color: #161F32 !important;
-  color: #F1F5F9;
+  background-color: #19354F !important;
+  color: #FFFFFF;
 }
 
 [data-wasla-theme="dark"] .wasla-storefront-root .hover\:bg-white:hover,
 [data-wasla-theme="dark"] .wasla-storefront-root .hover\:bg-white\/95:hover,
 [data-wasla-theme="dark"] [role="dialog"] .hover\:bg-white:hover {
-  background-color: #1E293B !important;
+  background-color: #19354F !important;
 }
 
 /* Default Dark Surface for Form Inputs, Selects & Textareas */
 [data-wasla-theme="dark"] input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not(.bg-transparent),
 [data-wasla-theme="dark"] select:not(.bg-transparent),
 [data-wasla-theme="dark"] textarea {
-  background-color: #0F172A !important;
-  color: #F8FAFC !important;
-  border-color: rgba(255, 255, 255, 0.16);
+  background-color: #0F2233 !important;
+  color: #FFFFFF !important;
+  border-color: #334155;
 }
 
 [data-wasla-theme="dark"] input::placeholder,
@@ -407,43 +453,35 @@ select:not(.bg-transparent):not(.no-led):focus {
   color: #64748B !important;
 }
 
-/* Owner Control Header Banner in Dark Mode */
-[data-wasla-theme="dark"] .wasla-storefront-root .from-\[\#EEF2FF\] {
-  background-image: linear-gradient(to right, #111827, #162038, #0F172A) !important;
-  border-color: rgba(99, 102, 241, 0.32) !important;
-}
-
 /* Keep the Hero's active white pill & Carousel arrow buttons readable in dark mode */
 [data-wasla-theme="dark"] .wasla-hero-glare [role="group"] button.bg-white {
   background-color: #FFFFFF !important;
-  color: #DE1B00 !important;
+  color: #EE5426 !important;
 }
 
 [data-wasla-theme="dark"] .wasla-storefront-root button.rounded-full.bg-white\/90,
 [data-wasla-theme="dark"] .wasla-storefront-root button.rounded-full.bg-white\/95 {
-  background-color: rgba(15, 23, 42, 0.88) !important;
-  color: #F8FAFC !important;
+  background-color: rgba(15, 34, 51, 0.88) !important;
+  color: #FFFFFF !important;
   border-color: rgba(255, 255, 255, 0.2) !important;
 }
 
-/* Secondary Muted & Warm Sand Surfaces across all 4 pages */
-[data-wasla-theme="dark"] .wasla-storefront-root .bg-\[\#FAFCFF\],
-[data-wasla-theme="dark"] .wasla-storefront-root .bg-\[\#FAF8F5\],
-[data-wasla-theme="dark"] .wasla-storefront-root .bg-\[\#FAF7F2\],
+/* Secondary Muted & Warm Cream Surfaces across all 4 pages */
+[data-wasla-theme="dark"] .wasla-storefront-root .bg-\[\#FAF4ED\],
+[data-wasla-theme="dark"] .wasla-storefront-root .bg-\[\#FAF4ED\]\/50,
+[data-wasla-theme="dark"] .wasla-storefront-root .bg-\[\#FAF4ED\]\/55,
+[data-wasla-theme="dark"] .wasla-storefront-root .bg-\[\#FAF4ED\]\/60,
+[data-wasla-theme="dark"] .wasla-storefront-root .bg-\[\#FAF4ED\]\/80,
 [data-wasla-theme="dark"] .wasla-storefront-root .bg-\[\#F8FAFC\],
 [data-wasla-theme="dark"] .wasla-storefront-root .bg-\[\#F8FAFC\]\/60,
 [data-wasla-theme="dark"] .wasla-storefront-root .bg-\[\#F1F5F9\],
-[data-wasla-theme="dark"] .wasla-storefront-root .bg-\[\#E8EEF0\],
-[data-wasla-theme="dark"] .wasla-storefront-root .bg-\[\#E8EEF5\],
-[data-wasla-theme="dark"] [role="dialog"] .bg-\[\#FAFCFF\],
-[data-wasla-theme="dark"] [role="dialog"] .bg-\[\#FAF8F5\],
+[data-wasla-theme="dark"] [role="dialog"] .bg-\[\#FAF4ED\],
 [data-wasla-theme="dark"] [role="dialog"] .bg-\[\#F8FAFC\],
-[data-wasla-theme="dark"] [role="dialog"] .bg-\[\#EEF2F6\],
 [data-wasla-theme="dark"] [role="dialog"] .bg-\[\#F1F5F9\] {
-  background-color: #0D1626 !important;
+  background-color: #0F2233 !important;
 }
 
-/* Warm Orange / Amber / Yellow Pastel Surfaces in Dark Mode */
+/* Warm Orange / Amber Pastel Surfaces in Dark Mode */
 [data-wasla-theme="dark"] .wasla-storefront-root .bg-\[\#FFF7ED\],
 [data-wasla-theme="dark"] .wasla-storefront-root .bg-\[\#FFF7ED\]\/40,
 [data-wasla-theme="dark"] .wasla-storefront-root .bg-\[\#FFF7ED\]\/50,
@@ -459,7 +497,7 @@ select:not(.bg-transparent):not(.no-led):focus {
 [data-wasla-theme="dark"] [role="dialog"] .bg-\[\#FFF7ED\]\/70,
 [data-wasla-theme="dark"] [role="dialog"] .bg-\[\#FFF7ED\]\/80,
 [data-wasla-theme="dark"] [role="listbox"] .bg-\[\#FFF7ED\] {
-  background-color: rgba(234, 88, 12, 0.18) !important;
+  background-color: rgba(238, 84, 38, 0.18) !important;
 }
 
 [data-wasla-theme="dark"] [role="listbox"] .hover\:bg-\[\#FFF7ED\]\/60:hover {
@@ -494,24 +532,13 @@ select:not(.bg-transparent):not(.no-led):focus {
 [data-wasla-theme="dark"] [role="dialog"] .bg-\[\#F0FDF4\]\/90,
 [data-wasla-theme="dark"] [role="dialog"] .bg-\[\#DCFCE7\],
 [data-wasla-theme="dark"] [role="dialog"] .bg-\[\#ECFDF5\] {
-  background-color: rgba(22, 163, 74, 0.14) !important;
+  background-color: rgba(16, 185, 129, 0.14) !important;
 }
 
 [data-wasla-theme="dark"] .wasla-storefront-root .bg-\[\#F0FDFA\],
 [data-wasla-theme="dark"] .wasla-storefront-root .bg-\[\#F0FDFA\]\/95,
 [data-wasla-theme="dark"] [role="dialog"] .bg-\[\#F0FDFA\] {
-  background-color: rgba(13, 148, 136, 0.15) !important;
-}
-
-/* Indigo / Violet / Purple Pastel Surfaces in Dark Mode */
-[data-wasla-theme="dark"] .wasla-storefront-root .bg-\[\#EEF2FF\],
-[data-wasla-theme="dark"] .wasla-storefront-root .bg-\[\#F5F3FF\],
-[data-wasla-theme="dark"] .wasla-storefront-root .bg-\[\#F5F3FF\]\/90,
-[data-wasla-theme="dark"] .wasla-storefront-root .bg-\[\#F5F3FF\]\/95,
-[data-wasla-theme="dark"] .wasla-storefront-root .bg-\[\#EDE9FE\]\/70,
-[data-wasla-theme="dark"] [role="dialog"] .bg-\[\#EEF2FF\],
-[data-wasla-theme="dark"] [role="dialog"] .bg-\[\#F5F3FF\] {
-  background-color: rgba(99, 102, 241, 0.15) !important;
+  background-color: rgba(16, 185, 129, 0.14) !important;
 }
 
 /* Red / Rose Pastel Surfaces in Dark Mode */
@@ -523,10 +550,11 @@ select:not(.bg-transparent):not(.no-led):focus {
 [data-wasla-theme="dark"] [role="dialog"] .bg-\[\#FEF2F2\],
 [data-wasla-theme="dark"] [role="dialog"] .bg-\[\#FDF2F2\],
 [data-wasla-theme="dark"] [role="dialog"] .bg-\[\#FEE2E2\] {
-  background-color: rgba(220, 38, 38, 0.16) !important;
+  background-color: rgba(239, 68, 68, 0.16) !important;
 }
 
 /* Interactive Hover States in Dark Mode */
+[data-wasla-theme="dark"] .wasla-storefront-root .hover\:bg-\[\#FAF4ED\]:hover,
 [data-wasla-theme="dark"] .wasla-storefront-root .hover\:bg-\[\#F1F5F9\]:hover,
 [data-wasla-theme="dark"] .wasla-storefront-root .hover\:bg-\[\#F8FAFC\]\/80:hover,
 [data-wasla-theme="dark"] .wasla-storefront-root .hover\:bg-\[\#FFEDD5\]:hover,
@@ -534,8 +562,8 @@ select:not(.bg-transparent):not(.no-led):focus {
 [data-wasla-theme="dark"] .wasla-storefront-root .hover\:bg-\[\#DCFCE7\]:hover,
 [data-wasla-theme="dark"] .wasla-storefront-root .hover\:bg-\[\#FEE2E2\]:hover,
 [data-wasla-theme="dark"] .wasla-storefront-root .hover\:bg-\[\#FEF3C7\]:hover,
-[data-wasla-theme="dark"] .wasla-storefront-root .hover\:bg-\[\#E0E7FF\]:hover,
 [data-wasla-theme="dark"] .wasla-storefront-root .hover\:bg-\[\#CCFBF1\]:hover,
+[data-wasla-theme="dark"] [role="dialog"] .hover\:bg-\[\#FAF4ED\]:hover,
 [data-wasla-theme="dark"] [role="dialog"] .hover\:bg-\[\#F1F5F9\]:hover,
 [data-wasla-theme="dark"] [role="dialog"] .hover\:bg-\[\#FFEDD5\]:hover,
 [data-wasla-theme="dark"] [role="dialog"] .hover\:bg-\[\#FFF7ED\]:hover,
@@ -546,13 +574,10 @@ select:not(.bg-transparent):not(.no-led):focus {
 }
 
 /* Typography Hierarchy across all 4 pages */
-[data-wasla-theme="dark"] .wasla-storefront-root .text-\[\#0F172A\],
-[data-wasla-theme="dark"] .wasla-storefront-root .text-\[\#0B1F2E\],
-[data-wasla-theme="dark"] [role="dialog"] .text-\[\#0F172A\],
-[data-wasla-theme="dark"] [role="dialog"] .text-\[\#0B1F2E\],
-[data-wasla-theme="dark"] [role="listbox"] .text-\[\#0F172A\],
-[data-wasla-theme="dark"] [role="listbox"] .text-\[\#0B1F2E\] {
-  color: #F8FAFC !important;
+[data-wasla-theme="dark"] .wasla-storefront-root .text-\[\#0F2233\],
+[data-wasla-theme="dark"] [role="dialog"] .text-\[\#0F2233\],
+[data-wasla-theme="dark"] [role="listbox"] .text-\[\#0F2233\] {
+  color: #FFFFFF !important;
 }
 
 [data-wasla-theme="dark"] .wasla-storefront-root .text-\[\#334155\],
@@ -576,15 +601,6 @@ select:not(.bg-transparent):not(.no-led):focus {
 }
 
 /* Semantic Dark Text Colors Brightened for Dark Surfaces */
-[data-wasla-theme="dark"] .wasla-storefront-root .text-\[\#3730A3\],
-[data-wasla-theme="dark"] .wasla-storefront-root .text-\[\#4338CA\],
-[data-wasla-theme="dark"] .wasla-storefront-root .text-\[\#4C1D95\],
-[data-wasla-theme="dark"] .wasla-storefront-root .text-\[\#5B21B6\],
-[data-wasla-theme="dark"] .wasla-storefront-root .text-\[\#6D28D9\],
-[data-wasla-theme="dark"] [role="dialog"] .text-\[\#3730A3\] {
-  color: #C4B5FD !important;
-}
-
 [data-wasla-theme="dark"] .wasla-storefront-root .text-\[\#064E3B\],
 [data-wasla-theme="dark"] .wasla-storefront-root .text-\[\#065F46\],
 [data-wasla-theme="dark"] .wasla-storefront-root .text-\[\#047857\],
@@ -609,8 +625,8 @@ select:not(.bg-transparent):not(.no-led):focus {
 }
 
 [data-wasla-theme="dark"] .wasla-storefront-root .text-\[\#9A3412\],
-[data-wasla-theme="dark"] .wasla-storefront-root .text-\[\#C2410C\],
-[data-wasla-theme="dark"] [role="dialog"] .text-\[\#C2410C\] {
+[data-wasla-theme="dark"] .wasla-storefront-root .text-\[\#D9461B\],
+[data-wasla-theme="dark"] [role="dialog"] .text-\[\#D9461B\] {
   color: #FDBA74 !important;
 }
 
@@ -626,10 +642,17 @@ select:not(.bg-transparent):not(.no-led):focus {
 }
 
 /* Borders & Dividers across all 4 pages */
+[data-wasla-theme="dark"] .wasla-storefront-root .border-\[\#C8C2B8\],
+[data-wasla-theme="dark"] .wasla-storefront-root .border-\[\#C8C2B8\]\/40,
+[data-wasla-theme="dark"] .wasla-storefront-root .border-\[\#C8C2B8\]\/50,
+[data-wasla-theme="dark"] .wasla-storefront-root .border-\[\#C8C2B8\]\/60,
 [data-wasla-theme="dark"] .wasla-storefront-root .border-\[\#E2E8F0\],
 [data-wasla-theme="dark"] .wasla-storefront-root .border-\[\#E2E8F0\]\/70,
 [data-wasla-theme="dark"] .wasla-storefront-root .border-\[\#CBD5E1\],
 [data-wasla-theme="dark"] .wasla-storefront-root .border-\[\#F1F5F9\],
+[data-wasla-theme="dark"] [role="dialog"] .border-\[\#C8C2B8\],
+[data-wasla-theme="dark"] [role="dialog"] .border-\[\#C8C2B8\]\/50,
+[data-wasla-theme="dark"] [role="dialog"] .border-\[\#C8C2B8\]\/60,
 [data-wasla-theme="dark"] [role="dialog"] .border-\[\#E2E8F0\],
 [data-wasla-theme="dark"] [role="dialog"] .border-\[\#CBD5E1\],
 [data-wasla-theme="dark"] [role="dialog"] .border-\[\#94A3B8\],
@@ -638,11 +661,12 @@ select:not(.bg-transparent):not(.no-led):focus {
 [data-wasla-theme="dark"] [role="dialog"] .border-\[\#94A3B8\]\/60,
 [data-wasla-theme="dark"] [role="dialog"] .border-\[\#94A3B8\]\/55,
 [data-wasla-theme="dark"] [role="dialog"] .border-\[\#64748B\],
+[data-wasla-theme="dark"] .wasla-storefront-root .divide-\[\#C8C2B8\]\/40 > :not([hidden]) ~ :not([hidden]),
 [data-wasla-theme="dark"] .wasla-storefront-root .divide-\[\#E2E8F0\] > :not([hidden]) ~ :not([hidden]),
 [data-wasla-theme="dark"] .wasla-storefront-root .divide-\[\#F1F5F9\] > :not([hidden]) ~ :not([hidden]),
 [data-wasla-theme="dark"] [role="dialog"] .divide-\[\#F1F5F9\] > :not([hidden]) ~ :not([hidden]),
 [data-wasla-theme="dark"] [role="listbox"] {
-  border-color: rgba(148, 163, 184, 0.28) !important;
+  border-color: #334155 !important;
 }
 
 [data-wasla-theme="dark"] .wasla-storefront-root .border-\[\#FED7AA\],
@@ -651,30 +675,24 @@ select:not(.bg-transparent):not(.no-led):focus {
 [data-wasla-theme="dark"] .wasla-storefront-root .border-\[\#FDBA74\],
 [data-wasla-theme="dark"] [role="dialog"] .border-\[\#FED7AA\],
 [data-wasla-theme="dark"] [role="dialog"] .border-\[\#FED7AA\]\/60 {
-  border-color: rgba(251, 146, 60, 0.28) !important;
+  border-color: rgba(238, 84, 38, 0.35) !important;
 }
 
 [data-wasla-theme="dark"] .wasla-storefront-root .border-\[\#A7F3D0\],
 [data-wasla-theme="dark"] .wasla-storefront-root .border-\[\#BBF7D0\],
 [data-wasla-theme="dark"] [role="dialog"] .border-\[\#BBF7D0\] {
-  border-color: rgba(52, 211, 153, 0.28) !important;
+  border-color: rgba(16, 185, 129, 0.3) !important;
 }
 
 [data-wasla-theme="dark"] .wasla-storefront-root .border-\[\#99F6E4\],
 [data-wasla-theme="dark"] .wasla-storefront-root .border-\[\#CCFBF1\],
 [data-wasla-theme="dark"] .wasla-storefront-root .border-\[\#5EEAD4\],
 [data-wasla-theme="dark"] [role="dialog"] .border-\[\#CCFBF1\] {
-  border-color: rgba(45, 212, 191, 0.28) !important;
-}
-
-[data-wasla-theme="dark"] .wasla-storefront-root .border-\[\#DDD6FE\],
-[data-wasla-theme="dark"] .wasla-storefront-root .border-\[\#C7D2FE\],
-[data-wasla-theme="dark"] .wasla-storefront-root .border-\[\#C4B5FD\] {
-  border-color: rgba(167, 139, 250, 0.3) !important;
+  border-color: rgba(16, 185, 129, 0.3) !important;
 }
 
 [data-wasla-theme="dark"] .wasla-storefront-root .border-\[\#FDE68A\] {
-  border-color: rgba(251, 191, 36, 0.3) !important;
+  border-color: rgba(245, 158, 11, 0.32) !important;
 }
 
 [data-wasla-theme="dark"] .wasla-storefront-root .border-\[\#FECACA\],
@@ -683,23 +701,18 @@ select:not(.bg-transparent):not(.no-led):focus {
 [data-wasla-theme="dark"] .wasla-storefront-root .border-\[\#EBC6C6\],
 [data-wasla-theme="dark"] [role="dialog"] .border-\[\#FECACA\],
 [data-wasla-theme="dark"] [role="dialog"] .border-\[\#EBC6C6\] {
-  border-color: rgba(248, 113, 113, 0.32) !important;
-}
-
-[data-wasla-theme="dark"] .wasla-storefront-root .border-\[\#E7E2DA\],
-[data-wasla-theme="dark"] [role="dialog"] .border-\[\#E7E2DA\] {
-  border-color: rgba(148, 163, 184, 0.22) !important;
+  border-color: rgba(239, 68, 68, 0.34) !important;
 }
 
 [data-wasla-theme="dark"] .wasla-led-ring {
-  background-color: #0E1A2B !important;
-  border-color: rgba(148, 163, 184, 0.24) !important;
+  background-color: #19354F !important;
+  border-color: #334155 !important;
   box-shadow: 0 20px 44px -16px rgba(0, 0, 0, 0.65);
 }
 
 [data-wasla-theme="dark"] .wasla-led-ring:focus-within {
-  border-color: rgba(234, 88, 12, 0.65) !important;
-  box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.22), 0 22px 48px -16px rgba(0, 0, 0, 0.7);
+  border-color: rgba(238, 84, 38, 0.65) !important;
+  box-shadow: 0 0 0 3px rgba(238, 84, 38, 0.22), 0 22px 48px -16px rgba(0, 0, 0, 0.7);
 }
 
 [data-wasla-theme="dark"] input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not(.bg-transparent):not(.no-led):hover,
@@ -711,14 +724,14 @@ select:not(.bg-transparent):not(.no-led):focus {
 [data-wasla-theme="dark"] input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not(.bg-transparent):not(.no-led):focus,
 [data-wasla-theme="dark"] textarea:not(.no-led):focus,
 [data-wasla-theme="dark"] select:not(.bg-transparent):not(.no-led):focus {
-  border-color: #EA580C !important;
-  box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.22) !important;
-  color: #F8FAFC !important;
+  border-color: #EE5426 !important;
+  box-shadow: 0 0 0 3px rgba(238, 84, 38, 0.22) !important;
+  color: #FFFFFF !important;
 }
 
 [data-wasla-theme="dark"] select option {
-  background-color: #111827;
-  color: #F8FAFC;
+  background-color: #19354F;
+  color: #FFFFFF;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -766,3 +779,161 @@ select:not(.bg-transparent):not(.no-led):focus {
     transform: none !important;
   }
 }
+
+/* Official 1-Page Digital Boarding Voucher Screen & Print Layout */
+#wasla-print-voucher-root {
+  display: none;
+}
+
+html.wasla-printing-voucher,
+body.wasla-printing-voucher,
+[data-wasla-theme="dark"] body.wasla-printing-voucher {
+  background: #F1F5F9 !important;
+  background-color: #F1F5F9 !important;
+  color: #0F2233 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 100% !important;
+  height: auto !important;
+  min-height: 100vh !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+}
+
+body.wasla-printing-voucher > *:not(#wasla-print-voucher-root) {
+  display: none !important;
+}
+
+body.wasla-printing-voucher #wasla-print-voucher-root {
+  display: block !important;
+  width: 100% !important;
+  max-width: 740px !important;
+  margin: 0 auto !important;
+  padding: 16px 12px 32px 12px !important;
+  box-sizing: border-box !important;
+}
+
+.wasla-voucher-screen-toolbar {
+  background: #0F2233 !important;
+  color: #FFFFFF !important;
+  border: 2px solid #EE5426 !important;
+  border-radius: 14px !important;
+  padding: 12px 16px !important;
+  margin-bottom: 14px !important;
+  box-shadow: 0 10px 25px rgba(15, 34, 51, 0.18) !important;
+  font-family: "Plus Jakarta Sans", "Cairo", "IBM Plex Sans Arabic", system-ui, sans-serif !important;
+}
+
+.wasla-voucher-toolbar-inner {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 10px !important;
+  flex-wrap: wrap !important;
+}
+
+.wasla-voucher-toolbar-actions {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  flex-wrap: wrap !important;
+}
+
+.wasla-voucher-btn-back {
+  background: #19354F !important;
+  color: #FFFFFF !important;
+  border: 1px solid #475569 !important;
+  border-radius: 9999px !important;
+  padding: 8px 16px !important;
+  font-size: 12.5px !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+}
+
+.wasla-voucher-btn-download {
+  background: #15803D !important;
+  color: #FFFFFF !important;
+  border: 1px solid #16A34A !important;
+  border-radius: 9999px !important;
+  padding: 8px 16px !important;
+  font-size: 12.5px !important;
+  font-weight: 800 !important;
+  cursor: pointer !important;
+}
+
+.wasla-voucher-btn-print {
+  background: #EE5426 !important;
+  color: #FFFFFF !important;
+  border: 1px solid #F97316 !important;
+  border-radius: 9999px !important;
+  padding: 8px 16px !important;
+  font-size: 12.5px !important;
+  font-weight: 800 !important;
+  cursor: pointer !important;
+}
+
+.wasla-voucher-toolbar-hint {
+  margin-top: 8px !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  color: #FDBA74 !important;
+}
+
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 10mm;
+  }
+
+  html,
+  body,
+  html.wasla-printing-voucher,
+  body.wasla-printing-voucher,
+  [data-wasla-theme="dark"] body {
+    background: #FFFFFF !important;
+    background-color: #FFFFFF !important;
+    color: #0F2233 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  body > *:not(#wasla-print-voucher-root) {
+    display: none !important;
+  }
+
+  .wasla-voucher-screen-toolbar {
+    display: none !important;
+  }
+
+  #wasla-print-voucher-root,
+  body.wasla-printing-voucher #wasla-print-voucher-root {
+    display: block !important;
+    width: 100% !important;
+    max-width: 190mm !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    background: #FFFFFF !important;
+    color: #0F2233 !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  .wasla-voucher-sheet {
+    border: 2px solid #0F2233 !important;
+    border-radius: 14px !important;
+    overflow: hidden !important;
+    background: #FFFFFF !important;
+    color: #0F2233 !important;
+    font-family: "Plus Jakarta Sans", "Cairo", "IBM Plex Sans Arabic", system-ui, sans-serif !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+}
+
+

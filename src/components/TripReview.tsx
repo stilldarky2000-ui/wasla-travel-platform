@@ -546,7 +546,7 @@ export const PostTripReviewModal: React.FC<PostTripReviewModalProps> = ({
 
   return createPortal(
     <div
-      className="fixed inset-0 z-[70] flex items-center justify-center bg-[#0F172A]/70 p-3 sm:p-5 backdrop-blur-xs"
+      className="fixed inset-0 z-[70] flex items-center justify-center bg-[#0F2233]/70 p-3 sm:p-5 backdrop-blur-xs"
       dir={isRtl ? 'rtl' : 'ltr'}
       role="dialog"
       aria-modal="true"
@@ -554,17 +554,17 @@ export const PostTripReviewModal: React.FC<PostTripReviewModalProps> = ({
       onClick={onClose}
     >
       <div
-        className="flex max-h-[90vh] w-full max-w-lg flex-col overflow-hidden rounded-2xl border border-[#FED7AA] bg-white shadow-2xl"
+        className="card-wasla p-0 flex max-h-[90vh] w-full max-w-lg flex-col overflow-hidden shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="shrink-0 bg-gradient-to-r from-[#FF7000] via-[#F54400] to-[#DE1B00] flex items-center justify-between gap-3 px-5 py-4 text-white">
+        <div className="shrink-0 bg-gradient-to-r from-[#EE5426] to-[#D9461B] flex items-center justify-between gap-3 px-5 py-4 text-white">
           <div className="flex items-center gap-2.5 min-w-0">
             <WaslaBrandMark size="sm" className="ring-white/40" />
             <div className="min-w-0">
               <h2 id="post-trip-review-title" className="font-display text-lg font-semibold leading-tight text-white truncate">
                 {copy.formTitle}
               </h2>
-              <p className="text-[11px] text-[#FFF7ED]/90 truncate">{tText(trip.name, lang)}</p>
+              <p className="text-[11px] text-[#FAF4ED]/90 truncate">{tText(trip.name, lang)}</p>
             </div>
           </div>
           <button
@@ -590,7 +590,7 @@ export const PostTripReviewModal: React.FC<PostTripReviewModalProps> = ({
               <button
                 type="button"
                 onClick={onClose}
-                className="wasla-book-glare min-h-[42px] w-full rounded-full px-5 py-2 text-sm font-semibold text-white cursor-pointer"
+                className="btn-wasla-primary min-h-[42px] w-full rounded-full px-5 py-2 text-sm cursor-pointer"
               >
                 {copy.cancelBtn === 'Cancel' ? 'Done' : copy.cancelBtn === 'إلغاء' ? 'تم' : 'Fertig'}
               </button>
@@ -598,8 +598,8 @@ export const PostTripReviewModal: React.FC<PostTripReviewModalProps> = ({
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="rounded-xl border border-[#FED7AA] bg-[#FFF7ED]/70 px-3.5 py-2.5 text-xs text-[#475569] space-y-1">
-                <div className="flex items-center gap-1.5 font-semibold text-[#0F172A]">
-                  <Lock className="h-3.5 w-3.5 text-[#EA580C]" aria-hidden="true" />
+                <div className="flex items-center gap-1.5 font-semibold text-[#0F2233]">
+                  <Lock className="h-3.5 w-3.5 text-[#EE5426]" aria-hidden="true" />
                   <span>{copy.formSubtitle}</span>
                 </div>
                 <p className="leading-relaxed">{copy.approvalHint}</p>
@@ -608,7 +608,7 @@ export const PostTripReviewModal: React.FC<PostTripReviewModalProps> = ({
               <div className="space-y-2">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-end">
                   <label className="block space-y-1">
-                    <span className="text-xs font-semibold text-[#0F172A]">{copy.bookingRefLabel}</span>
+                    <span className="text-xs font-semibold text-[#0F2233]">{copy.bookingRefLabel}</span>
                     <input
                       type="text"
                       required
@@ -616,12 +616,12 @@ export const PostTripReviewModal: React.FC<PostTripReviewModalProps> = ({
                       value={bookingIdInput}
                       onChange={(e) => setBookingIdInput(sanitizeBookingId(e.target.value))}
                       placeholder={copy.bookingRefPlaceholder}
-                      className="min-h-[42px] w-full rounded-lg border border-[#CBD5E1] bg-white px-3 text-sm font-mono uppercase text-[#0F172A] focus:border-[#EA580C] focus:outline-none"
+                      className="min-h-[42px] w-full rounded-lg border border-[#CBD5E1] bg-white px-3 text-sm font-mono uppercase text-[#0F2233] focus:border-[#EE5426] focus:outline-none"
                     />
                   </label>
 
                   <div className="space-y-1">
-                    <span className="block text-xs font-semibold text-[#0F172A]">{copy.ratingLabel}</span>
+                    <span className="block text-xs font-semibold text-[#0F2233]">{copy.ratingLabel}</span>
                     <div className="inline-flex items-center gap-1" role="radiogroup" aria-label={copy.ratingLabel}>
                       {[1, 2, 3, 4, 5].map((starVal) => {
                         const active = starVal <= rating;
@@ -661,7 +661,7 @@ export const PostTripReviewModal: React.FC<PostTripReviewModalProps> = ({
                   >
                     {isChecking ? (
                       <>
-                        <Loader2 className="h-3.5 w-3.5 shrink-0 animate-spin text-[#EA580C]" aria-hidden="true" />
+                        <Loader2 className="h-3.5 w-3.5 shrink-0 animate-spin text-[#EE5426]" aria-hidden="true" />
                         <span>{copy.bookingCheckingLabel}</span>
                       </>
                     ) : verification.status === 'eligible' ? (
@@ -689,7 +689,7 @@ export const PostTripReviewModal: React.FC<PostTripReviewModalProps> = ({
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <label className="block space-y-1">
-                  <span className="text-xs font-semibold text-[#0F172A]">{copy.nameLabel}</span>
+                  <span className="text-xs font-semibold text-[#0F2233]">{copy.nameLabel}</span>
                   <input
                     type="text"
                     required
@@ -697,22 +697,22 @@ export const PostTripReviewModal: React.FC<PostTripReviewModalProps> = ({
                     value={guestName}
                     onChange={(e) => setGuestName(e.target.value)}
                     placeholder={copy.namePlaceholder}
-                    className="min-h-[42px] w-full rounded-lg border border-[#CBD5E1] bg-white px-3 text-sm text-[#0F172A] focus:border-[#EA580C] focus:outline-none"
+                    className="min-h-[42px] w-full rounded-lg border border-[#CBD5E1] bg-white px-3 text-sm text-[#0F2233] focus:border-[#EE5426] focus:outline-none"
                   />
                 </label>
                 <label className="block space-y-1">
-                  <span className="text-xs font-semibold text-[#0F172A]">{copy.countryLabel}</span>
+                  <span className="text-xs font-semibold text-[#0F2233]">{copy.countryLabel}</span>
                   <input
                     type="text"
                     maxLength={60}
                     value={guestCountry}
                     onChange={(e) => setGuestCountry(e.target.value)}
                     placeholder={copy.countryPlaceholder}
-                    className="min-h-[42px] w-full rounded-lg border border-[#CBD5E1] bg-white px-3 text-sm text-[#0F172A] focus:border-[#EA580C] focus:outline-none"
+                    className="min-h-[42px] w-full rounded-lg border border-[#CBD5E1] bg-white px-3 text-sm text-[#0F2233] focus:border-[#EE5426] focus:outline-none"
                   />
                 </label>
                 <label className="block space-y-1">
-                  <span className="text-xs font-semibold text-[#0F172A]">{copy.dateLabel}</span>
+                  <span className="text-xs font-semibold text-[#0F2233]">{copy.dateLabel}</span>
                   <input
                     type="date"
                     max={todayIso}
@@ -721,14 +721,14 @@ export const PostTripReviewModal: React.FC<PostTripReviewModalProps> = ({
                       setDateTouched(true);
                       setVisitDate(e.target.value);
                     }}
-                    className="min-h-[42px] w-full rounded-lg border border-[#CBD5E1] bg-white px-3 text-sm text-[#0F172A] focus:border-[#EA580C] focus:outline-none tabular-nums"
+                    className="min-h-[42px] w-full rounded-lg border border-[#CBD5E1] bg-white px-3 text-sm text-[#0F2233] focus:border-[#EE5426] focus:outline-none tabular-nums"
                   />
                 </label>
               </div>
 
               {/* Photo Upload Section */}
               <div className="space-y-2">
-                <span className="block text-xs font-semibold text-[#0F172A]">{copy.photoLabel}</span>
+                <span className="block text-xs font-semibold text-[#0F2233]">{copy.photoLabel}</span>
                 <input
                   ref={fileInputRef}
                   type="file"
@@ -747,9 +747,9 @@ export const PostTripReviewModal: React.FC<PostTripReviewModalProps> = ({
                       <button
                         type="button"
                         onClick={() => fileInputRef.current?.click()}
-                        className="inline-flex items-center gap-1 rounded-full border border-[#CBD5E1] bg-white px-3 py-1.5 text-xs font-semibold text-[#0F172A] hover:border-[#EA580C] cursor-pointer"
+                        className="inline-flex items-center gap-1 rounded-full border border-[#CBD5E1] bg-white px-3 py-1.5 text-xs font-semibold text-[#0F2233] hover:border-[#EE5426] cursor-pointer"
                       >
-                        <Camera className="h-3.5 w-3.5 text-[#EA580C]" aria-hidden="true" />
+                        <Camera className="h-3.5 w-3.5 text-[#EE5426]" aria-hidden="true" />
                         <span>{copy.photoChangeBtn}</span>
                       </button>
                       <button
@@ -767,9 +767,9 @@ export const PostTripReviewModal: React.FC<PostTripReviewModalProps> = ({
                     type="button"
                     disabled={photoLoading}
                     onClick={() => fileInputRef.current?.click()}
-                    className="w-full rounded-xl border border-dashed border-[#CBD5E1] bg-[#F8FAFC] px-4 py-3 text-xs font-medium text-[#475569] hover:border-[#EA580C] hover:bg-[#FFF7ED]/50 transition-colors flex items-center justify-center gap-2 cursor-pointer"
+                    className="w-full rounded-xl border border-dashed border-[#CBD5E1] bg-[#F8FAFC] px-4 py-3 text-xs font-medium text-[#475569] hover:border-[#EE5426] hover:bg-[#FFF7ED]/50 transition-colors flex items-center justify-center gap-2 cursor-pointer"
                   >
-                    <Camera className="h-4 w-4 text-[#EA580C]" aria-hidden="true" />
+                    <Camera className="h-4 w-4 text-[#EE5426]" aria-hidden="true" />
                     <span>{photoLoading ? '...' : copy.photoUploadBtn}</span>
                     <span className="text-[11px] text-[#64748B] hidden sm:inline">· {copy.photoHint}</span>
                   </button>
@@ -778,7 +778,7 @@ export const PostTripReviewModal: React.FC<PostTripReviewModalProps> = ({
 
               <label className="block space-y-1">
                 <div className="flex items-center justify-between text-xs">
-                  <span className="font-semibold text-[#0F172A]">{copy.commentLabel}</span>
+                  <span className="font-semibold text-[#0F2233]">{copy.commentLabel}</span>
                   <span className="text-[#475569] tabular-nums">{comment.length} / 800</span>
                 </div>
                 <textarea
@@ -788,7 +788,7 @@ export const PostTripReviewModal: React.FC<PostTripReviewModalProps> = ({
                   value={comment}
                   onChange={(e) => setComment(e.target.value)}
                   placeholder={copy.commentPlaceholder}
-                  className="w-full rounded-lg border border-[#CBD5E1] bg-white p-3 text-sm text-[#0F172A] placeholder:text-[#7B8E95] focus:border-[#EA580C] focus:outline-none"
+                  className="w-full rounded-lg border border-[#CBD5E1] bg-white p-3 text-sm text-[#0F2233] placeholder:text-[#7B8E95] focus:border-[#EE5426] focus:outline-none"
                 />
               </label>
 
@@ -802,14 +802,14 @@ export const PostTripReviewModal: React.FC<PostTripReviewModalProps> = ({
                 <button
                   type="button"
                   onClick={onClose}
-                  className="min-h-[42px] rounded-full border border-[#CBD5E1] bg-white px-4 py-2 text-xs font-semibold text-[#475569] hover:text-[#0F172A] cursor-pointer"
+                  className="min-h-[42px] rounded-full border border-[#CBD5E1] bg-white px-4 py-2 text-xs font-semibold text-[#475569] hover:text-[#0F2233] cursor-pointer"
                 >
                   {copy.cancelBtn}
                 </button>
                 <button
                   type="submit"
                   disabled={submitting || photoLoading}
-                  className="wasla-book-glare min-h-[42px] rounded-full px-6 py-2 text-xs font-semibold text-white disabled:opacity-60 transition-all cursor-pointer"
+                  className="btn-wasla-primary min-h-[42px] rounded-full px-6 py-2 text-xs disabled:opacity-60 transition-all cursor-pointer"
                 >
                   {submitting ? copy.submittingBtn : copy.submitBtn}
                 </button>
@@ -973,9 +973,9 @@ export const TripReview: React.FC<TripReviewProps> = ({
     <section className="space-y-4" aria-label={copy.heading}>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="space-y-1">
-          <h3 className="text-base sm:text-lg font-semibold text-[#0F172A]">{copy.heading}</h3>
+          <h3 className="text-base sm:text-lg font-semibold text-[#0F2233]">{copy.heading}</h3>
           <div className="flex flex-wrap items-center gap-2 text-xs text-[#475569] tabular-nums">
-            <span className="inline-flex items-center gap-1 font-semibold text-[#0F172A]">
+            <span className="inline-flex items-center gap-1 font-semibold text-[#0F2233]">
               <Star className="h-3.5 w-3.5 fill-[#F59E0B] text-[#F59E0B]" aria-hidden="true" />
               <span>{stats.average} / 5.0</span>
             </span>
@@ -999,7 +999,7 @@ export const TripReview: React.FC<TripReviewProps> = ({
               (latestBooking.verification.status === 'not-finished' ||
                 latestBooking.verification.status === 'not-confirmed') ? (
               <span className="inline-flex items-center gap-1.5 rounded-lg border border-[#CBD5E1] bg-[#F8FAFC] px-2.5 py-1.5 text-xs font-medium text-[#475569] tabular-nums">
-                <Clock className="h-3.5 w-3.5 shrink-0 text-[#EA580C]" aria-hidden="true" />
+                <Clock className="h-3.5 w-3.5 shrink-0 text-[#EE5426]" aria-hidden="true" />
                 <span>
                   {latestBooking.bookingId} · {copy.detectedPendingBadge}
                 </span>
@@ -1016,7 +1016,7 @@ export const TripReview: React.FC<TripReviewProps> = ({
               className={`inline-flex min-h-[38px] items-center gap-1.5 rounded-lg border-[1.5px] px-3.5 py-1.5 text-xs font-semibold transition-colors cursor-pointer ${
                 eligibleBooking
                   ? 'border-[#15803D] bg-[#15803D] text-white hover:bg-[#166534]'
-                  : 'border-[#EA580C]/70 bg-[#FFF7ED] text-[#EA580C] hover:bg-[#EA580C] hover:text-white'
+                  : 'border-[#EE5426]/70 bg-[#FFF7ED] text-[#EE5426] hover:bg-[#EE5426] hover:text-white'
               }`}
             >
               <Star
@@ -1037,7 +1037,7 @@ export const TripReview: React.FC<TripReviewProps> = ({
         <p className="py-3 text-xs text-[#B91C1C]">{loadError}</p>
       ) : reviews.length === 0 ? (
         <div className="rounded-xl border border-[#E2E8F0] bg-white p-4 space-y-1">
-          <p className="text-sm font-medium text-[#0F172A]">{copy.emptyTitle}</p>
+          <p className="text-sm font-medium text-[#0F2233]">{copy.emptyTitle}</p>
           <p className="text-xs text-[#475569]">{copy.emptySub}</p>
         </div>
       ) : (
@@ -1050,7 +1050,7 @@ export const TripReview: React.FC<TripReviewProps> = ({
               <div className="space-y-2">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div className="flex flex-wrap items-center gap-1.5 text-xs text-[#475569]">
-                    <span className="font-semibold text-[#0F172A]">{rev.guestName}</span>
+                    <span className="font-semibold text-[#0F2233]">{rev.guestName}</span>
                     {rev.guestCountry && (
                       <>
                         <span aria-hidden="true">·</span>

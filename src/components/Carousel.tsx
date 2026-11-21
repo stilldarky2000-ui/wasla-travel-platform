@@ -48,13 +48,13 @@ export const Carousel: React.FC<CarouselProps> = (props) => {
 
 const HeroCarouselSkeleton: React.FC<{ ariaLabel: string }> = ({ ariaLabel }) => (
   <div
-    className="relative h-[420px] sm:h-[440px] w-full overflow-hidden rounded-2xl border border-[#E2E8F0] bg-[#0F172A]"
+    className="relative h-[420px] sm:h-[440px] w-full overflow-hidden rounded-2xl border border-[#E2E8F0] bg-[#0F2233]"
     role="region"
     aria-label={ariaLabel}
     aria-busy="true"
   >
     {/* Background Shimmer Surface */}
-    <div className="shimmer-wave absolute inset-0 bg-gradient-to-br from-[#1E293B] via-[#0F172A] to-[#1E293B]" />
+    <div className="shimmer-wave absolute inset-0 bg-gradient-to-br from-[#19354F] via-[#0F2233] to-[#19354F]" />
 
     {/* Bottom Contrast Scrim */}
     <div className="pointer-events-none absolute inset-x-0 bottom-0 h-56 bg-gradient-to-t from-[#1C1008]/90 via-[#1C1008]/45 to-transparent" />
@@ -95,7 +95,7 @@ const HeroCarouselSkeleton: React.FC<{ ariaLabel: string }> = ({ ariaLabel }) =>
 const CardsCarouselSkeletonItem: React.FC = () => (
   <div
     aria-hidden="true"
-    className="snap-start shrink-0 basis-[86%] sm:basis-[calc((100%-20px)/2)] lg:basis-[calc((100%-40px)/3)] flex flex-col rounded-xl border border-[#E2E8F0] bg-white overflow-hidden"
+    className="card-wasla p-0 snap-start shrink-0 basis-[86%] sm:basis-[calc((100%-20px)/2)] lg:basis-[calc((100%-40px)/3)] flex flex-col overflow-hidden"
   >
     {/* 16:10 Media Header Skeleton */}
     <div className="shimmer-wave relative aspect-[16/10] w-full bg-[#F1F5F9]">
@@ -186,7 +186,7 @@ const HeroSlider: React.FC<HeroCarouselProps> = ({
 
   return (
     <div
-      className="wasla-hero-glare group relative h-[420px] sm:h-[440px] w-full overflow-hidden rounded-2xl border border-[#E2E8F0] bg-[#0F172A]"
+      className="wasla-hero-glare group relative h-[420px] sm:h-[440px] w-full overflow-hidden rounded-2xl border border-[#C8C2B8]/50 bg-[#0F2233]"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       onTouchStart={handleTouchStart}
@@ -216,7 +216,7 @@ const HeroSlider: React.FC<HeroCarouselProps> = ({
             </div>
 
             {/* Bottom contrast scrim: clean photo above, crisp legible info bar at bottom */}
-            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-56 bg-gradient-to-t from-[#1C1008]/92 via-[#1C1008]/50 to-transparent" />
+            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-56 bg-gradient-to-t from-[#0F2233]/92 via-[#0F2233]/50 to-transparent" />
 
             <div className="absolute inset-x-0 bottom-0 z-20 px-5 pb-11 pt-6 sm:px-8 sm:pb-10 flex flex-col sm:flex-row sm:items-end justify-between gap-4 text-white">
               <div className="space-y-1.5 max-w-2xl">
@@ -258,7 +258,7 @@ const HeroSlider: React.FC<HeroCarouselProps> = ({
               <button
                 type="button"
                 onClick={() => onViewTrip(trip)}
-                className="wasla-book-glare self-start sm:self-auto min-h-[44px] rounded-full px-6 py-2.5 text-sm font-semibold text-white active:scale-[0.98] transition-all whitespace-nowrap shrink-0 cursor-pointer"
+                className="btn-wasla-primary self-start sm:self-auto min-h-[44px] rounded-full px-6 py-2.5 text-sm whitespace-nowrap shrink-0 cursor-pointer"
               >
                 {t.viewTrip}
               </button>
@@ -271,7 +271,7 @@ const HeroSlider: React.FC<HeroCarouselProps> = ({
       <button
         type="button"
         onClick={isRtl ? goNext : goPrev}
-        className="absolute start-3 sm:start-4 top-1/2 -translate-y-1/2 z-20 inline-flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-full bg-white/95 text-[#0F172A] hover:bg-white hover:scale-105 active:scale-95 transition-all shadow-md cursor-pointer"
+        className="absolute start-3 sm:start-4 top-1/2 -translate-y-1/2 z-20 inline-flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-full bg-white/95 text-[#0F2233] hover:bg-white hover:scale-105 active:scale-95 transition-all shadow-md cursor-pointer"
         aria-label={isRtl ? 'Next slide' : 'Previous slide'}
       >
         <ChevronLeft className="h-5 w-5 rtl:rotate-180" />
@@ -280,7 +280,7 @@ const HeroSlider: React.FC<HeroCarouselProps> = ({
       <button
         type="button"
         onClick={isRtl ? goPrev : goNext}
-        className="absolute end-3 sm:end-4 top-1/2 -translate-y-1/2 z-20 inline-flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-full bg-white/95 text-[#0F172A] hover:bg-white hover:scale-105 active:scale-95 transition-all shadow-md cursor-pointer"
+        className="absolute end-3 sm:end-4 top-1/2 -translate-y-1/2 z-20 inline-flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-full bg-white/95 text-[#0F2233] hover:bg-white hover:scale-105 active:scale-95 transition-all shadow-md cursor-pointer"
         aria-label={isRtl ? 'Previous slide' : 'Next slide'}
       >
         <ChevronRight className="h-5 w-5 rtl:rotate-180" />
@@ -388,7 +388,7 @@ const CardsTrack: React.FC<CardsCarouselProps> = ({
               <button
                 type="button"
                 onClick={() => scrollTrack(-1)}
-                className="inline-flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-full border border-[#CBD5E1] bg-white text-[#0F172A] shadow-xs hover:border-[#EA580C] hover:bg-[#FFF7ED] hover:text-[#EA580C] active:scale-95 transition-all cursor-pointer"
+                className="inline-flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-full border border-[#CBD5E1] bg-white text-[#0F2233] shadow-xs hover:border-[#EE5426] hover:bg-[#FFF7ED] hover:text-[#EE5426] active:scale-95 transition-all cursor-pointer"
                 aria-label="Scroll previous"
               >
                 <ChevronLeft className="h-4 w-4 sm:h-5 sm:w-5 rtl:rotate-180" />
@@ -397,7 +397,7 @@ const CardsTrack: React.FC<CardsCarouselProps> = ({
               <button
                 type="button"
                 onClick={() => scrollTrack(1)}
-                className="inline-flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-full border border-[#CBD5E1] bg-white text-[#0F172A] shadow-xs hover:border-[#EA580C] hover:bg-[#FFF7ED] hover:text-[#EA580C] active:scale-95 transition-all cursor-pointer"
+                className="inline-flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-full border border-[#CBD5E1] bg-white text-[#0F2233] shadow-xs hover:border-[#EE5426] hover:bg-[#FFF7ED] hover:text-[#EE5426] active:scale-95 transition-all cursor-pointer"
                 aria-label="Scroll next"
               >
                 <ChevronRight className="h-4 w-4 sm:h-5 sm:w-5 rtl:rotate-180" />
@@ -421,7 +421,7 @@ const CardsTrack: React.FC<CardsCarouselProps> = ({
 
       <div className={`mt-1 h-1 w-full rounded-full bg-[#FED7AA]/50 overflow-hidden ${progressHiddenClass}`}>
         <div
-          className="h-full rounded-full bg-[#EA580C] transition-all duration-200"
+          className="h-full rounded-full bg-[#EE5426] transition-all duration-200"
           style={{ width: `${Math.round(scrollProgress * 100)}%` }}
         />
       </div>

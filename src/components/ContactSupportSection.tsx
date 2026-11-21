@@ -151,13 +151,13 @@ export const ContactSupportSection: React.FC<ContactSupportSectionProps> = ({
       className="reveal-item scroll-mt-24"
       aria-labelledby="contact-desk-heading"
     >
-      <div className="rounded-2xl border border-[#E2E8F0] bg-white overflow-hidden">
+      <div className="card-wasla p-0 overflow-hidden">
         <div className="grid grid-cols-1 lg:grid-cols-12 items-stretch">
           {/* Left Column: Direct Hurghada Operations Desk Channels */}
-          <div className="lg:col-span-5 bg-[#FFF7ED]/70 border-b lg:border-b-0 lg:border-e border-[#FED7AA]/70 p-6 sm:p-8 flex flex-col justify-between gap-6">
+          <div className="lg:col-span-5 bg-[#FAF4ED]/80 dark:bg-[#0F2233]/60 border-b lg:border-b-0 lg:border-e border-[#C8C2B8]/50 dark:border-[#334155] p-6 sm:p-8 flex flex-col justify-between gap-6">
             <div className="space-y-5">
               <div className="space-y-2">
-                <p className="text-xs font-semibold tracking-wide text-[#EA580C]">
+                <p className="text-xs font-semibold tracking-wide text-[#EE5426]">
                   {tText(
                     {
                       en: 'Direct Human Support',
@@ -169,7 +169,7 @@ export const ContactSupportSection: React.FC<ContactSupportSectionProps> = ({
                 </p>
                 <h2
                   id="contact-desk-heading"
-                  className="font-display text-2xl sm:text-[28px] font-semibold tracking-[-0.02em] text-[#0F172A] leading-tight"
+                  className="font-display text-2xl sm:text-[28px] font-semibold tracking-[-0.02em] text-[#0F2233] leading-tight"
                 >
                   {tText(
                     {
@@ -202,7 +202,7 @@ export const ContactSupportSection: React.FC<ContactSupportSectionProps> = ({
                         <MessageCircle className="h-4.5 w-4.5" aria-hidden="true" />
                       </span>
                       <div className="min-w-0">
-                        <div className="text-xs font-semibold text-[#0F172A]">
+                        <div className="text-xs font-semibold text-[#0F2233]">
                           {tText(
                             { en: 'WhatsApp Operations Desk', ar: 'مكتب عمليات واتساب المباشر', de: 'WhatsApp-Service-Desk' },
                             lang
@@ -241,16 +241,16 @@ export const ContactSupportSection: React.FC<ContactSupportSectionProps> = ({
                 {/* Email Direct Card */}
                 <div className="rounded-xl border border-[#E2E8F0] bg-white p-4 flex items-center justify-between gap-3">
                   <div className="flex items-center gap-2.5 min-w-0">
-                    <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#FFF7ED] text-[#EA580C]">
+                    <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#FFF7ED] text-[#EE5426]">
                       <Mail className="h-4.5 w-4.5" aria-hidden="true" />
                     </span>
                     <div className="min-w-0">
-                      <div className="text-xs font-semibold text-[#0F172A]">
+                      <div className="text-xs font-semibold text-[#0F2233]">
                         {tText({ en: 'Email Reservations', ar: 'البريد الإلكتروني للحجوزات', de: 'E-Mail-Reservierung' }, lang)}
                       </div>
                       <a
                         href={`mailto:${contactEmail}`}
-                        className="block text-xs font-medium text-[#EA580C] hover:underline underline-offset-4 truncate"
+                        className="block text-xs font-medium text-[#EE5426] hover:underline underline-offset-4 truncate"
                       >
                         {contactEmail}
                       </a>
@@ -260,7 +260,7 @@ export const ContactSupportSection: React.FC<ContactSupportSectionProps> = ({
                     type="button"
                     onClick={() => void handleCopy('email', contactEmail)}
                     aria-label="Copy email address"
-                    className="inline-flex h-8 items-center gap-1 rounded-lg border border-[#E2E8F0] px-2 text-[11px] font-semibold text-[#475569] hover:border-[#EA580C] hover:text-[#EA580C] cursor-pointer shrink-0"
+                    className="inline-flex h-8 items-center gap-1 rounded-lg border border-[#E2E8F0] px-2 text-[11px] font-semibold text-[#475569] hover:border-[#EE5426] hover:text-[#EE5426] cursor-pointer shrink-0"
                   >
                     {copiedKey === 'email' ? (
                       <>
@@ -280,7 +280,7 @@ export const ContactSupportSection: React.FC<ContactSupportSectionProps> = ({
               {/* Clean Desk Metadata */}
               <div className="divide-y divide-[#FED7AA]/60 text-xs text-[#475569]">
                 <div className="py-2.5 flex items-center gap-2.5">
-                  <Clock className="h-4 w-4 text-[#EA580C] shrink-0" aria-hidden="true" />
+                  <Clock className="h-4 w-4 text-[#EE5426] shrink-0" aria-hidden="true" />
                   <span>
                     {tText(
                       {
@@ -293,7 +293,7 @@ export const ContactSupportSection: React.FC<ContactSupportSectionProps> = ({
                   </span>
                 </div>
                 <div className="py-2.5 flex items-center gap-2.5">
-                  <MapPin className="h-4 w-4 text-[#EA580C] shrink-0" aria-hidden="true" />
+                  <MapPin className="h-4 w-4 text-[#EE5426] shrink-0" aria-hidden="true" />
                   <span>
                     {tText(
                       {
@@ -306,7 +306,7 @@ export const ContactSupportSection: React.FC<ContactSupportSectionProps> = ({
                   </span>
                 </div>
                 <div className="py-2.5 flex items-center gap-2.5">
-                  <Globe className="h-4 w-4 text-[#EA580C] shrink-0" aria-hidden="true" />
+                  <Globe className="h-4 w-4 text-[#EE5426] shrink-0" aria-hidden="true" />
                   <span>
                     {tText(
                       {
@@ -322,13 +322,13 @@ export const ContactSupportSection: React.FC<ContactSupportSectionProps> = ({
             </div>
 
             {/* Quick Self-Service Shortcuts */}
-            <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-[#FED7AA]/60">
+            <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-[#C8C2B8]/50 dark:border-[#334155]">
               <button
                 type="button"
                 onClick={onOpenTrackBooking}
-                className="inline-flex min-h-[38px] items-center gap-1.5 rounded-lg border border-[#CBD5E1] bg-white px-3.5 py-1.5 text-xs font-semibold text-[#0B1F2E] hover:border-[#0B1F2E]/40 hover:text-[#EA580C] transition-colors cursor-pointer"
+                className="inline-flex min-h-[38px] items-center gap-1.5 rounded-lg border border-[#C8C2B8] bg-white px-3.5 py-1.5 text-xs font-semibold text-[#0F2233] hover:border-[#EE5426] hover:text-[#EE5426] transition-colors cursor-pointer"
               >
-                <Ticket className="h-3.5 w-3.5 text-[#0E7490]" aria-hidden="true" />
+                <Ticket className="h-3.5 w-3.5 text-[#EE5426]" aria-hidden="true" />
                 <span>
                   {tText({ en: 'Track Existing Booking', ar: 'تتبّع حجزك الحالي', de: 'Buchung prüfen' }, lang)}
                 </span>
@@ -336,9 +336,9 @@ export const ContactSupportSection: React.FC<ContactSupportSectionProps> = ({
               <button
                 type="button"
                 onClick={onOpenCustomTrip}
-                className="inline-flex min-h-[38px] items-center gap-1.5 rounded-lg border border-[#CBD5E1] bg-white px-3.5 py-1.5 text-xs font-semibold text-[#0B1F2E] hover:border-[#0B1F2E]/40 hover:text-[#EA580C] transition-colors cursor-pointer"
+                className="inline-flex min-h-[38px] items-center gap-1.5 rounded-lg border border-[#C8C2B8] bg-white px-3.5 py-1.5 text-xs font-semibold text-[#0F2233] hover:border-[#EE5426] hover:text-[#EE5426] transition-colors cursor-pointer"
               >
-                <SlidersHorizontal className="h-3.5 w-3.5 text-[#EA580C]" aria-hidden="true" />
+                <SlidersHorizontal className="h-3.5 w-3.5 text-[#EE5426]" aria-hidden="true" />
                 <span>
                   {tText({ en: 'Plan Custom Trip', ar: 'صمّم رحلة مخصصة', de: 'Individuelle Tour' }, lang)}
                 </span>
@@ -353,7 +353,7 @@ export const ContactSupportSection: React.FC<ContactSupportSectionProps> = ({
                 <div className="flex items-start gap-3">
                   <CheckCircle2 className="h-6 w-6 text-[#15803D] shrink-0 mt-0.5" aria-hidden="true" />
                   <div className="space-y-1">
-                    <h3 className="text-base font-bold text-[#0F172A]">
+                    <h3 className="text-base font-bold text-[#0F2233]">
                       {tText(
                         {
                           en: 'Your message is ready to dispatch',
@@ -397,9 +397,9 @@ export const ContactSupportSection: React.FC<ContactSupportSectionProps> = ({
 
                   <a
                     href={submittedPayload.mailtoUrl}
-                    className="inline-flex min-h-[42px] items-center justify-center gap-2 rounded-lg border border-[#CBD5E1] bg-white px-5 py-2 text-xs font-semibold text-[#0B1F2E] hover:border-[#EA580C] hover:text-[#EA580C] transition-colors"
+                    className="inline-flex min-h-[42px] items-center justify-center gap-2 rounded-lg border border-[#CBD5E1] bg-white px-5 py-2 text-xs font-semibold text-[#0F2233] hover:border-[#EE5426] hover:text-[#EE5426] transition-colors"
                   >
-                    <Mail className="h-4 w-4 text-[#EA580C]" aria-hidden="true" />
+                    <Mail className="h-4 w-4 text-[#EE5426]" aria-hidden="true" />
                     <span>
                       {tText(
                         { en: 'Send via Email', ar: 'إرسال عبر الإيميل', de: 'Per E-Mail senden' },
@@ -414,7 +414,7 @@ export const ContactSupportSection: React.FC<ContactSupportSectionProps> = ({
                       setSubmittedPayload(null);
                       setMessage('');
                     }}
-                    className="text-xs font-semibold text-[#475569] hover:text-[#0F172A] underline underline-offset-4 px-2 py-2 cursor-pointer"
+                    className="text-xs font-semibold text-[#475569] hover:text-[#0F2233] underline underline-offset-4 px-2 py-2 cursor-pointer"
                   >
                     {tText({ en: 'Write another message', ar: 'كتابة رسالة أخرى', de: 'Weitere Nachricht' }, lang)}
                   </button>
@@ -423,7 +423,7 @@ export const ContactSupportSection: React.FC<ContactSupportSectionProps> = ({
             ) : (
               <form onSubmit={handleSubmit} className="space-y-4" noValidate>
                 <div className="space-y-1">
-                  <h3 className="text-lg font-semibold text-[#0F172A]">
+                  <h3 className="text-lg font-semibold text-[#0F2233]">
                     {tText(
                       {
                         en: 'Send a quick message to our team',
@@ -465,7 +465,7 @@ export const ContactSupportSection: React.FC<ContactSupportSectionProps> = ({
                       value={guestName}
                       onChange={(e) => setGuestName(e.target.value)}
                       placeholder={tText({ en: 'e.g. Sarah Meyer', ar: 'مثال: أحمد محمود', de: 'z. B. Sarah Meyer' }, lang)}
-                      className="min-h-[42px] w-full rounded-xl border border-[#CBD5E1] bg-white px-3.5 text-sm text-[#0F172A] placeholder:text-[#94A3B8]"
+                      className="min-h-[42px] w-full rounded-xl border border-[#CBD5E1] bg-white px-3.5 text-sm text-[#0F2233] placeholder:text-[#94A3B8]"
                     />
                   </label>
 
@@ -482,7 +482,7 @@ export const ContactSupportSection: React.FC<ContactSupportSectionProps> = ({
                       value={contactInfo}
                       onChange={(e) => setContactInfo(e.target.value)}
                       placeholder={tText({ en: '+49... or you@email.com', ar: '+20... أو بريدك الإلكتروني', de: '+49... oder E-Mail' }, lang)}
-                      className="min-h-[42px] w-full rounded-xl border border-[#CBD5E1] bg-white px-3.5 text-sm text-[#0F172A] placeholder:text-[#94A3B8]"
+                      className="min-h-[42px] w-full rounded-xl border border-[#CBD5E1] bg-white px-3.5 text-sm text-[#0F2233] placeholder:text-[#94A3B8]"
                     />
                   </label>
                 </div>
@@ -495,7 +495,7 @@ export const ContactSupportSection: React.FC<ContactSupportSectionProps> = ({
                     <select
                       value={topic}
                       onChange={(e) => setTopic(e.target.value as InquiryTopicId)}
-                      className="min-h-[42px] w-full rounded-xl border border-[#CBD5E1] bg-white px-3.5 text-sm text-[#0F172A] cursor-pointer"
+                      className="min-h-[42px] w-full rounded-xl border border-[#CBD5E1] bg-white px-3.5 text-sm text-[#0F2233] cursor-pointer"
                     >
                       {(Object.keys(topicLabels) as InquiryTopicId[]).map((key) => (
                         <option key={key} value={key}>
@@ -517,7 +517,7 @@ export const ContactSupportSection: React.FC<ContactSupportSectionProps> = ({
                         { en: 'e.g. Makadi Bay, Sahl Hasheesh...', ar: 'مثال: سهل حشيش، مكادي، الغردقة...', de: 'z. B. Makadi Bay, Sahl Hasheesh...' },
                         lang
                       )}
-                      className="min-h-[42px] w-full rounded-xl border border-[#CBD5E1] bg-white px-3.5 text-sm text-[#0F172A] placeholder:text-[#94A3B8]"
+                      className="min-h-[42px] w-full rounded-xl border border-[#CBD5E1] bg-white px-3.5 text-sm text-[#0F2233] placeholder:text-[#94A3B8]"
                     />
                   </label>
                 </div>
@@ -539,7 +539,7 @@ export const ContactSupportSection: React.FC<ContactSupportSectionProps> = ({
                       },
                       lang
                     )}
-                    className="w-full rounded-xl border border-[#CBD5E1] bg-white px-3.5 py-2.5 text-sm text-[#0F172A] placeholder:text-[#94A3B8]"
+                    className="w-full rounded-xl border border-[#CBD5E1] bg-white px-3.5 py-2.5 text-sm text-[#0F2233] placeholder:text-[#94A3B8]"
                   />
                 </label>
 
@@ -556,7 +556,7 @@ export const ContactSupportSection: React.FC<ContactSupportSectionProps> = ({
                   </p>
                   <button
                     type="submit"
-                    className="wasla-book-glare inline-flex min-h-[44px] items-center justify-center gap-2 rounded-lg px-6 py-2.5 text-xs sm:text-sm font-semibold text-white whitespace-nowrap cursor-pointer shrink-0"
+                    className="btn-wasla-primary min-h-[44px] rounded-lg px-6 py-2.5 text-xs sm:text-sm whitespace-nowrap cursor-pointer shrink-0"
                   >
                     <Send className="h-4 w-4" aria-hidden="true" />
                     <span>

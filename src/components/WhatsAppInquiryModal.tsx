@@ -260,7 +260,7 @@ export const WhatsAppInquiryModal: React.FC<WhatsAppInquiryModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-[#0F172A]/65 p-3 sm:p-4 backdrop-blur-[2px]"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-[#0F2233]/65 p-3 sm:p-4 backdrop-blur-[2px]"
       dir={isRtl ? 'rtl' : 'ltr'}
       onClick={onClose}
       role="dialog"
@@ -268,16 +268,16 @@ export const WhatsAppInquiryModal: React.FC<WhatsAppInquiryModalProps> = ({
       aria-labelledby="whatsapp-modal-title"
     >
       <div
-        className="w-full max-w-md max-h-[88vh] flex flex-col rounded-2xl border border-[#E2E8F0] bg-white shadow-2xl overflow-hidden"
+        className="card-wasla p-0 w-full max-w-md max-h-[88vh] flex flex-col shadow-2xl overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Compact Sticky Modal Header */}
-        <div className="sticky top-0 z-10 flex items-center justify-between border-b border-[#E2E8F0] bg-white/95 px-4 sm:px-5 py-3.5 shrink-0">
+        <div className="sticky top-0 z-10 flex items-center justify-between border-b border-[#C8C2B8]/50 bg-white/95 px-4 sm:px-5 py-3.5 shrink-0">
           <div className="flex items-center gap-2.5 min-w-0">
             <WaslaBrandMark size="sm" />
             <h2
               id="whatsapp-modal-title"
-              className="font-display text-base sm:text-lg font-semibold text-[#0F172A] truncate"
+              className="font-display text-base sm:text-lg font-semibold text-[#0F2233] truncate"
             >
               {copy.title}
             </h2>
@@ -285,7 +285,7 @@ export const WhatsAppInquiryModal: React.FC<WhatsAppInquiryModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-[#E2E8F0] text-[#0F172A] hover:bg-[#F1F5F9] cursor-pointer"
+            className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-[#C8C2B8]/60 text-[#0F2233] hover:bg-[#FAF4ED] cursor-pointer"
             aria-label="Close modal"
           >
             <X className="h-4 w-4" />
@@ -300,8 +300,8 @@ export const WhatsAppInquiryModal: React.FC<WhatsAppInquiryModalProps> = ({
               onClick={() => setActiveTab('ask')}
               className={`flex-1 min-h-[34px] rounded-lg px-2.5 text-xs font-semibold transition-colors whitespace-nowrap cursor-pointer ${
                 activeTab === 'ask'
-                  ? 'bg-white text-[#0F172A] shadow-xs'
-                  : 'text-[#475569] hover:text-[#0F172A]'
+                  ? 'bg-white text-[#0F2233] shadow-xs'
+                  : 'text-[#475569] hover:text-[#0F2233]'
               }`}
             >
               {copy.tabAsk}
@@ -311,8 +311,8 @@ export const WhatsAppInquiryModal: React.FC<WhatsAppInquiryModalProps> = ({
               onClick={() => setActiveTab('requests')}
               className={`flex-1 min-h-[34px] rounded-lg px-2.5 text-xs font-semibold transition-colors whitespace-nowrap tabular-nums cursor-pointer ${
                 activeTab === 'requests'
-                  ? 'bg-white text-[#0F172A] shadow-xs'
-                  : 'text-[#475569] hover:text-[#0F172A]'
+                  ? 'bg-white text-[#0F2233] shadow-xs'
+                  : 'text-[#475569] hover:text-[#0F2233]'
               }`}
             >
               {copy.tabRequests}
@@ -328,11 +328,11 @@ export const WhatsAppInquiryModal: React.FC<WhatsAppInquiryModalProps> = ({
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                 <label className="block space-y-1">
-                  <span className="text-xs font-semibold text-[#0F172A]">{copy.topicLabel}</span>
+                  <span className="text-xs font-semibold text-[#0F2233]">{copy.topicLabel}</span>
                   <select
                     value={topic}
                     onChange={(e) => setTopic(e.target.value)}
-                    className="min-h-[40px] w-full rounded-lg border border-[#CBD5E1] bg-white px-2.5 text-xs sm:text-sm text-[#0F172A] focus:border-[#EA580C] focus:outline-none"
+                    className="min-h-[40px] w-full rounded-lg border border-[#CBD5E1] bg-white px-2.5 text-xs sm:text-sm text-[#0F2233] focus:border-[#EE5426] focus:outline-none"
                   >
                     {TOPIC_OPTIONS.map((opt) => (
                       <option key={opt.value} value={opt.value}>
@@ -342,11 +342,11 @@ export const WhatsAppInquiryModal: React.FC<WhatsAppInquiryModalProps> = ({
                   </select>
                 </label>
                 <label className="block space-y-1">
-                  <span className="text-xs font-semibold text-[#0F172A]">{copy.zoneLabel}</span>
+                  <span className="text-xs font-semibold text-[#0F2233]">{copy.zoneLabel}</span>
                   <select
                     value={hotelZone}
                     onChange={(e) => setHotelZone(e.target.value)}
-                    className="min-h-[40px] w-full rounded-lg border border-[#CBD5E1] bg-white px-2.5 text-xs sm:text-sm text-[#0F172A] focus:border-[#EA580C] focus:outline-none"
+                    className="min-h-[40px] w-full rounded-lg border border-[#CBD5E1] bg-white px-2.5 text-xs sm:text-sm text-[#0F2233] focus:border-[#EE5426] focus:outline-none"
                   >
                     {HOTEL_ZONE_OPTIONS.map((opt) => (
                       <option key={opt.value} value={opt.value}>
@@ -358,24 +358,24 @@ export const WhatsAppInquiryModal: React.FC<WhatsAppInquiryModalProps> = ({
               </div>
 
               <label className="block space-y-1">
-                <span className="text-xs font-semibold text-[#0F172A]">{copy.waLabel}</span>
+                <span className="text-xs font-semibold text-[#0F2233]">{copy.waLabel}</span>
                 <input
                   type="tel"
                   placeholder={copy.waPlaceholder}
                   value={guestWhatsapp}
                   onChange={(e) => setGuestWhatsapp(e.target.value)}
-                  className="min-h-[40px] w-full rounded-lg border border-[#CBD5E1] bg-white px-3 text-xs sm:text-sm text-[#0F172A] placeholder:text-[#7B8E95] focus:border-[#EA580C] focus:outline-none tabular-nums"
+                  className="min-h-[40px] w-full rounded-lg border border-[#CBD5E1] bg-white px-3 text-xs sm:text-sm text-[#0F2233] placeholder:text-[#7B8E95] focus:border-[#EE5426] focus:outline-none tabular-nums"
                 />
               </label>
 
               <label className="block space-y-1">
-                <span className="text-xs font-semibold text-[#0F172A]">{copy.questionLabel}</span>
+                <span className="text-xs font-semibold text-[#0F2233]">{copy.questionLabel}</span>
                 <textarea
                   rows={2}
                   placeholder={copy.questionPlaceholder}
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
-                  className="w-full rounded-lg border border-[#CBD5E1] bg-white p-2.5 text-xs sm:text-sm text-[#0F172A] placeholder:text-[#7B8E95] focus:border-[#EA580C] focus:outline-none"
+                  className="w-full rounded-lg border border-[#CBD5E1] bg-white p-2.5 text-xs sm:text-sm text-[#0F2233] placeholder:text-[#7B8E95] focus:border-[#EE5426] focus:outline-none"
                 />
               </label>
 
@@ -394,8 +394,8 @@ export const WhatsAppInquiryModal: React.FC<WhatsAppInquiryModalProps> = ({
             </form>
           ) : bookingRequests.length === 0 ? (
             <div className="py-6 text-center space-y-3">
-              <ShieldCheck className="h-7 w-7 text-[#EA580C] mx-auto" aria-hidden="true" />
-              <p className="text-sm font-semibold text-[#0F172A]">{copy.noRequestsTitle}</p>
+              <ShieldCheck className="h-7 w-7 text-[#EE5426] mx-auto" aria-hidden="true" />
+              <p className="text-sm font-semibold text-[#0F2233]">{copy.noRequestsTitle}</p>
               <p className="text-xs text-[#475569] max-w-xs mx-auto">{copy.noRequestsSub}</p>
               {onOpenTrackBooking && (
                 <button
@@ -404,7 +404,7 @@ export const WhatsAppInquiryModal: React.FC<WhatsAppInquiryModalProps> = ({
                     onClose();
                     onOpenTrackBooking();
                   }}
-                  className="inline-flex min-h-[38px] items-center justify-center rounded-full border border-[#EA580C] bg-[#FFF7ED] px-4 text-xs font-semibold text-[#EA580C] hover:bg-[#EA580C] hover:text-white transition-colors cursor-pointer"
+                  className="inline-flex min-h-[38px] items-center justify-center rounded-full border border-[#EE5426] bg-[#FFF7ED] px-4 text-xs font-semibold text-[#EE5426] hover:bg-[#EE5426] hover:text-white transition-colors cursor-pointer"
                 >
                   {tText(
                     {
@@ -426,7 +426,7 @@ export const WhatsAppInquiryModal: React.FC<WhatsAppInquiryModalProps> = ({
                     onClose();
                     onOpenTrackBooking();
                   }}
-                  className="inline-flex min-h-[36px] w-full items-center justify-center rounded-xl border border-[#CBD5E1] bg-[#F8FAFC] px-3 text-xs font-semibold text-[#0F172A] hover:border-[#EA580C] hover:text-[#EA580C] transition-colors cursor-pointer"
+                  className="inline-flex min-h-[36px] w-full items-center justify-center rounded-xl border border-[#CBD5E1] bg-[#F8FAFC] px-3 text-xs font-semibold text-[#0F2233] hover:border-[#EE5426] hover:text-[#EE5426] transition-colors cursor-pointer"
                 >
                   {tText(
                     {
@@ -459,7 +459,7 @@ export const WhatsAppInquiryModal: React.FC<WhatsAppInquiryModalProps> = ({
                       className="rounded-xl border border-[#E2E8F0] bg-[#FFFFFF] p-3.5 space-y-2"
                     >
                       <div className="flex items-center justify-between text-xs text-[#475569]">
-                        <span className="font-semibold text-[#EA580C] tabular-nums">{req.id}</span>
+                        <span className="font-semibold text-[#EE5426] tabular-nums">{req.id}</span>
                         <span
                           className={
                             isCompletedBooking
@@ -470,13 +470,13 @@ export const WhatsAppInquiryModal: React.FC<WhatsAppInquiryModalProps> = ({
                           {statusText}
                         </span>
                       </div>
-                      <p className="text-sm font-semibold text-[#0F172A]">{req.tripTitle}</p>
+                      <p className="text-sm font-semibold text-[#0F2233]">{req.tripTitle}</p>
                       <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-[#475569] tabular-nums">
                         <span>{req.date}</span>
                         <span aria-hidden="true">·</span>
                         <span>{req.hotel}</span>
                         <span aria-hidden="true">·</span>
-                        <span className="font-semibold text-[#0F172A]">
+                        <span className="font-semibold text-[#0F2233]">
                           {req.totalEur > 0
                             ? `€${req.totalEur}`
                             : tText({ en: 'Custom Quote', ar: 'عرض سعر', de: 'Angebot' }, lang)}
@@ -488,7 +488,7 @@ export const WhatsAppInquiryModal: React.FC<WhatsAppInquiryModalProps> = ({
                           <button
                             type="button"
                             onClick={() => onOpenPostTripReview(matchingTrip, sanitizeBookingId(req.id))}
-                            className="inline-flex w-full items-center justify-center gap-1.5 rounded-full border border-[#FED7AA] bg-[#FFF7ED] px-3 py-1.5 text-xs font-semibold text-[#EA580C] hover:bg-[#FFEDD5] transition-colors cursor-pointer"
+                            className="inline-flex w-full items-center justify-center gap-1.5 rounded-full border border-[#FED7AA] bg-[#FFF7ED] px-3 py-1.5 text-xs font-semibold text-[#EE5426] hover:bg-[#FFEDD5] transition-colors cursor-pointer"
                           >
                             <Star className="h-3.5 w-3.5 fill-[#F59E0B] text-[#F59E0B]" aria-hidden="true" />
                             <span>

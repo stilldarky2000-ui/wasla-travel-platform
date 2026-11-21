@@ -51,25 +51,25 @@ const TripExplorerSkeleton: React.FC = () => (
     aria-busy="true"
     aria-label="Loading trips explorer"
   >
-    <div className="order-2 lg:order-1 rounded-2xl border border-[#E2E8F0] bg-white p-5 sm:p-6 flex flex-col justify-between gap-5">
+    <div className="card-wasla order-2 lg:order-1 p-5 sm:p-6 flex flex-col justify-between gap-5">
       <div className="space-y-4">
-        <div className="shimmer-wave relative aspect-[16/10] w-full overflow-hidden rounded-xl border border-[#E2E8F0] bg-[#F1F5F9]" />
+        <div className="shimmer-wave relative aspect-[16/10] w-full overflow-hidden rounded-xl border border-[#C8C2B8]/40 bg-[#FAF4ED]" />
         <div className="space-y-2.5">
-          <div className="shimmer-wave h-4 w-2/3 rounded bg-[#F1F5F9]" />
-          <div className="shimmer-wave h-7 w-4/5 rounded-lg bg-[#E2E8F0]" />
+          <div className="shimmer-wave h-4 w-2/3 rounded bg-[#FAF4ED]" />
+          <div className="shimmer-wave h-7 w-4/5 rounded-lg bg-[#C8C2B8]/40" />
           <div className="space-y-1.5 pt-0.5">
-            <div className="shimmer-wave h-4 w-full rounded bg-[#F1F5F9]" />
-            <div className="shimmer-wave h-4 w-5/6 rounded bg-[#F1F5F9]" />
+            <div className="shimmer-wave h-4 w-full rounded bg-[#FAF4ED]" />
+            <div className="shimmer-wave h-4 w-5/6 rounded bg-[#FAF4ED]" />
           </div>
         </div>
       </div>
-      <div className="flex items-center justify-between border-t border-[#E2E8F0] pt-4">
-        <div className="shimmer-wave h-8 w-24 rounded bg-[#E2E8F0]" />
-        <div className="shimmer-wave h-11 w-36 rounded-full bg-[#E2E8F0]" />
+      <div className="flex items-center justify-between border-t border-[#C8C2B8]/40 pt-4">
+        <div className="shimmer-wave h-8 w-24 rounded bg-[#C8C2B8]/40" />
+        <div className="shimmer-wave h-11 w-36 rounded-full bg-[#C8C2B8]/40" />
       </div>
     </div>
 
-    <div className="order-1 lg:order-2 rounded-2xl border border-[#E2E8F0] bg-white p-4 sm:p-5 flex flex-col gap-3">
+    <div className="card-wasla order-1 lg:order-2 p-4 sm:p-5 flex flex-col gap-3">
       <div className="shimmer-wave h-10 w-full rounded-xl bg-[#F1F5F9]" />
       <div className="space-y-2">
         {Array.from({ length: 5 }).map((_, idx) => (
@@ -193,12 +193,12 @@ export const TripExplorer: React.FC<TripExplorerProps> = ({
         : '';
 
     return (
-      <div className="rounded-2xl border-[1.5px] border-[#CBD5E1] bg-white p-8 sm:p-10 text-center space-y-4">
-        <div className="mx-auto inline-flex h-12 w-12 items-center justify-center rounded-xl bg-[#FFF7ED] text-[#EA580C]">
+      <div className="card-wasla p-8 sm:p-10 text-center space-y-4">
+        <div className="mx-auto inline-flex h-12 w-12 items-center justify-center rounded-xl bg-[#FAF4ED] text-[#EE5426]">
           <CalendarDays className="h-6 w-6" aria-hidden="true" />
         </div>
         <div className="space-y-1.5 max-w-md mx-auto">
-          <h3 className="font-display text-lg font-semibold text-[#0F172A]">
+          <h3 className="font-display text-lg font-semibold text-[#0F2233]">
             {tText(
               {
                 en: 'No excursions match your current search',
@@ -232,7 +232,7 @@ export const TripExplorer: React.FC<TripExplorerProps> = ({
           <button
             type="button"
             onClick={onResetFilters}
-            className="inline-flex min-h-[42px] items-center gap-2 rounded-full border border-[#EA580C] bg-[#FFF7ED] px-5 py-2 text-xs font-semibold text-[#EA580C] hover:bg-[#EA580C] hover:text-white transition-colors cursor-pointer"
+            className="inline-flex min-h-[42px] items-center gap-2 rounded-full border border-[#EE5426] bg-[#FFF7ED] px-5 py-2 text-xs font-semibold text-[#EE5426] hover:bg-[#EE5426] hover:text-white transition-colors cursor-pointer"
           >
             <RotateCcw className="h-3.5 w-3.5" aria-hidden="true" />
             <span>
@@ -308,11 +308,11 @@ export const TripExplorer: React.FC<TripExplorerProps> = ({
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
       {/* Preview half */}
-      <div className="order-2 lg:order-1 rounded-2xl border border-[#E2E8F0] bg-white p-5 sm:p-6 flex flex-col justify-between gap-5">
+      <div className="card-wasla order-2 lg:order-1 p-5 sm:p-6 flex flex-col justify-between gap-5">
         {!activeTrip ? (
           <div className="flex flex-1 flex-col items-center justify-center py-12 text-center space-y-3">
-            <Search className="h-8 w-8 text-[#CBD5E1]" aria-hidden="true" />
-            <p className="text-sm font-semibold text-[#0F172A]">
+            <Search className="h-8 w-8 text-[#C8C2B8]" aria-hidden="true" />
+            <p className="text-sm font-semibold text-[#0F2233]">
               {tText(
                 {
                   en: 'No matching trips for this filter',
@@ -325,7 +325,7 @@ export const TripExplorer: React.FC<TripExplorerProps> = ({
             <button
               type="button"
               onClick={resetLocalFilters}
-              className="inline-flex min-h-[38px] items-center gap-1.5 rounded-full border border-[#EA580C] bg-[#FFF7ED] px-4 text-xs font-semibold text-[#EA580C] hover:bg-[#EA580C] hover:text-white transition-colors cursor-pointer"
+              className="inline-flex min-h-[38px] items-center gap-1.5 rounded-full border border-[#EE5426] bg-[#FFF7ED] px-4 text-xs font-semibold text-[#EE5426] hover:bg-[#EE5426] hover:text-white transition-colors cursor-pointer"
             >
               <RotateCcw className="h-3.5 w-3.5" />
               <span>{tText({ en: 'Show all trips', ar: 'عرض كل الرحلات', de: 'Alle zeigen' }, lang)}</span>
@@ -348,7 +348,7 @@ export const TripExplorer: React.FC<TripExplorerProps> = ({
                 />
 
                 <div className="absolute top-3 start-3 z-20 flex items-center gap-1.5">
-                  <span className="rounded-md bg-[#0F172A]/70 px-2.5 py-1 text-[11px] font-semibold text-white backdrop-blur-xs">
+                  <span className="rounded-md bg-[#0F2233]/70 px-2.5 py-1 text-[11px] font-semibold text-white backdrop-blur-xs">
                     {categoryLabel}
                   </span>
                 </div>
@@ -366,7 +366,7 @@ export const TripExplorer: React.FC<TripExplorerProps> = ({
                       className={`inline-flex h-9 w-9 items-center justify-center rounded-full transition-all duration-200 active:scale-90 cursor-pointer ${
                         favoriteTripIds.includes(activeTrip.id)
                           ? 'border border-white/50 bg-[#E11D48] text-white shadow-[0_6px_18px_rgba(225,29,72,0.55)] scale-105'
-                          : 'border border-white/40 bg-[#0F172A]/65 text-white hover:bg-[#E11D48]/90 backdrop-blur-xs shadow-xs'
+                          : 'border border-white/40 bg-[#0F2233]/65 text-white hover:bg-[#E11D48]/90 backdrop-blur-xs shadow-xs'
                       }`}
                     >
                       <Heart
@@ -386,7 +386,7 @@ export const TripExplorer: React.FC<TripExplorerProps> = ({
                     className={`inline-flex h-9 items-center justify-center gap-1 rounded-full transition-all duration-200 active:scale-90 cursor-pointer ${
                       copiedId === activeTrip.id
                         ? 'border border-white/60 bg-[#16A34A] px-2.5 text-white shadow-[0_6px_18px_rgba(22,163,74,0.5)]'
-                        : 'w-9 border border-white/40 bg-[#0F172A]/65 text-white hover:bg-[#EA580C]/95 backdrop-blur-xs shadow-xs'
+                        : 'w-9 border border-white/40 bg-[#0F2233]/65 text-white hover:bg-[#EE5426]/95 backdrop-blur-xs shadow-xs'
                     }`}
                   >
                     {copiedId === activeTrip.id ? (
@@ -402,13 +402,13 @@ export const TripExplorer: React.FC<TripExplorerProps> = ({
 
                 {images.length > 1 && (
                   <>
-                    <span className="pointer-events-none absolute bottom-3 end-3 z-10 rounded-md bg-[#0B1F2E]/78 px-2 py-0.5 text-[11px] font-semibold text-white backdrop-blur-xs tabular-nums">
+                    <span className="pointer-events-none absolute bottom-3 end-3 z-10 rounded-md bg-[#0F2233]/78 px-2 py-0.5 text-[11px] font-semibold text-white backdrop-blur-xs tabular-nums">
                       {imageIndex + 1} / {images.length}
                     </span>
                     <button
                       type="button"
                       onClick={isRtl ? nextImage : prevImage}
-                      className="absolute start-3 top-1/2 -translate-y-1/2 z-10 inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-[#0F172A] hover:bg-white shadow-sm cursor-pointer"
+                      className="absolute start-3 top-1/2 -translate-y-1/2 z-10 inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-[#0F2233] hover:bg-white shadow-sm cursor-pointer"
                       aria-label="Previous trip image"
                     >
                       <ChevronLeft className="h-4 w-4 rtl:rotate-180" />
@@ -416,7 +416,7 @@ export const TripExplorer: React.FC<TripExplorerProps> = ({
                     <button
                       type="button"
                       onClick={isRtl ? prevImage : nextImage}
-                      className="absolute end-3 top-1/2 -translate-y-1/2 z-10 inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-[#0F172A] hover:bg-white shadow-sm cursor-pointer"
+                      className="absolute end-3 top-1/2 -translate-y-1/2 z-10 inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-[#0F2233] hover:bg-white shadow-sm cursor-pointer"
                       aria-label="Next trip image"
                     >
                       <ChevronRight className="h-4 w-4 rtl:rotate-180" />
@@ -440,30 +440,30 @@ export const TripExplorer: React.FC<TripExplorerProps> = ({
 
               <div className="space-y-2.5">
                 <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-xs font-medium text-[#475569] tabular-nums">
-                  <span className="inline-flex items-center gap-1 text-[#0F172A] font-semibold">
+                  <span className="inline-flex items-center gap-1 text-[#0F2233] font-semibold">
                     <Star className="h-3.5 w-3.5 fill-[#F59E0B] text-[#F59E0B]" aria-hidden="true" />
                     {activeTrip.rating.toFixed(1)}
                     <span className="font-normal text-[#475569]">({activeTrip.reviewCount})</span>
                   </span>
                   <span aria-hidden="true">·</span>
                   <span className="inline-flex items-center gap-1">
-                    <Clock className="h-3.5 w-3.5 text-[#EA580C]" aria-hidden="true" />
+                    <Clock className="h-3.5 w-3.5 text-[#EE5426]" aria-hidden="true" />
                     {tText(activeTrip.duration, lang)}
                   </span>
                   <span aria-hidden="true">·</span>
-                  <span className="font-semibold text-[#EA580C]">
+                  <span className="font-semibold text-[#EE5426]">
                     {formatTripScheduleSummary(activeTrip, lang, false)}
                   </span>
                   <span aria-hidden="true">·</span>
-                  <span className="inline-flex items-center gap-1 text-[#0F172A]">
-                    <CalendarDays className="h-3.5 w-3.5 text-[#EA580C]" aria-hidden="true" />
+                  <span className="inline-flex items-center gap-1 text-[#0F2233]">
+                    <CalendarDays className="h-3.5 w-3.5 text-[#EE5426]" aria-hidden="true" />
                     {formatTripOperatingDaysLabel(activeTrip, lang)}
                   </span>
                   <span aria-hidden="true">·</span>
                   <span>{activeTrip.destination}</span>
                 </div>
 
-                <h3 className="font-display text-xl sm:text-2xl font-semibold text-[#0F172A] leading-snug">
+                <h3 className="font-display text-xl sm:text-2xl font-semibold text-[#0F2233] leading-snug">
                   {activeName}
                 </h3>
 
@@ -472,8 +472,8 @@ export const TripExplorer: React.FC<TripExplorerProps> = ({
                 </p>
 
                 {activeTrip.options && activeTrip.options.length > 0 && (
-                  <div className="rounded-lg border border-[#FED7AA] bg-[#FFF7ED]/60 px-3 py-2 text-xs text-[#0F172A]">
-                    <span className="font-semibold text-[#EA580C] tabular-nums">
+                  <div className="rounded-lg border border-[#FED7AA] bg-[#FFF7ED]/60 px-3 py-2 text-xs text-[#0F2233]">
+                    <span className="font-semibold text-[#EE5426] tabular-nums">
                       {activeTrip.options.length} {t.optionsCountSuffix}:{' '}
                     </span>
                     <span className="text-[#475569]">
@@ -482,7 +482,7 @@ export const TripExplorer: React.FC<TripExplorerProps> = ({
                   </div>
                 )}
 
-                <div className="pt-0.5 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-xs font-medium text-[#EA580C]">
+                <div className="pt-0.5 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-xs font-medium text-[#EE5426]">
                   {activeTrip.familyFriendly && <span>{t.familyFriendly}</span>}
                   {activeTrip.womenFriendly && (
                     <>
@@ -506,19 +506,19 @@ export const TripExplorer: React.FC<TripExplorerProps> = ({
               </div>
             </div>
 
-            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[#E2E8F0] pt-4">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[#C8C2B8]/50 dark:border-[#334155] pt-4">
               <div className="tabular-nums">
                 <span className="block text-[11px] font-medium text-[#64748B]">
                   {fromWord} · {tText({ en: 'per adult', ar: 'للبالغ', de: 'pro Erw.' }, lang)}
                 </span>
-                <span className="text-xl sm:text-2xl font-bold tracking-tight text-[#0F172A]">
+                <span className="text-xl sm:text-2xl font-bold tracking-tight text-[#0F2233]">
                   {formatCurrencyPrice(activeTrip.price, currency, currency !== 'EUR')}
                 </span>
               </div>
               <button
                 type="button"
                 onClick={() => onBookTrip(activeTrip)}
-                className="wasla-book-glare min-h-[44px] flex-1 sm:flex-none rounded-lg px-7 py-2.5 text-sm font-semibold text-white active:scale-[0.98] whitespace-nowrap cursor-pointer"
+                className="btn-wasla-primary min-h-[44px] flex-1 sm:flex-none rounded-lg px-7 py-2.5 text-sm whitespace-nowrap cursor-pointer"
               >
                 {t.bookNow}
               </button>
@@ -528,8 +528,8 @@ export const TripExplorer: React.FC<TripExplorerProps> = ({
       </div>
 
       {/* List half with keyword search, sorting, destination & trait filters */}
-      <div className="order-1 lg:order-2 rounded-2xl border border-[#E2E8F0] bg-white p-4 sm:p-5 flex flex-col">
-        <div className="flex flex-col gap-2.5 pb-3 mb-2 border-b border-[#E2E8F0]">
+      <div className="card-wasla order-1 lg:order-2 p-4 sm:p-5 flex flex-col">
+        <div className="flex flex-col gap-2.5 pb-3 mb-2 border-b border-[#C8C2B8]/50 dark:border-[#334155]">
           <div className="flex items-center justify-between gap-2">
             <span className="text-xs font-semibold text-[#475569]">{t.allTripsListHeading}</span>
             <div className="flex items-center gap-2">
@@ -541,7 +541,7 @@ export const TripExplorer: React.FC<TripExplorerProps> = ({
                 <button
                   type="button"
                   onClick={() => scrollList(-1)}
-                  className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-[#CBD5E1] bg-white text-[#0F172A] hover:bg-[#F1F5F9] active:scale-95 transition-all cursor-pointer"
+                  className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-[#CBD5E1] bg-white text-[#0F2233] hover:bg-[#F1F5F9] active:scale-95 transition-all cursor-pointer"
                   aria-label="Scroll previous trips"
                 >
                   <ChevronLeft className="h-4 w-4 rtl:rotate-180" />
@@ -549,7 +549,7 @@ export const TripExplorer: React.FC<TripExplorerProps> = ({
                 <button
                   type="button"
                   onClick={() => scrollList(1)}
-                  className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-[#CBD5E1] bg-white text-[#0F172A] hover:bg-[#F1F5F9] active:scale-95 transition-all cursor-pointer"
+                  className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-[#CBD5E1] bg-white text-[#0F2233] hover:bg-[#F1F5F9] active:scale-95 transition-all cursor-pointer"
                   aria-label="Scroll next trips"
                 >
                   <ChevronRight className="h-4 w-4 rtl:rotate-180" />
@@ -577,14 +577,14 @@ export const TripExplorer: React.FC<TripExplorerProps> = ({
                   },
                   lang
                 )}
-                className="min-h-[38px] w-full rounded-xl border border-[#CBD5E1] bg-[#F8FAFC] ps-8.5 pe-8 text-xs text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#EA580C] focus:bg-white focus:outline-none"
+                className="min-h-[38px] w-full rounded-xl border border-[#CBD5E1] bg-[#F8FAFC] ps-8.5 pe-8 text-xs text-[#0F2233] placeholder:text-[#94A3B8] focus:border-[#EE5426] focus:bg-white focus:outline-none"
               />
               {keyword && (
                 <button
                   type="button"
                   onClick={() => setKeyword('')}
                   aria-label="Clear search"
-                  className="absolute end-2 top-1/2 -translate-y-1/2 inline-flex h-6 w-6 items-center justify-center rounded-full text-[#64748B] hover:text-[#0F172A] cursor-pointer"
+                  className="absolute end-2 top-1/2 -translate-y-1/2 inline-flex h-6 w-6 items-center justify-center rounded-full text-[#64748B] hover:text-[#0F2233] cursor-pointer"
                 >
                   <X className="h-3.5 w-3.5" />
                 </button>
@@ -600,7 +600,7 @@ export const TripExplorer: React.FC<TripExplorerProps> = ({
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as ExplorerSort)}
                 aria-label={tText({ en: 'Sort trips', ar: 'ترتيب الرحلات', de: 'Sortieren' }, lang)}
-                className="min-h-[38px] w-full sm:w-auto rounded-xl border border-[#CBD5E1] bg-[#F8FAFC] ps-8 pe-3 text-xs font-medium text-[#0F172A] focus:border-[#EA580C] focus:bg-white focus:outline-none cursor-pointer"
+                className="min-h-[38px] w-full sm:w-auto rounded-xl border border-[#CBD5E1] bg-[#F8FAFC] ps-8 pe-3 text-xs font-medium text-[#0F2233] focus:border-[#EE5426] focus:bg-white focus:outline-none cursor-pointer"
               >
                 <option value="featured">
                   {tText({ en: 'Featured', ar: 'المميزة أولاً', de: 'Empfohlen' }, lang)}
@@ -638,8 +638,8 @@ export const TripExplorer: React.FC<TripExplorerProps> = ({
                   onClick={() => setQuickFilter(pill.id)}
                   className={`shrink-0 rounded-full px-3 py-1 text-[11px] font-semibold transition-all active:scale-95 cursor-pointer ${
                     isActive
-                      ? 'bg-[#EA580C] text-white shadow-xs'
-                      : 'border border-[#E2E8F0] bg-[#F8FAFC] text-[#475569] hover:border-[#FDBA74] hover:text-[#EA580C]'
+                      ? 'bg-[#EE5426] text-white shadow-xs'
+                      : 'border border-[#E2E8F0] bg-[#F8FAFC] text-[#475569] hover:border-[#FDBA74] hover:text-[#EE5426]'
                   }`}
                 >
                   {pill.label}
@@ -653,8 +653,8 @@ export const TripExplorer: React.FC<TripExplorerProps> = ({
               aria-pressed={familyOnly}
               className={`shrink-0 rounded-full px-3 py-1 text-[11px] font-semibold transition-all cursor-pointer ${
                 familyOnly
-                  ? 'bg-[#0F172A] text-white'
-                  : 'border border-[#E2E8F0] bg-white text-[#475569] hover:border-[#0F172A]'
+                  ? 'bg-[#0F2233] text-white'
+                  : 'border border-[#E2E8F0] bg-white text-[#475569] hover:border-[#0F2233]'
               }`}
             >
               {t.familyFriendly}
@@ -666,8 +666,8 @@ export const TripExplorer: React.FC<TripExplorerProps> = ({
               aria-pressed={womenOnly}
               className={`shrink-0 rounded-full px-3 py-1 text-[11px] font-semibold transition-all cursor-pointer ${
                 womenOnly
-                  ? 'bg-[#0F172A] text-white'
-                  : 'border border-[#E2E8F0] bg-white text-[#475569] hover:border-[#0F172A]'
+                  ? 'bg-[#0F2233] text-white'
+                  : 'border border-[#E2E8F0] bg-white text-[#475569] hover:border-[#0F2233]'
               }`}
             >
               {t.womenFriendly}
@@ -677,7 +677,7 @@ export const TripExplorer: React.FC<TripExplorerProps> = ({
               <button
                 type="button"
                 onClick={resetLocalFilters}
-                className="shrink-0 inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-semibold text-[#EA580C] hover:underline cursor-pointer"
+                className="shrink-0 inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-semibold text-[#EE5426] hover:underline cursor-pointer"
               >
                 <RotateCcw className="h-3 w-3" />
                 {tText({ en: 'Reset', ar: 'إعادة ضبط', de: 'Reset' }, lang)}
@@ -688,7 +688,7 @@ export const TripExplorer: React.FC<TripExplorerProps> = ({
 
         {filteredListTrips.length === 0 ? (
           <div className="flex flex-1 flex-col items-center justify-center py-8 text-center space-y-2.5">
-            <p className="text-xs sm:text-sm font-semibold text-[#0F172A]">
+            <p className="text-xs sm:text-sm font-semibold text-[#0F2233]">
               {tText(
                 {
                   en: 'No excursions found for this filter combination.',
@@ -701,7 +701,7 @@ export const TripExplorer: React.FC<TripExplorerProps> = ({
             <button
               type="button"
               onClick={resetLocalFilters}
-              className="inline-flex min-h-[36px] items-center gap-1.5 rounded-full border border-[#EA580C] bg-[#FFF7ED] px-4 text-xs font-semibold text-[#EA580C] hover:bg-[#EA580C] hover:text-white transition-colors cursor-pointer"
+              className="inline-flex min-h-[36px] items-center gap-1.5 rounded-full border border-[#EE5426] bg-[#FFF7ED] px-4 text-xs font-semibold text-[#EE5426] hover:bg-[#EE5426] hover:text-white transition-colors cursor-pointer"
             >
               <RotateCcw className="h-3.5 w-3.5" />
               <span>{tText({ en: 'Reset filters', ar: 'إعادة ضبط الفلاتر', de: 'Filter zurücksetzen' }, lang)}</span>
@@ -730,7 +730,7 @@ export const TripExplorer: React.FC<TripExplorerProps> = ({
                   }}
                   className={`group snap-start shrink-0 w-[82%] sm:w-[48%] lg:w-full text-start flex items-center gap-3 rounded-xl p-2.5 transition-all duration-200 cursor-pointer border ${
                     isSelected
-                      ? 'border-[#EA580C] bg-[#FFF7ED] shadow-xs'
+                      ? 'border-[#EE5426] bg-[#FFF7ED] shadow-xs'
                       : 'border-[#E2E8F0] lg:border-transparent bg-[#F8FAFC]/60 lg:bg-transparent hover:bg-[#FFF7ED]/50'
                   }`}
                 >
@@ -744,14 +744,14 @@ export const TripExplorer: React.FC<TripExplorerProps> = ({
                   </div>
                   <div className="min-w-0 flex-1 space-y-1">
                     <div className="flex items-baseline justify-between gap-2">
-                      <p className="text-sm font-semibold text-[#0F172A] truncate">{tripName}</p>
-                      <span className="shrink-0 text-xs font-bold text-[#EA580C] tabular-nums">
+                      <p className="text-sm font-semibold text-[#0F2233] truncate">{tripName}</p>
+                      <span className="shrink-0 text-xs font-bold text-[#EE5426] tabular-nums">
                         {formatCurrencyPrice(trip.price, currency)}
                       </span>
                     </div>
                     <div className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-xs text-[#475569] tabular-nums">
-                      <span className="inline-flex items-center gap-0.5 text-[#0F172A] font-medium">
-                        <MapPin className="h-3 w-3 text-[#EA580C] shrink-0" aria-hidden="true" />
+                      <span className="inline-flex items-center gap-0.5 text-[#0F2233] font-medium">
+                        <MapPin className="h-3 w-3 text-[#EE5426] shrink-0" aria-hidden="true" />
                         {trip.destination}
                       </span>
                       <span aria-hidden="true">·</span>
@@ -772,7 +772,7 @@ export const TripExplorer: React.FC<TripExplorerProps> = ({
                       className={`inline-flex h-8 w-8 items-center justify-center rounded-full border transition-all cursor-pointer ${
                         copiedId === trip.id
                           ? 'border-[#16A34A] bg-[#16A34A] text-white shadow-xs'
-                          : 'border-[#CBD5E1] bg-white text-[#64748B] hover:border-[#EA580C] hover:text-[#EA580C]'
+                          : 'border-[#CBD5E1] bg-white text-[#64748B] hover:border-[#EE5426] hover:text-[#EE5426]'
                       }`}
                     >
                       {copiedId === trip.id ? (

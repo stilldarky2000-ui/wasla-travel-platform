@@ -1,0 +1,22 @@
+{
+  "name": "wasla-travel-functions",
+  "private": true,
+  "description": "Firebase Cloud Functions v2 for automated Wasla Travel booking confirmation notifications (Customer bilingual email + Owner email + Owner WhatsApp alert).",
+  "engines": {
+    "node": "20"
+  },
+  "main": "lib/index.js",
+  "scripts": {
+    "build": "tsc",
+    "serve": "npm run build && firebase emulators:start --only functions",
+    "deploy": "firebase deploy --only functions"
+  },
+  "dependencies": {
+    "firebase-functions": "^6.3.2",
+    "nodemailer": "^7.0.3"
+  },
+  "devDependencies": {
+    "@types/nodemailer": "^6.4.17",
+    "typescript": "^5.8.2"
+  }
+}

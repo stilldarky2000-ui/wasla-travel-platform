@@ -89,10 +89,10 @@ const THEME_PREVIEWS: Record<
   },
   'obsidian-gold': {
     label: 'Obsidian & Gold Luxury',
-    bg: 'bg-[#090D16]',
-    overlay: 'from-[#05080F]/84 via-[#111827]/58 to-[#090D16]/88',
+    bg: 'bg-[#0F2233]',
+    overlay: 'from-[#0F2233]/86 via-[#19354F]/58 to-[#0F2233]/90',
     accent: 'text-[#FDE047]',
-    swatch: '#090D16',
+    swatch: '#0F2233',
     accentHex: '#FDE047',
   },
 };
@@ -280,7 +280,7 @@ export const OwnerHeroStudio: React.FC<OwnerHeroStudioProps> = ({
               </>
             )}
           </h2>
-          <p className="max-w-2xl text-xs sm:text-sm text-[#E2EFF0]">
+          <p className="max-w-2xl text-xs sm:text-sm text-[#FAF4ED]/90">
             {heroSubEn.trim() ||
               'Wasla Travel connects you directly with vetted local tourism providers across the Red Sea and Nile.'}
           </p>
@@ -289,10 +289,10 @@ export const OwnerHeroStudio: React.FC<OwnerHeroStudioProps> = ({
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left: Panorama Photo Picker */}
-        <div className="lg:col-span-6 rounded-xl border border-[#E2E8F0] bg-white p-5 space-y-4">
+        <div className="lg:col-span-6 card-wasla rounded-xl p-5 space-y-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-sm font-semibold text-[#0F172A]">
-              <ImageIcon className="h-4 w-4 text-[#EA580C]" aria-hidden="true" />
+            <div className="flex items-center gap-2 text-sm font-semibold text-[#0F2233]">
+              <ImageIcon className="h-4 w-4 text-[#EE5426]" aria-hidden="true" />
               <span>1. Hero Panorama Image</span>
             </div>
             <button
@@ -301,7 +301,7 @@ export const OwnerHeroStudio: React.FC<OwnerHeroStudioProps> = ({
                 setHeroImageUrl('');
                 setUploadNote('Reset to default Hurghada coastline panorama.');
               }}
-              className="inline-flex items-center gap-1 text-xs font-medium text-[#475569] hover:text-[#0F172A] cursor-pointer"
+              className="inline-flex items-center gap-1 text-xs font-medium text-[#475569] hover:text-[#0F2233] cursor-pointer"
             >
               <RotateCcw className="h-3.5 w-3.5" aria-hidden="true" />
               <span>Reset default</span>
@@ -319,7 +319,7 @@ export const OwnerHeroStudio: React.FC<OwnerHeroStudioProps> = ({
             <button
               type="button"
               onClick={() => fileRef.current?.click()}
-              className="inline-flex min-h-[40px] items-center justify-center gap-2 rounded-lg border border-dashed border-[#EA580C] bg-[#FFF7ED]/60 px-4 text-xs font-semibold text-[#EA580C] hover:bg-[#FFEDD5] cursor-pointer whitespace-nowrap"
+              className="inline-flex min-h-[40px] items-center justify-center gap-2 rounded-lg border border-dashed border-[#EE5426] bg-[#FFF7ED]/60 px-4 text-xs font-semibold text-[#EE5426] hover:bg-[#FFEDD5] cursor-pointer whitespace-nowrap"
             >
               <Upload className="h-4 w-4" aria-hidden="true" />
               <span>Upload Panorama</span>
@@ -333,7 +333,7 @@ export const OwnerHeroStudio: React.FC<OwnerHeroStudioProps> = ({
             />
           </div>
 
-          {uploadNote && <p className="text-xs font-medium text-[#EA580C]">{uploadNote}</p>}
+          {uploadNote && <p className="text-xs font-medium text-[#EE5426]">{uploadNote}</p>}
 
           <div className="space-y-1.5">
             <span className="block text-[11px] font-medium text-[#475569]">
@@ -349,7 +349,7 @@ export const OwnerHeroStudio: React.FC<OwnerHeroStudioProps> = ({
                     setUploadNote('');
                   }}
                   className={`wasla-img-glare rounded-lg border overflow-hidden cursor-pointer ${
-                    heroImageUrl === src ? 'border-[#EA580C] ring-2 ring-[#EA580C]/30' : 'border-[#CBD5E1]'
+                    heroImageUrl === src ? 'border-[#EE5426] ring-2 ring-[#EE5426]/30' : 'border-[#CBD5E1]'
                   }`}
                 >
                   <img src={src} alt={`Preset ${i + 1}`} className="h-12 w-full object-cover" />
@@ -360,10 +360,10 @@ export const OwnerHeroStudio: React.FC<OwnerHeroStudioProps> = ({
         </div>
 
         {/* Right: Profiles, Font + Overlay Theme */}
-        <div className="lg:col-span-6 rounded-xl border border-[#E2E8F0] bg-white p-5 space-y-5">
+        <div className="lg:col-span-6 card-wasla rounded-xl p-5 space-y-5">
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <div className="flex items-center gap-2 text-sm font-semibold text-[#0F172A]">
-              <Type className="h-4 w-4 text-[#EA580C]" aria-hidden="true" />
+            <div className="flex items-center gap-2 text-sm font-semibold text-[#0F2233]">
+              <Type className="h-4 w-4 text-[#EE5426]" aria-hidden="true" />
               <span>2. Hero Typography &amp; Background Overlay</span>
             </div>
             <span className="text-[11px] font-medium text-[#64748B]">
@@ -373,8 +373,8 @@ export const OwnerHeroStudio: React.FC<OwnerHeroStudioProps> = ({
 
           {/* Ready-made 1-Click Style Profiles */}
           <div className="space-y-2">
-            <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#0F172A]">
-              <Sparkles className="h-3.5 w-3.5 text-[#EA580C]" aria-hidden="true" />
+            <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#0F2233]">
+              <Sparkles className="h-3.5 w-3.5 text-[#EE5426]" aria-hidden="true" />
               <span>Ready Style Profiles (1-Click Font + Theme)</span>
             </span>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
@@ -392,7 +392,7 @@ export const OwnerHeroStudio: React.FC<OwnerHeroStudioProps> = ({
                     }}
                     className={`flex items-start justify-between gap-2 rounded-lg border px-3 py-2 text-start transition-all cursor-pointer ${
                       isProfileActive
-                        ? 'border-[#EA580C] bg-[#FFF7ED] ring-1 ring-[#EA580C]/30'
+                        ? 'border-[#EE5426] bg-[#FFF7ED] ring-1 ring-[#EE5426]/30'
                         : 'border-[#E2E8F0] bg-white hover:border-[#FDBA74]'
                     }`}
                   >
@@ -406,7 +406,7 @@ export const OwnerHeroStudio: React.FC<OwnerHeroStudioProps> = ({
                         />
                         <span
                           className={`text-xs font-semibold truncate ${
-                            isProfileActive ? 'text-[#EA580C]' : 'text-[#0F172A]'
+                            isProfileActive ? 'text-[#EE5426]' : 'text-[#0F2233]'
                           }`}
                         >
                           {profile.name}
@@ -415,7 +415,7 @@ export const OwnerHeroStudio: React.FC<OwnerHeroStudioProps> = ({
                       <p className="text-[10.5px] text-[#64748B] truncate">{profile.desc}</p>
                     </div>
                     {isProfileActive && (
-                      <Check className="h-3.5 w-3.5 shrink-0 text-[#EA580C] mt-0.5" aria-hidden="true" />
+                      <Check className="h-3.5 w-3.5 shrink-0 text-[#EE5426] mt-0.5" aria-hidden="true" />
                     )}
                   </button>
                 );
@@ -425,7 +425,7 @@ export const OwnerHeroStudio: React.FC<OwnerHeroStudioProps> = ({
 
           {/* 6 Headline Font Families */}
           <div className="space-y-2">
-            <span className="block text-xs font-semibold text-[#0F172A]">
+            <span className="block text-xs font-semibold text-[#0F2233]">
               Headline Font Family ({FONT_OPTIONS.length} styles)
             </span>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
@@ -436,7 +436,7 @@ export const OwnerHeroStudio: React.FC<OwnerHeroStudioProps> = ({
                   onClick={() => setHeroFontStyle(opt.id)}
                   className={`rounded-lg border px-3 py-2 text-start transition-colors cursor-pointer ${
                     heroFontStyle === opt.id
-                      ? 'border-[#EA580C] bg-[#FFF7ED] text-[#EA580C]'
+                      ? 'border-[#EE5426] bg-[#FFF7ED] text-[#EE5426]'
                       : 'border-[#E2E8F0] bg-white text-[#475569] hover:border-[#CBD5E1]'
                   }`}
                 >
@@ -451,8 +451,8 @@ export const OwnerHeroStudio: React.FC<OwnerHeroStudioProps> = ({
 
           {/* 8 Backdrop Color & Overlay Tints */}
           <div className="space-y-2">
-            <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#0F172A]">
-              <Palette className="h-3.5 w-3.5 text-[#EA580C]" aria-hidden="true" />
+            <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#0F2233]">
+              <Palette className="h-3.5 w-3.5 text-[#EE5426]" aria-hidden="true" />
               <span>Backdrop Color &amp; Overlay Tint ({Object.keys(THEME_PREVIEWS).length} themes)</span>
             </span>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -465,7 +465,7 @@ export const OwnerHeroStudio: React.FC<OwnerHeroStudioProps> = ({
                     onClick={() => setHeroTheme(key)}
                     className={`flex items-center justify-between gap-2 rounded-lg border px-3 py-2 text-xs font-semibold transition-colors cursor-pointer ${
                       heroTheme === key
-                        ? 'border-[#EA580C] bg-[#FFF7ED] text-[#EA580C]'
+                        ? 'border-[#EE5426] bg-[#FFF7ED] text-[#EE5426]'
                         : 'border-[#E2E8F0] bg-white text-[#475569] hover:border-[#CBD5E1]'
                     }`}
                   >
@@ -479,7 +479,7 @@ export const OwnerHeroStudio: React.FC<OwnerHeroStudioProps> = ({
                       <span className="truncate">{cfg.label}</span>
                     </span>
                     {heroTheme === key && (
-                      <Check className="h-3.5 w-3.5 shrink-0 text-[#EA580C]" aria-hidden="true" />
+                      <Check className="h-3.5 w-3.5 shrink-0 text-[#EE5426]" aria-hidden="true" />
                     )}
                   </button>
                 );
@@ -490,9 +490,9 @@ export const OwnerHeroStudio: React.FC<OwnerHeroStudioProps> = ({
       </div>
 
       {/* Captions & Subtitles EN / AR / DE */}
-      <div className="rounded-xl border border-[#E2E8F0] bg-white p-5 space-y-4">
+      <div className="card-wasla rounded-xl p-5 space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <h3 className="text-sm font-semibold text-[#0F172A]">
+          <h3 className="text-sm font-semibold text-[#0F2233]">
             3. Hero Caption &amp; Subtitle (Leave empty to keep built-in Wasla defaults)
           </h3>
           {savedBanner && (
@@ -503,7 +503,7 @@ export const OwnerHeroStudio: React.FC<OwnerHeroStudioProps> = ({
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="space-y-2">
             <label className="block space-y-1">
-              <span className="text-xs font-semibold text-[#0F172A]">Headline (English)</span>
+              <span className="text-xs font-semibold text-[#0F2233]">Headline (English)</span>
               <input
                 type="text"
                 value={heroCaptionEn}
@@ -513,7 +513,7 @@ export const OwnerHeroStudio: React.FC<OwnerHeroStudioProps> = ({
               />
             </label>
             <label className="block space-y-1">
-              <span className="text-xs font-semibold text-[#0F172A]">Subtitle (English)</span>
+              <span className="text-xs font-semibold text-[#0F2233]">Subtitle (English)</span>
               <textarea
                 rows={2}
                 value={heroSubEn}
@@ -526,7 +526,7 @@ export const OwnerHeroStudio: React.FC<OwnerHeroStudioProps> = ({
 
           <div className="space-y-2">
             <label className="block space-y-1">
-              <span className="text-xs font-semibold text-[#0F172A]">العنوان الرئيسي (Arabic)</span>
+              <span className="text-xs font-semibold text-[#0F2233]">العنوان الرئيسي (Arabic)</span>
               <input
                 type="text"
                 dir="rtl"
@@ -537,7 +537,7 @@ export const OwnerHeroStudio: React.FC<OwnerHeroStudioProps> = ({
               />
             </label>
             <label className="block space-y-1">
-              <span className="text-xs font-semibold text-[#0F172A]">النص التوضيحي (Arabic)</span>
+              <span className="text-xs font-semibold text-[#0F2233]">النص التوضيحي (Arabic)</span>
               <textarea
                 rows={2}
                 dir="rtl"
@@ -551,7 +551,7 @@ export const OwnerHeroStudio: React.FC<OwnerHeroStudioProps> = ({
 
           <div className="space-y-2">
             <label className="block space-y-1">
-              <span className="text-xs font-semibold text-[#0F172A]">Titel (Deutsch)</span>
+              <span className="text-xs font-semibold text-[#0F2233]">Titel (Deutsch)</span>
               <input
                 type="text"
                 value={heroCaptionDe}
@@ -561,7 +561,7 @@ export const OwnerHeroStudio: React.FC<OwnerHeroStudioProps> = ({
               />
             </label>
             <label className="block space-y-1">
-              <span className="text-xs font-semibold text-[#0F172A]">Untertitel (Deutsch)</span>
+              <span className="text-xs font-semibold text-[#0F2233]">Untertitel (Deutsch)</span>
               <textarea
                 rows={2}
                 value={heroSubDe}
@@ -577,7 +577,7 @@ export const OwnerHeroStudio: React.FC<OwnerHeroStudioProps> = ({
           <button
             type="submit"
             disabled={saving || !onSavePublicSettings}
-            className="inline-flex min-h-[42px] items-center gap-2 rounded-lg bg-[#EA580C] px-5 text-xs font-semibold text-white hover:bg-[#C2410C] disabled:opacity-60 cursor-pointer"
+            className="btn-wasla-primary min-h-[42px] rounded-lg px-5 py-2 text-xs cursor-pointer"
           >
             <Save className="h-4 w-4" aria-hidden="true" />
             <span>{saving ? 'Saving Live...' : 'Save Hero & Appearance Live'}</span>

@@ -21,44 +21,18 @@ export default defineConfig(({mode}) => {
       VitePWA({
         registerType: 'autoUpdate',
         includeAssets: [
+          'favicon.svg',
+          'apple-touch-icon.svg',
+          'logo-dark-icon.svg',
+          'logo-horizontal-light.svg',
+          'manifest.json',
           'apple-touch-icon.png',
           'icon.svg',
           'pwa-192x192.png',
           'pwa-512x512.png',
           'pwa-maskable-512x512.png',
         ],
-        manifest: {
-          id: '/',
-          name: 'Wasla Travel — Red Sea & Egypt Excursions',
-          short_name: 'Wasla',
-          description:
-            'Small-group sea days, desert safaris, Luxor history, and local Hurghada experiences with whole-euro pricing and instant WhatsApp booking.',
-          theme_color: '#EA580C',
-          background_color: '#FFFFFF',
-          display: 'standalone',
-          start_url: '/',
-          scope: '/',
-          icons: [
-            {
-              src: '/pwa-192x192.png',
-              sizes: '192x192',
-              type: 'image/png',
-              purpose: 'any',
-            },
-            {
-              src: '/pwa-512x512.png',
-              sizes: '512x512',
-              type: 'image/png',
-              purpose: 'any',
-            },
-            {
-              src: '/pwa-maskable-512x512.png',
-              sizes: '512x512',
-              type: 'image/png',
-              purpose: 'maskable',
-            },
-          ],
-        },
+        manifest: false,
         workbox: {
           globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2}'],
           maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,

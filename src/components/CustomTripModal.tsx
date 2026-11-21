@@ -1,8 +1,7 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { CheckCircle2, ExternalLink, MessageCircle, X } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { CheckCircle2, MessageCircle, X } from 'lucide-react';
 import { DestinationRegion, SITE_CONFIG, tText } from '../data/marketplaceData';
 import { detectGuestCountry } from '../lib/nationalityDetect';
-import { buildBookingWhatsAppUrl } from '../lib/whatsapp';
 import { Lang } from '../data/i18n';
 import { WaslaBrandMark } from './WaslaBrandMark';
 
@@ -74,13 +73,15 @@ export const CustomTripModal: React.FC<CustomTripModalProps> = ({
   const defaultDate = new Date(Date.now() + 86400000).toISOString().slice(0, 10);
   const [guestName, setGuestName] = useState('');
   const [guestWhatsapp, setGuestWhatsapp] = useState('');
+  const [whatsappOptIn, setWhatsappOptIn] = useState(true);
   const [guestEmail, setGuestEmail] = useState('');
   const [destination, setDestination] = useState<DestinationRegion>('Hurghada');
   const [date, setDate] = useState(defaultDate);
   const [adults, setAdults] = useState(2);
   const [children, setChildren] = useState(0);
   const [infants, setInfants] = useState(0);
-  const [guideLanguage, setGuideLanguage] = useState('English');
+  const defaultGuideLang = lang === 'de' ? 'German' : lang === 'ar' ? 'Arabic' : 'English';
+  const [guideLanguage, setGuideLanguage] = useState(defaultGuideLang);
   const [services, setServices] = useState<string[]>(
     initialServices && initialServices.length > 0
       ? initialServices
@@ -89,20 +90,19 @@ export const CustomTripModal: React.FC<CustomTripModalProps> = ({
   const [notes, setNotes] = useState('');
   const [formError, setFormError] = useState('');
   const [createdRef, setCreatedRef] = useState<string | null>(null);
-  const [waUrl, setWaUrl] = useState('');
-  const autoWaRef = useRef<HTMLAnchorElement | null>(null);
 
   useEffect(() => {
     if (!open) return;
     setCreatedRef(null);
-    setWaUrl('');
     setFormError('');
+    setWhatsappOptIn(true);
+    setGuideLanguage(lang === 'de' ? 'German' : lang === 'ar' ? 'Arabic' : 'English');
     setServices(
       initialServices && initialServices.length > 0
         ? initialServices
         : ['Trips', 'Professional Egyptian Guide']
     );
-  }, [open, initialServices]);
+  }, [open, initialServices, lang]);
 
   useEffect(() => {
     if (!open) return;
@@ -153,6 +153,8 @@ export const CustomTripModal: React.FC<CustomTripModalProps> = ({
     });
     const selectedServices = services.length > 0 ? services : ['Customized Trip'];
     const combinedContact = `${cleanWa} · ${cleanEmail}`;
+    const consentNote = whatsappOptIn ? 'WhatsApp Opt-in: Yes ✓' : 'WhatsApp Opt-in: Email only';
+    const mergedNotes = [consentNote, notes.trim()].filter(Boolean).join(' · ');
     const refId = onSubmit({
       guestName: cleanName,
       guestCountry: autoCountry,
@@ -166,38 +168,14 @@ export const CustomTripModal: React.FC<CustomTripModalProps> = ({
       infants,
       guideLanguage,
       services: selectedServices,
-      notes: notes.trim(),
+      notes: mergedNotes,
     });
-    const url = buildBookingWhatsAppUrl(
-      whatsappNumber,
-      {
-        id: refId,
-        tripTitle: `Custom (${destination}): ${selectedServices.join(', ')} [${guideLanguage} Guide]`,
-        date,
-        adults,
-        children,
-        infants,
-        totalEur: 0,
-        hotel: `${destination} Custom Pickup`,
-        guestName: cleanName,
-        guestCountry: autoCountry,
-        whatsapp: cleanWa,
-        email: cleanEmail,
-        contact: combinedContact,
-        notes: notes.trim(),
-      },
-      lang
-    );
-    setWaUrl(url);
     setCreatedRef(refId);
-    window.setTimeout(() => {
-      autoWaRef.current?.click();
-    }, 60);
   };
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-[#0F172A]/65 p-3 sm:p-4 backdrop-blur-[2px]"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-[#0F2233]/65 p-3 sm:p-4 backdrop-blur-[2px]"
       dir={isRtl ? 'rtl' : 'ltr'}
       onClick={onClose}
       role="dialog"
@@ -205,14 +183,14 @@ export const CustomTripModal: React.FC<CustomTripModalProps> = ({
       aria-labelledby="custom-trip-title"
     >
       <div
-        className="w-full max-w-xl max-h-[90vh] flex flex-col rounded-2xl border border-[#E2E8F0] bg-white shadow-2xl overflow-hidden"
+        className="card-wasla p-0 w-full max-w-xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between border-b border-[#E2E8F0] px-5 sm:px-6 py-4 shrink-0">
+        <div className="flex items-center justify-between border-b border-[#C8C2B8]/50 px-5 sm:px-6 py-4 shrink-0">
           <div className="flex items-center gap-3 min-w-0">
             <WaslaBrandMark size="sm" />
             <div className="min-w-0">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#EA580C]">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#EE5426]">
                 {tText(
                   {
                     en: 'Tailored by Wasla Operations',
@@ -224,7 +202,7 @@ export const CustomTripModal: React.FC<CustomTripModalProps> = ({
               </p>
               <h2
                 id="custom-trip-title"
-                className="font-display text-lg sm:text-xl font-semibold text-[#0F172A] truncate"
+                className="font-display text-lg sm:text-xl font-semibold text-[#0F2233] truncate"
               >
                 {tText(
                   {
@@ -241,7 +219,7 @@ export const CustomTripModal: React.FC<CustomTripModalProps> = ({
             type="button"
             onClick={onClose}
             aria-label="Close"
-            className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-[#E2E8F0] text-[#0F172A] hover:bg-[#F1F5F9] cursor-pointer"
+            className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-[#E2E8F0] text-[#0F2233] hover:bg-[#F1F5F9] cursor-pointer"
           >
             <X className="h-4 w-4" />
           </button>
@@ -251,16 +229,16 @@ export const CustomTripModal: React.FC<CustomTripModalProps> = ({
           {createdRef ? (
             <div className="space-y-4 py-2 text-center">
               <CheckCircle2 className="h-10 w-10 text-[#16A34A] mx-auto" />
-              <div className="space-y-1">
-                <p className="font-mono text-xs font-semibold uppercase tracking-wider text-[#EA580C]">
+              <div className="space-y-1.5">
+                <p className="font-mono text-xs font-semibold uppercase tracking-wider text-[#EE5426]">
                   {createdRef}
                 </p>
-                <h3 className="font-display text-xl font-semibold text-[#0F172A]">
+                <h3 className="font-display text-xl font-semibold text-[#0F2233]">
                   {tText(
                     {
-                      en: 'Custom request received — quote coming soon',
-                      ar: 'تم استلام طلبك الخاص — سنرسل لك عرض السعر قريباً',
-                      de: 'Individuelle Anfrage erhalten — Angebot folgt in Kürze',
+                      en: 'Your booking request is confirmed — we will contact you shortly',
+                      ar: 'تم تأكيد استلام طلبك بنجاح — سنتواصل معك الآن',
+                      de: 'Ihre Anfrage ist bestätigt — wir melden uns in Kürze',
                     },
                     lang
                   )}
@@ -268,38 +246,72 @@ export const CustomTripModal: React.FC<CustomTripModalProps> = ({
                 <p className="text-sm text-[#475569]">
                   {tText(
                     {
-                      en: 'No payment is taken now. Our Operations Desk will prepare a transparent whole-euro quote and confirm pickup via WhatsApp and email.',
-                      ar: 'لا يوجد أي دفع الآن. سيقوم فريق العمليات بإعداد عرض سعر شفاف باليورو والتواصل معك عبر واتساب والبريد الإلكتروني للتأكيد.',
-                      de: 'Keine Vorauszahlung nötig. Unser Team erstellt ein transparentes Angebot und meldet sich per WhatsApp und E-Mail.',
+                      en: 'A confirmation email has been sent to your inbox and our team has been alerted immediately. We will contact you right now via WhatsApp and Email with your tailored quote.',
+                      ar: 'تم إرسال إيميل بتأكيد الطلب إلى بريدك الإلكتروني وإشعار فريقنا فوراً. سنتواصل معك الآن عبر واتساب والبريد الإلكتروني بعرض السعر والتفاصيل.',
+                      de: 'Eine Bestätigungs-E-Mail wurde an Ihr Postfach gesendet und unser Team wurde sofort benachrichtigt. Wir melden uns gleich per WhatsApp und E-Mail.',
                     },
                     lang
                   )}
                 </p>
               </div>
-              <a
-                ref={autoWaRef}
-                href={waUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="wasla-wa-glare inline-flex min-h-[44px] w-full items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold text-white cursor-pointer"
-              >
-                <MessageCircle className="h-4 w-4" />
-                <span>
-                  {tText(
-                    {
-                      en: 'Open Request on WhatsApp',
-                      ar: 'افتح تفاصيل الطلب عبر واتساب',
-                      de: 'Anfrage auf WhatsApp öffnen',
-                    },
-                    lang
-                  )}
-                </span>
-                <ExternalLink className="h-3.5 w-3.5" />
-              </a>
+              {(() => {
+                const waDigits = whatsappNumber.replace(/\D/g, '') || '201129155520';
+                const waGreeting =
+                  lang === 'ar'
+                    ? `أهلاً وصلة ترافيل! أرسلت طلب رحلة مخصصة إلى ${destination} (رقم الطلب: ${createdRef}) ليوم ${date}. أوافق على استلام عرض السعر والتفاصيل هنا على واتساب.`
+                    : lang === 'de'
+                    ? `Hallo Wasla Travel! Ich habe gerade eine individuelle Anfrage für ${destination} (Ref: ${createdRef}) für den ${date} gesendet. Ich möchte mein Angebot gerne hier per WhatsApp erhalten.`
+                    : `Hi Wasla Travel! I just sent a custom trip request for ${destination} (Ref: ${createdRef}) for ${date}. I agree to receive my tailored quote & details here on WhatsApp.`;
+                const waUrl = `https://wa.me/${waDigits}?text=${encodeURIComponent(waGreeting)}`;
+                return (
+                  <div className="rounded-xl border border-[#CBD5E1] bg-[#F8FAFC] p-3.5 text-start space-y-2.5">
+                    <div className="space-y-0.5">
+                      <p className="text-xs font-bold text-[#0F2233]">
+                        {tText(
+                          {
+                            en: 'Prefer to receive your quote faster on WhatsApp? (Optional)',
+                            ar: 'هل تفضل استلام عرض السعر أسرع على واتساب؟ (اختياري)',
+                            de: 'Möchten Sie Ihr Angebot schneller per WhatsApp erhalten? (Optional)',
+                          },
+                          lang
+                        )}
+                      </p>
+                      <p className="text-[11px] leading-relaxed text-[#475569]">
+                        {tText(
+                          {
+                            en: 'Your request is already confirmed by email. Tap below only if you want to start a direct WhatsApp chat with our concierge.',
+                            ar: 'طلبك مؤكد بالفعل عبر البريد الإلكتروني. اضغط أدناه فقط إذا كنت تفضل بدء محادثة واتساب مباشرة معنا.',
+                            de: 'Ihre Anfrage ist bereits per E-Mail bestätigt. Tippen Sie unten nur, wenn Sie einen direkten WhatsApp-Chat starten möchten.',
+                          },
+                          lang
+                        )}
+                      </p>
+                    </div>
+                    <a
+                      href={waUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="min-h-[40px] w-full inline-flex items-center justify-center gap-2 rounded-lg border border-[#16A34A] bg-white px-4 py-2 text-xs font-bold text-[#15803D] hover:bg-[#F0FDF4] transition-colors"
+                    >
+                      <MessageCircle className="h-4 w-4 text-[#16A34A]" aria-hidden="true" />
+                      <span>
+                        {tText(
+                          {
+                            en: 'Start Chat on WhatsApp',
+                            ar: 'ابدأ المحادثة على واتساب',
+                            de: 'Chat auf WhatsApp starten',
+                          },
+                          lang
+                        )}
+                      </span>
+                    </a>
+                  </div>
+                );
+              })()}
               <button
                 type="button"
                 onClick={onClose}
-                className="min-h-[40px] w-full rounded-full border border-[#CBD5E1] bg-white px-5 text-xs font-semibold text-[#0F172A] hover:bg-[#F8FAFC] cursor-pointer"
+                className="btn-wasla-primary min-h-[44px] w-full rounded-full px-5 text-sm font-semibold cursor-pointer"
               >
                 {tText({ en: 'Done', ar: 'تم', de: 'Fertig' }, lang)}
               </button>
@@ -319,13 +331,13 @@ export const CustomTripModal: React.FC<CustomTripModalProps> = ({
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <label className="block space-y-1">
-                  <span className="text-xs font-semibold text-[#0F172A]">
+                  <span className="text-xs font-semibold text-[#0F2233]">
                     {tText({ en: 'Destination', ar: 'الوجهة', de: 'Reiseziel' }, lang)}
                   </span>
                   <select
                     value={destination}
                     onChange={(e) => setDestination(e.target.value as DestinationRegion)}
-                    className="min-h-[44px] w-full rounded-lg border border-[#CBD5E1] bg-white px-3 text-sm text-[#0F172A]"
+                    className="min-h-[44px] w-full rounded-lg border border-[#CBD5E1] bg-white px-3 text-sm text-[#0F2233]"
                   >
                     <option value="Hurghada">
                       {tText({ en: 'Hurghada', ar: 'الغردقة', de: 'Hurghada' }, lang)}
@@ -343,7 +355,7 @@ export const CustomTripModal: React.FC<CustomTripModalProps> = ({
                 </label>
 
                 <label className="block space-y-1">
-                  <span className="text-xs font-semibold text-[#0F172A]">
+                  <span className="text-xs font-semibold text-[#0F2233]">
                     {tText(
                       { en: 'Preferred guide language', ar: 'لغة المرشد المفضلة', de: 'Gewünschte Guide-Sprache' },
                       lang
@@ -352,7 +364,7 @@ export const CustomTripModal: React.FC<CustomTripModalProps> = ({
                   <select
                     value={guideLanguage}
                     onChange={(e) => setGuideLanguage(e.target.value)}
-                    className="min-h-[44px] w-full rounded-lg border border-[#CBD5E1] bg-white px-3 text-sm text-[#0F172A]"
+                    className="min-h-[44px] w-full rounded-lg border border-[#CBD5E1] bg-white px-3 text-sm text-[#0F2233]"
                   >
                     {GUIDE_LANGUAGES.map((opt) => (
                       <option key={opt.value} value={opt.value}>
@@ -364,7 +376,7 @@ export const CustomTripModal: React.FC<CustomTripModalProps> = ({
               </div>
 
               <div className="space-y-1.5">
-                <span className="block text-xs font-semibold text-[#0F172A]">
+                <span className="block text-xs font-semibold text-[#0F2233]">
                   {tText({ en: 'Services to include', ar: 'الخدمات المطلوبة', de: 'Gewünschte Leistungen' }, lang)}
                 </span>
                 <div className="flex flex-wrap gap-2">
@@ -377,8 +389,8 @@ export const CustomTripModal: React.FC<CustomTripModalProps> = ({
                         onClick={() => toggleService(svc.id)}
                         className={`min-h-[36px] rounded-full px-3.5 text-xs font-semibold border transition-colors cursor-pointer ${
                           active
-                            ? 'border-[#EA580C] bg-[#FFF7ED] text-[#EA580C]'
-                            : 'border-[#E2E8F0] bg-white text-[#475569] hover:text-[#0F172A]'
+                            ? 'border-[#EE5426] bg-[#FFF7ED] text-[#EE5426]'
+                            : 'border-[#E2E8F0] bg-white text-[#475569] hover:text-[#0F2233]'
                         }`}
                       >
                         {tText(svc.label, lang)}
@@ -390,7 +402,7 @@ export const CustomTripModal: React.FC<CustomTripModalProps> = ({
 
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 <label className="block space-y-1">
-                  <span className="text-xs font-semibold text-[#0F172A]">
+                  <span className="text-xs font-semibold text-[#0F2233]">
                     {tText({ en: 'Start date', ar: 'تاريخ البداية', de: 'Startdatum' }, lang)}
                   </span>
                   <input
@@ -402,7 +414,7 @@ export const CustomTripModal: React.FC<CustomTripModalProps> = ({
                   />
                 </label>
                 <label className="block space-y-1">
-                  <span className="text-xs font-semibold text-[#0F172A]">
+                  <span className="text-xs font-semibold text-[#0F2233]">
                     {tText({ en: 'Adults', ar: 'البالغون', de: 'Erwachsene' }, lang)}
                   </span>
                   <input
@@ -415,7 +427,7 @@ export const CustomTripModal: React.FC<CustomTripModalProps> = ({
                   />
                 </label>
                 <label className="block space-y-1">
-                  <span className="text-xs font-semibold text-[#0F172A]">
+                  <span className="text-xs font-semibold text-[#0F2233]">
                     {tText({ en: 'Children', ar: 'الأطفال', de: 'Kinder' }, lang)}
                   </span>
                   <input
@@ -428,7 +440,7 @@ export const CustomTripModal: React.FC<CustomTripModalProps> = ({
                   />
                 </label>
                 <label className="block space-y-1">
-                  <span className="text-xs font-semibold text-[#0F172A]">
+                  <span className="text-xs font-semibold text-[#0F2233]">
                     {tText({ en: 'Infants (Free)', ar: 'رضّع (مجاناً)', de: 'Babys (Gratis)' }, lang)}
                   </span>
                   <input
@@ -443,7 +455,7 @@ export const CustomTripModal: React.FC<CustomTripModalProps> = ({
               </div>
 
               <label className="block space-y-1">
-                <span className="text-xs font-semibold text-[#0F172A]">
+                <span className="text-xs font-semibold text-[#0F2233]">
                   {tText({ en: 'Your full name', ar: 'الاسم الكامل', de: 'Ihr vollständiger Name' }, lang)}
                 </span>
                 <input
@@ -458,7 +470,7 @@ export const CustomTripModal: React.FC<CustomTripModalProps> = ({
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-end">
                 <label className="flex flex-col justify-end gap-1.5 h-full">
-                  <span className="text-xs font-semibold text-[#0F172A] leading-snug">
+                  <span className="text-xs font-semibold text-[#0F2233] leading-snug">
                     {tText({ en: 'WhatsApp number', ar: 'رقم الواتساب', de: 'WhatsApp-Nummer' }, lang)}
                   </span>
                   <input
@@ -471,7 +483,7 @@ export const CustomTripModal: React.FC<CustomTripModalProps> = ({
                   />
                 </label>
                 <label className="flex flex-col justify-end gap-1.5 h-full">
-                  <span className="text-xs font-semibold text-[#0F172A] leading-snug">
+                  <span className="text-xs font-semibold text-[#0F2233] leading-snug">
                     {tText({ en: 'Email address', ar: 'البريد الإلكتروني', de: 'E-Mail-Adresse' }, lang)}
                   </span>
                   <input
@@ -485,8 +497,27 @@ export const CustomTripModal: React.FC<CustomTripModalProps> = ({
                 </label>
               </div>
 
+              <label className="flex items-start gap-2.5 rounded-xl border border-[#CBD5E1] bg-[#F8FAFC] px-3.5 py-2.5 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={whatsappOptIn}
+                  onChange={(e) => setWhatsappOptIn(e.target.checked)}
+                  className="mt-0.5 h-4 w-4 shrink-0 rounded border-[#94A3B8] accent-[#16A34A] cursor-pointer"
+                />
+                <span className="text-[11.5px] leading-relaxed text-[#334155]">
+                  {tText(
+                    {
+                      en: 'I agree to receive my custom quote and trip updates from Wasla Travel via WhatsApp.',
+                      ar: 'أوافق على تواصل فريق وصلة ترافيل معي عبر واتساب لإرسال عرض السعر وتفاصيل الرحلة.',
+                      de: 'Ich stimme zu, mein individuelles Angebot und Updates von Wasla Travel per WhatsApp zu erhalten.',
+                    },
+                    lang
+                  )}
+                </span>
+              </label>
+
               <label className="block space-y-1">
-                <span className="text-xs font-semibold text-[#0F172A]">
+                <span className="text-xs font-semibold text-[#0F2233]">
                   {tText(
                     {
                       en: 'Itinerary wishes & pickup hotel',
@@ -520,7 +551,7 @@ export const CustomTripModal: React.FC<CustomTripModalProps> = ({
 
               <button
                 type="submit"
-                className="wasla-book-glare min-h-[44px] w-full rounded-full px-5 py-2.5 text-sm font-semibold text-white cursor-pointer"
+                className="btn-wasla-primary min-h-[44px] w-full rounded-full px-5 py-2.5 text-sm cursor-pointer"
               >
                 {tText(
                   {

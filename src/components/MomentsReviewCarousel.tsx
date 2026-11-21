@@ -234,7 +234,7 @@ export const MomentsReviewCarousel: React.FC<MomentsReviewCarouselProps> = ({
       {/* Section Header + Back-and-Forth Carousel Controls */}
       <div className="reveal-item flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div className="space-y-1.5">
-          <h2 className="font-display text-2xl sm:text-[32px] font-semibold tracking-[-0.02em] leading-tight text-[#0F172A]">
+          <h2 className="font-display text-2xl sm:text-[32px] font-semibold tracking-[-0.02em] leading-tight text-[#0F2233]">
             {t.sectionMoments}
           </h2>
           <p className="text-[14.5px] text-[#475569]">{t.sectionMomentsSub}</p>
@@ -253,7 +253,7 @@ export const MomentsReviewCarousel: React.FC<MomentsReviewCarouselProps> = ({
           <button
             type="button"
             onClick={() => setAutoPlay((prev) => !prev)}
-            className="inline-flex min-h-[40px] items-center gap-1.5 rounded-full border border-[#CBD5E1] bg-white px-3.5 py-1.5 text-xs font-semibold text-[#0F172A] hover:border-[#EA580C] hover:text-[#EA580C] transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+            className="inline-flex min-h-[40px] items-center gap-1.5 rounded-full border border-[#CBD5E1] bg-white px-3.5 py-1.5 text-xs font-semibold text-[#0F2233] hover:border-[#EE5426] hover:text-[#EE5426] transition-colors whitespace-nowrap shrink-0 cursor-pointer"
             aria-pressed={autoPlay}
           >
             {autoPlay ? (
@@ -272,7 +272,7 @@ export const MomentsReviewCarousel: React.FC<MomentsReviewCarouselProps> = ({
           <button
             type="button"
             onClick={() => scrollByDirection(isRtl ? 1 : -1, true)}
-            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#CBD5E1] bg-white text-[#0F172A] hover:border-[#EA580C] hover:text-[#EA580C] active:scale-95 transition-all cursor-pointer shrink-0"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#CBD5E1] bg-white text-[#0F2233] hover:border-[#EE5426] hover:text-[#EE5426] active:scale-95 transition-all cursor-pointer shrink-0"
             aria-label={isRtl ? copy.nextAria : copy.prevAria}
           >
             <ChevronLeft className="h-4.5 w-4.5" />
@@ -281,7 +281,7 @@ export const MomentsReviewCarousel: React.FC<MomentsReviewCarouselProps> = ({
           <button
             type="button"
             onClick={() => scrollByDirection(isRtl ? -1 : 1, true)}
-            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#CBD5E1] bg-white text-[#0F172A] hover:border-[#EA580C] hover:text-[#EA580C] active:scale-95 transition-all cursor-pointer shrink-0"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#CBD5E1] bg-white text-[#0F2233] hover:border-[#EE5426] hover:text-[#EE5426] active:scale-95 transition-all cursor-pointer shrink-0"
             aria-label={isRtl ? copy.prevAria : copy.nextAria}
           >
             <ChevronRight className="h-4.5 w-4.5" />
@@ -309,13 +309,13 @@ export const MomentsReviewCarousel: React.FC<MomentsReviewCarouselProps> = ({
           return (
             <article
               key={moment.id}
-              className="snap-start shrink-0 basis-[84%] sm:basis-[340px] lg:basis-[372px] group rounded-2xl border border-[#E2E8F0] bg-white overflow-hidden flex flex-col justify-between transition-all duration-200 hover:-translate-y-1 hover:shadow-lg hover:border-[#EA580C]/45"
+              className="card-wasla p-0 snap-start shrink-0 basis-[84%] sm:basis-[340px] lg:basis-[372px] group overflow-hidden flex flex-col justify-between transition-all duration-200 hover:-translate-y-1 hover:shadow-lg hover:border-[#EE5426]/45"
             >
               {/* Interactive Photo / Review Story Trigger */}
               <button
                 type="button"
                 onClick={() => onOpenMoment(idx)}
-                className="flex-1 flex flex-col text-start cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#EA580C]"
+                className="flex-1 flex flex-col text-start cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#EE5426]"
               >
                 {/* Top Media Frame (Fixed Uniform Height Across All Cards) */}
                 {hasPhoto ? (
@@ -331,7 +331,7 @@ export const MomentsReviewCarousel: React.FC<MomentsReviewCarouselProps> = ({
                       loading="eager"
                       className="h-full w-full group-hover:scale-[1.06] transition-transform duration-500 ease-out"
                     />
-                    <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-[#0F172A]/88 via-[#0F172A]/40 to-transparent" />
+                    <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-[#0F2233]/88 via-[#0F2233]/40 to-transparent" />
                     <div className="pointer-events-none absolute inset-x-4 bottom-3 space-y-0.5">
                       <div className="flex items-center gap-1.5 text-[11px] font-medium text-[#FED7AA]">
                         <Camera className="h-3 w-3 shrink-0" aria-hidden="true" />
@@ -361,18 +361,18 @@ export const MomentsReviewCarousel: React.FC<MomentsReviewCarouselProps> = ({
                         />
                       </div>
                       <div className="min-w-0 space-y-1">
-                        <div className="flex items-center gap-1.5 text-[11px] font-medium text-[#C2410C]">
+                        <div className="flex items-center gap-1.5 text-[11px] font-medium text-[#D9461B]">
                           <MessageSquareQuote className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
                           <span className="truncate">{copy.guestStory}</span>
                         </div>
-                        <p className="text-[13.5px] font-semibold text-[#0F172A] line-clamp-2 leading-snug">
+                        <p className="text-[13.5px] font-semibold text-[#0F2233] line-clamp-2 leading-snug">
                           {tripLabel}
                         </p>
                       </div>
                     </div>
 
                     <div className="flex items-center justify-between text-xs text-[#64748B] pt-2 border-t border-[#FED7AA]/60">
-                      <span className="font-medium text-[#0F172A]">{trip.destination}</span>
+                      <span className="font-medium text-[#0F2233]">{trip.destination}</span>
                       {moment.visitDate && (
                         <span className="tabular-nums">{moment.visitDate}</span>
                       )}
@@ -398,12 +398,12 @@ export const MomentsReviewCarousel: React.FC<MomentsReviewCarouselProps> = ({
                           aria-hidden="true"
                         />
                       ))}
-                      <span className="ms-1 text-xs font-semibold text-[#0F172A] tabular-nums">
+                      <span className="ms-1 text-xs font-semibold text-[#0F2233] tabular-nums">
                         {moment.rating.toFixed(1)}
                       </span>
                     </div>
 
-                    <span className="text-[11.5px] font-medium text-[#EA580C] group-hover:underline underline-offset-4">
+                    <span className="text-[11.5px] font-medium text-[#EE5426] group-hover:underline underline-offset-4">
                       {copy.readFull}
                     </span>
                   </div>
@@ -427,16 +427,16 @@ export const MomentsReviewCarousel: React.FC<MomentsReviewCarouselProps> = ({
               </button>
 
               {/* Guest Attribution & Trip Shortcut Footer */}
-              <div className="px-4 sm:px-5 py-3 border-t border-[#F1F5F9] bg-[#FAFCFF] flex items-center justify-between gap-3">
+              <div className="px-4 sm:px-5 py-3 border-t border-[#C8C2B8]/40 dark:border-[#334155] bg-[#FAF4ED]/75 dark:bg-[#0F2233]/60 flex items-center justify-between gap-3">
                 <div className="flex items-center gap-2.5 min-w-0">
                   <div
                     aria-hidden="true"
-                    className="h-8 w-8 rounded-full bg-[#FFF7ED] border border-[#FED7AA] text-[#EA580C] font-semibold text-xs flex items-center justify-center shrink-0"
+                    className="h-8 w-8 rounded-full bg-[#EE5426]/10 border border-[#EE5426]/30 text-[#EE5426] font-semibold text-xs flex items-center justify-center shrink-0"
                   >
                     {initialChar}
                   </div>
                   <div className="min-w-0">
-                    <p className="text-xs font-semibold text-[#0F172A] truncate">
+                    <p className="text-xs font-semibold text-[#0F2233] truncate">
                       {moment.guestName}
                     </p>
                     {countryLabel && (
@@ -448,7 +448,7 @@ export const MomentsReviewCarousel: React.FC<MomentsReviewCarouselProps> = ({
                 <button
                   type="button"
                   onClick={() => onSelectTrip(trip)}
-                  className="text-xs font-semibold text-[#EA580C] hover:underline underline-offset-4 whitespace-nowrap shrink-0 cursor-pointer"
+                  className="text-xs font-semibold text-[#EE5426] hover:underline underline-offset-4 whitespace-nowrap shrink-0 cursor-pointer"
                 >
                   {copy.viewTrip} {isRtl ? '←' : '→'}
                 </button>
@@ -462,7 +462,7 @@ export const MomentsReviewCarousel: React.FC<MomentsReviewCarouselProps> = ({
       <div className="flex items-center gap-3">
         <div className="flex-1 h-1.5 rounded-full bg-[#FED7AA]/50 overflow-hidden">
           <div
-            className="h-full rounded-full bg-[#EA580C] transition-all duration-300"
+            className="h-full rounded-full bg-[#EE5426] transition-all duration-300"
             style={{ width: `${Math.round(scrollProgress * 100)}%` }}
           />
         </div>

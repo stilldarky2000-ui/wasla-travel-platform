@@ -4,11 +4,13 @@ import {
   Calendar,
   CheckCircle2,
   Clock,
+  Download,
   ExternalLink,
   Loader2,
   MapPin,
   MessageCircle,
   Printer,
+  QrCode,
   Search,
   ShieldCheck,
   Star,
@@ -24,12 +26,22 @@ import {
   formatCurrencyPrice,
   tText,
 } from '../data/marketplaceData';
+import { PlatformBooking } from '../data/platformData';
 import {
   isValidBookingIdFormat,
   sanitizeBookingId,
 } from '../hooks/useBookingReviewVerification';
 import { db } from '../lib/firebase';
-import { normalizeWhatsAppDigits } from '../lib/whatsapp';
+import {
+  downloadWaslaVoucherImage,
+  generateVoucherQrDataUrl,
+  printWaslaBoardingVoucher,
+} from '../lib/printVoucher';
+import {
+  formatPickupSpotByLang,
+  normalizeWhatsAppDigits,
+  resolveGuestLanguageCode,
+} from '../lib/whatsapp';
 import { BookingRequest } from './TripDetailModal';
 import { WaslaBrandMark } from './WaslaBrandMark';
 
@@ -40,7 +52,9 @@ interface TrackBookingModalProps {
   currency: CurrencyCode;
   whatsappNumber?: string;
   contactEmail?: string;
+  initialBookingId?: string;
   bookingRequests: BookingRequest[];
+  platformBookings?: PlatformBooking[];
   trips: Trip[];
   onOpenPostTripReview?: (trip: Trip, bookingId: string) => void;
   onClose: () => void;
@@ -52,6 +66,31 @@ interface LiveReceiptResult {
   tripDate: string;
   status: string;
   tripEndAtMs: number;
+}
+
+interface ServerVoucherSnapshot {
+  id: string;
+  tripId?: string;
+  tripTitle?: string;
+  destination?: string;
+  date?: string;
+  tripStartTime?: string;
+  pickupTime?: string;
+  pickupSpot?: string;
+  assignedDriverOrGuide?: string;
+  guestName?: string;
+  guestCountry?: string;
+  guestLang?: string;
+  guestLanguage?: string;
+  hotel?: string;
+  roomNumber?: string;
+  adults?: number;
+  children?: number;
+  infants?: number;
+  grossEur?: number;
+  paymentStatus?: string;
+  status?: string;
+  notes?: string;
 }
 
 function getStatusMeta(status: string, lang: Lang): {
@@ -86,7 +125,7 @@ function getStatusMeta(status: string, lang: Lang): {
         { en: 'Driver & Pickup Assigned', ar: 'تم تحديد السائق وموعد التوصيل', de: 'Fahrer & Abholung zugewiesen' },
         lang
       ),
-      tone: 'text-[#0369A1] bg-[#F0F9FF] border-[#BAE6FD]',
+      tone: 'text-[#0F2233] bg-[#FAF4ED] border-[#C8C2B8]',
       stepIndex: 2,
       isCancelled: false,
     };
@@ -120,7 +159,9 @@ export const TrackBookingModal: React.FC<TrackBookingModalProps> = ({
   currency,
   whatsappNumber = SITE_CONFIG.whatsappNumber,
   contactEmail = SITE_CONFIG.email,
+  initialBookingId,
   bookingRequests,
+  platformBookings = [],
   trips,
   onOpenPostTripReview,
   onClose,
@@ -129,7 +170,23 @@ export const TrackBookingModal: React.FC<TrackBookingModalProps> = ({
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [liveReceipt, setLiveReceipt] = useState<LiveReceiptResult | null>(null);
+  const [serverVoucher, setServerVoucher] = useState<ServerVoucherSnapshot | null>(null);
+  const [qrDataUrl, setQrDataUrl] = useState<string>('');
   const [searchedOnce, setSearchedOnce] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+    if (!liveReceipt?.id) {
+      setQrDataUrl('');
+      return;
+    }
+    void generateVoucherQrDataUrl(liveReceipt.id).then((url) => {
+      if (active) setQrDataUrl(url);
+    });
+    return () => {
+      active = false;
+    };
+  }, [liveReceipt?.id]);
 
   useEffect(() => {
     if (!open) return;
@@ -145,6 +202,14 @@ export const TrackBookingModal: React.FC<TrackBookingModalProps> = ({
     };
   }, [open, onClose]);
 
+  useEffect(() => {
+    if (!open || !initialBookingId) return;
+    const clean = sanitizeBookingId(initialBookingId);
+    if (clean && isValidBookingIdFormat(clean)) {
+      void lookupBooking(clean);
+    }
+  }, [open, initialBookingId]);
+
   if (!open) return null;
 
   const lookupBooking = async (rawId: string) => {
@@ -155,6 +220,7 @@ export const TrackBookingModal: React.FC<TrackBookingModalProps> = ({
 
     if (!cleanId || !isValidBookingIdFormat(cleanId)) {
       setLiveReceipt(null);
+      setServerVoucher(null);
       setErrorMsg(
         tText(
           {
@@ -170,7 +236,15 @@ export const TrackBookingModal: React.FC<TrackBookingModalProps> = ({
 
     setLoading(true);
     try {
-      const snap = await getDoc(doc(db, 'booking_receipts', cleanId));
+      const [snap, voucherResp] = await Promise.all([
+        getDoc(doc(db, 'booking_receipts', cleanId)),
+        fetch(`/api/vouchers/${encodeURIComponent(cleanId)}`)
+          .then(async (r) => (r.ok ? ((await r.json()) as { voucher?: ServerVoucherSnapshot }) : null))
+          .catch(() => null),
+      ]);
+      const fetchedVoucher = voucherResp?.voucher || null;
+      setServerVoucher(fetchedVoucher);
+
       if (snap.exists()) {
         const data = snap.data() as {
           id?: string;
@@ -187,9 +261,9 @@ export const TrackBookingModal: React.FC<TrackBookingModalProps> = ({
             : 0;
         setLiveReceipt({
           id: data.id || cleanId,
-          tripId: data.tripId || '',
-          tripDate: data.tripDate || '',
-          status: data.status || 'Pending',
+          tripId: data.tripId || fetchedVoucher?.tripId || '',
+          tripDate: data.tripDate || fetchedVoucher?.date || '',
+          status: data.status || fetchedVoucher?.status || 'Pending',
           tripEndAtMs: endMs,
         });
       } else {
@@ -258,6 +332,9 @@ export const TrackBookingModal: React.FC<TrackBookingModalProps> = ({
   const localMatch = liveReceipt
     ? bookingRequests.find((req) => sanitizeBookingId(req.id) === sanitizeBookingId(liveReceipt.id))
     : undefined;
+  const platformMatch = liveReceipt
+    ? platformBookings.find((bk) => sanitizeBookingId(bk.id) === sanitizeBookingId(liveReceipt.id))
+    : undefined;
   const matchedTrip = liveReceipt
     ? trips.find((tr) => tr.id === liveReceipt.tripId)
     : undefined;
@@ -293,7 +370,7 @@ export const TrackBookingModal: React.FC<TrackBookingModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-[#0F172A]/70 p-3 sm:p-4 backdrop-blur-xs"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-[#0F2233]/70 p-3 sm:p-4 backdrop-blur-xs"
       dir={isRtl ? 'rtl' : 'ltr'}
       role="dialog"
       aria-modal="true"
@@ -301,17 +378,17 @@ export const TrackBookingModal: React.FC<TrackBookingModalProps> = ({
       onClick={onClose}
     >
       <div
-        className="flex max-h-[90vh] w-full max-w-xl flex-col overflow-hidden rounded-2xl border border-[#E2E8F0] bg-white shadow-2xl"
+        className="card-wasla p-0 flex max-h-[90vh] w-full max-w-xl flex-col overflow-hidden shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between gap-3 border-b border-[#E2E8F0] bg-[#FFFFFF] px-5 py-4 shrink-0">
+        <div className="flex items-center justify-between gap-3 border-b border-[#C8C2B8]/50 dark:border-[#334155] bg-[#FFFFFF] px-5 py-4 shrink-0">
           <div className="flex items-center gap-2.5 min-w-0">
             <WaslaBrandMark size="sm" />
             <div className="min-w-0">
               <h2
                 id="track-booking-title"
-                className="font-display text-lg font-semibold text-[#0F172A] truncate"
+                className="font-display text-lg font-semibold text-[#0F2233] truncate"
               >
                 {tText(
                   {
@@ -338,7 +415,7 @@ export const TrackBookingModal: React.FC<TrackBookingModalProps> = ({
             type="button"
             onClick={onClose}
             aria-label="Close"
-            className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-[#E2E8F0] text-[#0F172A] hover:bg-[#F1F5F9] cursor-pointer"
+            className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-[#E2E8F0] text-[#0F2233] hover:bg-[#F1F5F9] cursor-pointer"
           >
             <X className="h-4 w-4" />
           </button>
@@ -350,7 +427,7 @@ export const TrackBookingModal: React.FC<TrackBookingModalProps> = ({
           <form onSubmit={handleSubmit} className="space-y-2">
             <label
               htmlFor="track-booking-input"
-              className="block text-xs font-semibold text-[#0F172A]"
+              className="block text-xs font-semibold text-[#0F2233]"
             >
               {tText(
                 {
@@ -373,13 +450,13 @@ export const TrackBookingModal: React.FC<TrackBookingModalProps> = ({
                   value={queryId}
                   onChange={(e) => setQueryId(e.target.value.toUpperCase())}
                   placeholder="WT-4829"
-                  className="min-h-[44px] w-full rounded-xl border border-[#CBD5E1] bg-white ps-9 pe-3 text-sm font-mono uppercase text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#EA580C] focus:outline-none"
+                  className="input-wasla min-h-[44px] ps-9 pe-3 text-sm font-mono uppercase"
                 />
               </div>
               <button
                 type="submit"
                 disabled={loading}
-                className="wasla-book-glare inline-flex min-h-[44px] items-center justify-center gap-1.5 rounded-xl px-4 text-xs sm:text-sm font-semibold text-white cursor-pointer disabled:opacity-60 shrink-0"
+                className="btn-wasla-primary min-h-[44px] gap-1.5 rounded-xl px-4 py-2 text-xs sm:text-sm cursor-pointer disabled:opacity-60 shrink-0"
               >
                 {loading ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
@@ -415,9 +492,9 @@ export const TrackBookingModal: React.FC<TrackBookingModalProps> = ({
                     : 'border-[#E2E8F0] bg-[#F8FAFC]'
                 }`}
               >
-                <div className="flex flex-wrap items-start justify-between gap-2 border-b border-[#E2E8F0] pb-3">
-                  <div>
-                    <p className="text-[11px] font-bold uppercase tracking-wider text-[#EA580C]">
+                <div className="flex flex-wrap items-start justify-between gap-3 border-b border-[#E2E8F0] pb-3">
+                  <div className="space-y-1">
+                    <p className="text-[11px] font-bold uppercase tracking-wider text-[#EE5426]">
                       {isVoucherUnlocked
                         ? tText(
                             {
@@ -436,16 +513,37 @@ export const TrackBookingModal: React.FC<TrackBookingModalProps> = ({
                             lang
                           )}
                     </p>
-                    <p className="font-mono text-lg font-bold text-[#0F172A] tabular-nums">
+                    <p className="font-mono text-lg font-bold text-[#0F2233] tabular-nums">
                       {liveReceipt.id}
                     </p>
+                    <span
+                      className={`inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-xs font-semibold ${statusMeta.tone}`}
+                    >
+                      <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />
+                      {statusMeta.label}
+                    </span>
                   </div>
-                  <span
-                    className={`inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-xs font-semibold ${statusMeta.tone}`}
-                  >
-                    <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />
-                    {statusMeta.label}
-                  </span>
+
+                  {isVoucherUnlocked && qrDataUrl && (
+                    <div className="flex flex-col items-center rounded-xl border border-[#CBD5E1] bg-white p-2 shadow-xs shrink-0">
+                      <img
+                        src={qrDataUrl}
+                        alt={`QR ${liveReceipt.id}`}
+                        className="h-16 w-16 rounded-md object-contain"
+                      />
+                      <span className="mt-1 inline-flex items-center gap-1 text-[9.5px] font-bold uppercase tracking-wider text-[#0F2233]">
+                        <QrCode className="h-2.5 w-2.5 text-[#EE5426]" />
+                        {tText(
+                          {
+                            en: 'Scan to Verify',
+                            ar: 'امسح للتحقق',
+                            de: 'QR-Prüfung',
+                          },
+                          lang
+                        )}
+                      </span>
+                    </div>
+                  )}
                 </div>
 
                 {/* 4-Step Horizontal Tracker */}
@@ -457,12 +555,12 @@ export const TrackBookingModal: React.FC<TrackBookingModalProps> = ({
                         <div key={label} className="space-y-1.5">
                           <div
                             className={`h-1.5 rounded-full transition-colors ${
-                              reached ? 'bg-[#EA580C]' : 'bg-[#CBD5E1]'
+                              reached ? 'bg-[#EE5426]' : 'bg-[#CBD5E1]'
                             }`}
                           />
                           <p
                             className={`text-[10.5px] font-semibold leading-tight ${
-                              reached ? 'text-[#0F172A]' : 'text-[#94A3B8]'
+                              reached ? 'text-[#0F2233]' : 'text-[#94A3B8]'
                             }`}
                           >
                             {label}
@@ -475,78 +573,133 @@ export const TrackBookingModal: React.FC<TrackBookingModalProps> = ({
 
                 {/* Trip Summary & Digital Voucher Body */}
                 <div className="space-y-2.5 text-xs text-[#334155]">
-                  <p className="text-sm font-bold text-[#0F172A]">
-                    {localMatch?.tripTitle ||
+                  <p className="text-sm font-bold text-[#0F2233]">
+                    {platformMatch?.tripTitle ||
+                      serverVoucher?.tripTitle ||
+                      localMatch?.tripTitle ||
                       (matchedTrip ? tText(matchedTrip.name, lang) : liveReceipt.tripId)}
                   </p>
                   <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 tabular-nums">
                     {liveReceipt.tripDate && (
-                      <span className="inline-flex items-center gap-1 font-semibold text-[#0F172A]">
-                        <Calendar className="h-3.5 w-3.5 text-[#EA580C]" />
+                      <span className="inline-flex items-center gap-1 font-semibold text-[#0F2233]">
+                        <Calendar className="h-3.5 w-3.5 text-[#EE5426]" />
                         {liveReceipt.tripDate}
                       </span>
                     )}
-                    {localMatch?.tripStartTime && (
+                    {(platformMatch?.tripStartTime ||
+                      serverVoucher?.tripStartTime ||
+                      localMatch?.tripStartTime) && (
                       <>
                         <span aria-hidden="true">·</span>
                         <span className="inline-flex items-center gap-1 font-medium">
-                          <Clock className="h-3.5 w-3.5 text-[#EA580C]" />
-                          {localMatch.tripStartTime}
+                          <Clock className="h-3.5 w-3.5 text-[#EE5426]" />
+                          {platformMatch?.tripStartTime ||
+                            serverVoucher?.tripStartTime ||
+                            localMatch?.tripStartTime}
                         </span>
                       </>
                     )}
-                    {localMatch?.hotel && (
+                    {(platformMatch?.pickupTime || serverVoucher?.pickupTime) && (
+                      <>
+                        <span aria-hidden="true">·</span>
+                        <span className="inline-flex items-center gap-1 font-bold text-[#15803D]">
+                          <Clock className="h-3.5 w-3.5 text-[#15803D]" />
+                          {tText({ en: 'Pickup:', ar: 'التحرك:', de: 'Abholung:' }, lang)}{' '}
+                          {platformMatch?.pickupTime || serverVoucher?.pickupTime}
+                          {platformMatch?.pickupSpot || serverVoucher?.pickupSpot
+                            ? ` (${formatPickupSpotByLang(
+                                platformMatch?.pickupSpot || serverVoucher?.pickupSpot,
+                                resolveGuestLanguageCode(undefined, undefined, lang)
+                              )})`
+                            : ''}
+                        </span>
+                      </>
+                    )}
+                    {(platformMatch?.hotel || serverVoucher?.hotel || localMatch?.hotel) && (
                       <>
                         <span aria-hidden="true">·</span>
                         <span className="inline-flex items-center gap-1 font-medium">
-                          <MapPin className="h-3.5 w-3.5 text-[#EA580C]" />
-                          {localMatch.hotel}
-                          {localMatch.roomNumber ? ` (Room ${localMatch.roomNumber})` : ''}
+                          <MapPin className="h-3.5 w-3.5 text-[#EE5426]" />
+                          {platformMatch?.hotel || serverVoucher?.hotel || localMatch?.hotel}
+                          {platformMatch?.roomNumber ||
+                          serverVoucher?.roomNumber ||
+                          localMatch?.roomNumber
+                            ? ` (Room ${
+                                platformMatch?.roomNumber ||
+                                serverVoucher?.roomNumber ||
+                                localMatch?.roomNumber
+                              })`
+                            : ''}
                         </span>
                       </>
                     )}
                   </div>
 
-                  {localMatch && (
-                    <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-[#CBD5E1] bg-[#F8FAFC] px-3.5 py-2.5 text-xs">
-                      <div className="space-y-0.5">
-                        <span className="block font-semibold text-[#0F172A]">
-                          {localMatch.guestName}
-                          {localMatch.guestCountry ? ` · ${localMatch.guestCountry}` : ''}
-                        </span>
-                        <span className="block text-[#475569]">
-                          {localMatch.adults}{' '}
-                          {tText({ en: 'Adult(s)', ar: 'بالغ', de: 'Erw.' }, lang)}
-                          {localMatch.children > 0
-                            ? ` · ${localMatch.children} ${tText({ en: 'Child(ren)', ar: 'طفل', de: 'Kind(er)' }, lang)}`
-                            : ''}
-                          {localMatch.infants && localMatch.infants > 0
-                            ? ` · ${localMatch.infants} INF`
-                            : ''}
-                        </span>
+                  {(localMatch || platformMatch || serverVoucher) && (() => {
+                    const gName =
+                      platformMatch?.guestName ||
+                      serverVoucher?.guestName ||
+                      localMatch?.guestName ||
+                      '';
+                    const gCountry =
+                      platformMatch?.guestCountry ||
+                      serverVoucher?.guestCountry ||
+                      localMatch?.guestCountry ||
+                      '';
+                    const gAdults =
+                      platformMatch?.adults ?? serverVoucher?.adults ?? localMatch?.adults ?? 1;
+                    const gChildren =
+                      platformMatch?.children ??
+                      serverVoucher?.children ??
+                      localMatch?.children ??
+                      0;
+                    const gInfants =
+                      platformMatch?.infants ?? serverVoucher?.infants ?? localMatch?.infants ?? 0;
+                    const gTotalEur =
+                      platformMatch?.grossEur ??
+                      serverVoucher?.grossEur ??
+                      localMatch?.totalEur ??
+                      0;
+
+                    return (
+                      <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-[#CBD5E1] bg-[#F8FAFC] px-3.5 py-2.5 text-xs">
+                        <div className="space-y-0.5">
+                          <span className="block font-semibold text-[#0F2233]">
+                            {gName}
+                            {gCountry ? ` · ${gCountry}` : ''}
+                          </span>
+                          <span className="block text-[#475569]">
+                            {gAdults}{' '}
+                            {tText({ en: 'Adult(s)', ar: 'بالغ', de: 'Erw.' }, lang)}
+                            {gChildren > 0
+                              ? ` · ${gChildren} ${tText({ en: 'Child(ren)', ar: 'طفل', de: 'Kind(er)' }, lang)}`
+                              : ''}
+                            {gInfants > 0 ? ` · ${gInfants} INF` : ''}
+                          </span>
+                        </div>
+                        <div className="text-end">
+                          <span className="block font-extrabold text-sm text-[#15803D] tabular-nums">
+                            {gTotalEur > 0
+                              ? formatCurrencyPrice(gTotalEur, currency, currency !== 'EUR')
+                              : tText(
+                                  { en: 'Custom Quote', ar: 'عرض سعر مخصص', de: 'Individuelles Angebot' },
+                                  lang
+                                )}
+                          </span>
+                          <span className="block text-[10px] font-medium text-[#64748B]">
+                            {tText(
+                              {
+                                en: 'Payable in EUR / USD / EGP',
+                                ar: 'يُقبل الدفع باليورو أو الدولار أو الجنيه',
+                                de: 'Zahlbar in EUR / USD / EGP',
+                              },
+                              lang
+                            )}
+                          </span>
+                        </div>
                       </div>
-                      <div className="text-end">
-                        <span className="block font-extrabold text-sm text-[#15803D] tabular-nums">
-                          {localMatch.totalEur > 0
-                            ? formatCurrencyPrice(localMatch.totalEur, currency, currency !== 'EUR')
-                            : tText(
-                                { en: 'Custom Quote', ar: 'عرض سعر مخصص', de: 'Individuelles Angebot' },
-                                lang
-                              )}
-                        </span>
-                        <span className="block text-[10px] font-medium text-[#64748B]">
-                          {tText(
-                            {
-                              en: 'Payable in EUR / USD / EGP',
-                              ar: 'يُقبل الدفع باليورو أو الدولار أو الجنيه',
-                              de: 'Zahlbar in EUR / USD / EGP',
-                            },
-                            lang
-                          )}
-                        </span>
-                      </div>
-                    </div>
-                  )}
+                    );
+                  })()}
 
                   {isVoucherUnlocked ? (
                     <div className="rounded-xl border border-[#BBF7D0] bg-[#F0FDF4] p-3 text-[11.5px] text-[#14532D] space-y-1 leading-relaxed">
@@ -573,7 +726,7 @@ export const TrackBookingModal: React.FC<TrackBookingModalProps> = ({
                     </div>
                   ) : (
                     <div className="rounded-xl border border-[#FED7AA] bg-[#FFF7ED] p-3 text-[11.5px] text-[#9A3412] space-y-1 leading-relaxed">
-                      <p className="font-bold text-[#C2410C]">
+                      <p className="font-bold text-[#D9461B]">
                         {tText(
                           {
                             en: '🔒 Final Boarding Voucher Locked Until Operator Confirmation',
@@ -615,25 +768,107 @@ export const TrackBookingModal: React.FC<TrackBookingModalProps> = ({
                     <ExternalLink className="h-3 w-3 opacity-80" />
                   </a>
 
-                  {isVoucherUnlocked && (
-                    <button
-                      type="button"
-                      onClick={() => window.print()}
-                      className="inline-flex min-h-[40px] items-center justify-center gap-1.5 rounded-full border border-[#16A34A] bg-[#F0FDF4] px-3.5 text-xs font-bold text-[#15803D] hover:bg-[#DCFCE7] cursor-pointer"
-                    >
-                      <Printer className="h-3.5 w-3.5 text-[#15803D]" />
-                      <span>
-                        {tText(
-                          {
-                            en: 'Print Official Voucher',
-                            ar: 'طباعة التذكرة النهائية',
-                            de: 'Voucher drucken',
-                          },
-                          lang
-                        )}
-                      </span>
-                    </button>
-                  )}
+                  {isVoucherUnlocked && (() => {
+                    const voucherPayload = {
+                      bookingId: liveReceipt.id,
+                      status: liveReceipt.status,
+                      tripTitle:
+                        platformMatch?.tripTitle ||
+                        serverVoucher?.tripTitle ||
+                        localMatch?.tripTitle ||
+                        (matchedTrip ? tText(matchedTrip.name, lang) : liveReceipt.tripId),
+                      date:
+                        liveReceipt.tripDate ||
+                        platformMatch?.date ||
+                        serverVoucher?.date ||
+                        localMatch?.date ||
+                        '',
+                      tripStartTime:
+                        platformMatch?.tripStartTime ||
+                        serverVoucher?.tripStartTime ||
+                        localMatch?.tripStartTime,
+                      pickupTime: platformMatch?.pickupTime || serverVoucher?.pickupTime,
+                      pickupSpot: platformMatch?.pickupSpot || serverVoucher?.pickupSpot,
+                      hotel: platformMatch?.hotel || serverVoucher?.hotel || localMatch?.hotel,
+                      roomNumber:
+                        platformMatch?.roomNumber ||
+                        serverVoucher?.roomNumber ||
+                        localMatch?.roomNumber,
+                      guestName:
+                        platformMatch?.guestName ||
+                        serverVoucher?.guestName ||
+                        localMatch?.guestName,
+                      guestCountry:
+                        platformMatch?.guestCountry ||
+                        serverVoucher?.guestCountry ||
+                        localMatch?.guestCountry,
+                      guestLang:
+                        platformMatch?.guestLang ||
+                        serverVoucher?.guestLang ||
+                        localMatch?.guestLang,
+                      guideLanguage:
+                        serverVoucher?.guestLanguage || localMatch?.guideLanguage,
+                      adults:
+                        platformMatch?.adults ?? serverVoucher?.adults ?? localMatch?.adults,
+                      children:
+                        platformMatch?.children ??
+                        serverVoucher?.children ??
+                        localMatch?.children,
+                      infants:
+                        platformMatch?.infants ?? serverVoucher?.infants ?? localMatch?.infants,
+                      totalEur:
+                        platformMatch?.grossEur ??
+                        serverVoucher?.grossEur ??
+                        localMatch?.totalEur ??
+                        (matchedTrip ? matchedTrip.price : 0),
+                      currency,
+                      assignedDriverOrGuide:
+                        platformMatch?.assignedDriverOrGuide ||
+                        serverVoucher?.assignedDriverOrGuide,
+                      whatsapp: platformMatch?.guestWhatsapp || localMatch?.whatsapp,
+                      email: platformMatch?.guestEmail || localMatch?.email,
+                      notes:
+                        platformMatch?.notes || serverVoucher?.notes || localMatch?.notes,
+                    };
+                    return (
+                      <>
+                        <button
+                          type="button"
+                          onClick={() => printWaslaBoardingVoucher(voucherPayload, lang)}
+                          className="inline-flex min-h-[40px] items-center justify-center gap-1.5 rounded-full border border-[#16A34A] bg-[#F0FDF4] px-3.5 text-xs font-bold text-[#15803D] hover:bg-[#DCFCE7] cursor-pointer"
+                        >
+                          <Printer className="h-3.5 w-3.5 text-[#15803D]" />
+                          <span>
+                            {tText(
+                              {
+                                en: 'Print Official Voucher',
+                                ar: 'طباعة التذكرة النهائية',
+                                de: 'Voucher drucken',
+                              },
+                              lang
+                            )}
+                          </span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => downloadWaslaVoucherImage(voucherPayload, lang)}
+                          className="inline-flex min-h-[40px] items-center justify-center gap-1.5 rounded-full border border-[#0F2233]/25 bg-white px-3.5 text-xs font-bold text-[#0F2233] hover:bg-[#FAF4ED] cursor-pointer"
+                        >
+                          <Download className="h-3.5 w-3.5 text-[#EE5426]" />
+                          <span>
+                            {tText(
+                              {
+                                en: 'Download Ticket Image',
+                                ar: 'حفظ التذكرة كصورة',
+                                de: 'Ticket als Bild',
+                              },
+                              lang
+                            )}
+                          </span>
+                        </button>
+                      </>
+                    );
+                  })()}
                 </div>
 
                 {isReviewEligible && matchedTrip && onOpenPostTripReview && (
@@ -643,7 +878,7 @@ export const TrackBookingModal: React.FC<TrackBookingModalProps> = ({
                       onClose();
                       onOpenPostTripReview(matchedTrip, sanitizeBookingId(liveReceipt.id));
                     }}
-                    className="inline-flex min-h-[40px] w-full items-center justify-center gap-1.5 rounded-full border border-[#FED7AA] bg-[#FFF7ED] px-4 text-xs font-semibold text-[#EA580C] hover:bg-[#FFEDD5] cursor-pointer"
+                    className="inline-flex min-h-[40px] w-full items-center justify-center gap-1.5 rounded-full border border-[#FED7AA] bg-[#FFF7ED] px-4 text-xs font-semibold text-[#EE5426] hover:bg-[#FFEDD5] cursor-pointer"
                   >
                     <Star className="h-3.5 w-3.5 fill-[#F59E0B] text-[#F59E0B]" />
                     <span>
@@ -665,7 +900,7 @@ export const TrackBookingModal: React.FC<TrackBookingModalProps> = ({
           {/* Locally Saved Bookings on This Device */}
           <div className="space-y-2.5 pt-1">
             <div className="flex items-center justify-between text-xs">
-              <span className="font-semibold text-[#0F172A]">
+              <span className="font-semibold text-[#0F2233]">
                 {tText(
                   {
                     en: 'Saved Bookings on This Device',
@@ -679,7 +914,7 @@ export const TrackBookingModal: React.FC<TrackBookingModalProps> = ({
               {contactEmail && (
                 <a
                   href={`mailto:${contactEmail}`}
-                  className="text-[#EA580C] hover:underline font-medium"
+                  className="text-[#EE5426] hover:underline font-medium"
                 >
                   {contactEmail}
                 </a>
@@ -689,8 +924,8 @@ export const TrackBookingModal: React.FC<TrackBookingModalProps> = ({
             {bookingRequests.length === 0 ? (
               !searchedOnce && (
                 <div className="rounded-xl border border-dashed border-[#CBD5E1] bg-[#F8FAFC] p-5 text-center space-y-1.5">
-                  <ShieldCheck className="h-6 w-6 text-[#EA580C] mx-auto" />
-                  <p className="text-xs font-semibold text-[#0F172A]">
+                  <ShieldCheck className="h-6 w-6 text-[#EE5426] mx-auto" />
+                  <p className="text-xs font-semibold text-[#0F2233]">
                     {tText(
                       {
                         en: 'Booked on another device? Enter your WT code above.',
@@ -725,22 +960,22 @@ export const TrackBookingModal: React.FC<TrackBookingModalProps> = ({
                       onClick={() => void lookupBooking(req.id)}
                       className={`w-full text-start rounded-xl border p-3 transition-colors cursor-pointer ${
                         selected
-                          ? 'border-[#EA580C] bg-[#FFF7ED]'
+                          ? 'border-[#EE5426] bg-[#FFF7ED]'
                           : 'border-[#E2E8F0] bg-white hover:border-[#FDBA74] hover:bg-[#FFF7ED]/40'
                       }`}
                     >
                       <div className="flex items-center justify-between gap-2 text-xs">
-                        <span className="font-mono font-bold text-[#EA580C] tabular-nums">
+                        <span className="font-mono font-bold text-[#EE5426] tabular-nums">
                           {req.id}
                         </span>
                         <span className="text-[#64748B] tabular-nums">{req.date}</span>
                       </div>
-                      <p className="mt-0.5 text-sm font-semibold text-[#0F172A] truncate">
+                      <p className="mt-0.5 text-sm font-semibold text-[#0F2233] truncate">
                         {req.tripTitle}
                       </p>
                       <div className="mt-1 flex items-center justify-between gap-2 text-[11.5px] text-[#475569] tabular-nums">
                         <span className="truncate">{req.hotel}</span>
-                        <span className="font-semibold text-[#0F172A] shrink-0">
+                        <span className="font-semibold text-[#0F2233] shrink-0">
                           {req.totalEur > 0
                             ? formatCurrencyPrice(req.totalEur, currency)
                             : tText({ en: 'Custom quote', ar: 'عرض سعر', de: 'Auf Anfrage' }, lang)}

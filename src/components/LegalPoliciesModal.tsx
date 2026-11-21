@@ -80,7 +80,7 @@ export const LegalPoliciesModal: React.FC<LegalPoliciesModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-[#0F172A]/70 p-3 sm:p-4 backdrop-blur-xs"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-[#0F2233]/70 p-3 sm:p-4 backdrop-blur-xs"
       dir={isRtl ? 'rtl' : 'ltr'}
       role="dialog"
       aria-modal="true"
@@ -88,17 +88,17 @@ export const LegalPoliciesModal: React.FC<LegalPoliciesModalProps> = ({
       onClick={onClose}
     >
       <div
-        className="flex max-h-[88vh] w-full max-w-2xl flex-col overflow-hidden rounded-2xl border border-[#E2E8F0] bg-white shadow-2xl"
+        className="card-wasla p-0 flex max-h-[88vh] w-full max-w-2xl flex-col overflow-hidden shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between gap-3 border-b border-[#E2E8F0] px-5 py-4 shrink-0">
+        <div className="flex items-center justify-between gap-3 border-b border-[#C8C2B8]/50 px-5 py-4 shrink-0">
           <div className="flex items-center gap-2.5 min-w-0">
             <WaslaBrandMark size="sm" />
             <div className="min-w-0">
               <h2
                 id="legal-policies-title"
-                className="font-display text-lg font-semibold text-[#0F172A] truncate"
+                className="font-display text-lg font-semibold text-[#0F2233] truncate"
               >
                 {tText(
                   {
@@ -118,7 +118,7 @@ export const LegalPoliciesModal: React.FC<LegalPoliciesModalProps> = ({
             type="button"
             onClick={onClose}
             aria-label="Close"
-            className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-[#E2E8F0] text-[#0F172A] hover:bg-[#F1F5F9] cursor-pointer"
+            className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-[#E2E8F0] text-[#0F2233] hover:bg-[#F1F5F9] cursor-pointer"
           >
             <X className="h-4 w-4" />
           </button>
@@ -136,8 +136,8 @@ export const LegalPoliciesModal: React.FC<LegalPoliciesModalProps> = ({
                   onClick={() => setActiveTab(tab.id)}
                   className={`inline-flex shrink-0 min-h-[36px] items-center gap-1.5 rounded-lg px-3 text-xs font-semibold transition-colors cursor-pointer whitespace-nowrap ${
                     isActive
-                      ? 'bg-[#EA580C] text-white shadow-xs'
-                      : 'bg-white border border-[#E2E8F0] text-[#475569] hover:text-[#0F172A]'
+                      ? 'bg-[#EE5426] text-white shadow-xs'
+                      : 'bg-white border border-[#E2E8F0] text-[#475569] hover:text-[#0F2233]'
                   }`}
                 >
                   {tab.icon}
@@ -153,7 +153,7 @@ export const LegalPoliciesModal: React.FC<LegalPoliciesModalProps> = ({
           {activeTab === 'terms' && (
             <div className="space-y-4">
               <div className="space-y-1.5">
-                <h3 className="text-sm font-bold text-[#0F172A]">
+                <h3 className="text-sm font-bold text-[#0F2233]">
                   {tText(
                     {
                       en: '1. Availability-First Human Confirmation',
@@ -176,7 +176,7 @@ export const LegalPoliciesModal: React.FC<LegalPoliciesModalProps> = ({
               </div>
 
               <div className="space-y-1.5">
-                <h3 className="text-sm font-bold text-[#0F172A]">
+                <h3 className="text-sm font-bold text-[#0F2233]">
                   {tText(
                     {
                       en: '2. Free 24-Hour Cancellation & Rescheduling',
@@ -199,7 +199,7 @@ export const LegalPoliciesModal: React.FC<LegalPoliciesModalProps> = ({
               </div>
 
               <div className="space-y-1.5">
-                <h3 className="text-sm font-bold text-[#0F172A]">
+                <h3 className="text-sm font-bold text-[#0F2233]">
                   {tText(
                     {
                       en: '3. Weather & Red Sea Safety Guarantee',
@@ -249,7 +249,7 @@ export const LegalPoliciesModal: React.FC<LegalPoliciesModalProps> = ({
               </div>
 
               <div className="space-y-1.5">
-                <h3 className="text-sm font-bold text-[#0F172A]">
+                <h3 className="text-sm font-bold text-[#0F2233]">
                   {tText(
                     {
                       en: 'Base Currency (EUR) & Display Estimates',
@@ -272,7 +272,7 @@ export const LegalPoliciesModal: React.FC<LegalPoliciesModalProps> = ({
               </div>
 
               <div className="space-y-1.5">
-                <h3 className="text-sm font-bold text-[#0F172A]">
+                <h3 className="text-sm font-bold text-[#0F2233]">
                   {tText(
                     {
                       en: 'Hotel Pickup & Outer Resort Zones',
@@ -299,7 +299,7 @@ export const LegalPoliciesModal: React.FC<LegalPoliciesModalProps> = ({
           {activeTab === 'privacy' && (
             <div className="space-y-4">
               <div className="space-y-1.5">
-                <h3 className="text-sm font-bold text-[#0F172A]">
+                <h3 className="text-sm font-bold text-[#0F2233]">
                   {tText(
                     {
                       en: 'Data Controller & Purpose of Processing',
@@ -322,7 +322,7 @@ export const LegalPoliciesModal: React.FC<LegalPoliciesModalProps> = ({
               </div>
 
               <div className="space-y-1.5">
-                <h3 className="text-sm font-bold text-[#0F172A]">
+                <h3 className="text-sm font-bold text-[#0F2233]">
                   {tText(
                     {
                       en: 'Operational Sharing & Security',
@@ -345,7 +345,7 @@ export const LegalPoliciesModal: React.FC<LegalPoliciesModalProps> = ({
               </div>
 
               <div className="space-y-1.5">
-                <h3 className="text-sm font-bold text-[#0F172A]">
+                <h3 className="text-sm font-bold text-[#0F2233]">
                   {tText(
                     {
                       en: 'Your GDPR Rights (Access, Correction & Deletion)',
@@ -372,7 +372,7 @@ export const LegalPoliciesModal: React.FC<LegalPoliciesModalProps> = ({
           {activeTab === 'permits' && (
             <div className="space-y-4">
               <div className="space-y-1.5">
-                <h3 className="text-sm font-bold text-[#0F172A]">
+                <h3 className="text-sm font-bold text-[#0F2233]">
                   {tText(
                     {
                       en: 'Luxor, Cairo & Marsa Alam Travel Permits',
@@ -395,7 +395,7 @@ export const LegalPoliciesModal: React.FC<LegalPoliciesModalProps> = ({
               </div>
 
               <div className="space-y-1.5">
-                <h3 className="text-sm font-bold text-[#0F172A]">
+                <h3 className="text-sm font-bold text-[#0F2233]">
                   {tText(
                     {
                       en: 'Hotel Room Numbers & Resort Gates',
@@ -425,9 +425,9 @@ export const LegalPoliciesModal: React.FC<LegalPoliciesModalProps> = ({
           <div className="flex flex-wrap items-center gap-3 text-[#475569]">
             <a
               href={`mailto:${contactEmail}`}
-              className="inline-flex items-center gap-1.5 hover:text-[#EA580C] font-medium"
+              className="inline-flex items-center gap-1.5 hover:text-[#EE5426] font-medium"
             >
-              <Mail className="h-3.5 w-3.5 text-[#EA580C]" />
+              <Mail className="h-3.5 w-3.5 text-[#EE5426]" />
               <span>{contactEmail}</span>
             </a>
             <a
@@ -443,7 +443,7 @@ export const LegalPoliciesModal: React.FC<LegalPoliciesModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="min-h-[36px] rounded-full border border-[#CBD5E1] bg-white px-4 text-xs font-semibold text-[#0F172A] hover:bg-[#F1F5F9] cursor-pointer"
+            className="min-h-[36px] rounded-full border border-[#CBD5E1] bg-white px-4 text-xs font-semibold text-[#0F2233] hover:bg-[#F1F5F9] cursor-pointer"
           >
             {tText({ en: 'Close', ar: 'إغلاق', de: 'Schließen' }, lang)}
           </button>

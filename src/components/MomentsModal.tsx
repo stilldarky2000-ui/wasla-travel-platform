@@ -88,7 +88,7 @@ export const MomentsModal: React.FC<MomentsModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-[#0F172A]/65 p-4 backdrop-blur-[2px] animate-[heroRise_220ms_ease-out]"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-[#0F2233]/65 p-4 backdrop-blur-[2px] animate-[heroRise_220ms_ease-out]"
       onClick={onClose}
       role="dialog"
       aria-modal="true"
@@ -96,10 +96,10 @@ export const MomentsModal: React.FC<MomentsModalProps> = ({
     >
       <div
         ref={containerRef}
-        className="relative w-full max-w-3xl overflow-hidden rounded-2xl border border-[#E2E8F0] bg-white shadow-2xl grid grid-cols-1 md:grid-cols-12"
+        className="card-wasla p-0 relative w-full max-w-3xl overflow-hidden shadow-2xl grid grid-cols-1 md:grid-cols-12"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="group relative md:col-span-7 aspect-square md:aspect-auto md:min-h-[400px] bg-[#FFF7ED]">
+        <div className="group relative md:col-span-7 aspect-square md:aspect-auto md:min-h-[400px] bg-[#FAF4ED]">
           <SmartImage
             src={
               moment.hasGuestPhoto !== false && moment.image
@@ -110,7 +110,7 @@ export const MomentsModal: React.FC<MomentsModalProps> = ({
             loading="eager"
             className="h-full w-full"
           />
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-[#0F172A]/80 via-[#0F172A]/30 to-transparent" />
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-[#0F2233]/80 via-[#0F2233]/30 to-transparent" />
           <div className="pointer-events-none absolute inset-x-4 bottom-3 flex items-center justify-between gap-2 text-xs text-white/95">
             <span className="font-medium truncate">
               {moment.hasGuestPhoto !== false
@@ -138,7 +138,7 @@ export const MomentsModal: React.FC<MomentsModalProps> = ({
           <button
             type="button"
             onClick={isRtl ? goNext : goPrev}
-            className="absolute start-3 top-1/2 -translate-y-1/2 inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/90 text-[#0F172A] hover:bg-white shadow-sm cursor-pointer"
+            className="absolute start-3 top-1/2 -translate-y-1/2 inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/90 text-[#0F2233] hover:bg-white shadow-sm cursor-pointer"
             aria-label={t.momentPrev}
           >
             <ChevronLeft className="h-5 w-5 rtl:rotate-180" />
@@ -146,7 +146,7 @@ export const MomentsModal: React.FC<MomentsModalProps> = ({
           <button
             type="button"
             onClick={isRtl ? goPrev : goNext}
-            className="absolute end-3 top-1/2 -translate-y-1/2 inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/90 text-[#0F172A] hover:bg-white shadow-sm cursor-pointer"
+            className="absolute end-3 top-1/2 -translate-y-1/2 inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/90 text-[#0F2233] hover:bg-white shadow-sm cursor-pointer"
             aria-label={t.momentNext}
           >
             <ChevronRight className="h-5 w-5 rtl:rotate-180" />
@@ -157,7 +157,7 @@ export const MomentsModal: React.FC<MomentsModalProps> = ({
           <div className="space-y-4">
             <div className="flex items-start justify-between gap-3">
               <div>
-                <h3 id="moment-modal-title" className="font-display text-xl font-semibold text-[#0F172A]">
+                <h3 id="moment-modal-title" className="font-display text-xl font-semibold text-[#0F2233]">
                   {moment.guestName}
                 </h3>
                 <p className="text-xs font-medium text-[#475569]">
@@ -169,7 +169,7 @@ export const MomentsModal: React.FC<MomentsModalProps> = ({
                 ref={closeBtnRef}
                 type="button"
                 onClick={onClose}
-                className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-[#E2E8F0] text-[#0F172A] hover:bg-[#F1F5F9] cursor-pointer"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-[#E2E8F0] text-[#0F2233] hover:bg-[#F1F5F9] cursor-pointer"
                 aria-label={t.momentClose}
               >
                 <X className="h-4 w-4" />
@@ -181,7 +181,7 @@ export const MomentsModal: React.FC<MomentsModalProps> = ({
                 {Array.from({ length: moment.rating }).map((_, idx) => (
                   <Star key={idx} className="h-4 w-4 fill-[#F59E0B] text-[#F59E0B]" aria-hidden="true" />
                 ))}
-                <span className="ms-1.5 text-xs font-semibold text-[#0F172A] tabular-nums">
+                <span className="ms-1.5 text-xs font-semibold text-[#0F2233] tabular-nums">
                   {moment.rating.toFixed(1)}
                 </span>
               </div>
@@ -215,7 +215,7 @@ export const MomentsModal: React.FC<MomentsModalProps> = ({
                   onClose();
                   onSelectTrip(linkedTrip);
                 }}
-                className="text-start text-sm font-semibold text-[#EA580C] hover:underline underline-offset-4 cursor-pointer"
+                className="text-start text-sm font-semibold text-[#EE5426] hover:underline underline-offset-4 cursor-pointer"
               >
                 {moment.tripTitleOverride || tText(linkedTrip.name, lang)} {isRtl ? '←' : '→'}
               </button>
@@ -229,14 +229,14 @@ export const MomentsModal: React.FC<MomentsModalProps> = ({
                 <button
                   type="button"
                   onClick={goPrev}
-                  className="rounded-md border border-[#E2E8F0] px-2.5 py-1.5 text-xs font-medium text-[#0F172A] hover:bg-[#F1F5F9] cursor-pointer"
+                  className="rounded-md border border-[#E2E8F0] px-2.5 py-1.5 text-xs font-medium text-[#0F2233] hover:bg-[#F1F5F9] cursor-pointer"
                 >
                   {t.momentPrev}
                 </button>
                 <button
                   type="button"
                   onClick={goNext}
-                  className="rounded-md border border-[#E2E8F0] px-2.5 py-1.5 text-xs font-medium text-[#0F172A] hover:bg-[#F1F5F9] cursor-pointer"
+                  className="rounded-md border border-[#E2E8F0] px-2.5 py-1.5 text-xs font-medium text-[#0F2233] hover:bg-[#F1F5F9] cursor-pointer"
                 >
                   {t.momentNext}
                 </button>

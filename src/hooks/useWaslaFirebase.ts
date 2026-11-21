@@ -1222,7 +1222,25 @@ export function useWaslaFirebase() {
                 showDesktopBookingNotification(newest);
               }
             }
-            if (list.length > 0) setBookings(list);
+            if (list.length > 0) {
+              setBookings(list);
+              void (async () => {
+                try {
+                  const idToken = await auth.currentUser?.getIdToken();
+                  if (!idToken) return;
+                  await fetch('/api/vouchers/sync', {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                      Authorization: `Bearer ${idToken}`,
+                    },
+                    body: JSON.stringify({ bookings: list }),
+                  });
+                } catch {
+                  // Non-blocking voucher cache sync
+                }
+              })();
+            }
           },
           (err) => console.warn('Bookings listener warning:', err)
         )
@@ -1930,6 +1948,16 @@ export function useWaslaFirebase() {
         persistedBookingId: string
       ) => {
         try {
+          const noteLangMatch = String(targetBooking.notes || '').match(
+            /Guide & Email Language:\s*([A-Za-z]+)/i
+          );
+          const resolvedGuestLanguage =
+            noteLangMatch?.[1] ||
+            (targetBooking.guestLang === 'de'
+              ? 'German'
+              : targetBooking.guestLang === 'ar'
+              ? 'Arabic'
+              : 'English');
           await fetch('/api/notifications/new-booking', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -1943,6 +1971,8 @@ export function useWaslaFirebase() {
               tripStartTime: targetBooking.tripStartTime,
               guestName: targetBooking.guestName,
               guestCountry: targetBooking.guestCountry,
+              guestLang: targetBooking.guestLang,
+              guestLanguage: resolvedGuestLanguage,
               guestWhatsapp: targetBooking.guestWhatsapp,
               guestEmail: targetBooking.guestEmail,
               guestContact: targetBooking.guestContact,
@@ -2374,6 +2404,85 @@ export function useWaslaFirebase() {
         }
 
         await batch.commit();
+
+        if (existingBooking) {
+          const mergedUpdated: PlatformBooking = { ...existingBooking, ...patch };
+          void (async () => {
+            try {
+              const idToken = await auth.currentUser?.getIdToken();
+              if (!idToken) return;
+              await fetch('/api/vouchers/sync', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  Authorization: `Bearer ${idToken}`,
+                },
+                body: JSON.stringify(mergedUpdated),
+              });
+            } catch {
+              // Non-blocking voucher cache sync
+            }
+          })();
+        }
+
+        if (
+          existingBooking &&
+          existingBooking.status !== 'Confirmed' &&
+          patch.status === 'Confirmed'
+        ) {
+          const mergedConfirmed: PlatformBooking = { ...existingBooking, ...patch };
+          void (async () => {
+            try {
+              const idToken = await auth.currentUser?.getIdToken();
+              if (!idToken) return;
+              const noteLangMatch = String(mergedConfirmed.notes || '').match(
+                /Guide & Email Language:\s*([A-Za-z]+)/i
+              );
+              const resolvedGuestLanguage =
+                noteLangMatch?.[1] ||
+                (mergedConfirmed.guestLang === 'de'
+                  ? 'German'
+                  : mergedConfirmed.guestLang === 'ar'
+                  ? 'Arabic'
+                  : 'English');
+              await fetch('/api/notifications/booking-confirmed', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  Authorization: `Bearer ${idToken}`,
+                },
+                body: JSON.stringify({
+                  id: mergedConfirmed.id,
+                  tripTitle: mergedConfirmed.tripTitle,
+                  destination: mergedConfirmed.destination,
+                  date: mergedConfirmed.date,
+                  tripStartTime: mergedConfirmed.tripStartTime,
+                  pickupTime: mergedConfirmed.pickupTime,
+                  pickupSpot: mergedConfirmed.pickupSpot,
+                  assignedDriverOrGuide: mergedConfirmed.assignedDriverOrGuide,
+                  guestName: mergedConfirmed.guestName,
+                  guestCountry: mergedConfirmed.guestCountry,
+                  guestLang: mergedConfirmed.guestLang,
+                  guestLanguage: resolvedGuestLanguage,
+                  guestWhatsapp: mergedConfirmed.guestWhatsapp,
+                  guestEmail: mergedConfirmed.guestEmail,
+                  guestContact: mergedConfirmed.guestContact,
+                  hotel: mergedConfirmed.hotel,
+                  roomNumber: mergedConfirmed.roomNumber,
+                  adults: mergedConfirmed.adults,
+                  children: mergedConfirmed.children,
+                  infants: mergedConfirmed.infants ?? 0,
+                  grossEur: mergedConfirmed.grossEur,
+                  supplierName: mergedConfirmed.supplierName,
+                  paymentStatus: mergedConfirmed.paymentStatus,
+                  notes: mergedConfirmed.notes,
+                }),
+              });
+            } catch {
+              // Non-blocking notification call should never break dispatch confirmation
+            }
+          })();
+        }
 
         if (patch.status !== undefined) {
           const nextVerified = patch.status === 'Completed';

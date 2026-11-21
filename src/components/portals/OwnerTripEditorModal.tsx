@@ -987,31 +987,31 @@ export const OwnerTripEditorModal: React.FC<OwnerTripEditorModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-[#0F172A]/60 p-4 backdrop-blur-[2px]"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-[#0F2233]/60 p-4 backdrop-blur-[2px]"
       onClick={onClose}
       role="dialog"
       aria-modal="true"
       aria-label={mode === 'create' ? 'Owner Create Trip' : 'Owner Edit Trip'}
     >
       <div
-        className="w-full max-w-4xl max-h-[92vh] overflow-y-auto rounded-2xl border border-[#E2E8F0] bg-white shadow-2xl"
+        className="card-wasla p-0 w-full max-w-4xl max-h-[92vh] overflow-y-auto shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="sticky top-0 z-10 flex items-center justify-between border-b border-[#E2E8F0] bg-white/95 px-6 py-4 backdrop-blur-sm">
+        <div className="sticky top-0 z-10 flex items-center justify-between border-b border-[#C8C2B8]/50 bg-white/95 px-6 py-4 backdrop-blur-sm">
           <div>
-            <div className="text-[11px] font-semibold text-[#EA580C]">
+            <div className="text-[11px] font-semibold text-[#EE5426]">
               {isSupplierMode
                 ? 'Supplier Trip Editor · تعديل رحلة المورد'
                 : 'Owner Full Catalog Control'}
             </div>
-            <h2 className="font-display text-lg font-semibold text-[#0F172A]">
+            <h2 className="font-display text-lg font-semibold text-[#0F2233]">
               {mode === 'create' ? 'Create New Trip / Service' : `Edit: ${initialTrip?.name.en}`}
             </h2>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-[#E2E8F0] text-[#0F172A] hover:bg-[#F1F5F9] cursor-pointer"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-[#C8C2B8]/60 text-[#0F2233] hover:bg-[#FAF4ED] cursor-pointer"
             aria-label="Close"
           >
             <X className="h-4 w-4" />
@@ -1027,7 +1027,7 @@ export const OwnerTripEditorModal: React.FC<OwnerTripEditorModalProps> = ({
               type="button"
               disabled={translating}
               onClick={handleAutoTranslate}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-[#EA580C] bg-white px-3 py-1.5 text-xs font-semibold text-[#EA580C] hover:bg-[#FFF7ED] disabled:opacity-60 cursor-pointer"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-[#EE5426] bg-white px-3 py-1.5 text-xs font-semibold text-[#EE5426] hover:bg-[#FFF7ED] disabled:opacity-60 cursor-pointer"
             >
               <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
               <span>{translating ? 'Translating...' : 'Auto-Translate EN / AR / DE'}</span>
@@ -1048,7 +1048,7 @@ export const OwnerTripEditorModal: React.FC<OwnerTripEditorModalProps> = ({
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <label className="block space-y-1">
-              <span className="text-xs font-semibold text-[#0F172A]">Title (EN)</span>
+              <span className="text-xs font-semibold text-[#0F2233]">Title (EN)</span>
               <input
                 type="text"
                 required
@@ -1058,7 +1058,7 @@ export const OwnerTripEditorModal: React.FC<OwnerTripEditorModalProps> = ({
               />
             </label>
             <label className="block space-y-1">
-              <span className="text-xs font-semibold text-[#0F172A]">Title (AR)</span>
+              <span className="text-xs font-semibold text-[#0F2233]">Title (AR)</span>
               <input
                 type="text"
                 dir="rtl"
@@ -1068,7 +1068,7 @@ export const OwnerTripEditorModal: React.FC<OwnerTripEditorModalProps> = ({
               />
             </label>
             <label className="block space-y-1">
-              <span className="text-xs font-semibold text-[#0F172A]">Title (DE)</span>
+              <span className="text-xs font-semibold text-[#0F2233]">Title (DE)</span>
               <input
                 type="text"
                 value={titleDe}
@@ -1080,7 +1080,7 @@ export const OwnerTripEditorModal: React.FC<OwnerTripEditorModalProps> = ({
 
           <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
             <label className="block space-y-1">
-              <span className="text-xs font-semibold text-[#0F172A]">Destination</span>
+              <span className="text-xs font-semibold text-[#0F2233]">Destination</span>
               <select
                 value={destination}
                 disabled={isSupplierMode && Boolean(initialTrip)}
@@ -1095,7 +1095,7 @@ export const OwnerTripEditorModal: React.FC<OwnerTripEditorModalProps> = ({
             </label>
 
             <label className="block space-y-1">
-              <span className="text-xs font-semibold text-[#0F172A]">Category</span>
+              <span className="text-xs font-semibold text-[#0F2233]">Category</span>
               <select
                 value={category}
                 disabled={isSupplierMode && Boolean(initialTrip)}
@@ -1114,7 +1114,7 @@ export const OwnerTripEditorModal: React.FC<OwnerTripEditorModalProps> = ({
             </label>
 
             <label className="block space-y-1">
-              <span className="text-xs font-semibold text-[#0F172A]">Supplier</span>
+              <span className="text-xs font-semibold text-[#0F2233]">Supplier</span>
               <select
                 value={supplierName}
                 disabled={isSupplierMode}
@@ -1130,7 +1130,7 @@ export const OwnerTripEditorModal: React.FC<OwnerTripEditorModalProps> = ({
             </label>
 
             <label className="block space-y-1">
-              <span className="text-xs font-semibold text-[#0F172A]">Listing Status</span>
+              <span className="text-xs font-semibold text-[#0F2233]">Listing Status</span>
               <select
                 value={
                   isSupplierMode && approvalStatus !== 'Paused'
@@ -1152,7 +1152,7 @@ export const OwnerTripEditorModal: React.FC<OwnerTripEditorModalProps> = ({
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             <label className="block space-y-1">
-              <span className="text-xs font-semibold text-[#0F172A]">Base Price (€)</span>
+              <span className="text-xs font-semibold text-[#0F2233]">Base Price (€)</span>
               <input
                 type="number"
                 min={5}
@@ -1162,7 +1162,7 @@ export const OwnerTripEditorModal: React.FC<OwnerTripEditorModalProps> = ({
               />
             </label>
             <label className="block space-y-1">
-              <span className="text-xs font-semibold text-[#0F172A]">Duration</span>
+              <span className="text-xs font-semibold text-[#0F2233]">Duration</span>
               <input
                 type="text"
                 value={duration}
@@ -1171,7 +1171,7 @@ export const OwnerTripEditorModal: React.FC<OwnerTripEditorModalProps> = ({
               />
             </label>
             <label className="block space-y-1">
-              <span className="text-xs font-semibold text-[#0F172A]">Pickup area</span>
+              <span className="text-xs font-semibold text-[#0F2233]">Pickup area</span>
               <input
                 type="text"
                 value={pickup}
@@ -1180,7 +1180,7 @@ export const OwnerTripEditorModal: React.FC<OwnerTripEditorModalProps> = ({
               />
             </label>
             <label className="block space-y-1">
-              <span className="text-xs font-semibold text-[#0F172A]">Min Child Age</span>
+              <span className="text-xs font-semibold text-[#0F2233]">Min Child Age</span>
               <input
                 type="number"
                 min={0}
@@ -1193,7 +1193,7 @@ export const OwnerTripEditorModal: React.FC<OwnerTripEditorModalProps> = ({
 
           <div className="rounded-xl border border-[#FED7AA] bg-[#FFF7ED]/50 p-3.5 space-y-2.5">
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <span className="text-xs font-semibold text-[#0F172A]">
+              <span className="text-xs font-semibold text-[#0F2233]">
                 توقيت بداية الرحلة · Trip Start Times (separate from Hotel Pickup Time)
               </span>
               <div className="flex flex-wrap gap-1.5">
@@ -1286,7 +1286,7 @@ export const OwnerTripEditorModal: React.FC<OwnerTripEditorModalProps> = ({
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <label className="block space-y-1">
-              <span className="text-xs font-semibold text-[#0F172A]">Short Description (EN)</span>
+              <span className="text-xs font-semibold text-[#0F2233]">Short Description (EN)</span>
               <textarea
                 rows={2}
                 required
@@ -1296,7 +1296,7 @@ export const OwnerTripEditorModal: React.FC<OwnerTripEditorModalProps> = ({
               />
             </label>
             <label className="block space-y-1">
-              <span className="text-xs font-semibold text-[#0F172A]">Short Description (AR)</span>
+              <span className="text-xs font-semibold text-[#0F2233]">Short Description (AR)</span>
               <textarea
                 rows={2}
                 dir="rtl"
@@ -1306,7 +1306,7 @@ export const OwnerTripEditorModal: React.FC<OwnerTripEditorModalProps> = ({
               />
             </label>
             <label className="block space-y-1">
-              <span className="text-xs font-semibold text-[#0F172A]">Short Description (DE)</span>
+              <span className="text-xs font-semibold text-[#0F2233]">Short Description (DE)</span>
               <textarea
                 rows={2}
                 value={descDe}
@@ -1318,7 +1318,7 @@ export const OwnerTripEditorModal: React.FC<OwnerTripEditorModalProps> = ({
 
           {/* Full 5-Part GetYourGuide-Style Trip Details */}
           <div className="rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] p-4 space-y-3">
-            <div className="text-xs font-semibold text-[#0F172A]">
+            <div className="text-xs font-semibold text-[#0F2233]">
               Full Description, Highlights, Includes, Exclusions, Google Maps & Safety Info (one bullet per line)
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -1445,7 +1445,7 @@ export const OwnerTripEditorModal: React.FC<OwnerTripEditorModalProps> = ({
           <div className="rounded-xl border border-[#CBD5E1] bg-[#F8FAFC] p-4 space-y-3">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div>
-                <div className="text-xs font-semibold text-[#0F172A]">
+                <div className="text-xs font-semibold text-[#0F2233]">
                   Full-Page Route Itinerary (مسار الرحلة خطوة بخطوة)
                 </div>
                 <p className="text-[11px] text-[#475569]">
@@ -1457,7 +1457,7 @@ export const OwnerTripEditorModal: React.FC<OwnerTripEditorModalProps> = ({
                   <button
                     type="button"
                     onClick={() => setItineraryDrafts(createDefaultItineraryDrafts())}
-                    className="inline-flex items-center gap-1 rounded-lg border border-[#CBD5E1] bg-white px-2.5 py-1 text-xs font-semibold text-[#0F172A] hover:border-[#EA580C] hover:text-[#EA580C] cursor-pointer"
+                    className="inline-flex items-center gap-1 rounded-lg border border-[#CBD5E1] bg-white px-2.5 py-1 text-xs font-semibold text-[#0F2233] hover:border-[#EE5426] hover:text-[#EE5426] cursor-pointer"
                   >
                     <Sparkles className="h-3 w-3" aria-hidden="true" />
                     <span>Pre-fill 3-Step Route</span>
@@ -1483,7 +1483,7 @@ export const OwnerTripEditorModal: React.FC<OwnerTripEditorModalProps> = ({
                       },
                     ])
                   }
-                  className="inline-flex items-center gap-1 rounded-lg border border-[#EA580C] bg-white px-2.5 py-1 text-xs font-semibold text-[#EA580C] hover:bg-[#FFF7ED] cursor-pointer"
+                  className="inline-flex items-center gap-1 rounded-lg border border-[#EE5426] bg-white px-2.5 py-1 text-xs font-semibold text-[#EE5426] hover:bg-[#FFF7ED] cursor-pointer"
                 >
                   <Plus className="h-3 w-3" aria-hidden="true" />
                   <span>Add Itinerary Stop</span>
@@ -1570,7 +1570,7 @@ export const OwnerTripEditorModal: React.FC<OwnerTripEditorModalProps> = ({
           <div className="rounded-xl border border-[#CBD5E1] bg-[#F8FAFC] p-4 space-y-3">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div>
-                <div className="text-xs font-semibold text-[#0F172A]">
+                <div className="text-xs font-semibold text-[#0F2233]">
                   Historical Facts & Cultural Context (حقائق تاريخية للرحلة - اختياري)
                 </div>
                 <p className="text-[11px] text-[#475569]">
@@ -1599,7 +1599,7 @@ export const OwnerTripEditorModal: React.FC<OwnerTripEditorModalProps> = ({
                     },
                   ])
                 }
-                className="inline-flex items-center gap-1 rounded-lg border border-[#EA580C] bg-white px-2.5 py-1 text-xs font-semibold text-[#EA580C] hover:bg-[#FFF7ED] cursor-pointer"
+                className="inline-flex items-center gap-1 rounded-lg border border-[#EE5426] bg-white px-2.5 py-1 text-xs font-semibold text-[#EE5426] hover:bg-[#FFF7ED] cursor-pointer"
               >
                 <Plus className="h-3 w-3" aria-hidden="true" />
                 <span>Add Historical Fact</span>
@@ -1680,7 +1680,7 @@ export const OwnerTripEditorModal: React.FC<OwnerTripEditorModalProps> = ({
           {/* Operating Schedule & Seasonal Range (powers date-range filtering) */}
           <div className="rounded-xl border border-[#CBD5E1] bg-[#F8FAFC] p-4 space-y-2.5">
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <span className="text-xs font-semibold text-[#0F172A]">
+              <span className="text-xs font-semibold text-[#0F2233]">
                 Operating Days & Date Range Availability (أيام التشغيل)
               </span>
               <span className="text-[11px] text-[#475569]">
@@ -1706,7 +1706,7 @@ export const OwnerTripEditorModal: React.FC<OwnerTripEditorModalProps> = ({
                       }
                       className={`min-h-[32px] rounded-lg border px-2.5 text-xs font-semibold transition-colors cursor-pointer ${
                         selected
-                          ? 'border-[#EA580C] bg-[#EA580C] text-white'
+                          ? 'border-[#EE5426] bg-[#EE5426] text-white'
                           : 'border-[#CBD5E1] bg-white text-[#475569]'
                       }`}
                     >
@@ -1722,7 +1722,7 @@ export const OwnerTripEditorModal: React.FC<OwnerTripEditorModalProps> = ({
                     type="date"
                     value={availableFrom}
                     onChange={(e) => setAvailableFrom(e.target.value)}
-                    className="min-h-[32px] rounded-lg border border-[#CBD5E1] bg-white px-2 text-xs text-[#0F172A]"
+                    className="min-h-[32px] rounded-lg border border-[#CBD5E1] bg-white px-2 text-xs text-[#0F2233]"
                   />
                 </label>
                 <label className="flex items-center gap-1.5 text-[11px] font-semibold text-[#475569]">
@@ -1732,7 +1732,7 @@ export const OwnerTripEditorModal: React.FC<OwnerTripEditorModalProps> = ({
                     value={availableTo}
                     min={availableFrom || undefined}
                     onChange={(e) => setAvailableTo(e.target.value)}
-                    className="min-h-[32px] rounded-lg border border-[#CBD5E1] bg-white px-2 text-xs text-[#0F172A]"
+                    className="min-h-[32px] rounded-lg border border-[#CBD5E1] bg-white px-2 text-xs text-[#0F2233]"
                   />
                 </label>
               </div>
@@ -1741,8 +1741,8 @@ export const OwnerTripEditorModal: React.FC<OwnerTripEditorModalProps> = ({
 
           {/* Photos & Gallery Captions */}
           <div className="rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] p-4 space-y-3">
-            <div className="flex items-center gap-2 text-xs font-semibold text-[#0F172A]">
-              <ImagePlus className="h-4 w-4 text-[#EA580C]" aria-hidden="true" />
+            <div className="flex items-center gap-2 text-xs font-semibold text-[#0F2233]">
+              <ImagePlus className="h-4 w-4 text-[#EE5426]" aria-hidden="true" />
               <span>Photos & Gallery Captions ({images.length}/8)</span>
             </div>
             <div className="flex flex-col sm:flex-row gap-2">
@@ -1757,7 +1757,7 @@ export const OwnerTripEditorModal: React.FC<OwnerTripEditorModalProps> = ({
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="inline-flex min-h-[38px] items-center justify-center gap-1.5 rounded-lg border border-dashed border-[#EA580C] bg-white px-3 text-xs font-semibold text-[#EA580C] hover:bg-[#FFF7ED] cursor-pointer"
+                className="inline-flex min-h-[38px] items-center justify-center gap-1.5 rounded-lg border border-dashed border-[#EE5426] bg-white px-3 text-xs font-semibold text-[#EE5426] hover:bg-[#FFF7ED] cursor-pointer"
               >
                 <Upload className="h-3.5 w-3.5" aria-hidden="true" />
                 <span>Upload Photo</span>
@@ -1777,7 +1777,7 @@ export const OwnerTripEditorModal: React.FC<OwnerTripEditorModalProps> = ({
                 Add URL
               </button>
             </div>
-            {uploadNote && <p className="text-[11px] text-[#EA580C]">{uploadNote}</p>}
+            {uploadNote && <p className="text-[11px] text-[#EE5426]">{uploadNote}</p>}
             {images.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5 pb-1">
                 {images.map((src, i) => (
@@ -1827,7 +1827,7 @@ export const OwnerTripEditorModal: React.FC<OwnerTripEditorModalProps> = ({
                       setImages([imgSrc]);
                       setGalleryCaptionDrafts([{ en: '', ar: '', de: '' }]);
                     }}
-                    className="wasla-img-glare shrink-0 rounded border border-[#CBD5E1] overflow-hidden hover:border-[#EA580C] cursor-pointer"
+                    className="wasla-img-glare shrink-0 rounded border border-[#CBD5E1] overflow-hidden hover:border-[#EE5426] cursor-pointer"
                   >
                     <img src={imgSrc} alt={`Gallery ${i + 1}`} className="h-12 w-16 object-cover" />
                   </button>
@@ -1839,7 +1839,7 @@ export const OwnerTripEditorModal: React.FC<OwnerTripEditorModalProps> = ({
           {/* Options Builder */}
           <div className="rounded-xl border border-[#E2E8F0] bg-[#FFF7ED]/40 p-4 space-y-2.5">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-[#0F172A]">Options & Pricing</span>
+              <span className="text-xs font-semibold text-[#0F2233]">Options & Pricing</span>
               <button
                 type="button"
                 onClick={() =>
@@ -1848,7 +1848,7 @@ export const OwnerTripEditorModal: React.FC<OwnerTripEditorModalProps> = ({
                     { id: `opt-${Date.now()}`, titleEn: '', titleAr: '', titleDe: '', detailEn: '', price: 50 },
                   ])
                 }
-                className="inline-flex items-center gap-1 rounded-lg border border-[#EA580C] bg-white px-2.5 py-1 text-xs font-semibold text-[#EA580C] cursor-pointer"
+                className="inline-flex items-center gap-1 rounded-lg border border-[#EE5426] bg-white px-2.5 py-1 text-xs font-semibold text-[#EE5426] cursor-pointer"
               >
                 <Plus className="h-3 w-3" aria-hidden="true" />
                 <span>Add Option</span>
@@ -1917,7 +1917,7 @@ export const OwnerTripEditorModal: React.FC<OwnerTripEditorModalProps> = ({
           </div>
 
           <div className="flex flex-wrap items-center justify-between gap-4 border-t border-[#E2E8F0] pt-4">
-            <div className="flex flex-wrap items-center gap-4 text-xs font-medium text-[#0F172A]">
+            <div className="flex flex-wrap items-center gap-4 text-xs font-medium text-[#0F2233]">
               <label className="inline-flex items-center gap-1.5 cursor-pointer">
                 <input
                   type="checkbox"
@@ -1956,7 +1956,7 @@ export const OwnerTripEditorModal: React.FC<OwnerTripEditorModalProps> = ({
               <button
                 type="button"
                 onClick={() => setPreviewTrip(buildTripPayload())}
-                className="inline-flex items-center gap-1.5 min-h-[40px] rounded-lg border border-[#EA580C] bg-[#FFF7ED] px-4 text-xs font-semibold text-[#EA580C] hover:bg-[#FFEDD5] cursor-pointer"
+                className="inline-flex items-center gap-1.5 min-h-[40px] rounded-lg border border-[#EE5426] bg-[#FFF7ED] px-4 text-xs font-semibold text-[#EE5426] hover:bg-[#FFEDD5] cursor-pointer"
               >
                 <Eye className="h-3.5 w-3.5" aria-hidden="true" />
                 <span>Preview Full Trip Page</span>
@@ -1971,7 +1971,7 @@ export const OwnerTripEditorModal: React.FC<OwnerTripEditorModalProps> = ({
               <button
                 type="submit"
                 disabled={saving}
-                className="inline-flex items-center gap-1.5 min-h-[40px] rounded-lg bg-[#EA580C] px-5 text-xs font-semibold text-white hover:bg-[#C2410C] disabled:opacity-60 cursor-pointer"
+                className="btn-wasla-primary gap-1.5 min-h-[40px] rounded-lg px-5 py-2 text-xs cursor-pointer"
               >
                 <Save className="h-3.5 w-3.5" aria-hidden="true" />
                 <span>{saving ? 'Saving...' : mode === 'create' ? 'Create & Save Trip' : 'Save Changes'}</span>

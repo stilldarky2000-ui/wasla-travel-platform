@@ -56,14 +56,14 @@ export const ThemeSwitch: React.FC<ThemeSwitchProps> = ({
             : 'h-9 sm:h-10 w-[72px] sm:w-[116px]'
         } ${
           darkMode
-            ? 'border-white/20 bg-[#131B2E] shadow-inner'
-            : 'border-[#FED7AA] bg-[#FFF7ED] shadow-xs'
+            ? 'border-[#334155] bg-[#19354F] shadow-inner'
+            : 'border-[#C8C2B8] bg-[#FAF4ED] shadow-xs'
         }`}
       >
         {/* Sliding Active Thumb */}
         <span
           aria-hidden="true"
-          className={`wasla-book-glare absolute top-1 bottom-1 rounded-full transition-all duration-300 ${
+          className={`bg-[#EE5426] shadow-cta absolute top-1 bottom-1 rounded-full transition-all duration-300 ${
             isSmall
               ? darkMode
                 ? 'w-[30px] sm:w-[48px] left-[33px] sm:left-[51px]'
@@ -77,7 +77,7 @@ export const ThemeSwitch: React.FC<ThemeSwitchProps> = ({
         {/* Light Option */}
         <span
           className={`relative z-10 flex-1 inline-flex items-center justify-center gap-1 text-[11px] font-bold transition-colors ${
-            !darkMode ? 'text-white' : 'text-slate-400'
+            !darkMode ? 'text-white' : 'text-slate-300'
           }`}
         >
           <Sun className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
@@ -87,7 +87,7 @@ export const ThemeSwitch: React.FC<ThemeSwitchProps> = ({
         {/* Dark Option */}
         <span
           className={`relative z-10 flex-1 inline-flex items-center justify-center gap-1 text-[11px] font-bold transition-colors ${
-            darkMode ? 'text-white' : 'text-[#9A3412]'
+            darkMode ? 'text-white' : 'text-[#0F2233]'
           }`}
         >
           <Moon className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />

@@ -210,24 +210,24 @@ export const StorefrontFaq: React.FC<StorefrontFaqProps> = ({
 
   return (
     <section id="faq" className="reveal-item scroll-mt-24">
-      <div className="rounded-2xl border border-[#E2E8F0] bg-white p-6 sm:p-8 space-y-6">
+      <div className="card-wasla p-6 sm:p-8 space-y-6">
         {/* Header + Filter Tabs */}
-        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4 border-b border-[#E2E8F0] pb-5">
+        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4 border-b border-[#C8C2B8]/50 dark:border-[#334155] pb-5">
           <div className="space-y-1.5 max-w-2xl">
-            <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#EA580C]">
+            <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#EE5426]">
               <HelpCircle className="h-3.5 w-3.5" aria-hidden="true" />
               <span>{tText(FAQ_COPY.eyebrow, lang)}</span>
             </div>
-            <h2 className="font-display text-2xl sm:text-[28px] font-semibold tracking-[-0.02em] text-[#0F172A] leading-tight">
+            <h2 className="font-display text-2xl sm:text-[28px] font-semibold tracking-[-0.02em] text-[#0F2233] leading-tight">
               {tText(FAQ_COPY.title, lang)}
             </h2>
-            <p className="text-sm text-[#475569]">{tText(FAQ_COPY.subtitle, lang)}</p>
+            <p className="text-sm text-[#64748B]">{tText(FAQ_COPY.subtitle, lang)}</p>
           </div>
 
           <div
             role="tablist"
             aria-label={tText(FAQ_COPY.eyebrow, lang)}
-            className="flex flex-wrap items-center gap-1.5 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] p-1 self-start lg:self-auto"
+            className="flex flex-wrap items-center gap-1.5 rounded-xl bg-[#FAF4ED] border border-[#C8C2B8]/60 p-1 self-start lg:self-auto"
           >
             {FAQ_TABS.map((tab) => {
               const active = selectedCategory === tab.id;
@@ -240,8 +240,8 @@ export const StorefrontFaq: React.FC<StorefrontFaqProps> = ({
                   onClick={() => handleSelectCategory(tab.id)}
                   className={`min-h-[36px] rounded-lg px-3 py-1.5 text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer ${
                     active
-                      ? 'bg-[#EA580C] text-white shadow-xs'
-                      : 'text-[#475569] hover:text-[#0F172A]'
+                      ? 'bg-[#EE5426] text-white shadow-xs'
+                      : 'text-[#64748B] hover:text-[#0F2233]'
                   }`}
                 >
                   {tText(tab.label, lang)}
@@ -252,7 +252,7 @@ export const StorefrontFaq: React.FC<StorefrontFaqProps> = ({
         </div>
 
         {/* Clean Hairline Accordion List */}
-        <div className="divide-y divide-[#E2E8F0]">
+        <div className="divide-y divide-[#C8C2B8]/50 dark:divide-[#334155]">
           {visibleItems.map((item) => {
             const isOpen = openId === item.id;
             const panelId = `faq-panel-${item.id}`;
@@ -265,7 +265,7 @@ export const StorefrontFaq: React.FC<StorefrontFaqProps> = ({
                   aria-expanded={isOpen}
                   aria-controls={panelId}
                   onClick={() => setOpenId((prev) => (prev === item.id ? '' : item.id))}
-                  className="w-full py-4 flex items-center justify-between gap-4 text-start group cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#EA580C] rounded-lg"
+                  className="w-full py-4 flex items-center justify-between gap-4 text-start group cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#EE5426] rounded-lg"
                 >
                   <div className="space-y-1 min-w-0">
                     <div className="text-[11px] font-medium text-[#64748B]">
@@ -274,16 +274,16 @@ export const StorefrontFaq: React.FC<StorefrontFaqProps> = ({
                     <div
                       className={`text-sm sm:text-[15.5px] font-semibold leading-snug transition-colors ${
                         isOpen
-                          ? 'text-[#EA580C]'
-                          : 'text-[#0F172A] group-hover:text-[#EA580C]'
+                          ? 'text-[#EE5426]'
+                          : 'text-[#0F2233] group-hover:text-[#EE5426]'
                       }`}
                     >
                       {tText(item.question, lang)}
                     </div>
                   </div>
                   <ChevronDown
-                    className={`h-4 w-4 shrink-0 text-[#475569] transition-transform duration-200 ${
-                      isOpen ? 'rotate-180 text-[#EA580C]' : ''
+                    className={`h-4 w-4 shrink-0 text-[#64748B] transition-transform duration-200 ${
+                      isOpen ? 'rotate-180 text-[#EE5426]' : ''
                     }`}
                     aria-hidden="true"
                   />
@@ -294,7 +294,7 @@ export const StorefrontFaq: React.FC<StorefrontFaqProps> = ({
                     id={panelId}
                     role="region"
                     aria-labelledby={buttonId}
-                    className="pb-4 pe-8 text-xs sm:text-sm leading-relaxed text-[#475569] max-w-3xl"
+                    className="pb-4 pe-8 text-xs sm:text-sm leading-relaxed text-[#64748B] max-w-3xl"
                   >
                     {tText(item.answer, lang)}
                   </div>
@@ -305,20 +305,20 @@ export const StorefrontFaq: React.FC<StorefrontFaqProps> = ({
         </div>
 
         {/* Direct Human Support Footer Strip */}
-        <div className="border-t border-[#E2E8F0] pt-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="border-t border-[#C8C2B8]/50 dark:border-[#334155] pt-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="space-y-0.5">
-            <h3 className="text-sm font-semibold text-[#0F172A]">
+            <h3 className="text-sm font-semibold text-[#0F2233]">
               {tText(FAQ_COPY.stillHaveTitle, lang)}
             </h3>
-            <p className="text-xs text-[#475569]">{tText(FAQ_COPY.stillHaveSub, lang)}</p>
+            <p className="text-xs text-[#64748B]">{tText(FAQ_COPY.stillHaveSub, lang)}</p>
           </div>
           <div className="flex flex-wrap items-center gap-2.5 shrink-0">
             <button
               type="button"
               onClick={onOpenPolicies}
-              className="inline-flex min-h-[40px] items-center gap-1.5 rounded-full border border-[#CBD5E1] bg-white px-4 text-xs font-semibold text-[#0F172A] hover:border-[#EA580C] hover:text-[#EA580C] transition-colors whitespace-nowrap cursor-pointer"
+              className="btn-wasla-outline min-h-[40px] gap-1.5 rounded-full bg-white dark:bg-[#0F2233] px-4 py-1.5 text-xs whitespace-nowrap cursor-pointer"
             >
-              <ShieldCheck className="h-3.5 w-3.5 text-[#EA580C]" aria-hidden="true" />
+              <ShieldCheck className="h-3.5 w-3.5 text-[#EE5426]" aria-hidden="true" />
               <span>{tText(FAQ_COPY.viewPolicies, lang)}</span>
             </button>
             <button

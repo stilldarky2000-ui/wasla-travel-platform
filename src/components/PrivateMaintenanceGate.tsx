@@ -1,18 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import {
   CheckCircle2,
-  KeyRound,
   Lock,
   Mail,
   MessageCircle,
-  Phone,
   Shield,
   ShieldAlert,
-  Sparkles,
-  Unlock,
 } from 'lucide-react';
 import { SITE_CONFIG } from '../data/marketplaceData';
-import { WaslaBrandMark } from './WaslaBrandMark';
+import { WaslaLogo } from './brand/WaslaLogo';
 
 interface PrivateMaintenanceGateProps {
   onUnlock: () => void;
@@ -87,30 +83,22 @@ export const PrivateMaintenanceGate: React.FC<PrivateMaintenanceGateProps> = ({ 
   return (
     <div
       dir="rtl"
-      className="relative min-h-screen w-full bg-[#0B1F2E] text-slate-100 flex flex-col justify-between selection:bg-[#EA580C]/20 selection:text-white overflow-hidden"
+      className="relative min-h-screen w-full bg-[#0F2233] text-slate-100 flex flex-col justify-between selection:bg-[#EE5426]/20 selection:text-white overflow-hidden"
     >
       {/* Ambient Red Sea glow backdrop */}
       <div
-        className="pointer-events-none absolute -top-40 start-1/2 -translate-x-1/2 w-[700px] h-[500px] rounded-full bg-[#0E7490]/20 blur-[130px]"
+        className="pointer-events-none absolute -top-40 start-1/2 -translate-x-1/2 w-[700px] h-[500px] rounded-full bg-[#19354F]/50 blur-[130px]"
         aria-hidden="true"
       />
       <div
-        className="pointer-events-none absolute -bottom-32 end-0 w-[450px] h-[450px] rounded-full bg-[#EA580C]/15 blur-[120px]"
+        className="pointer-events-none absolute -bottom-32 end-0 w-[450px] h-[450px] rounded-full bg-[#EE5426]/15 blur-[120px]"
         aria-hidden="true"
       />
 
       {/* Top minimal header bar */}
-      <header className="relative z-10 w-full px-6 py-5 flex items-center justify-between border-b border-white/10 backdrop-blur-md bg-[#0B1F2E]/70">
+      <header className="relative z-10 w-full px-6 py-5 flex items-center justify-between border-b border-white/10 backdrop-blur-md bg-[#0F2233]/80">
         <div className="flex items-center gap-3">
-          <WaslaBrandMark size="md" />
-          <div className="flex flex-col">
-            <span className="font-bold text-white text-base tracking-wide flex items-center gap-2">
-              WASLA TRAVEL
-              <span className="text-[#EA580C]">·</span>
-              <span className="font-arabic text-[#FAF8F5]">وصلة ترافيل</span>
-            </span>
-            <span className="text-xs text-slate-400">سياحة ورحلات البحر الأحمر ومصر</span>
-          </div>
+          <WaslaLogo variant="full" theme="dark" className="h-9 sm:h-11 w-auto" />
         </div>
 
         <button
@@ -119,7 +107,7 @@ export const PrivateMaintenanceGate: React.FC<PrivateMaintenanceGateProps> = ({ 
           className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 transition-colors cursor-pointer"
           title="دخول الإدارة وفريق العمل"
         >
-          <Lock className="h-3.5 w-3.5 text-[#EA580C]" />
+          <Lock className="h-3.5 w-3.5 text-[#EE5426]" />
           <span>دخول الإدارة</span>
         </button>
       </header>
@@ -128,8 +116,8 @@ export const PrivateMaintenanceGate: React.FC<PrivateMaintenanceGateProps> = ({ 
       <main className="relative z-10 flex-1 flex items-center justify-center px-4 py-12">
         <div className="max-w-xl w-full text-center space-y-8">
           {/* Status Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#EA580C]/15 border border-[#EA580C]/30 text-[#FDBA74] text-xs font-semibold shadow-inner">
-            <Shield className="h-4 w-4 text-[#EA580C]" />
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#EE5426]/15 border border-[#EE5426]/30 text-[#FDBA74] text-xs font-semibold shadow-inner">
+            <Shield className="h-4 w-4 text-[#EE5426]" />
             <span>وضع التجهيز والإطلاق الخاص مفعّل (قيد التطوير)</span>
           </div>
 
@@ -149,17 +137,17 @@ export const PrivateMaintenanceGate: React.FC<PrivateMaintenanceGateProps> = ({ 
 
           {/* Value points */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-start pt-2">
-            <div className="p-4 rounded-xl bg-white/5 border border-white/10 backdrop-blur-sm">
-              <span className="block text-xs font-semibold text-[#38BDF8] mb-1">رحلات بحرية وسفاري</span>
-              <p className="text-xs text-slate-400">حجز فوري ومباشر مع موردين معتمدين</p>
+            <div className="p-4 rounded-xl bg-[#19354F]/60 border border-[#334155] backdrop-blur-sm">
+              <span className="block text-xs font-semibold text-[#EE5426] mb-1">رحلات بحرية وسفاري</span>
+              <p className="text-xs text-slate-300">حجز فوري ومباشر مع موردين معتمدين</p>
             </div>
-            <div className="p-4 rounded-xl bg-white/5 border border-white/10 backdrop-blur-sm">
-              <span className="block text-xs font-semibold text-[#FDBA74] mb-1">تأكيد رسمي بالواتساب</span>
-              <p className="text-xs text-slate-400">مواعيد بيك أب دقيقة من الفندق</p>
+            <div className="p-4 rounded-xl bg-[#19354F]/60 border border-[#334155] backdrop-blur-sm">
+              <span className="block text-xs font-semibold text-[#FAF4ED] mb-1">تأكيد رسمي بالواتساب</span>
+              <p className="text-xs text-slate-300">مواعيد بيك أب دقيقة من الفندق</p>
             </div>
-            <div className="p-4 rounded-xl bg-white/5 border border-white/10 backdrop-blur-sm">
-              <span className="block text-xs font-semibold text-[#4ADE80] mb-1">أفضل أسعار بدون وسيط</span>
-              <p className="text-xs text-slate-400">أسعار شفافة ودعم عملاء متواصل</p>
+            <div className="p-4 rounded-xl bg-[#19354F]/60 border border-[#334155] backdrop-blur-sm">
+              <span className="block text-xs font-semibold text-[#10B981] mb-1">أفضل أسعار بدون وسيط</span>
+              <p className="text-xs text-slate-300">أسعار شفافة ودعم عملاء متواصل</p>
             </div>
           </div>
 
@@ -169,18 +157,18 @@ export const PrivateMaintenanceGate: React.FC<PrivateMaintenanceGateProps> = ({ 
             <div className="flex flex-wrap items-center justify-center gap-3 text-xs">
               <a
                 href="mailto:booking@waslatravel.com"
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-slate-200 transition-colors"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#19354F]/70 hover:bg-[#19354F] border border-[#334155] text-slate-200 transition-colors"
               >
-                <Mail className="h-4 w-4 text-[#EA580C]" />
+                <Mail className="h-4 w-4 text-[#EE5426]" />
                 <span dir="ltr">booking@waslatravel.com</span>
               </a>
               <a
                 href={`https://wa.me/${SITE_CONFIG.whatsappNumber.replace(/[^0-9]/g, '')}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#15803D]/20 hover:bg-[#15803D]/30 border border-[#15803D]/40 text-[#86EFAC] transition-colors"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#10B981]/20 hover:bg-[#10B981]/30 border border-[#10B981]/40 text-white transition-colors"
               >
-                <MessageCircle className="h-4 w-4 text-[#22C55E]" />
+                <MessageCircle className="h-4 w-4 text-[#10B981]" />
                 <span>واتساب مباشر: {SITE_CONFIG.whatsappDisplay}</span>
               </a>
             </div>
@@ -200,10 +188,8 @@ export const PrivateMaintenanceGate: React.FC<PrivateMaintenanceGateProps> = ({ 
           aria-modal="true"
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md animate-fadeIn"
         >
-          <div className="w-full max-w-sm rounded-2xl bg-[#0F283C] border border-white/20 p-6 shadow-2xl space-y-5 text-center">
-            <div className="inline-flex p-3 rounded-xl bg-[#EA580C]/20 border border-[#EA580C]/40 text-[#FDBA74]">
-              <KeyRound className="h-6 w-6 text-[#EA580C]" />
-            </div>
+          <div className="w-full max-w-sm rounded-2xl bg-[#19354F] border border-[#334155] p-6 shadow-2xl space-y-5 text-center">
+            <WaslaLogo variant="icon" iconStyle="orange" className="h-12 w-12 mx-auto" />
 
             <div className="space-y-1">
               <h2 className="text-lg font-bold text-white font-arabic">فتح المعاينة الخاصة بالإدارة</h2>
@@ -221,7 +207,7 @@ export const PrivateMaintenanceGate: React.FC<PrivateMaintenanceGateProps> = ({ 
                     key={index}
                     className={`h-4 w-4 rounded-full border transition-all ${
                       filled
-                        ? 'bg-[#EA580C] border-[#EA580C] scale-110 shadow-[0_0_8px_rgba(234,88,12,0.5)]'
+                        ? 'bg-[#EE5426] border-[#EE5426] scale-110 shadow-[0_0_8px_rgba(238,84,38,0.5)]'
                         : 'border-white/30 bg-white/5'
                     }`}
                   />
@@ -260,7 +246,7 @@ export const PrivateMaintenanceGate: React.FC<PrivateMaintenanceGateProps> = ({ 
                   }
                 }}
                 placeholder="أو اكتب رمز 4004 هنا"
-                className="w-full px-4 py-2.5 rounded-lg bg-black/40 border border-white/20 text-center text-lg tracking-[0.3em] font-mono text-white focus:outline-none focus:ring-2 focus:ring-[#EA580C] placeholder:text-slate-500 placeholder:text-xs placeholder:tracking-normal"
+                className="w-full px-4 py-2.5 rounded-lg bg-black/40 border border-white/20 text-center text-lg tracking-[0.3em] font-mono text-white focus:outline-none focus:ring-2 focus:ring-[#EE5426] placeholder:text-slate-500 placeholder:text-xs placeholder:tracking-normal"
                 autoFocus
               />
             </form>
@@ -272,7 +258,7 @@ export const PrivateMaintenanceGate: React.FC<PrivateMaintenanceGateProps> = ({ 
                   key={digit}
                   type="button"
                   onClick={() => handleKeypadPress(digit)}
-                  className="py-3 rounded-lg bg-white/5 hover:bg-white/10 active:bg-[#EA580C]/20 border border-white/10 text-white font-mono font-bold text-lg transition-colors cursor-pointer"
+                  className="py-3 rounded-lg bg-white/5 hover:bg-white/10 active:bg-[#EE5426]/20 border border-white/10 text-white font-mono font-bold text-lg transition-colors cursor-pointer"
                 >
                   {digit}
                 </button>
@@ -290,7 +276,7 @@ export const PrivateMaintenanceGate: React.FC<PrivateMaintenanceGateProps> = ({ 
               <button
                 type="button"
                 onClick={() => handleKeypadPress('0')}
-                className="py-3 rounded-lg bg-white/5 hover:bg-white/10 active:bg-[#EA580C]/20 border border-white/10 text-white font-mono font-bold text-lg transition-colors cursor-pointer"
+                className="py-3 rounded-lg bg-white/5 hover:bg-white/10 active:bg-[#EE5426]/20 border border-white/10 text-white font-mono font-bold text-lg transition-colors cursor-pointer"
               >
                 0
               </button>

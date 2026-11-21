@@ -69,6 +69,7 @@ import { AdminUserRecord, PublicStorefrontSettings } from '../../hooks/useWaslaF
 import {
   buildGuestPickupMailtoUrl,
   buildGuestPickupWhatsAppUrl,
+  buildLocalizedPickupConfirmationEmail,
   formatWhatsAppDisplay,
   normalizeWhatsAppDigits,
 } from '../../lib/whatsapp';
@@ -292,6 +293,13 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
     whatsappConfigured: boolean;
     whatsappProvider: string;
     webhookConfigured: boolean;
+    smtpHost?: string;
+    smtpPort?: number;
+    smtpSecure?: boolean;
+    smtpUser?: string;
+    ownerEmailTarget?: string;
+    whatsappHasToken?: boolean;
+    whatsappHasPhoneId?: boolean;
   } | null>(null);
   const [testingOwnerAlerts, setTestingOwnerAlerts] = useState(false);
   const [testAlertResult, setTestAlertResult] = useState<{
@@ -322,7 +330,8 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
     if (testingOwnerAlerts) return;
     setTestingOwnerAlerts(true);
     setTestAlertResult(null);
-    const targetEmail = publicSettings?.email || SITE_CONFIG.email;
+    const targetEmail =
+      alertChannelStatus?.ownerEmailTarget || publicSettings?.email || SITE_CONFIG.email;
     const targetWaDigits = normalizeWhatsAppDigits(
       publicSettings?.whatsappNumber || SITE_CONFIG.whatsappNumber
     );
@@ -353,7 +362,48 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
           isTest: true,
         }),
       });
-      const data = await res.json();
+      const rawText = await res.text();
+      let data: {
+        error?: string;
+        email?: { sent?: boolean; to?: string; provider?: string; error?: string };
+        whatsapp?: { sent?: boolean; to?: string; provider?: string; error?: string };
+      } | null = null;
+      try {
+        data = rawText ? JSON.parse(rawText) : null;
+      } catch {
+        data = null;
+      }
+
+      if (!data) {
+        const cleanSnippet = rawText.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 160);
+        const httpErr = `Server HTTP ${res.status}${cleanSnippet ? `: ${cleanSnippet}` : ' (non-JSON response)'}`;
+        setTestAlertResult({
+          emailSent: false,
+          emailTo: targetEmail,
+          emailProvider: alertChannelStatus?.emailProvider || 'none',
+          emailError: httpErr,
+          whatsappSent: false,
+          whatsappTo: targetWaDigits,
+          whatsappProvider: alertChannelStatus?.whatsappProvider || 'none',
+          whatsappError: httpErr,
+        });
+        return;
+      }
+
+      if (!res.ok && data.error && !data.email) {
+        setTestAlertResult({
+          emailSent: false,
+          emailTo: targetEmail,
+          emailProvider: alertChannelStatus?.emailProvider || 'none',
+          emailError: data.error,
+          whatsappSent: false,
+          whatsappTo: targetWaDigits,
+          whatsappProvider: alertChannelStatus?.whatsappProvider || 'none',
+          whatsappError: data.error,
+        });
+        return;
+      }
+
       setTestAlertResult({
         emailSent: Boolean(data?.email?.sent),
         emailTo: data?.email?.to || targetEmail,
@@ -364,16 +414,20 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
         whatsappProvider: data?.whatsapp?.provider || 'none',
         whatsappError: data?.whatsapp?.error,
       });
-    } catch {
+    } catch (err) {
+      const networkErr =
+        err instanceof Error && err.message
+          ? `Network error: ${err.message}`
+          : 'Could not reach server notification endpoint.';
       setTestAlertResult({
         emailSent: false,
         emailTo: targetEmail,
-        emailProvider: 'none',
-        emailError: 'Could not reach server notification endpoint.',
+        emailProvider: alertChannelStatus?.emailProvider || 'none',
+        emailError: networkErr,
         whatsappSent: false,
         whatsappTo: targetWaDigits,
-        whatsappProvider: 'none',
-        whatsappError: 'Could not reach server notification endpoint.',
+        whatsappProvider: alertChannelStatus?.whatsappProvider || 'none',
+        whatsappError: networkErr,
       });
     } finally {
       setTestingOwnerAlerts(false);
@@ -547,50 +601,45 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
     window.setTimeout(() => setBookingModalSaved(false), 2600);
   };
 
-  const buildBookingEmailBody = (bk: PlatformBooking): string => {
-    const spotText =
-      bk.pickupSpot === 'Outside Main Gate'
-        ? 'Outside Hotel Main Gate (أمام البوابة الخارجية)'
-        : 'Inside Hotel Reception / Lobby (أمام الريسبشن)';
-    return [
-      `Dear ${bk.guestName},`,
-      ``,
-      `Thank you for booking with Wasla Travel (waslatravel.com). Here are your confirmed booking & pickup details:`,
-      ``,
-      `• Booking Reference: ${bk.id}`,
-      `• Trip / Service: ${bk.tripTitle}`,
-      `• Date: ${bk.date}`,
-      bk.tripStartTime?.trim() ? `• Trip Start Time: ${bk.tripStartTime.trim()}` : undefined,
-      `• Hotel Pickup Time: ${bk.pickupTime && bk.pickupTime !== 'TBD' ? bk.pickupTime : 'TBD (Confirmed evening prior)'}`,
-      `• Meeting Point: ${spotText}`,
-      `• Hotel / Pickup Location: ${bk.hotel}${bk.roomNumber ? ` (Room ${bk.roomNumber})` : ''}`,
-      bk.guestCountry ? `• Nationality: ${bk.guestCountry}` : undefined,
-      `• Guests: ${bk.adults} Adult(s)${bk.children > 0 ? ` + ${bk.children} Child(ren)` : ''}${(bk.infants ?? 0) > 0 ? ` + ${bk.infants} Infant/INF (Free)` : ''}`,
-      `• Total Guest Price: €${bk.grossEur} (${bk.paymentStatus})`,
-      `• Assigned Driver / Guide: ${bk.assignedDriverOrGuide || 'Will greet you at the pickup point'}`,
-      bk.notes ? `• Notes: ${bk.notes}` : '',
-      ``,
-      `If you need any adjustments, reply to this email or message us anytime on WhatsApp.`,
-      ``,
-      `Best regards,`,
-      `Wasla Travel Operations Desk`,
-      `WhatsApp: ${publicSettings?.whatsappDisplay || SITE_CONFIG.whatsappDisplay} | ${SITE_CONFIG.email}`,
-    ]
-      .filter((line) => line !== undefined)
-      .join('\n');
-  };
+  const buildBookingEmailPayload = (bk: PlatformBooking) =>
+    buildLocalizedPickupConfirmationEmail({
+      bookingId: bk.id,
+      guestName: bk.guestName,
+      tripTitle: bk.tripTitle,
+      date: bk.date,
+      tripStartTime: bk.tripStartTime,
+      pickupTime: bk.pickupTime,
+      pickupSpot: bk.pickupSpot,
+      hotel: bk.hotel,
+      roomNumber: bk.roomNumber,
+      guestCountry: bk.guestCountry,
+      adults: bk.adults,
+      children: bk.children,
+      infants: bk.infants,
+      grossEur: bk.grossEur,
+      paymentStatus: bk.paymentStatus,
+      driverOrGuide: bk.assignedDriverOrGuide,
+      notes: bk.notes,
+      guestLang: bk.guestLang,
+      whatsappDisplay: publicSettings?.whatsappDisplay || SITE_CONFIG.whatsappDisplay,
+      supportEmail: publicSettings?.email || SITE_CONFIG.email,
+    });
+
+  const buildBookingEmailBody = (bk: PlatformBooking): string =>
+    buildBookingEmailPayload(bk).body;
 
   const openEmailForBooking = (bk: PlatformBooking) => {
     setEmailCopied(false);
     setEmailLoggedBanner(false);
     const recipient = bk.guestEmail || (bk.guestContact.includes('@') ? bk.guestContact : '');
+    const localizedEmail = buildBookingEmailPayload(bk);
     setEmailModal({
       to: recipient || 'No email on booking — add email in booking details',
-      subject: `Wasla Travel Pickup Confirmation — ${bk.id} (${bk.date})`,
+      subject: localizedEmail.subject,
       type: 'Booking Confirmation',
       sentAt: 'Ready to send',
       status: 'Preview',
-      body: buildBookingEmailBody(bk),
+      body: localizedEmail.body,
       relatedBooking: bk,
     });
   };
@@ -1930,17 +1979,17 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
   const pendingSuppliersCount = suppliers.filter((s) => s.status === 'Pending').length;
 
   return (
-    <div className="min-h-[calc(100vh-40px)] bg-[#F8FAFC] text-[#0F172A]">
+    <div className="min-h-[calc(100vh-40px)] bg-[#FAF4ED]/55 text-[#0F2233]">
       <div className="mx-auto max-w-[1320px] px-4 sm:px-6 py-6 space-y-6">
         {/* Clean Executive Header + 5-Workspace Navigation */}
-        <header className="rounded-xl border border-[#E2E8F0] bg-white shadow-xs overflow-hidden">
+        <header className="card-wasla p-0 overflow-hidden">
           <div
-            className="px-5 py-4 flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#E2E8F0]"
+            className="px-5 py-4 flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#C8C2B8]/50"
             dir={isAr ? 'rtl' : 'ltr'}
           >
             <div className="space-y-0.5 min-w-0">
               <div className="flex flex-wrap items-center gap-2 text-xs text-[#64748B] tabular-nums">
-                <span className="font-semibold text-[#0F172A]">{SITE_CONFIG.domain}</span>
+                <span className="font-semibold text-[#0F2233]">{SITE_CONFIG.domain}</span>
                 <span aria-hidden="true">·</span>
                 <span>
                   {isAr
@@ -1958,7 +2007,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                     : 'Operations steady'}
                 </span>
               </div>
-              <h1 className="font-display text-xl sm:text-2xl font-semibold tracking-[-0.02em] text-[#0F172A]">
+              <h1 className="font-display text-xl sm:text-2xl font-semibold tracking-[-0.02em] text-[#0F2233]">
                 {isAr ? 'لوحة تحكم المالك والإدارة' : 'Owner Command Center'}
               </h1>
             </div>
@@ -1966,7 +2015,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
             <div className="flex flex-wrap items-center gap-2.5 shrink-0">
               {/* Global Owner Workspace Language Switch */}
               <div
-                className="inline-flex items-center rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] p-0.5 text-xs font-semibold"
+                className="inline-flex items-center rounded-lg border border-[#C8C2B8]/60 bg-[#FAF4ED] p-0.5 text-xs font-semibold"
                 role="group"
                 aria-label="Workspace language"
               >
@@ -1974,7 +2023,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                   type="button"
                   onClick={() => setCopilotLang('ar')}
                   className={`rounded-md px-2.5 py-1.5 transition-colors cursor-pointer whitespace-nowrap ${
-                    isAr ? 'bg-white text-[#0F172A] shadow-xs' : 'text-[#64748B] hover:text-[#0F172A]'
+                    isAr ? 'bg-white text-[#0F2233] shadow-xs' : 'text-[#64748B] hover:text-[#0F2233]'
                   }`}
                 >
                   العربية
@@ -1983,7 +2032,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                   type="button"
                   onClick={() => setCopilotLang('en')}
                   className={`rounded-md px-2.5 py-1.5 transition-colors cursor-pointer whitespace-nowrap ${
-                    !isAr ? 'bg-white text-[#0F172A] shadow-xs' : 'text-[#64748B] hover:text-[#0F172A]'
+                    !isAr ? 'bg-white text-[#0F2233] shadow-xs' : 'text-[#64748B] hover:text-[#0F2233]'
                   }`}
                 >
                   English
@@ -1994,7 +2043,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                 <button
                   type="button"
                   onClick={() => setEditorState({ open: true, mode: 'create', trip: null })}
-                  className="inline-flex min-h-[38px] items-center gap-1.5 rounded-lg bg-[#EA580C] px-4 py-2 text-xs font-semibold text-white hover:bg-[#C2410C] transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                  className="btn-wasla-primary min-h-[38px] gap-1.5 rounded-lg px-4 py-2 text-xs whitespace-nowrap shrink-0 cursor-pointer"
                 >
                   <Plus className="h-4 w-4" aria-hidden="true" />
                   <span>{isAr ? 'إنشاء رحلة جديدة' : 'New Trip'}</span>
@@ -2055,8 +2104,8 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                   onClick={() => setActiveTab(tab.id)}
                   className={`inline-flex min-h-[38px] items-center gap-2 rounded-lg px-3.5 py-2 text-xs font-semibold transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                     isActive
-                      ? 'bg-[#0F172A] text-white shadow-xs'
-                      : 'text-[#475569] hover:bg-white hover:text-[#0F172A]'
+                      ? 'bg-[#0F2233] text-white shadow-xs'
+                      : 'text-[#475569] hover:bg-white hover:text-[#0F2233]'
                   }`}
                 >
                   <Icon className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
@@ -2098,7 +2147,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                       ? 'border-[#FECACA] bg-[#FEF2F2] text-[#B91C1C] hover:bg-[#FEE2E2]'
                       : item.severity === 'medium'
                       ? 'border-[#FDE68A] bg-[#FFFBEB] text-[#B45309] hover:bg-[#FEF3C7]'
-                      : 'border-[#E2E8F0] bg-[#F8FAFC] text-[#334155] hover:border-[#EA580C] hover:text-[#EA580C]'
+                      : 'border-[#E2E8F0] bg-[#F8FAFC] text-[#334155] hover:border-[#EE5426] hover:text-[#EE5426]'
                   }`}
                 >
                   <span>{item.label}</span>
@@ -2116,12 +2165,12 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
           <div className="space-y-6" dir={isAr ? 'rtl' : 'ltr'}>
             {/* 4-Column Uniform Financial & Supply KPI Strip */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="rounded-xl border border-[#E2E8F0] bg-white p-5 space-y-1.5">
+              <div className="card-wasla p-5 space-y-1.5">
                 <div className="flex items-center justify-between text-xs font-medium text-[#64748B]">
                   <span>{isAr ? 'إجمالي مبيعات العملاء' : 'Guest Sales Volume'}</span>
                   <DollarSign className="h-4 w-4 text-[#94A3B8]" aria-hidden="true" />
                 </div>
-                <div className="font-mono text-2xl font-semibold text-[#0F172A] tabular-nums">
+                <div className="font-mono text-2xl font-semibold text-[#0F2233] tabular-nums">
                   €{financials.gross}
                 </div>
                 <div className="text-xs text-[#64748B] tabular-nums">
@@ -2131,12 +2180,12 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                 </div>
               </div>
 
-              <div className="rounded-xl border border-[#E2E8F0] bg-white p-5 space-y-1.5">
+              <div className="card-wasla p-5 space-y-1.5">
                 <div className="flex items-center justify-between text-xs font-medium text-[#64748B]">
                   <span>{isAr ? 'صافي أرباح المنصة' : 'Platform Revenue Earned'}</span>
-                  <TrendingUp className="h-4 w-4 text-[#EA580C]" aria-hidden="true" />
+                  <TrendingUp className="h-4 w-4 text-[#EE5426]" aria-hidden="true" />
                 </div>
-                <div className="font-mono text-2xl font-semibold text-[#EA580C] tabular-nums">
+                <div className="font-mono text-2xl font-semibold text-[#EE5426] tabular-nums">
                   €{financials.commission}
                 </div>
                 <div className="text-xs text-[#64748B] tabular-nums">
@@ -2146,12 +2195,12 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                 </div>
               </div>
 
-              <div className="rounded-xl border border-[#E2E8F0] bg-white p-5 space-y-1.5">
+              <div className="card-wasla p-5 space-y-1.5">
                 <div className="flex items-center justify-between text-xs font-medium text-[#64748B]">
                   <span>{isAr ? 'مستحقات الموردين' : 'Supplier Payouts Owed'}</span>
-                  <Users className="h-4 w-4 text-[#16A34A]" aria-hidden="true" />
+                  <Users className="h-4 w-4 text-[#10B981]" aria-hidden="true" />
                 </div>
-                <div className="font-mono text-2xl font-semibold text-[#0F172A] tabular-nums">
+                <div className="font-mono text-2xl font-semibold text-[#0F2233] tabular-nums">
                   €{financials.supplierNet}
                 </div>
                 <div className="text-xs text-[#64748B] tabular-nums">
@@ -2161,12 +2210,12 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                 </div>
               </div>
 
-              <div className="rounded-xl border border-[#E2E8F0] bg-white p-5 space-y-1.5">
+              <div className="card-wasla p-5 space-y-1.5">
                 <div className="flex items-center justify-between text-xs font-medium text-[#64748B]">
                   <span>{isAr ? 'الرحلات والموردين النشطين' : 'Live Marketplace Supply'}</span>
                   <ShieldCheck className="h-4 w-4 text-[#64748B]" aria-hidden="true" />
                 </div>
-                <div className="font-mono text-2xl font-semibold text-[#0F172A] tabular-nums">
+                <div className="font-mono text-2xl font-semibold text-[#0F2233] tabular-nums">
                   {activeSuppliersCount} / {suppliers.length}
                 </div>
                 <div className="text-xs text-[#64748B] tabular-nums">
@@ -2186,10 +2235,10 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
             </div>
 
             {/* Live Bookings & Payment Status Ledger */}
-            <section className="rounded-xl border border-[#E2E8F0] bg-white overflow-hidden">
+            <section className="card-wasla p-0 overflow-hidden">
               <div className="px-5 py-4 border-b border-[#E2E8F0] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div className="space-y-0.5">
-                  <h2 className="text-base font-semibold text-[#0F172A]">
+                  <h2 className="text-base font-semibold text-[#0F2233]">
                     {isAr ? 'أحدث الحجوزات وحالة الدفع (كاش / رابط دفع)' : 'Recent Bookings & Payment Status'}
                   </h2>
                   <p className="text-xs text-[#64748B] tabular-nums">
@@ -2215,8 +2264,8 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                         onClick={() => setOverviewBookingFilter(f.id)}
                         className={`rounded-md px-2.5 py-1 transition-colors cursor-pointer whitespace-nowrap ${
                           overviewBookingFilter === f.id
-                            ? 'bg-white text-[#0F172A] shadow-xs'
-                            : 'text-[#64748B] hover:text-[#0F172A]'
+                            ? 'bg-white text-[#0F2233] shadow-xs'
+                            : 'text-[#64748B] hover:text-[#0F2233]'
                         }`}
                       >
                         {f.label}
@@ -2226,7 +2275,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                   <button
                     type="button"
                     onClick={() => setActiveTab('copilot')}
-                    className="inline-flex items-center gap-1 text-xs font-semibold text-[#EA580C] hover:underline underline-offset-4 cursor-pointer whitespace-nowrap"
+                    className="inline-flex items-center gap-1 text-xs font-semibold text-[#EE5426] hover:underline underline-offset-4 cursor-pointer whitespace-nowrap"
                   >
                     <span>{isAr ? 'فتح مركز المراسلات' : 'Open Inbox'}</span>
                     <span aria-hidden="true">{isAr ? '←' : '→'}</span>
@@ -2236,14 +2285,14 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
 
               {recentOverviewBookings.length === 0 ? (
                 <div className="px-5 py-10 text-center space-y-2">
-                  <p className="text-sm font-medium text-[#0F172A]">
+                  <p className="text-sm font-medium text-[#0F2233]">
                     {isAr ? 'لا توجد حجوزات مطابقة لهذا الفلتر حالياً.' : 'No bookings match this filter right now.'}
                   </p>
                   {overviewBookingFilter !== 'all' && (
                     <button
                       type="button"
                       onClick={() => setOverviewBookingFilter('all')}
-                      className="text-xs font-semibold text-[#EA580C] hover:underline cursor-pointer"
+                      className="text-xs font-semibold text-[#EE5426] hover:underline cursor-pointer"
                     >
                       {isAr ? 'عرض جميع الحجوزات' : 'Show all bookings'}
                     </button>
@@ -2276,18 +2325,18 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                             }`}
                           >
                             <td className="py-3 px-4 whitespace-nowrap">
-                              <div className="font-mono font-semibold text-[#0F172A] tabular-nums">{bk.id}</div>
+                              <div className="font-mono font-semibold text-[#0F2233] tabular-nums">{bk.id}</div>
                               <div className="text-[11px] text-[#64748B] tabular-nums">{bk.date}</div>
                             </td>
                             <td className="py-3 px-4 max-w-[200px]">
-                              <div className="font-semibold text-[#0F172A] truncate">{bk.guestName}</div>
+                              <div className="font-semibold text-[#0F2233] truncate">{bk.guestName}</div>
                               <div className="text-[11px] text-[#64748B] truncate">{bk.hotel}</div>
                             </td>
                             <td className="py-3 px-4 max-w-[240px]">
-                              <div className="font-medium text-[#0F172A] truncate">{bk.tripTitle}</div>
+                              <div className="font-medium text-[#0F2233] truncate">{bk.tripTitle}</div>
                               <div className="text-[11px] text-[#64748B] truncate">{bk.supplierName}</div>
                             </td>
-                            <td className="py-3 px-4 text-end font-mono font-semibold text-[#0F172A] tabular-nums whitespace-nowrap">
+                            <td className="py-3 px-4 text-end font-mono font-semibold text-[#0F2233] tabular-nums whitespace-nowrap">
                               €{bk.grossEur}
                             </td>
                             <td className="py-3 px-4 whitespace-nowrap text-[#475569] font-medium">
@@ -2323,14 +2372,14 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                                 <button
                                   type="button"
                                   onClick={() => openOwnerBookingModal(bk, 'ticket')}
-                                  className="rounded-md border border-[#CBD5E1] bg-white px-2.5 py-1 text-[11px] font-semibold text-[#0F172A] hover:border-[#EA580C] hover:text-[#EA580C] transition-colors cursor-pointer"
+                                  className="rounded-md border border-[#CBD5E1] bg-white px-2.5 py-1 text-[11px] font-semibold text-[#0F2233] hover:border-[#EE5426] hover:text-[#EE5426] transition-colors cursor-pointer"
                                 >
                                   {isAr ? 'التذكرة' : 'Ticket'}
                                 </button>
                                 <button
                                   type="button"
                                   onClick={() => openOwnerBookingModal(bk, 'edit')}
-                                  className="rounded-md border border-[#E2E8F0] bg-[#F8FAFC] px-2.5 py-1 text-[11px] font-semibold text-[#475569] hover:text-[#0F172A] transition-colors cursor-pointer"
+                                  className="rounded-md border border-[#E2E8F0] bg-[#F8FAFC] px-2.5 py-1 text-[11px] font-semibold text-[#475569] hover:text-[#0F2233] transition-colors cursor-pointer"
                                 >
                                   {isAr ? 'تعديل' : 'Edit'}
                                 </button>
@@ -2346,22 +2395,22 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
             </section>
 
             {/* Official Support Channels & Escalation Summary Strip */}
-            <section className="rounded-xl border border-[#E2E8F0] bg-white p-5 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+            <section className="card-wasla p-5 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
               <div className="space-y-1">
-                <h2 className="text-sm font-semibold text-[#0F172A]">
+                <h2 className="text-sm font-semibold text-[#0F2233]">
                   {isAr ? 'قنوات التواصل الرسمية ومركز الدعم' : 'Official Contact Channels & Support Desk'}
                 </h2>
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-[#475569] tabular-nums">
                   <span className="inline-flex items-center gap-1.5">
                     <MessageCircle className="h-3.5 w-3.5 text-[#16A34A]" aria-hidden="true" />
-                    <span dir="ltr" className="font-mono font-medium text-[#0F172A]">
+                    <span dir="ltr" className="font-mono font-medium text-[#0F2233]">
                       {liveWhatsappDisplay}
                     </span>
                   </span>
                   <span aria-hidden="true" className="text-[#CBD5E1]">·</span>
                   <span className="inline-flex items-center gap-1.5">
-                    <Mail className="h-3.5 w-3.5 text-[#EA580C]" aria-hidden="true" />
-                    <span className="font-mono font-medium text-[#0F172A]">{liveContactEmail}</span>
+                    <Mail className="h-3.5 w-3.5 text-[#EE5426]" aria-hidden="true" />
+                    <span className="font-mono font-medium text-[#0F2233]">{liveContactEmail}</span>
                   </span>
                   <span aria-hidden="true" className="text-[#CBD5E1]">·</span>
                   <span>
@@ -2376,7 +2425,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                 <button
                   type="button"
                   onClick={() => setActiveTab('copilot')}
-                  className="inline-flex min-h-[38px] items-center gap-1.5 rounded-lg bg-[#0F172A] px-3.5 py-2 text-xs font-semibold text-white hover:bg-[#1E293B] transition-colors cursor-pointer whitespace-nowrap"
+                  className="inline-flex min-h-[38px] items-center gap-1.5 rounded-lg bg-[#0F2233] px-3.5 py-2 text-xs font-semibold text-white hover:bg-[#19354F] transition-colors cursor-pointer whitespace-nowrap"
                 >
                   <Inbox className="h-3.5 w-3.5" aria-hidden="true" />
                   <span>{isAr ? 'فتح مركز المراسلات' : 'Open Inbox & Support'}</span>
@@ -2384,7 +2433,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                 <button
                   type="button"
                   onClick={() => setActiveTab('design')}
-                  className="inline-flex min-h-[38px] items-center gap-1.5 rounded-lg border border-[#CBD5E1] bg-white px-3.5 py-2 text-xs font-semibold text-[#0F172A] hover:border-[#EA580C] hover:text-[#EA580C] transition-colors cursor-pointer whitespace-nowrap"
+                  className="inline-flex min-h-[38px] items-center gap-1.5 rounded-lg border border-[#CBD5E1] bg-white px-3.5 py-2 text-xs font-semibold text-[#0F2233] hover:border-[#EE5426] hover:text-[#EE5426] transition-colors cursor-pointer whitespace-nowrap"
                 >
                   <SlidersHorizontal className="h-3.5 w-3.5" aria-hidden="true" />
                   <span>{isAr ? 'تعديل قنوات التواصل والعمولة' : 'Edit Contact Channels'}</span>
@@ -2436,8 +2485,8 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                       onClick={() => setCatalogSubTab(sub.id)}
                       className={`inline-flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-xs font-semibold transition-colors whitespace-nowrap cursor-pointer ${
                         active
-                          ? 'bg-[#EA580C] text-white'
-                          : 'text-[#475569] hover:bg-[#F8FAFC] hover:text-[#0F172A]'
+                          ? 'bg-[#EE5426] text-white'
+                          : 'text-[#475569] hover:bg-[#F8FAFC] hover:text-[#0F2233]'
                       }`}
                     >
                       <span>{sub.label}</span>
@@ -2459,7 +2508,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                 <button
                   type="button"
                   onClick={() => setEditorState({ open: true, mode: 'create', trip: null })}
-                  className="self-start sm:self-auto inline-flex min-h-[38px] items-center gap-1.5 rounded-lg bg-[#EA580C] px-4 py-2 text-xs font-semibold text-white hover:bg-[#C2410C] cursor-pointer whitespace-nowrap"
+                  className="btn-wasla-primary self-start sm:self-auto min-h-[38px] gap-1.5 rounded-lg px-4 py-2 text-xs cursor-pointer whitespace-nowrap"
                 >
                   <Plus className="h-4 w-4" aria-hidden="true" />
                   <span>{isAr ? 'إنشاء رحلة جديدة' : 'Create New Trip'}</span>
@@ -2469,10 +2518,10 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
 
             {/* SUB-TAB A: TRIPS CATALOG MANAGER */}
             {catalogSubTab === 'trips' && (
-              <div id="owner-trips-queue" className="rounded-xl border border-[#E2E8F0] bg-white overflow-hidden">
+              <div id="owner-trips-queue" className="card-wasla p-0 overflow-hidden">
                 <div className="px-5 py-4 border-b border-[#E2E8F0] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   <div>
-                    <h2 className="text-base font-semibold text-[#0F172A]">
+                    <h2 className="text-base font-semibold text-[#0F2233]">
                       {isAr ? 'إدارة كتالوج الرحلات' : 'Owner Trip Catalog Manager'}
                     </h2>
                     <p className="text-xs text-[#64748B] tabular-nums">
@@ -2498,8 +2547,8 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                         onClick={() => setTripStatusFilter(st.id)}
                         className={`rounded-md px-2.5 py-1 transition-colors cursor-pointer whitespace-nowrap ${
                           tripStatusFilter === st.id
-                            ? 'bg-white text-[#0F172A] shadow-xs'
-                            : 'text-[#64748B] hover:text-[#0F172A]'
+                            ? 'bg-white text-[#0F2233] shadow-xs'
+                            : 'text-[#64748B] hover:text-[#0F2233]'
                         }`}
                       >
                         {st.label}
@@ -2540,7 +2589,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                                 {status}
                               </span>
                               <span aria-hidden="true" className="text-[#CBD5E1]">·</span>
-                              <span className="font-semibold text-[#0F172A]">{trip.name.en}</span>
+                              <span className="font-semibold text-[#0F2233]">{trip.name.en}</span>
                               <span className="text-[#64748B] tabular-nums">
                                 · {trip.destination} · From €{trip.price}
                                 {trip.options && trip.options.length > 0 ? ` (${trip.options.length} options)` : ''}
@@ -2557,10 +2606,10 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                             <button
                               type="button"
                               onClick={() => setPreviewTripModal(trip)}
-                              className="inline-flex items-center gap-1 rounded-lg border border-[#CBD5E1] bg-white px-2.5 py-1.5 text-xs font-semibold text-[#0F172A] hover:bg-[#F8FAFC] cursor-pointer"
+                              className="inline-flex items-center gap-1 rounded-lg border border-[#CBD5E1] bg-white px-2.5 py-1.5 text-xs font-semibold text-[#0F2233] hover:bg-[#F8FAFC] cursor-pointer"
                               title="Preview customer booking page"
                             >
-                              <Eye className="h-3.5 w-3.5 text-[#EA580C]" aria-hidden="true" />
+                              <Eye className="h-3.5 w-3.5 text-[#EE5426]" aria-hidden="true" />
                               <span>{isAr ? 'معاينة' : 'Preview'}</span>
                             </button>
 
@@ -2568,10 +2617,10 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                               <button
                                 type="button"
                                 onClick={() => setEditorState({ open: true, mode: 'edit', trip })}
-                                className="inline-flex items-center gap-1 rounded-lg border border-[#CBD5E1] bg-white px-2.5 py-1.5 text-xs font-semibold text-[#0F172A] hover:bg-[#F8FAFC] cursor-pointer"
+                                className="inline-flex items-center gap-1 rounded-lg border border-[#CBD5E1] bg-white px-2.5 py-1.5 text-xs font-semibold text-[#0F2233] hover:bg-[#F8FAFC] cursor-pointer"
                                 title="Edit all details & prices"
                               >
-                                <Pencil className="h-3.5 w-3.5 text-[#EA580C]" aria-hidden="true" />
+                                <Pencil className="h-3.5 w-3.5 text-[#EE5426]" aria-hidden="true" />
                                 <span>{isAr ? 'تعديل' : 'Edit'}</span>
                               </button>
                             )}
@@ -2591,7 +2640,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                               <button
                                 type="button"
                                 onClick={() => onUpdateTripApproval(trip.id, 'Paused')}
-                                className="rounded-lg border border-[#CBD5E1] bg-white px-2.5 py-1.5 text-xs font-semibold text-[#475569] hover:text-[#0F172A] cursor-pointer"
+                                className="rounded-lg border border-[#CBD5E1] bg-white px-2.5 py-1.5 text-xs font-semibold text-[#475569] hover:text-[#0F2233] cursor-pointer"
                               >
                                 {isAr ? 'إيقاف مؤقت' : 'Pause'}
                               </button>
@@ -2655,7 +2704,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
               <div id="owner-suppliers-queue" className="rounded-xl border border-[#E2E8F0] bg-white overflow-hidden">
                 <div className="px-5 py-4 border-b border-[#E2E8F0] flex flex-wrap items-center justify-between gap-2">
                   <div>
-                    <h2 className="text-base font-semibold text-[#0F172A]">
+                    <h2 className="text-base font-semibold text-[#0F2233]">
                       {isAr ? 'الموردين وحساب المستحقات المالية' : 'Suppliers, Approvals & Payout Ledger'}
                     </h2>
                     <p className="text-xs text-[#64748B] tabular-nums">
@@ -2688,16 +2737,16 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                         return (
                           <tr key={sup.id} className="bg-white hover:bg-[#F8FAFC]">
                             <td className="py-3 px-4">
-                              <div className="font-semibold text-[#0F172A]">{sup.name}</div>
+                              <div className="font-semibold text-[#0F2233]">{sup.name}</div>
                               <div className="text-[11px] text-[#64748B]">{sup.email}</div>
                             </td>
                             <td className="py-3 px-4 max-w-[260px]">
-                              <div className="font-medium text-[#0F172A]">{sup.city}</div>
+                              <div className="font-medium text-[#0F2233]">{sup.city}</div>
                               <div className="text-[11px] text-[#64748B] truncate">{sup.specialty}</div>
                             </td>
                             <td className="py-3 px-4 text-end font-mono tabular-nums">{supTrips}</td>
                             <td className="py-3 px-4 text-end font-mono tabular-nums">€{supGross}</td>
-                            <td className="py-3 px-4 text-end font-mono font-semibold text-[#EA580C] tabular-nums">
+                            <td className="py-3 px-4 text-end font-mono font-semibold text-[#EE5426] tabular-nums">
                               €{supNet}
                             </td>
                             <td className="py-3 px-4">
@@ -2733,7 +2782,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
               <div id="owner-reviews-queue" className="rounded-xl border border-[#E2E8F0] bg-white overflow-hidden">
                 <div className="px-5 py-4 border-b border-[#E2E8F0] flex flex-wrap items-center justify-between gap-2">
                   <div>
-                    <h2 className="text-base font-semibold text-[#0F172A]">
+                    <h2 className="text-base font-semibold text-[#0F2233]">
                       {isAr ? 'مراجعة واعتماد تقييمات المسافرين' : 'Customer Trip Reviews & Approval Queue'}
                     </h2>
                     <p className="text-xs text-[#64748B] tabular-nums">
@@ -2802,14 +2851,14 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                               {rev.bookingId && (
                                 <>
                                   <span aria-hidden="true" className="text-[#CBD5E1]">·</span>
-                                  <span className="font-mono text-[11px] font-semibold text-[#EA580C]">
+                                  <span className="font-mono text-[11px] font-semibold text-[#EE5426]">
                                     {rev.bookingId}
                                   </span>
                                 </>
                               )}
                               <span aria-hidden="true" className="text-[#CBD5E1]">·</span>
-                              <span className="font-semibold text-[#0F172A]">{rev.tripTitle}</span>
-                              <span className="inline-flex items-center gap-1 font-semibold text-[#0F172A] tabular-nums">
+                              <span className="font-semibold text-[#0F2233]">{rev.tripTitle}</span>
+                              <span className="inline-flex items-center gap-1 font-semibold text-[#0F2233] tabular-nums">
                                 <Star className="h-3.5 w-3.5 fill-[#F59E0B] text-[#F59E0B]" aria-hidden="true" />
                                 {rev.rating}/5
                               </span>
@@ -2824,14 +2873,14 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                                 <button
                                   type="button"
                                   onClick={() => setReviewLightboxPhoto(rev.photoUrl || null)}
-                                  className="inline-flex items-center gap-2 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] p-1.5 hover:border-[#EA580C] cursor-pointer"
+                                  className="inline-flex items-center gap-2 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] p-1.5 hover:border-[#EE5426] cursor-pointer"
                                 >
                                   <img
                                     src={rev.photoUrl}
                                     alt={`Guest upload by ${rev.guestName}`}
                                     className="h-12 w-16 rounded object-cover"
                                   />
-                                  <span className="pe-2 text-[11px] font-semibold text-[#0F172A]">
+                                  <span className="pe-2 text-[11px] font-semibold text-[#0F2233]">
                                     {isAr ? 'معاينة صورة المسافر' : 'Inspect Guest Photo'}
                                   </span>
                                 </button>
@@ -2855,7 +2904,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                                 <button
                                   type="button"
                                   onClick={() => onUpdateTripReviewApproval(rev.id, 'Pending')}
-                                  className="rounded-lg border border-[#CBD5E1] bg-white px-2.5 py-1.5 text-xs font-semibold text-[#475569] hover:text-[#0F172A] cursor-pointer"
+                                  className="rounded-lg border border-[#CBD5E1] bg-white px-2.5 py-1.5 text-xs font-semibold text-[#475569] hover:text-[#0F2233] cursor-pointer"
                                 >
                                   {isAr ? 'تعليق' : 'Set Pending'}
                                 </button>
@@ -2886,8 +2935,8 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                 <div id="owner-access-requests" className="rounded-xl border border-[#E2E8F0] bg-white p-5 space-y-3">
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <div className="flex items-center gap-2">
-                      <UserCheck className="h-4 w-4 text-[#EA580C]" aria-hidden="true" />
-                      <h2 className="text-sm font-semibold text-[#0F172A]">
+                      <UserCheck className="h-4 w-4 text-[#EE5426]" aria-hidden="true" />
+                      <h2 className="text-sm font-semibold text-[#0F2233]">
                         {isAr
                           ? `طلبات انضمام الفريق والموردين (${pendingRequests.length})`
                           : `Staff & Partner Access Requests (${pendingRequests.length})`}
@@ -2910,7 +2959,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                           className="rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs"
                         >
                           <div className="space-y-0.5 min-w-0">
-                            <div className="font-semibold text-[#0F172A] truncate">
+                            <div className="font-semibold text-[#0F2233] truncate">
                               {req.companyName || req.displayName} ({req.requestedRole})
                             </div>
                             <div className="text-[11px] text-[#64748B] truncate">
@@ -2938,7 +2987,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                                     displayName: req.companyName || req.displayName,
                                   })
                                 }
-                                className="inline-flex items-center gap-1 rounded-lg bg-[#EA580C] px-3 py-1.5 text-xs font-semibold text-white hover:bg-[#C2410C] cursor-pointer"
+                                className="btn-wasla-primary gap-1 rounded-lg px-3 py-1.5 text-xs cursor-pointer"
                               >
                                 <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
                                 <span>Grant Co-Owner</span>
@@ -2952,11 +3001,11 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                 </div>
 
                 {isPrimaryOwner && (
-                  <div className="rounded-xl border border-[#E2E8F0] bg-white p-5 space-y-3">
+                  <div className="card-wasla p-5 space-y-3">
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       <div className="flex items-center gap-2">
-                        <ShieldCheck className="h-4 w-4 text-[#0F172A]" aria-hidden="true" />
-                        <h2 className="text-sm font-semibold text-[#0F172A]">
+                        <ShieldCheck className="h-4 w-4 text-[#0F2233]" aria-hidden="true" />
+                        <h2 className="text-sm font-semibold text-[#0F2233]">
                           {isAr ? 'الشركاء الإداريين وصلاحيات الفريق النشطة' : 'Active Co-Owners & Team Roles'}
                         </h2>
                       </div>
@@ -2988,8 +3037,8 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                               >
                                 <div className="min-w-0 space-y-0.5">
                                   <div className="flex items-center gap-2">
-                                    <span className="font-semibold text-[#0F172A] truncate">{label}</span>
-                                    <span className="text-[11px] font-semibold text-[#EA580C] whitespace-nowrap">
+                                    <span className="font-semibold text-[#0F2233] truncate">{label}</span>
+                                    <span className="text-[11px] font-semibold text-[#EE5426] whitespace-nowrap">
                                       · {isCoOwner ? 'Co-Owner' : roleInfo?.role || 'staff'}
                                     </span>
                                   </div>
@@ -3003,7 +3052,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                                       onClick={() =>
                                         void onGrantCoOwner({ uid, email, displayName: label })
                                       }
-                                      className="rounded-md border border-[#CBD5E1] bg-white px-2.5 py-1 text-[11px] font-semibold text-[#0F172A] hover:border-[#EA580C] hover:text-[#EA580C] cursor-pointer"
+                                      className="rounded-md border border-[#CBD5E1] bg-white px-2.5 py-1 text-[11px] font-semibold text-[#0F2233] hover:border-[#EE5426] hover:text-[#EE5426] cursor-pointer"
                                     >
                                       Make Co-Owner
                                     </button>
@@ -3040,8 +3089,8 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
             <div className="lg:col-span-5 rounded-xl border border-[#E2E8F0] bg-white p-5 sm:p-6 space-y-4">
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
-                  <Megaphone className="h-4 w-4 text-[#EA580C]" aria-hidden="true" />
-                  <h2 className="text-base font-semibold text-[#0F172A]">
+                  <Megaphone className="h-4 w-4 text-[#EE5426]" aria-hidden="true" />
+                  <h2 className="text-base font-semibold text-[#0F2233]">
                     {isAr ? 'منشئ الحملات الإعلانية المربحة' : 'Profitable Ad Campaign Builder'}
                   </h2>
                 </div>
@@ -3052,12 +3101,12 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                 </p>
               </div>
 
-              <label className="block space-y-1 text-xs font-medium text-[#0F172A]">
+              <label className="block space-y-1 text-xs font-medium text-[#0F2233]">
                 <span>1. Select Trip to Promote</span>
                 <select
                   value={selectedTripId}
                   onChange={(e) => setSelectedTripId(e.target.value)}
-                  className="w-full rounded-lg border border-[#CBD5E1] bg-white px-3 py-2 text-xs text-[#0F172A] focus:border-[#EA580C] focus:outline-none"
+                  className="w-full rounded-lg border border-[#CBD5E1] bg-white px-3 py-2 text-xs text-[#0F2233] focus:border-[#EE5426] focus:outline-none"
                 >
                   {trips.map((trip) => (
                     <option key={trip.id} value={trip.id}>
@@ -3071,7 +3120,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                 <div className="grid grid-cols-3 gap-2 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] p-3 text-center font-mono tabular-nums">
                   <div>
                     <div className="font-sans text-[11px] text-[#64748B]">1 Guest Fee</div>
-                    <div className="text-sm font-semibold text-[#EA580C]">
+                    <div className="text-sm font-semibold text-[#EE5426]">
                       €{unitEconomics.commissionPerGuest}
                     </div>
                   </div>
@@ -3083,7 +3132,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                   </div>
                   <div>
                     <div className="font-sans text-[11px] text-[#64748B]">Max Safe CPA</div>
-                    <div className="text-sm font-semibold text-[#0F172A]">
+                    <div className="text-sm font-semibold text-[#0F2233]">
                       ≤ €{unitEconomics.maxSafeCpa}
                     </div>
                   </div>
@@ -3091,12 +3140,12 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
               )}
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <label className="block space-y-1 text-xs font-medium text-[#0F172A]">
+                <label className="block space-y-1 text-xs font-medium text-[#0F2233]">
                   <span>2. Channel / Format</span>
                   <select
                     value={adPlatform}
                     onChange={(e) => setAdPlatform(e.target.value as AdPlatform)}
-                    className="w-full rounded-lg border border-[#CBD5E1] bg-white px-3 py-2 text-xs text-[#0F172A] focus:border-[#EA580C] focus:outline-none"
+                    className="w-full rounded-lg border border-[#CBD5E1] bg-white px-3 py-2 text-xs text-[#0F2233] focus:border-[#EE5426] focus:outline-none"
                   >
                     <option value="Facebook & Instagram Ad">Facebook &amp; Instagram Ad</option>
                     <option value="Instagram Reels / TikTok Script">Instagram Reels / TikTok Script</option>
@@ -3106,12 +3155,12 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                   </select>
                 </label>
 
-                <label className="block space-y-1 text-xs font-medium text-[#0F172A]">
+                <label className="block space-y-1 text-xs font-medium text-[#0F2233]">
                   <span>3. Tourist Language</span>
                   <select
                     value={audienceLang}
                     onChange={(e) => setAudienceLang(e.target.value as 'en' | 'de' | 'ar')}
-                    className="w-full rounded-lg border border-[#CBD5E1] bg-white px-3 py-2 text-xs text-[#0F172A] focus:border-[#EA580C] focus:outline-none"
+                    className="w-full rounded-lg border border-[#CBD5E1] bg-white px-3 py-2 text-xs text-[#0F2233] focus:border-[#EE5426] focus:outline-none"
                   >
                     <option value="en">English (UK / International)</option>
                     <option value="de">Deutsch (German / DACH)</option>
@@ -3120,12 +3169,12 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                 </label>
               </div>
 
-              <label className="block space-y-1 text-xs font-medium text-[#0F172A]">
+              <label className="block space-y-1 text-xs font-medium text-[#0F2233]">
                 <span>4. Campaign Goal</span>
                 <select
                   value={adGoal}
                   onChange={(e) => setAdGoal(e.target.value)}
-                  className="w-full rounded-lg border border-[#CBD5E1] bg-white px-3 py-2 text-xs text-[#0F172A] focus:border-[#EA580C] focus:outline-none"
+                  className="w-full rounded-lg border border-[#CBD5E1] bg-white px-3 py-2 text-xs text-[#0F2233] focus:border-[#EE5426] focus:outline-none"
                 >
                   <option value="Direct Bookings (ROI)">Direct Bookings on {SITE_CONFIG.domain} (ROI)</option>
                   <option value="WhatsApp Inquiries">
@@ -3135,13 +3184,13 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                 </select>
               </label>
 
-              <label className="block space-y-1 text-xs font-medium text-[#0F172A]">
+              <label className="block space-y-1 text-xs font-medium text-[#0F2233]">
                 <span>5. Offer / Trust Angle</span>
                 <input
                   type="text"
                   value={offerNote}
                   onChange={(e) => setOfferNote(e.target.value)}
-                  className="w-full rounded-lg border border-[#CBD5E1] bg-white px-3 py-2 text-xs text-[#0F172A] focus:border-[#EA580C] focus:outline-none"
+                  className="w-full rounded-lg border border-[#CBD5E1] bg-white px-3 py-2 text-xs text-[#0F2233] focus:border-[#EE5426] focus:outline-none"
                 />
               </label>
 
@@ -3149,7 +3198,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                 type="button"
                 onClick={handleGenerateAd}
                 disabled={generatingAd || !selectedTrip}
-                className="inline-flex w-full min-h-[42px] items-center justify-center gap-2 rounded-lg bg-[#EA580C] px-4 py-2 text-xs font-semibold text-white hover:bg-[#C2410C] disabled:opacity-60 transition-colors cursor-pointer"
+                className="btn-wasla-primary w-full min-h-[42px] rounded-lg px-4 py-2 text-xs cursor-pointer"
               >
                 <Sparkles className="h-4 w-4" aria-hidden="true" />
                 <span>{generatingAd ? 'Writing campaign draft...' : 'Generate Campaign Draft'}</span>
@@ -3163,13 +3212,13 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
             </div>
 
             {/* Right: Generated Ad Output + Auto UTM Link + Targeting Advice */}
-            <div className="lg:col-span-7 rounded-xl border border-[#E2E8F0] bg-white p-5 sm:p-6 flex flex-col justify-between gap-5">
+            <div className="card-wasla lg:col-span-7 p-5 sm:p-6 flex flex-col justify-between gap-5">
               {!generatedAd ? (
                 <div className="my-auto py-12 text-center space-y-3 max-w-md mx-auto">
-                  <div className="mx-auto inline-flex h-11 w-11 items-center justify-center rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] text-[#EA580C]">
+                  <div className="mx-auto inline-flex h-11 w-11 items-center justify-center rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] text-[#EE5426]">
                     <TrendingUp className="h-5 w-5" aria-hidden="true" />
                   </div>
-                  <h3 className="text-base font-semibold text-[#0F172A]">
+                  <h3 className="text-base font-semibold text-[#0F2233]">
                     {isAr ? 'جاهز لإنشاء حملة إعلانية بعائد محسوب' : 'Ready to draft campaigns that convert'}
                   </h3>
                   <p className="text-xs text-[#64748B] leading-relaxed">
@@ -3182,13 +3231,13 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                 <div className="space-y-4">
                   <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#E2E8F0] pb-3">
                     <div>
-                      <div className="text-[11px] font-semibold text-[#EA580C]">{adPlatform}</div>
-                      <h3 className="text-base font-semibold text-[#0F172A]">{generatedAd.headline}</h3>
+                      <div className="text-[11px] font-semibold text-[#EE5426]">{adPlatform}</div>
+                      <h3 className="text-base font-semibold text-[#0F2233]">{generatedAd.headline}</h3>
                     </div>
                     <button
                       type="button"
                       onClick={handleCopyAd}
-                      className="inline-flex items-center gap-1.5 rounded-lg border border-[#CBD5E1] bg-[#F8FAFC] px-3 py-1.5 text-xs font-semibold text-[#0F172A] hover:bg-[#F1F5F9] cursor-pointer"
+                      className="inline-flex items-center gap-1.5 rounded-lg border border-[#CBD5E1] bg-[#F8FAFC] px-3 py-1.5 text-xs font-semibold text-[#0F2233] hover:bg-[#F1F5F9] cursor-pointer"
                     >
                       {copiedAd ? (
                         <>
@@ -3207,15 +3256,15 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                   <div className="space-y-3 text-sm">
                     <div className="rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] p-3.5 space-y-1">
                       <div className="text-[11px] font-semibold text-[#64748B]">Scroll-Stopping Hook</div>
-                      <p className="font-semibold text-[#0F172A]">{generatedAd.hook}</p>
+                      <p className="font-semibold text-[#0F2233]">{generatedAd.hook}</p>
                     </div>
 
                     <div className="rounded-lg border border-[#E2E8F0] bg-white p-3.5 space-y-1.5">
                       <div className="text-[11px] font-semibold text-[#64748B]">Primary Ad Copy</div>
-                      <p className="text-xs sm:text-sm text-[#0F172A] whitespace-pre-line leading-relaxed">
+                      <p className="text-xs sm:text-sm text-[#0F2233] whitespace-pre-line leading-relaxed">
                         {generatedAd.primaryText}
                       </p>
-                      <div className="pt-2 text-xs font-semibold text-[#EA580C]">
+                      <div className="pt-2 text-xs font-semibold text-[#EE5426]">
                         CTA: {generatedAd.cta}
                       </div>
                       {generatedAd.hashtags.length > 0 && (
@@ -3226,17 +3275,17 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                     </div>
 
                     <div className="rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] p-3.5 space-y-1">
-                      <div className="text-[11px] font-semibold text-[#EA580C] tabular-nums">
+                      <div className="text-[11px] font-semibold text-[#EE5426] tabular-nums">
                         Targeting &amp; Margin Advice (Keep CPA ≤ €{unitEconomics.maxSafeCpa})
                       </div>
-                      <p className="text-xs text-[#0F172A] leading-relaxed">{generatedAd.targetingTip}</p>
+                      <p className="text-xs text-[#0F2233] leading-relaxed">{generatedAd.targetingTip}</p>
                     </div>
 
                     <div className="rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] p-3 text-xs space-y-1">
                       <div className="text-[11px] font-semibold text-[#64748B]">
                         Tracked Landing URL ({SITE_CONFIG.domain})
                       </div>
-                      <div className="font-mono text-[11px] text-[#EA580C] break-all">{utmLink}</div>
+                      <div className="font-mono text-[11px] text-[#EE5426] break-all">{utmLink}</div>
                     </div>
                   </div>
                 </div>
@@ -3256,7 +3305,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                 <button
                   type="button"
                   onClick={() => setActiveTab('design')}
-                  className="font-semibold text-[#EA580C] hover:underline cursor-pointer"
+                  className="font-semibold text-[#EE5426] hover:underline cursor-pointer"
                 >
                   {isAr ? 'إعدادات التتبع والقنوات ←' : 'Configure Pixel & Channels →'}
                 </button>
@@ -3273,14 +3322,14 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
             {/* Consolidated Official Contact Channels, Commission & Analytics Settings */}
             <form
               onSubmit={handleSaveSettings}
-              className="rounded-xl border border-[#E2E8F0] bg-white p-5 sm:p-6 space-y-5"
+              className="card-wasla p-5 sm:p-6 space-y-5"
               dir={isAr ? 'rtl' : 'ltr'}
             >
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#E2E8F0] pb-4">
                 <div className="space-y-0.5">
                   <div className="flex items-center gap-2">
-                    <Globe className="h-4 w-4 text-[#EA580C]" aria-hidden="true" />
-                    <h2 className="text-base font-semibold text-[#0F172A]">
+                    <Globe className="h-4 w-4 text-[#EE5426]" aria-hidden="true" />
+                    <h2 className="text-base font-semibold text-[#0F2233]">
                       {isAr
                         ? 'قنوات التواصل الرسمية وإعدادات المنصة المباشرة'
                         : 'Official Contact Channels & Platform Settings'}
@@ -3307,7 +3356,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
                 <label className="block space-y-1.5">
-                  <span className="font-semibold text-[#0F172A]">
+                  <span className="font-semibold text-[#0F2233]">
                     {isAr ? 'رقم واتساب التشغيل الرسمي' : 'Official WhatsApp Desk'}
                   </span>
                   <input
@@ -3316,12 +3365,12 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                     value={whatsappInput}
                     onChange={(e) => setWhatsappInput(e.target.value)}
                     placeholder="+20 112 915 5520"
-                    className="w-full rounded-lg border border-[#CBD5E1] bg-white px-3 py-2 text-xs text-[#0F172A] focus:border-[#EA580C] focus:outline-none font-mono tabular-nums"
+                    className="w-full rounded-lg border border-[#CBD5E1] bg-white px-3 py-2 text-xs text-[#0F2233] focus:border-[#EE5426] focus:outline-none font-mono tabular-nums"
                   />
                 </label>
 
                 <label className="block space-y-1.5">
-                  <span className="font-semibold text-[#0F172A]">
+                  <span className="font-semibold text-[#0F2233]">
                     {isAr ? 'البريد الإلكتروني الرسمي للدعم' : 'Official Support Email'}
                   </span>
                   <input
@@ -3330,12 +3379,12 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                     value={emailInput}
                     onChange={(e) => setEmailInput(e.target.value)}
                     placeholder={SITE_CONFIG.email}
-                    className="w-full rounded-lg border border-[#CBD5E1] bg-white px-3 py-2 text-xs text-[#0F172A] focus:border-[#EA580C] focus:outline-none"
+                    className="w-full rounded-lg border border-[#CBD5E1] bg-white px-3 py-2 text-xs text-[#0F2233] focus:border-[#EE5426] focus:outline-none"
                   />
                 </label>
 
                 <label className="block space-y-1.5">
-                  <span className="font-semibold text-[#0F172A]">
+                  <span className="font-semibold text-[#0F2233]">
                     {isAr ? 'معرّف Meta Pixel (اختياري)' : 'Meta Pixel ID (optional)'}
                   </span>
                   <input
@@ -3344,12 +3393,12 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                     value={metaPixelId}
                     onChange={(e) => setMetaPixelId(e.target.value)}
                     placeholder="e.g. 123456789012345"
-                    className="w-full rounded-lg border border-[#CBD5E1] bg-white px-3 py-2 text-xs text-[#0F172A] focus:border-[#EA580C] focus:outline-none font-mono tabular-nums"
+                    className="w-full rounded-lg border border-[#CBD5E1] bg-white px-3 py-2 text-xs text-[#0F2233] focus:border-[#EE5426] focus:outline-none font-mono tabular-nums"
                   />
                 </label>
 
                 <label className="block space-y-1.5">
-                  <span className="font-semibold text-[#0F172A]">
+                  <span className="font-semibold text-[#0F2233]">
                     {isAr ? 'معرّف Google Analytics 4' : 'GA4 Measurement ID'}
                   </span>
                   <input
@@ -3358,7 +3407,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                     value={ga4Id}
                     onChange={(e) => setGa4Id(e.target.value)}
                     placeholder="e.g. G-XXXXXXXXXX"
-                    className="w-full rounded-lg border border-[#CBD5E1] bg-white px-3 py-2 text-xs text-[#0F172A] focus:border-[#EA580C] focus:outline-none font-mono"
+                    className="w-full rounded-lg border border-[#CBD5E1] bg-white px-3 py-2 text-xs text-[#0F2233] focus:border-[#EE5426] focus:outline-none font-mono"
                   />
                 </label>
               </div>
@@ -3368,7 +3417,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                 {onChangeCommissionRate && (
                   <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-4 py-3 text-xs">
                     <div className="space-y-0.5">
-                      <div className="font-semibold text-[#0F172A]">
+                      <div className="font-semibold text-[#0F2233]">
                         {isAr ? 'نسبة عمولة المنصة (%)' : 'Platform Commission Margin (%)'}
                       </div>
                       <div className="text-[11px] text-[#64748B]">
@@ -3383,8 +3432,8 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                           onClick={() => onChangeCommissionRate(rate)}
                           className={`rounded-md border px-2.5 py-1 text-xs font-semibold transition-colors cursor-pointer ${
                             commissionRate === rate
-                              ? 'border-[#EA580C] bg-[#EA580C] text-white'
-                              : 'border-[#CBD5E1] bg-white text-[#475569] hover:border-[#0F172A]'
+                              ? 'border-[#EE5426] bg-[#EE5426] text-white'
+                              : 'border-[#CBD5E1] bg-white text-[#475569] hover:border-[#0F2233]'
                           }`}
                         >
                           {rate}%
@@ -3396,7 +3445,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
 
                 <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-4 py-3 text-xs">
                   <div className="space-y-0.5">
-                    <div className="font-semibold text-[#0F172A]">
+                    <div className="font-semibold text-[#0F2233]">
                       {isAr ? 'إظهار خدمة حجز تذاكر الطيران بالواجهة' : 'Storefront Air Tickets Add-on'}
                     </div>
                     <div className="text-[11px] text-[#64748B]">
@@ -3415,7 +3464,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                     className={`rounded-lg px-3.5 py-1.5 text-xs font-semibold transition-colors cursor-pointer whitespace-nowrap ${
                       airTicketsEnabled
                         ? 'bg-[#16A34A] text-white hover:bg-[#15803D]'
-                        : 'border border-[#CBD5E1] bg-white text-[#475569] hover:text-[#0F172A]'
+                        : 'border border-[#CBD5E1] bg-white text-[#475569] hover:text-[#0F2233]'
                     }`}
                   >
                     {airTicketsEnabled
@@ -3441,7 +3490,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                   <button
                     type="submit"
                     disabled={savingSettings}
-                    className="inline-flex min-h-[40px] items-center gap-2 rounded-lg bg-[#EA580C] px-5 py-2 text-xs font-semibold text-white hover:bg-[#C2410C] disabled:opacity-60 transition-colors cursor-pointer"
+                    className="btn-wasla-primary min-h-[40px] rounded-lg px-5 py-2 text-xs cursor-pointer"
                   >
                     <Save className="h-3.5 w-3.5" aria-hidden="true" />
                     <span>
@@ -3466,17 +3515,17 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#E2E8F0] pb-4">
                 <div className="space-y-0.5">
                   <div className="flex items-center gap-2">
-                    <Bell className="h-4 w-4 text-[#EA580C]" aria-hidden="true" />
-                    <h2 className="text-base font-bold text-[#0F172A]">
+                    <Bell className="h-4 w-4 text-[#EE5426]" aria-hidden="true" />
+                    <h2 className="text-base font-bold text-[#0F2233]">
                       {isAr
-                        ? 'تنبيهات الحجوزات الجديدة التلقائية للمالك (واتساب + الإيميل الرسمي)'
-                        : 'Automatic Owner Booking Alerts (WhatsApp + Official Email)'}
+                        ? 'إشعارات الحجز التلقائية (إيميل للعميل + إيميل وواتساب للمالك)'
+                        : 'Automatic Booking Notifications (Guest Email + Owner Email & WhatsApp)'}
                     </h2>
                   </div>
                   <p className="text-xs text-[#475569]">
                     {isAr
-                      ? 'فور إتمام أي عميل لحجز جديد، يقوم السيرفر بإرسال تنبيه فوري على واتساب المالك وإيميل رسمي كامل إلى بريد الشركة.'
-                      : 'On every new customer booking, the server automatically dispatches an instant WhatsApp alert to the owner and a complete booking email to your official inbox.'}
+                      ? 'فور ضغط العميل على تأكيد الحجز، يقوم السيرفر تلقائياً بإرسال إيميل تأكيد للعميل + إيميل تنبيه كامل للمالك + رسالة واتساب فورية للمالك.'
+                      : 'The moment a guest confirms a booking, the server automatically sends a confirmation email to the guest, a full booking alert email to you, and an instant WhatsApp push alert to your phone.'}
                   </p>
                 </div>
 
@@ -3484,7 +3533,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                   type="button"
                   onClick={() => void handleSendTestOwnerAlert()}
                   disabled={testingOwnerAlerts}
-                  className="inline-flex min-h-[38px] items-center gap-1.5 rounded-lg bg-[#0F172A] px-4 py-2 text-xs font-bold text-white hover:bg-[#1E293B] disabled:opacity-60 transition-colors cursor-pointer shrink-0"
+                  className="inline-flex min-h-[38px] items-center gap-1.5 rounded-lg bg-[#0F2233] px-4 py-2 text-xs font-bold text-white hover:bg-[#19354F] disabled:opacity-60 transition-colors cursor-pointer shrink-0"
                 >
                   <Send className="h-3.5 w-3.5" aria-hidden="true" />
                   <span>
@@ -3503,10 +3552,10 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                 {/* Official Email Delivery Card */}
                 <div className="rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] p-4 space-y-2">
                   <div className="flex items-center justify-between gap-2">
-                    <span className="inline-flex items-center gap-1.5 font-bold text-[#0F172A]">
-                      <Mail className="h-4 w-4 text-[#EA580C]" aria-hidden="true" />
+                    <span className="inline-flex items-center gap-1.5 font-bold text-[#0F2233]">
+                      <Mail className="h-4 w-4 text-[#EE5426]" aria-hidden="true" />
                       <span>
-                        {isAr ? 'إيميل الحجز الرسمي للمالك' : 'Official Owner Booking Email'}
+                        {isAr ? 'إيميلات التأكيد التلقائية (العميل + المالك)' : 'Automated Booking Emails (Guest + Owner)'}
                       </span>
                     </span>
                     <span
@@ -3521,28 +3570,35 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                           ? `مفعّل (${alertChannelStatus.emailProvider.toUpperCase()})`
                           : `Active (${alertChannelStatus.emailProvider.toUpperCase()})`
                         : isAr
-                        ? 'بانتظار إعداد SMTP في Secrets'
-                        : 'Configure SMTP in Secrets'}
+                        ? 'بانتظار إعداد SMTP أو Resend في Secrets'
+                        : 'Configure SMTP / Resend in Secrets'}
                     </span>
                   </div>
-                  <div className="font-mono font-semibold text-[#0F172A]" dir="ltr">
-                    {liveContactEmail}
+                  <div className="font-mono font-semibold text-[#0F2233] break-all" dir="ltr">
+                    {alertChannelStatus?.ownerEmailTarget || liveContactEmail}
                   </div>
+                  {alertChannelStatus?.smtpHost && (
+                    <div className="font-mono text-[10.5px] text-[#64748B] break-all" dir="ltr">
+                      SMTP: {alertChannelStatus.smtpHost}:{alertChannelStatus.smtpPort} (
+                      {alertChannelStatus.smtpSecure ? 'SSL' : 'STARTTLS'}) ·{' '}
+                      {alertChannelStatus.smtpUser}
+                    </div>
+                  )}
                   <p className="text-[11px] text-[#475569] leading-relaxed">
                     {alertChannelStatus?.emailConfigured
                       ? isAr
-                        ? 'يصل كل حجز جديد فوراً إلى الإيميل الرسمي بكافة تفاصيل العميل والفندق والسعر وزر الرد المباشر.'
-                        : 'Every new booking arrives automatically in your official inbox with full guest, hotel, pricing, and direct reply-to details.'
+                        ? 'يُرسل تلقائياً إيميل تأكيد للعميل وإيميل حجز كامل إلى بريد المالك فور تأكيد أي حجز.'
+                        : 'Automatically emails a branded booking confirmation to the guest and a full dispatch alert to your owner inbox on every booking.'
                       : isAr
-                      ? 'لتفعيل الإرسال الفعلي لإيميل الدومين (booking@waslatravel.com)، أضف SMTP_HOST و SMTP_USER و SMTP_PASS (أو RESEND_API_KEY) في AI Studio Secrets.'
-                      : 'To activate live delivery to your official domain email, add SMTP_HOST, SMTP_USER, and SMTP_PASS (or RESEND_API_KEY) in AI Studio Settings > Secrets.'}
+                      ? 'لتفعيل الإرسال الفعلي للعميل والمالك، أضف SMTP_HOST و SMTP_USER و SMTP_PASS (أو RESEND_API_KEY) في AI Studio Settings → Secrets.'
+                      : 'To activate real email delivery to both the guest and owner, add SMTP_HOST, SMTP_USER, and SMTP_PASS (or RESEND_API_KEY) in AI Studio Settings > Secrets.'}
                   </p>
                 </div>
 
                 {/* Owner WhatsApp Push Alert Card */}
                 <div className="rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] p-4 space-y-2">
                   <div className="flex items-center justify-between gap-2">
-                    <span className="inline-flex items-center gap-1.5 font-bold text-[#0F172A]">
+                    <span className="inline-flex items-center gap-1.5 font-bold text-[#0F2233]">
                       <MessageCircle className="h-4 w-4 text-[#16A34A]" aria-hidden="true" />
                       <span>
                         {isAr ? 'تنبيه واتساب الفوري للمالك' : 'Instant Owner WhatsApp Push Alert'}
@@ -3564,7 +3620,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                         : 'Configure WhatsApp in Secrets'}
                     </span>
                   </div>
-                  <div className="font-mono font-semibold text-[#0F172A]" dir="ltr">
+                  <div className="font-mono font-semibold text-[#0F2233]" dir="ltr">
                     {liveWhatsappDisplay}
                   </div>
                   <p className="text-[11px] text-[#475569] leading-relaxed">
@@ -3572,16 +3628,24 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                       ? isAr
                         ? 'يتم إرسال رسالة واتساب تلقائية لك فور تسجيل أي حجز جديد على الموقع.'
                         : 'An automated WhatsApp message is pushed to you the moment any new customer booking is submitted.'
+                      : alertChannelStatus?.whatsappHasPhoneId && !alertChannelStatus?.whatsappHasToken
+                      ? isAr
+                        ? 'تم التعرّف على معرّف رقم الواتساب (whatsapp_phone_id) ✅ — تبقى إضافة مفتاح التوكن WHATSAPP_CLOUD_TOKEN (أو whatsapp_token) من Meta Developer في Secrets.'
+                        : 'Phone Number ID detected ✅ — add WHATSAPP_CLOUD_TOKEN (or whatsapp_token) from Meta Developer in Secrets to activate.'
+                      : alertChannelStatus?.whatsappHasToken && !alertChannelStatus?.whatsappHasPhoneId
+                      ? isAr
+                        ? 'تم التعرّف على مفتاح التوكن ✅ — تبقى إضافة WHATSAPP_PHONE_NUMBER_ID (أو whatsapp_phone_id) في Secrets.'
+                        : 'WhatsApp token detected ✅ — add WHATSAPP_PHONE_NUMBER_ID (or whatsapp_phone_id) in Secrets to activate.'
                       : isAr
-                      ? 'لتفعيل تنبيه الواتساب التلقائي، أضف أحد الخيارات في Secrets: (CallMeBot مجاني عبر CALLMEBOT_API_KEY، أو Meta WhatsApp Cloud عبر WHATSAPP_CLOUD_TOKEN + WHATSAPP_PHONE_NUMBER_ID، أو Twilio).'
-                      : 'To activate instant WhatsApp alerts, add ONE option in AI Studio Secrets: free personal alerts via CALLMEBOT_API_KEY, official Meta Cloud API (WHATSAPP_CLOUD_TOKEN + WHATSAPP_PHONE_NUMBER_ID), or Twilio WhatsApp.'}
+                      ? 'لتفعيل تنبيه الواتساب التلقائي، أضف أحد الخيارات في Secrets: (CallMeBot مجاني عبر CALLMEBOT_API_KEY، أو Meta WhatsApp Cloud عبر WHATSAPP_CLOUD_TOKEN + whatsapp_phone_id، أو Twilio).'
+                      : 'To activate instant WhatsApp alerts, add ONE option in AI Studio Secrets: free personal alerts via CALLMEBOT_API_KEY, official Meta Cloud API (WHATSAPP_CLOUD_TOKEN + whatsapp_phone_id), or Twilio WhatsApp.'}
                   </p>
                 </div>
               </div>
 
               {testAlertResult && (
                 <div className="rounded-xl border border-[#CBD5E1] bg-white p-3.5 text-xs space-y-1.5">
-                  <div className="font-bold text-[#0F172A]">
+                  <div className="font-bold text-[#0F2233]">
                     {isAr ? 'نتيجة الإرسال التجريبي:' : 'Test Delivery Result:'}
                   </div>
                   <div className="flex flex-wrap gap-3">
@@ -3636,10 +3700,10 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
         {activeTab === 'copilot' && (
           <div className="space-y-5" dir={isAr ? 'rtl' : 'ltr'}>
             {/* Clean Flat Conversations Hub Header + Sub-View Switcher (Inbox vs AI Radar) */}
-            <div className="rounded-xl border border-[#E2E8F0] bg-white p-4 sm:p-5 space-y-3">
+            <div className="card-wasla p-4 sm:p-5 space-y-3">
               <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
                 <div className="space-y-0.5">
-                  <div className="inline-flex items-center gap-2 text-xs font-semibold text-[#EA580C]">
+                  <div className="inline-flex items-center gap-2 text-xs font-semibold text-[#EE5426]">
                     <Inbox className="h-4 w-4" aria-hidden="true" />
                     <span>
                       {isAr
@@ -3647,7 +3711,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                         : 'Unified Inbox & Customer Communication Hub'}
                     </span>
                   </div>
-                  <h2 className="text-base sm:text-lg font-semibold text-[#0F172A]">
+                  <h2 className="text-base sm:text-lg font-semibold text-[#0F2233]">
                     {isAr
                       ? 'متابعة محادثات العملاء والإيميلات والرد السريع أو تفعيل رادار التشغيل'
                       : 'Manage WhatsApp dispatches, guest emails, and executive operational radar'}
@@ -3656,12 +3720,12 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
 
                 <div className="flex flex-wrap items-center gap-2 shrink-0">
                   {/* View Toggle: Inbox vs AI Radar & Briefing */}
-                  <div className="inline-flex rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] p-0.5 text-xs font-semibold">
+                  <div className="inline-flex rounded-lg border border-[#C8C2B8]/60 bg-[#FAF4ED] p-0.5 text-xs font-semibold">
                     <button
                       type="button"
                       onClick={() => setInboxSubView('inbox')}
                       className={`inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 cursor-pointer whitespace-nowrap ${
-                        inboxSubView === 'inbox' ? 'bg-[#0F172A] text-white shadow-xs' : 'text-[#475569] hover:text-[#0F172A]'
+                        inboxSubView === 'inbox' ? 'bg-[#0F2233] text-white shadow-xs' : 'text-[#64748B] hover:text-[#0F2233]'
                       }`}
                     >
                       <MessageCircle className="h-3.5 w-3.5" aria-hidden="true" />
@@ -3671,7 +3735,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                       type="button"
                       onClick={() => setInboxSubView('radar')}
                       className={`inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 cursor-pointer whitespace-nowrap ${
-                        inboxSubView === 'radar' ? 'bg-[#EA580C] text-white shadow-xs' : 'text-[#475569] hover:text-[#0F172A]'
+                        inboxSubView === 'radar' ? 'bg-[#EE5426] text-white shadow-xs' : 'text-[#64748B] hover:text-[#0F2233]'
                       }`}
                     >
                       <Bot className="h-3.5 w-3.5" aria-hidden="true" />
@@ -3683,8 +3747,8 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
 
               {inboxSubView === 'radar' && (
                 <>
-                  <div className="flex flex-wrap items-center justify-between gap-2 border-t border-[#C7D2FE]/60 pt-3">
-                    <span className="text-xs font-medium text-[#3730A3]">
+                  <div className="flex flex-wrap items-center justify-between gap-2 border-t border-[#C8C2B8]/60 pt-3">
+                    <span className="text-xs font-medium text-[#0F2233]">
                       {copilotLang === 'ar'
                         ? 'مؤشرات الشركة الحية وتقرير المساعد التنفيذي'
                         : 'Live Company Telemetry & AI Executive Briefing'}
@@ -3693,7 +3757,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                       type="button"
                       onClick={handleRunBriefing}
                       disabled={briefingLoading}
-                      className="inline-flex min-h-[38px] items-center gap-2 rounded-lg bg-[#EA580C] px-4 py-1.5 text-xs font-semibold text-white hover:bg-[#C2410C] disabled:opacity-60 cursor-pointer"
+                      className="btn-wasla-primary min-h-[38px] rounded-lg px-4 py-1.5 text-xs cursor-pointer"
                     >
                       <Sparkles className="h-4 w-4" aria-hidden="true" />
                       <span>
@@ -3713,7 +3777,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                       <div className="text-[#B45309] font-semibold">
                         {copilotLang === 'ar' ? 'حجوزات بدون سائق/مرشد' : 'Unassigned Pickups'}
                       </div>
-                      <div className="text-xl font-semibold text-[#0F172A]">
+                      <div className="text-xl font-semibold text-[#0F2233]">
                         {companyRadar.unassignedBookings.length}
                       </div>
                       <div className="text-[11px] text-[#475569]">
@@ -3727,7 +3791,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                       <div className="text-[#B91C1C] font-semibold">
                         {copilotLang === 'ar' ? 'شكاوى وطلبات استرداد' : 'Open Complaints / Refunds'}
                       </div>
-                      <div className="text-xl font-semibold text-[#0F172A]">
+                      <div className="text-xl font-semibold text-[#0F2233]">
                         {companyRadar.openComplaints.length}
                       </div>
                       <div className="text-[11px] text-[#475569]">
@@ -3736,10 +3800,10 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                     </div>
 
                     <div className="rounded-lg border border-[#FED7AA] bg-[#FFF7ED] p-3 space-y-1">
-                      <div className="text-[#C2410C] font-semibold">
+                      <div className="text-[#D9461B] font-semibold">
                         {copilotLang === 'ar' ? 'موردين بانتظار الموافقة' : 'Pending Supplier Approvals'}
                       </div>
-                      <div className="text-xl font-semibold text-[#0F172A]">
+                      <div className="text-xl font-semibold text-[#0F2233]">
                         {companyRadar.pendingSuppliers.length}
                       </div>
                       <div className="text-[11px] text-[#475569]">
@@ -3753,7 +3817,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                       <div className="text-[#047857] font-semibold">
                         {copilotLang === 'ar' ? 'أعلى رحلة ربحاً بالعمولة' : 'Highest-Margin Trip'}
                       </div>
-                      <div className="text-xl font-semibold text-[#0F172A]">
+                      <div className="text-xl font-semibold text-[#0F2233]">
                         €
                         {companyRadar.topMarginTrips[0]
                           ? Math.round(companyRadar.topMarginTrips[0].price * (commissionRate / 100))
@@ -3782,16 +3846,16 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                 {/* Left 7 Cols: Executive AI Briefing Output */}
                 <div className="lg:col-span-7 space-y-5">
                   {!briefing ? (
-                    <div className="rounded-xl border border-[#DDD6FE] bg-[#F5F3FF]/90 p-8 text-center space-y-3 shadow-xs">
-                      <div className="mx-auto inline-flex h-12 w-12 items-center justify-center rounded-xl bg-white text-[#5B21B6] shadow-xs">
+                    <div className="card-wasla bg-[#FAF4ED] p-8 text-center space-y-3">
+                      <div className="mx-auto inline-flex h-12 w-12 items-center justify-center rounded-xl bg-white text-[#EE5426] shadow-xs">
                         <Target className="h-6 w-6" aria-hidden="true" />
                       </div>
-                      <h3 className="text-base font-semibold text-[#0F172A]">
+                      <h3 className="text-base font-semibold text-[#0F2233]">
                         {copilotLang === 'ar'
                           ? 'اضغط "تحليل الشركة + خطة تسويق وتنبيهات الآن" لتشغيل المساعد'
                           : 'Click "Run Full Company AI Briefing" to analyze your live business'}
                       </h3>
-                      <p className="text-xs text-[#475569] max-w-md mx-auto leading-relaxed">
+                      <p className="text-xs text-[#64748B] max-w-md mx-auto leading-relaxed">
                         {copilotLang === 'ar'
                           ? 'سيقرأ المساعد أرقام الحجوزات، الشكاوى، الموردين، وأعلى الرحلات عمولة، ويمكنك العودة للمراسلات في أي وقت.'
                           : 'Your AI Chief of Staff scans live bookings, complaints, pending suppliers, and highest-margin tours.'}
@@ -3800,10 +3864,10 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                   ) : (
                     <div className="space-y-5">
                       <div className="rounded-xl border border-[#FED7AA] bg-[#FFF7ED]/95 p-5 space-y-2 shadow-xs">
-                        <div className="text-xs font-semibold text-[#C2410C]">
+                        <div className="text-xs font-semibold text-[#D9461B]">
                           {copilotLang === 'ar' ? 'ملخص الموقف التنفيذي' : 'Executive Summary'}
                         </div>
-                        <p className="text-sm text-[#0F172A] leading-relaxed">{briefing.executiveSummary}</p>
+                        <p className="text-sm text-[#0F2233] leading-relaxed">{briefing.executiveSummary}</p>
                       </div>
 
                       <div className="rounded-xl border border-[#FDE68A] bg-[#FFFBEB]/95 p-5 space-y-3 shadow-xs">
@@ -3823,9 +3887,9 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                                   : 'border-[#FDE68A] bg-white/80'
                               }`}
                             >
-                              <div className="font-semibold text-[#0F172A]">{alert.title}</div>
+                              <div className="font-semibold text-[#0F2233]">{alert.title}</div>
                               <p className="text-[#475569] leading-relaxed">{alert.detail}</p>
-                              <div className="font-semibold text-[#C2410C] pt-0.5">
+                              <div className="font-semibold text-[#D9461B] pt-0.5">
                                 {copilotLang === 'ar' ? 'الإجراء المطلوب: ' : 'Action: '}
                                 {alert.action}
                               </div>
@@ -3848,19 +3912,19 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                               className="rounded-lg border border-[#A7F3D0] bg-white/80 p-3.5 space-y-1 text-xs"
                             >
                               <div className="flex items-center justify-between gap-2">
-                                <span className="font-semibold text-[#0F172A]">{opp.title}</span>
+                                <span className="font-semibold text-[#0F2233]">{opp.title}</span>
                                 <span className="font-semibold text-[#15803D]">{opp.estimatedImpact}</span>
                               </div>
                               <p className="text-[#475569] leading-relaxed">{opp.detail}</p>
-                              <div className="font-semibold text-[#C2410C] pt-0.5">{opp.action}</div>
+                              <div className="font-semibold text-[#D9461B] pt-0.5">{opp.action}</div>
                             </div>
                           ))}
                         </div>
                       </div>
 
-                      <div className="rounded-xl border border-[#DDD6FE] bg-[#F5F3FF]/95 p-5 space-y-3 shadow-xs">
-                        <div className="flex items-center gap-2 text-sm font-semibold text-[#4C1D95]">
-                          <TrendingUp className="h-4 w-4 text-[#6D28D9]" aria-hidden="true" />
+                      <div className="card-wasla bg-[#FAF4ED] p-5 space-y-3">
+                        <div className="flex items-center gap-2 text-sm font-semibold text-[#0F2233]">
+                          <TrendingUp className="h-4 w-4 text-[#EE5426]" aria-hidden="true" />
                           <span>
                             {copilotLang === 'ar'
                               ? 'خطة التسويق العملية للأسبوع القادم'
@@ -3869,13 +3933,13 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                         </div>
                         <div className="space-y-2.5">
                           {briefing.marketingPlan.map((step, idx) => (
-                            <div key={idx} className="rounded-lg border border-[#DDD6FE] bg-white/80 p-3.5 text-xs space-y-1">
+                            <div key={idx} className="rounded-lg border border-[#C8C2B8]/60 bg-white/90 p-3.5 text-xs space-y-1">
                               <div className="flex items-center justify-between gap-2">
-                                <span className="font-semibold text-[#5B21B6]">{step.channel}</span>
-                                <span className="font-medium text-[#15803D]">{step.expectedReturn}</span>
+                                <span className="font-semibold text-[#EE5426]">{step.channel}</span>
+                                <span className="font-medium text-[#10B981]">{step.expectedReturn}</span>
                               </div>
-                              <div className="font-semibold text-[#0F172A]">{step.focusTripOrAngle}</div>
-                              <p className="text-[#475569] leading-relaxed">{step.weeklyAction}</p>
+                              <div className="font-semibold text-[#0F2233]">{step.focusTripOrAngle}</div>
+                              <p className="text-[#64748B] leading-relaxed">{step.weeklyAction}</p>
                             </div>
                           ))}
                         </div>
@@ -3904,7 +3968,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                         type="button"
                         onClick={() => void handleAskCopilot(preset)}
                         disabled={chatLoading}
-                        className="rounded-lg border border-[#CCFBF1] bg-white/85 px-2.5 py-1.5 text-[11px] font-medium text-[#0F172A] hover:border-[#0D9488] hover:bg-white transition-colors text-start cursor-pointer"
+                        className="rounded-lg border border-[#CCFBF1] bg-white/85 px-2.5 py-1.5 text-[11px] font-medium text-[#0F2233] hover:border-[#0D9488] hover:bg-white transition-colors text-start cursor-pointer"
                       >
                         {preset}
                       </button>
@@ -3929,7 +3993,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                             className={`rounded-xl px-3.5 py-2.5 text-xs leading-relaxed whitespace-pre-line ${
                               msg.role === 'owner'
                                 ? 'bg-[#0F766E] text-white ms-8'
-                                : 'border border-[#CCFBF1] bg-white/90 text-[#0F172A] me-4'
+                                : 'border border-[#CCFBF1] bg-white/90 text-[#0F2233] me-4'
                             }`}
                           >
                             <div>{msg.text}</div>
@@ -3965,7 +4029,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                           ? 'bg-[#DC2626] hover:bg-[#B91C1C] ring-2 ring-[#FCA5A5]'
                           : transcribingVoice
                           ? 'bg-[#D97706] hover:bg-[#B45309]'
-                          : 'bg-[#4F46E5] hover:bg-[#4338CA] disabled:opacity-60'
+                          : 'bg-[#0F2233] hover:bg-[#19354F] disabled:opacity-60'
                       }`}
                     >
                       {transcribingVoice ? (
@@ -3985,7 +4049,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                           ? 'تكلم بالمايك أو اكتب سؤالك لـ AI Copilot...'
                           : 'Speak via mic or ask AI Copilot...'
                       }
-                      className="min-h-[40px] flex-1 rounded-lg border border-[#99F6E4] bg-white px-3 py-2 text-xs text-[#0F172A] focus:border-[#0D9488] focus:outline-none"
+                      className="min-h-[40px] flex-1 rounded-lg border border-[#99F6E4] bg-white px-3 py-2 text-xs text-[#0F2233] focus:border-[#0D9488] focus:outline-none"
                     />
                     <button
                       type="submit"
@@ -4011,8 +4075,8 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                         onClick={() => setInboxFilter('all')}
                         className={`rounded-lg px-2.5 py-1.5 cursor-pointer transition-colors ${
                           inboxFilter === 'all'
-                            ? 'bg-[#0F172A] text-white'
-                            : 'bg-[#F1F5F9] text-[#475569] hover:text-[#0F172A]'
+                            ? 'bg-[#0F2233] text-white'
+                            : 'bg-[#F1F5F9] text-[#475569] hover:text-[#0F2233]'
                         }`}
                       >
                         {copilotLang === 'ar' ? 'الكل' : 'All'} ({unifiedInboxEntries.length})
@@ -4055,8 +4119,8 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                       }}
                       className={`inline-flex items-center gap-1 rounded-lg border px-2.5 py-1.5 text-[11px] font-semibold cursor-pointer ${
                         selectedInboxKey === 'copilot'
-                          ? 'border-[#4F46E5] bg-[#4F46E5] text-white'
-                          : 'border-[#C7D2FE] bg-[#EEF2FF] text-[#4338CA] hover:bg-[#E0E7FF]'
+                          ? 'border-[#0F2233] bg-[#0F2233] text-white'
+                          : 'border-[#C8C2B8] bg-[#FAF4ED] text-[#0F2233] hover:bg-[#C8C2B8]/25'
                       }`}
                     >
                       <Sparkles className="h-3 w-3" aria-hidden="true" />
@@ -4079,7 +4143,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                           ? 'ابحث باسم العميل، رقم الحجز WT، أو الإيميل...'
                           : 'Search guest, WT booking ref, or email...'
                       }
-                      className="w-full rounded-lg border border-[#CBD5E1] bg-[#F8FAFC] ps-8 pe-3 py-2 text-xs text-[#0F172A] focus:border-[#0D9488] focus:bg-white focus:outline-none"
+                      className="w-full rounded-lg border border-[#CBD5E1] bg-[#F8FAFC] ps-8 pe-3 py-2 text-xs text-[#0F2233] focus:border-[#0D9488] focus:bg-white focus:outline-none"
                     />
                   </div>
 
@@ -4123,11 +4187,11 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                                     <Mail className="h-3 w-3" aria-hidden="true" />
                                   </span>
                                 )}
-                                <span className="font-semibold text-[#0F172A] truncate">
+                                <span className="font-semibold text-[#0F2233] truncate">
                                   {item.title}
                                 </span>
                                 {item.unread && (
-                                  <span className="h-2 w-2 shrink-0 rounded-full bg-[#EA580C]" />
+                                  <span className="h-2 w-2 shrink-0 rounded-full bg-[#EE5426]" />
                                 )}
                               </div>
                               <span className="shrink-0 text-[10.5px] font-medium text-[#64748B] tabular-nums">
@@ -4142,11 +4206,11 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                               {item.urgentLevel === 'today' ? (
                                 <span className="shrink-0 font-bold text-[#B91C1C]">عاجل · اليوم</span>
                               ) : item.urgentLevel === 'tomorrow' ? (
-                                <span className="shrink-0 font-bold text-[#C2410C]">عاجل · غداً</span>
+                                <span className="shrink-0 font-bold text-[#D9461B]">عاجل · غداً</span>
                               ) : item.kind === 'email' ? (
                                 <span className="shrink-0 font-semibold text-[#BE123C]">Email</span>
                               ) : item.kind === 'newsletter' ? (
-                                <span className="shrink-0 font-semibold text-[#7C3AED]">Subscriber</span>
+                                <span className="shrink-0 font-semibold text-[#EE5426]">Subscriber</span>
                               ) : null}
                             </div>
 
@@ -4171,7 +4235,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                                 ? 'bg-[#DCFCE7] text-[#15803D]'
                                 : selectedInboxItem.kind === 'email'
                                 ? 'bg-[#FFE4E6] text-[#9F1239]'
-                                : 'bg-[#EDE9FE] text-[#5B21B6]'
+                                : 'bg-[#FAF4ED] text-[#0F2233] border border-[#C8C2B8]/60'
                             }`}
                           >
                             {selectedInboxItem.kind === 'whatsapp'
@@ -4180,7 +4244,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                               ? selectedInboxItem.emailLog?.type || 'Sent Email'
                               : 'Newsletter Subscriber'}
                           </span>
-                          <h3 className="text-sm font-semibold text-[#0F172A] truncate">
+                          <h3 className="text-sm font-semibold text-[#0F2233] truncate">
                             {selectedInboxItem.title}
                           </h3>
                           {selectedInboxItem.booking?.guestCountry && (
@@ -4217,7 +4281,10 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                             pickupTime: selectedInboxItem.booking.pickupTime,
                             pickupSpot: selectedInboxItem.booking.pickupSpot,
                             hotel: selectedInboxItem.booking.hotel,
+                            roomNumber: selectedInboxItem.booking.roomNumber,
                             driverOrGuide: selectedInboxItem.booking.assignedDriverOrGuide,
+                            guestLang: selectedInboxItem.booking.guestLang,
+                            notes: selectedInboxItem.booking.notes,
                           });
                           return directWa ? (
                             <a
@@ -4254,7 +4321,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                     </div>
                   ) : (
                     <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#CCFBF1] pb-3">
-                      <div className="flex items-center gap-2 text-xs font-semibold text-[#4338CA]">
+                      <div className="flex items-center gap-2 text-xs font-semibold text-[#0F2233]">
                         <Bot className="h-4 w-4" aria-hidden="true" />
                         <span>
                           {copilotLang === 'ar'
@@ -4308,7 +4375,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                                 type="button"
                                 onClick={() => void handleAskCopilot(preset)}
                                 disabled={chatLoading}
-                                className="rounded-lg border border-[#CCFBF1] bg-white/90 px-2.5 py-1.5 text-[11px] font-medium text-[#0F172A] hover:border-[#0D9488] cursor-pointer text-start"
+                                className="rounded-lg border border-[#CCFBF1] bg-white/90 px-2.5 py-1.5 text-[11px] font-medium text-[#0F2233] hover:border-[#0D9488] cursor-pointer text-start"
                               >
                                 {preset}
                               </button>
@@ -4323,7 +4390,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                               className={`rounded-xl px-3.5 py-2.5 text-xs leading-relaxed whitespace-pre-line ${
                                 msg.role === 'owner'
                                   ? 'bg-[#0F766E] text-white ms-8'
-                                  : 'border border-[#CCFBF1] bg-white/95 text-[#0F172A] me-4'
+                                  : 'border border-[#CCFBF1] bg-white/95 text-[#0F2233] me-4'
                               }`}
                             >
                               {msg.text}
@@ -4359,7 +4426,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                             {/* Real Email Header Envelope */}
                             <div className="border-b border-[#E2E8F0] bg-[#F8FAFC] px-4 py-3 text-[11.5px] space-y-1">
                               <div className="flex flex-wrap items-center justify-between gap-2">
-                                <span className="font-semibold text-[#0F172A]">
+                                <span className="font-semibold text-[#0F2233]">
                                   From:{' '}
                                   <span className="font-normal text-[#334155]">
                                     Wasla Travel Operations &lt;{SITE_CONFIG.email}&gt;
@@ -4371,15 +4438,15 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                                 </span>
                               </div>
                               <div className="text-[#475569]">
-                                <span className="font-semibold text-[#0F172A]">To:</span> {recipientEmail}
+                                <span className="font-semibold text-[#0F2233]">To:</span> {recipientEmail}
                               </div>
-                              <div className="text-[#0F172A] font-semibold">
+                              <div className="text-[#0F2233] font-semibold">
                                 Subject: <span className="font-medium">{subjectLine}</span>
                               </div>
                             </div>
 
                             {/* Branded HTML Email Layout As Delivered */}
-                            <div className="bg-gradient-to-r from-[#0F172A] to-[#1E293B] px-5 py-4 text-white flex flex-wrap items-center justify-between gap-2">
+                            <div className="bg-gradient-to-r from-[#0F2233] to-[#19354F] px-5 py-4 text-white flex flex-wrap items-center justify-between gap-2">
                               <div>
                                 <div className="text-base font-bold tracking-tight">
                                   WASLA TRAVEL <span className="text-[#FB923C]">· وصلة ترافيل</span>
@@ -4388,14 +4455,14 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                                   Curated Red Sea, Luxor &amp; Cairo Experiences · {SITE_CONFIG.domain}
                                 </div>
                               </div>
-                              <span className="rounded-md bg-[#EA580C] px-2.5 py-1 text-[10.5px] font-bold uppercase tracking-wider text-white">
+                              <span className="rounded-md bg-[#EE5426] px-2.5 py-1 text-[10.5px] font-bold uppercase tracking-wider text-white">
                                 {emailType}
                               </span>
                             </div>
-                            <div className="h-1 bg-[#EA580C]" />
+                            <div className="h-1 bg-[#EE5426]" />
 
-                            <div className="p-5 space-y-4 text-xs text-[#1E293B] leading-relaxed">
-                              <h4 className="text-base font-bold text-[#0F172A]">
+                            <div className="p-5 space-y-4 text-xs text-[#0F2233] leading-relaxed">
+                              <h4 className="text-base font-bold text-[#0F2233]">
                                 {emailType === 'Payment Link'
                                   ? 'Your Secure Excursion Payment Link Is Ready'
                                   : emailType === 'Supplier Dispatch'
@@ -4406,7 +4473,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                               </h4>
 
                               <p>
-                                Dear <span className="font-semibold text-[#0F172A]">{guestDisplay}</span>,
+                                Dear <span className="font-semibold text-[#0F2233]">{guestDisplay}</span>,
                               </p>
 
                               <p>
@@ -4422,27 +4489,27 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                               {bk && (
                                 <div className="rounded-xl border border-[#E2E8F0] overflow-hidden">
                                   <div className="bg-[#FFF7ED] border-b border-[#FED7AA] px-3.5 py-2 flex items-center justify-between">
-                                    <span className="font-mono font-bold text-[#C2410C]">
+                                    <span className="font-mono font-bold text-[#D9461B]">
                                       BOOKING REF: {bk.id}
                                     </span>
-                                    <span className="font-semibold text-[#0F172A]">{bk.status}</span>
+                                    <span className="font-semibold text-[#0F2233]">{bk.status}</span>
                                   </div>
                                   <table className="w-full text-[11.5px] border-collapse">
                                     <tbody className="divide-y divide-[#E2E8F0]">
                                       <tr className="bg-white">
                                         <td className="px-3.5 py-2 font-semibold text-[#64748B] w-[36%]">Excursion</td>
-                                        <td className="px-3.5 py-2 font-semibold text-[#0F172A]">{bk.tripTitle}</td>
+                                        <td className="px-3.5 py-2 font-semibold text-[#0F2233]">{bk.tripTitle}</td>
                                       </tr>
                                       <tr className="bg-[#F8FAFC]">
                                         <td className="px-3.5 py-2 font-semibold text-[#64748B]">Date &amp; Trip Start</td>
-                                        <td className="px-3.5 py-2 font-semibold text-[#0F172A]">
+                                        <td className="px-3.5 py-2 font-semibold text-[#0F2233]">
                                           {bk.date}
                                           {bk.tripStartTime ? ` · ${bk.tripStartTime}` : ''}
                                         </td>
                                       </tr>
                                       <tr className="bg-white">
                                         <td className="px-3.5 py-2 font-semibold text-[#64748B]">Hotel Pickup Time</td>
-                                        <td className="px-3.5 py-2 font-semibold text-[#EA580C]">
+                                        <td className="px-3.5 py-2 font-semibold text-[#EE5426]">
                                           {bk.pickupTime && bk.pickupTime !== 'TBD'
                                             ? bk.pickupTime
                                             : 'TBD (Confirmed via WA)'}
@@ -4450,17 +4517,17 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                                       </tr>
                                       <tr className="bg-white">
                                         <td className="px-3.5 py-2 font-semibold text-[#64748B]">Hotel &amp; Meeting Point</td>
-                                        <td className="px-3.5 py-2 text-[#0F172A]">
+                                        <td className="px-3.5 py-2 text-[#0F2233]">
                                           {bk.hotel}
                                           {bk.roomNumber ? ` · Room ${bk.roomNumber}` : ''} ·{' '}
-                                          <span className="font-medium text-[#EA580C]">
+                                          <span className="font-medium text-[#EE5426]">
                                             {bk.pickupSpot || 'Inside Reception'}
                                           </span>
                                         </td>
                                       </tr>
                                       <tr className="bg-[#F8FAFC]">
                                         <td className="px-3.5 py-2 font-semibold text-[#64748B]">Guests &amp; Nationality</td>
-                                        <td className="px-3.5 py-2 text-[#0F172A]">
+                                        <td className="px-3.5 py-2 text-[#0F2233]">
                                           {bk.adults} Adult(s)
                                           {bk.children > 0 ? ` + ${bk.children} Child(ren)` : ''}
                                           {(bk.infants ?? 0) > 0 ? ` + ${bk.infants} Infant(s)` : ''}
@@ -4469,7 +4536,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                                       </tr>
                                       <tr className="bg-white">
                                         <td className="px-3.5 py-2 font-semibold text-[#64748B]">Driver / Guide</td>
-                                        <td className="px-3.5 py-2 text-[#0F172A]">
+                                        <td className="px-3.5 py-2 text-[#0F2233]">
                                           {bk.assignedDriverOrGuide || 'Assigned prior to pickup'}
                                         </td>
                                       </tr>
@@ -4495,7 +4562,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                                   href={waHelpUrl}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="inline-flex items-center gap-1.5 rounded-lg bg-[#EA580C] px-4 py-2 text-xs font-semibold text-white hover:bg-[#C2410C]"
+                                  className="btn-wasla-primary gap-1.5 rounded-lg px-4 py-2 text-xs"
                                 >
                                   <MessageCircle className="h-3.5 w-3.5" aria-hidden="true" />
                                   <span>
@@ -4505,7 +4572,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                               </div>
 
                               <div className="border-t border-[#E2E8F0] pt-3 text-[11px] text-[#64748B] space-y-0.5">
-                                <div className="font-semibold text-[#0F172A]">
+                                <div className="font-semibold text-[#0F2233]">
                                   Wasla Travel Operations Desk · Hurghada &amp; Red Sea
                                 </div>
                                 <div>
@@ -4554,7 +4621,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                             {/* Quick Booking Context Strip */}
                             {bk && (
                               <div className="rounded-lg border border-[#CCFBF1] bg-white/85 px-3 py-2 text-[11px] flex flex-wrap items-center justify-between gap-2">
-                                <span className="text-[#0F172A]">
+                                <span className="text-[#0F2233]">
                                   <strong className="font-mono text-[#0F766E]">{bk.id}</strong> · {bk.date}{' '}
                                   {bk.tripStartTime ? `· Start: ${bk.tripStartTime} ` : ''}
                                   {bk.pickupTime ? `(Pickup: ${bk.pickupTime})` : ''} · {bk.hotel}
@@ -4577,7 +4644,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                                   className={`max-w-[88%] rounded-2xl px-3.5 py-2.5 text-xs leading-relaxed whitespace-pre-line shadow-2xs ${
                                     msg.sender === 'operator'
                                       ? 'bg-[#0F766E] text-white rounded-be-xs'
-                                      : 'border border-[#CCFBF1] bg-white text-[#0F172A] rounded-bs-xs'
+                                      : 'border border-[#CCFBF1] bg-white text-[#0F2233] rounded-bs-xs'
                                   }`}
                                 >
                                   <div className="flex items-center justify-between gap-3 mb-1 text-[10px] opacity-80 font-semibold">
@@ -4605,7 +4672,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                                           )
                                         }
                                         aria-expanded={!!ownerExpandedTranslations[msg.id]}
-                                        className="inline-flex items-center gap-1 rounded px-1 py-0.5 text-[10.5px] font-semibold text-[#475569] hover:bg-[#F1F5F9] hover:text-[#0F172A] cursor-pointer"
+                                        className="inline-flex items-center gap-1 rounded px-1 py-0.5 text-[10.5px] font-semibold text-[#475569] hover:bg-[#F1F5F9] hover:text-[#0F2233] cursor-pointer"
                                       >
                                         <ChevronDown
                                           className={`h-3 w-3 transition-transform ${
@@ -4621,7 +4688,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                                       {ownerExpandedTranslations[msg.id] && (
                                         <div
                                           dir="rtl"
-                                          className="mt-1 rounded-lg bg-[#F0FDFA] border border-[#CCFBF1] px-2.5 py-1.5 text-[11.5px] leading-relaxed text-[#0F172A]"
+                                          className="mt-1 rounded-lg bg-[#F0FDFA] border border-[#CCFBF1] px-2.5 py-1.5 text-[11.5px] leading-relaxed text-[#0F2233]"
                                         >
                                           {ownerTranslatingIds[msg.id] ? (
                                             <span className="inline-flex items-center gap-1 text-[#64748B] text-[10.5px]">
@@ -4718,7 +4785,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                             type="button"
                             onClick={() => setComposerMode('copilot')}
                             className={`inline-flex items-center gap-1 rounded-md px-2.5 py-1 cursor-pointer ${
-                              composerMode === 'copilot' ? 'bg-[#4F46E5] text-white' : 'text-[#475569]'
+                              composerMode === 'copilot' ? 'bg-[#0F2233] text-white' : 'text-[#475569]'
                             }`}
                           >
                             <Sparkles className="h-3 w-3" aria-hidden="true" />
@@ -4731,7 +4798,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                             type="button"
                             onClick={() => void handleDraftReplyWithCopilot()}
                             disabled={draftingAiReply}
-                            className="inline-flex items-center gap-1 rounded-lg border border-[#C7D2FE] bg-[#EEF2FF] px-2.5 py-1 font-semibold text-[#4338CA] hover:bg-[#E0E7FF] disabled:opacity-60 cursor-pointer"
+                            className="inline-flex items-center gap-1 rounded-lg border border-[#C8C2B8] bg-[#FAF4ED] px-2.5 py-1 font-semibold text-[#0F2233] hover:bg-[#C8C2B8]/30 disabled:opacity-60 cursor-pointer"
                           >
                             <Sparkles className="h-3 w-3" aria-hidden="true" />
                             <span>
@@ -4777,7 +4844,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                             ? 'bg-[#DC2626] hover:bg-[#B91C1C] ring-2 ring-[#FCA5A5]'
                             : transcribingVoice
                             ? 'bg-[#D97706] hover:bg-[#B45309]'
-                            : 'bg-[#4F46E5] hover:bg-[#4338CA] disabled:opacity-60'
+                            : 'bg-[#0F2233] hover:bg-[#19354F] disabled:opacity-60'
                         }`}
                       >
                         {transcribingVoice ? (
@@ -4817,7 +4884,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                             ? 'اكتب رد أو متابعة لهذا الإيميل...'
                             : 'Write a follow-up reply for this email...'
                         }
-                        className="min-h-[40px] flex-1 rounded-lg border border-[#99F6E4] bg-white px-3 py-2 text-xs text-[#0F172A] focus:border-[#0D9488] focus:outline-none"
+                        className="min-h-[40px] flex-1 rounded-lg border border-[#99F6E4] bg-white px-3 py-2 text-xs text-[#0F2233] focus:border-[#0D9488] focus:outline-none"
                       />
 
                       <button
@@ -4829,7 +4896,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                         }
                         className={`inline-flex h-10 items-center gap-1.5 rounded-lg px-3.5 text-xs font-semibold text-white disabled:opacity-60 cursor-pointer ${
                           composerMode === 'copilot' || !selectedInboxItem
-                            ? 'bg-[#4F46E5] hover:bg-[#4338CA]'
+                            ? 'bg-[#0F2233] hover:bg-[#19354F]'
                             : 'bg-[#0F766E] hover:bg-[#115E59]'
                         }`}
                       >
@@ -4882,7 +4949,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
       {/* Owner Booking View / Edit & Pickup Dispatch Modal */}
       {bookingModalDraft && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-[#0F172A]/60 p-4 backdrop-blur-[2px]"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-[#0F2233]/60 p-4 backdrop-blur-[2px]"
           onClick={() => setBookingModalDraft(null)}
           role="dialog"
           aria-modal="true"
@@ -4911,7 +4978,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                     {getBookingUrgency(bookingModalDraft).label}
                   </span>
                 </div>
-                <h2 className="text-lg font-semibold text-[#0F172A]">
+                <h2 className="text-lg font-semibold text-[#0F2233]">
                   {bookingModalDraft.guestName} — {bookingModalDraft.tripTitle}
                 </h2>
               </div>
@@ -4923,22 +4990,22 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                     className="inline-flex min-h-[36px] items-center gap-1.5 rounded-lg border border-[#0D9488] bg-[#F0FDFA] px-3.5 text-xs font-semibold text-[#0F766E] hover:bg-[#CCFBF1] cursor-pointer"
                   >
                     <Pencil className="h-3.5 w-3.5" aria-hidden="true" />
-                    <span>تعديل البيانات (Edit)</span>
+                    <span>{isAr ? 'تعديل البيانات' : 'Edit Details'}</span>
                   </button>
                 ) : (
                   <button
                     type="button"
                     onClick={() => setBookingModalMode('ticket')}
-                    className="inline-flex min-h-[36px] items-center gap-1.5 rounded-lg border border-[#CBD5E1] bg-[#F8FAFC] px-3.5 text-xs font-semibold text-[#0F172A] hover:bg-[#E2E8F0] cursor-pointer"
+                    className="inline-flex min-h-[36px] items-center gap-1.5 rounded-lg border border-[#CBD5E1] bg-[#F8FAFC] px-3.5 text-xs font-semibold text-[#0F2233] hover:bg-[#E2E8F0] cursor-pointer"
                   >
                     <Eye className="h-3.5 w-3.5 text-[#0D9488]" aria-hidden="true" />
-                    <span>← عرض التيكت · Back to Ticket</span>
+                    <span>{isAr ? 'العودة للتذكرة' : 'Back to Ticket'}</span>
                   </button>
                 )}
                 <button
                   type="button"
                   onClick={() => setBookingModalDraft(null)}
-                  className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-[#E2E8F0] text-[#0F172A] hover:bg-[#F1F5F9] cursor-pointer"
+                  className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-[#E2E8F0] text-[#0F2233] hover:bg-[#F1F5F9] cursor-pointer"
                   aria-label="Close booking details"
                 >
                   <X className="h-4 w-4" />
@@ -4951,27 +5018,32 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                 {bookingModalSaved && (
                   <div className="rounded-xl border border-[#BBF7D0] bg-[#F0FDF4] px-4 py-2.5 text-xs font-semibold text-[#15803D] flex items-center gap-2">
                     <Check className="h-4 w-4 shrink-0" aria-hidden="true" />
-                    <span>تم حفظ التعديلات وتحديث التيكت بنجاح!</span>
+                    <span>
+                      {isAr
+                        ? 'تم حفظ التعديلات وتحديث التذكرة بنجاح.'
+                        : 'Changes saved and booking ticket updated.'}
+                    </span>
                   </div>
                 )}
 
                 {/* Visual Booking Ticket Card */}
                 <div className="overflow-hidden rounded-2xl border-2 border-[#0D9488]/40 bg-white shadow-lg">
                   {/* Ticket Header Bar */}
-                  <div className="bg-gradient-to-r from-[#0F172A] via-[#134E4A] to-[#0F172A] px-6 py-4 text-white flex flex-wrap items-center justify-between gap-3">
+                  <div className="bg-gradient-to-r from-[#0F2233] via-[#134E4A] to-[#0F2233] px-6 py-4 text-white flex flex-wrap items-center justify-between gap-3">
                     <div>
                       <span className="block text-[10px] font-bold uppercase tracking-widest text-[#5EEAD4]">
-                        WASLA TRAVEL OFFICIAL BOOKING TICKET · تيكت حجز العميل
+                        {isAr ? 'تذكرة حجز وصلة ترافيل الرسمية' : 'WASLA TRAVEL OFFICIAL BOOKING TICKET'}
                       </span>
                       <div className="mt-0.5 text-base sm:text-lg font-bold text-white">
                         {bookingModalDraft.tripTitle}
                       </div>
                       <div className="text-xs text-[#CCFBF1]">
-                        {bookingModalDraft.destination} · {bookingModalDraft.category} · Supplier: {bookingModalDraft.supplierName}
+                        {bookingModalDraft.destination} · {bookingModalDraft.category} ·{' '}
+                        {isAr ? 'المورد:' : 'Supplier:'} {bookingModalDraft.supplierName}
                       </div>
                     </div>
                     <div className="flex flex-col items-end gap-1">
-                      <span className="rounded-lg bg-[#EA580C] px-3 py-1 font-mono text-xs font-bold text-white">
+                      <span className="rounded-lg bg-[#EE5426] px-3 py-1 font-mono text-xs font-bold text-white">
                         {bookingModalDraft.id}
                       </span>
                       <div className="flex items-center gap-1.5 text-[11px]">
@@ -4990,25 +5062,25 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
                       <div className="rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] p-3">
                         <span className="block text-[11px] font-semibold text-[#64748B]">
-                          اسم الزبون · Guest Name
+                          {isAr ? 'اسم العميل' : 'Guest Name'}
                         </span>
-                        <strong className="mt-1 block text-sm font-bold text-[#0F172A]">
+                        <strong className="mt-1 block text-sm font-bold text-[#0F2233]">
                           {bookingModalDraft.guestName}
                         </strong>
                       </div>
 
                       <div className="rounded-xl border border-[#FED7AA] bg-[#FFF7ED]/70 p-3">
                         <span className="block text-[11px] font-semibold text-[#9A3412]">
-                          الجنسية · Nationality
+                          {isAr ? 'الجنسية' : 'Nationality'}
                         </span>
-                        <strong className="mt-1 block text-sm font-bold text-[#EA580C]">
+                        <strong className="mt-1 block text-sm font-bold text-[#EE5426]">
                           {bookingModalDraft.guestCountry || 'Guest'}
                         </strong>
                       </div>
 
                       <div className="rounded-xl border border-[#BBF7D0] bg-[#F0FDF4] p-3">
                         <span className="block text-[11px] font-semibold text-[#15803D]">
-                          إجمالي التيكت · Total Price
+                          {isAr ? 'إجمالي السعر' : 'Total Price'}
                         </span>
                         <strong className="mt-1 block font-mono text-base font-extrabold text-[#15803D] tabular-nums">
                           €{bookingModalDraft.grossEur}
@@ -5018,76 +5090,98 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
 
                     {/* Perforated Divider */}
                     <div className="relative flex items-center py-1">
-                      <div className="h-4 w-4 -ms-8 rounded-full bg-[#0F172A]/10 border border-[#CBD5E1]" />
+                      <div className="h-4 w-4 -ms-8 rounded-full bg-[#0F2233]/10 border border-[#CBD5E1]" />
                       <div className="flex-1 border-t-2 border-dashed border-[#CBD5E1]" />
-                      <div className="h-4 w-4 -me-8 rounded-full bg-[#0F172A]/10 border border-[#CBD5E1]" />
+                      <div className="h-4 w-4 -me-8 rounded-full bg-[#0F2233]/10 border border-[#CBD5E1]" />
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                       <div className="rounded-xl border border-[#CCFBF1] bg-[#F0FDFA]/70 p-3.5 space-y-1.5">
                         <span className="block text-[11px] font-semibold text-[#0F766E]">
-                          المواعيد والتاريخ · Date, Trip Start &amp; Pickup
+                          {isAr ? 'التاريخ ومواعيد الرحلة والبيك أب' : 'Date, Trip Start & Pickup'}
                         </span>
                         <div className="text-xs font-medium text-[#334155] tabular-nums space-y-0.5">
                           <div>
-                            التاريخ · Date:{' '}
-                            <strong className="font-mono text-[#0F172A]">{bookingModalDraft.date}</strong>
+                            {isAr ? 'التاريخ:' : 'Date:'}{' '}
+                            <strong className="font-mono text-[#0F2233]">{bookingModalDraft.date}</strong>
                           </div>
                           {bookingModalDraft.tripStartTime && (
                             <div>
-                              توقيت بداية الرحلة · Trip Start:{' '}
-                              <strong className="text-[#EA580C]">
+                              {isAr ? 'توقيت بداية الرحلة:' : 'Trip Start:'}{' '}
+                              <strong className="text-[#EE5426]">
                                 {bookingModalDraft.tripStartTime}
                               </strong>
                             </div>
                           )}
                           <div>
-                            موعد البيك أب · Hotel Pickup:{' '}
-                            <strong className="font-mono text-[#0F172A]">
+                            {isAr ? 'موعد الاستلام:' : 'Hotel Pickup:'}{' '}
+                            <strong className="font-mono text-[#0F2233]">
                               {bookingModalDraft.pickupTime || 'TBD'}
                             </strong>
                           </div>
                         </div>
                         <span className="block text-[11px] font-semibold text-[#0D9488]">
                           {bookingModalDraft.pickupSpot === 'Outside Main Gate'
-                            ? 'أمام البوابة الخارجية (Outside Main Gate)'
-                            : 'أمام الريسبشن داخلياً (Inside Reception)'}
+                            ? isAr
+                              ? 'أمام البوابة الرئيسية للفندق'
+                              : 'Outside Hotel Main Gate'
+                            : isAr
+                            ? 'داخل استقبال الفندق'
+                            : 'Inside Hotel Reception'}
                         </span>
                       </div>
 
                       <div className="rounded-xl border border-[#CCFBF1] bg-[#F0FDFA]/70 p-3.5 space-y-1">
                         <span className="block text-[11px] font-semibold text-[#0F766E]">
-                          الفندق ورقم الغرفة · Hotel &amp; Room
+                          {isAr ? 'الفندق ورقم الغرفة' : 'Hotel & Room'}
                         </span>
-                        <strong className="block text-sm font-bold text-[#0F172A]">
+                        <strong className="block text-sm font-bold text-[#0F2233]">
                           {bookingModalDraft.hotel}
                         </strong>
                         <span className="block text-[11px] font-semibold text-[#475569]">
                           {bookingModalDraft.roomNumber
-                            ? `Room No: ${bookingModalDraft.roomNumber}`
+                            ? isAr
+                              ? `رقم الغرفة: ${bookingModalDraft.roomNumber}`
+                              : `Room No: ${bookingModalDraft.roomNumber}`
+                            : isAr
+                            ? 'لم يُضف رقم الغرفة بعد'
                             : 'Room number not added yet'}
                         </span>
                       </div>
 
                       <div className="rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] p-3.5 space-y-1">
                         <span className="block text-[11px] font-semibold text-[#64748B]">
-                          عدد الأفراد · Guests Manifest
+                          {isAr ? 'عدد الأفراد' : 'Guests Manifest'}
                         </span>
-                        <strong className="block text-sm font-bold text-[#0F172A] tabular-nums">
-                          {bookingModalDraft.adults} Adults
-                          {bookingModalDraft.children > 0 ? ` + ${bookingModalDraft.children} Children` : ''}
-                          {(bookingModalDraft.infants ?? 0) > 0 ? ` + ${bookingModalDraft.infants} Infants (INF)` : ''}
+                        <strong className="block text-sm font-bold text-[#0F2233] tabular-nums">
+                          {bookingModalDraft.adults} {isAr ? 'بالغين' : 'Adults'}
+                          {bookingModalDraft.children > 0
+                            ? ` + ${bookingModalDraft.children} ${isAr ? 'أطفال' : 'Children'}`
+                            : ''}
+                          {(bookingModalDraft.infants ?? 0) > 0
+                            ? ` + ${bookingModalDraft.infants} ${isAr ? 'رضّع' : 'Infants (INF)'}`
+                            : ''}
                         </strong>
-                        <span className="block text-[11px] font-medium text-[#EA580C]">
-                          إجمالي كشف الباص/المركب: {bookingModalDraft.adults + bookingModalDraft.children + (bookingModalDraft.infants ?? 0)} فرد
+                        <span className="block text-[11px] font-medium text-[#EE5426]">
+                          {isAr
+                            ? `إجمالي الكشف: ${
+                                bookingModalDraft.adults +
+                                bookingModalDraft.children +
+                                (bookingModalDraft.infants ?? 0)
+                              } فرد`
+                            : `Total headcount: ${
+                                bookingModalDraft.adults +
+                                bookingModalDraft.children +
+                                (bookingModalDraft.infants ?? 0)
+                              }`}
                         </span>
                       </div>
 
                       <div className="rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] p-3.5 space-y-1">
                         <span className="block text-[11px] font-semibold text-[#64748B]">
-                          بيانات التواصل · Guest Contact
+                          {isAr ? 'بيانات التواصل' : 'Guest Contact'}
                         </span>
-                        <strong className="block font-mono text-xs font-bold text-[#0F172A] tabular-nums">
+                        <strong className="block font-mono text-xs font-bold text-[#0F2233] tabular-nums">
                           WA: {bookingModalDraft.guestWhatsapp || bookingModalDraft.guestContact || '—'}
                         </strong>
                         <span className="block text-xs font-medium text-[#334155] break-all">
@@ -5097,30 +5191,35 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
 
                       <div className="rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] p-3.5 space-y-1">
                         <span className="block text-[11px] font-semibold text-[#64748B]">
-                          المورد والسائق / المرشد · Supplier &amp; Driver
+                          {isAr ? 'المورد والسائق / المرشد' : 'Supplier & Driver / Guide'}
                         </span>
-                        <strong className="block text-xs sm:text-sm font-bold text-[#0F172A]">
+                        <strong className="block text-xs sm:text-sm font-bold text-[#0F2233]">
                           {bookingModalDraft.supplierName}
                         </strong>
                         <span className="block text-xs font-medium text-[#0D9488]">
-                          Driver / Guide: {bookingModalDraft.assignedDriverOrGuide || 'لم يتم التعيين بعد (اضغط تعديل للتعيين)'}
+                          {isAr ? 'السائق / المرشد:' : 'Driver / Guide:'}{' '}
+                          {bookingModalDraft.assignedDriverOrGuide ||
+                            (isAr ? 'لم يتم التعيين بعد' : 'Not assigned yet')}
                         </span>
                       </div>
 
                       <div className="rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] p-3.5 space-y-1">
                         <span className="block text-[11px] font-semibold text-[#64748B]">
-                          ملاحظات التيكت · Booking Notes
+                          {isAr ? 'ملاحظات الحجز' : 'Booking Notes'}
                         </span>
                         <p className="text-xs font-medium text-[#334155] leading-relaxed">
-                          {bookingModalDraft.notes || 'لا توجد ملاحظات إضافية على التيكت.'}
+                          {bookingModalDraft.notes ||
+                            (isAr ? 'لا توجد ملاحظات إضافية.' : 'No additional booking notes.')}
                         </p>
                       </div>
                     </div>
 
                     {bookingModalDraft.locationImageUrl && (
                       <div className="rounded-xl border border-[#CBD5E1] bg-[#F8FAFC] p-3 space-y-1.5">
-                        <span className="block text-xs font-semibold text-[#0F172A]">
-                          صورة بوابة الفندق / كارت الغرفة المرفقة
+                        <span className="block text-xs font-semibold text-[#0F2233]">
+                          {isAr
+                            ? 'صورة بوابة الفندق أو بطاقة الغرفة'
+                            : 'Attached Hotel Gate / Room Card Photo'}
                         </span>
                         <img
                           src={bookingModalDraft.locationImageUrl}
@@ -5150,6 +5249,8 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                         hotel: bookingModalDraft.hotel,
                         roomNumber: bookingModalDraft.roomNumber,
                         driverOrGuide: bookingModalDraft.assignedDriverOrGuide,
+                        guestLang: bookingModalDraft.guestLang,
+                        notes: bookingModalDraft.notes,
                       });
                       return (
                         <>
@@ -5161,7 +5262,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                               className="wasla-wa-glare inline-flex min-h-[40px] items-center gap-1.5 rounded-lg px-4 text-xs font-semibold text-white"
                             >
                               <MessageCircle className="h-3.5 w-3.5" aria-hidden="true" />
-                              <span>إرسال عبر واتساب · Send WhatsApp</span>
+                              <span>{isAr ? 'إرسال عبر واتساب' : 'Send WhatsApp'}</span>
                             </a>
                           )}
                           <button
@@ -5172,10 +5273,10 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                                 pickupTime: bookingModalDraft.pickupTime || livePickup,
                               })
                             }
-                            className="inline-flex min-h-[40px] items-center gap-1.5 rounded-lg border border-[#FED7AA] bg-[#FFF7ED] px-4 text-xs font-semibold text-[#C2410C] hover:bg-[#FFEDD5] cursor-pointer"
+                            className="inline-flex min-h-[40px] items-center gap-1.5 rounded-lg border border-[#FED7AA] bg-[#FFF7ED] px-4 text-xs font-semibold text-[#D9461B] hover:bg-[#FFEDD5] cursor-pointer"
                           >
                             <Mail className="h-3.5 w-3.5" aria-hidden="true" />
-                            <span>إرسال إيميل · Send Email</span>
+                            <span>{isAr ? 'إرسال إيميل' : 'Send Email'}</span>
                           </button>
                           {onUpdateBooking && bookingModalDraft.status === 'Pending' && (
                             <button
@@ -5191,7 +5292,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                               className="inline-flex min-h-[40px] items-center gap-1.5 rounded-lg bg-[#0D9488] px-3.5 text-xs font-semibold text-white hover:bg-[#0F766E] cursor-pointer"
                             >
                               <Check className="h-3.5 w-3.5" aria-hidden="true" />
-                              <span>تأكيد الحجز سريعاً · Quick Confirm</span>
+                              <span>{isAr ? 'تأكيد الحجز سريعاً' : 'Quick Confirm'}</span>
                             </button>
                           )}
                         </>
@@ -5203,17 +5304,17 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                     <button
                       type="button"
                       onClick={() => setBookingModalMode('edit')}
-                      className="inline-flex min-h-[40px] items-center gap-1.5 rounded-lg bg-[#0F172A] px-4 text-xs font-semibold text-white hover:bg-[#1E293B] cursor-pointer"
+                      className="inline-flex min-h-[40px] items-center gap-1.5 rounded-lg bg-[#0F2233] px-4 text-xs font-semibold text-white hover:bg-[#19354F] cursor-pointer"
                     >
                       <Pencil className="h-3.5 w-3.5" aria-hidden="true" />
-                      <span>فتح لوحة الإيديت · Edit Ticket</span>
+                      <span>{isAr ? 'تعديل التذكرة' : 'Edit Ticket'}</span>
                     </button>
                     <button
                       type="button"
                       onClick={() => setBookingModalDraft(null)}
-                      className="min-h-[40px] rounded-lg border border-[#CBD5E1] bg-white px-4 text-xs font-semibold text-[#475569] hover:text-[#0F172A] cursor-pointer"
+                      className="min-h-[40px] rounded-lg border border-[#CBD5E1] bg-white px-4 text-xs font-semibold text-[#475569] hover:text-[#0F2233] cursor-pointer"
                     >
-                      Close
+                      {isAr ? 'إغلاق' : 'Close'}
                     </button>
                   </div>
                 </div>
@@ -5222,8 +5323,8 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
             <form onSubmit={handleSaveOwnerBooking} className="p-6 space-y-5">
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <label className="block space-y-1">
-                  <span className="text-xs font-semibold text-[#0F172A]">
-                    Guest Name / اسم الزبون
+                  <span className="text-xs font-semibold text-[#0F2233]">
+                    {isAr ? 'اسم العميل' : 'Guest Name'}
                   </span>
                   <input
                     type="text"
@@ -5235,13 +5336,13 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                         prev ? { ...prev, guestName: e.target.value } : prev
                       )
                     }
-                    className="min-h-[42px] w-full rounded-lg border border-[#CBD5E1] px-3 text-sm text-[#0F172A]"
+                    className="min-h-[42px] w-full rounded-lg border border-[#CBD5E1] px-3 text-sm text-[#0F2233]"
                   />
                 </label>
 
                 <label className="block space-y-1">
-                  <span className="text-xs font-semibold text-[#0F172A]">
-                    Nationality / الجنسية
+                  <span className="text-xs font-semibold text-[#0F2233]">
+                    {isAr ? 'الجنسية' : 'Nationality'}
                   </span>
                   <input
                     type="text"
@@ -5253,13 +5354,13 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                       )
                     }
                     placeholder="e.g. German, British, Egyptian..."
-                    className="min-h-[42px] w-full rounded-lg border border-[#CBD5E1] px-3 text-sm text-[#0F172A]"
+                    className="min-h-[42px] w-full rounded-lg border border-[#CBD5E1] px-3 text-sm text-[#0F2233]"
                   />
                 </label>
 
                 <label className="block space-y-1">
-                  <span className="text-xs font-semibold text-[#0F172A]">
-                    Trip / Service Title · اسم الرحلة
+                  <span className="text-xs font-semibold text-[#0F2233]">
+                    {isAr ? 'اسم الرحلة / الخدمة' : 'Trip / Service Title'}
                   </span>
                   <input
                     type="text"
@@ -5271,7 +5372,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                         prev ? { ...prev, tripTitle: e.target.value } : prev
                       )
                     }
-                    className="min-h-[42px] w-full rounded-lg border border-[#CBD5E1] px-3 text-sm text-[#0F172A]"
+                    className="min-h-[42px] w-full rounded-lg border border-[#CBD5E1] px-3 text-sm text-[#0F2233]"
                   />
                 </label>
               </div>
@@ -5279,11 +5380,11 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
               {/* Pickup Time (AM/PM) + Spot (Reception / Main Gate) */}
               <div className="rounded-xl border border-[#CCFBF1] bg-[#F0FDFA] p-4 space-y-3">
                 <div className="text-xs font-semibold text-[#115E59]">
-                  Trip Start Time &amp; Pickup Schedule · توقيت الرحلة وموعد ومكان البيك أب
+                  {isAr ? 'توقيت الرحلة وموعد ومكان الاستلام' : 'Trip Start Time & Pickup Schedule'}
                 </div>
                 <label className="block space-y-1">
                   <span className="text-xs font-medium text-[#334155]">
-                    توقيت بداية الرحلة · Trip Start Time (or Flight Time)
+                    {isAr ? 'توقيت بداية الرحلة (أو موعد الطيران)' : 'Trip Start Time (or Flight Time)'}
                   </span>
                   <input
                     type="text"
@@ -5294,12 +5395,14 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                       )
                     }
                     placeholder="e.g. 09:00 AM · 02:30 PM (Sunset) · According to flight time"
-                    className="min-h-[40px] w-full rounded-lg border border-[#CBD5E1] bg-white px-3 text-xs font-semibold text-[#EA580C]"
+                    className="min-h-[40px] w-full rounded-lg border border-[#CBD5E1] bg-white px-3 text-xs font-semibold text-[#EE5426]"
                   />
                 </label>
                 <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
                   <label className="block space-y-1">
-                    <span className="text-xs font-medium text-[#334155]">Date</span>
+                    <span className="text-xs font-medium text-[#334155]">
+                      {isAr ? 'التاريخ' : 'Date'}
+                    </span>
                     <input
                       type="date"
                       value={bookingModalDraft.date}
@@ -5314,7 +5417,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
 
                   <div className="space-y-1">
                     <span className="block text-xs font-medium text-[#334155]">
-                      Pickup Time (AM / PM)
+                      {isAr ? 'موعد الاستلام (AM / PM)' : 'Pickup Time (AM / PM)'}
                     </span>
                     <div className="flex gap-1.5">
                       <input
@@ -5345,13 +5448,19 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
 
                   <div className="sm:col-span-2 space-y-1">
                     <span className="block text-xs font-medium text-[#334155]">
-                      Pickup Location (جوه / بره)
+                      {isAr ? 'نقطة الالتقاء بالفندق' : 'Hotel Meeting Point'}
                     </span>
                     <div className="grid grid-cols-2 gap-2">
                       {(
                         [
-                          { val: 'Inside Reception', label: 'أمام الريسبشن (جوه)' },
-                          { val: 'Outside Main Gate', label: 'أمام البوابة (بره)' },
+                          {
+                            val: 'Inside Reception',
+                            label: isAr ? 'داخل استقبال الفندق' : 'Inside Hotel Reception',
+                          },
+                          {
+                            val: 'Outside Main Gate',
+                            label: isAr ? 'أمام البوابة الرئيسية' : 'Outside Main Gate',
+                          },
                         ] as { val: PickupSpot; label: string }[]
                       ).map((spot) => (
                         <button
@@ -5365,7 +5474,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                           className={`min-h-[40px] rounded-lg border px-2.5 text-xs font-semibold cursor-pointer ${
                             (bookingModalDraft.pickupSpot || 'Inside Reception') === spot.val
                               ? 'border-[#0D9488] bg-[#0D9488] text-white'
-                              : 'border-[#CBD5E1] bg-white text-[#0F172A]'
+                              : 'border-[#CBD5E1] bg-white text-[#0F2233]'
                           }`}
                         >
                           {spot.label}
@@ -5424,7 +5533,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
               {/* Guest WhatsApp + Email */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <label className="block space-y-1">
-                  <span className="text-xs font-semibold text-[#0F172A]">
+                  <span className="text-xs font-semibold text-[#0F2233]">
                     Guest WhatsApp
                   </span>
                   <input
@@ -5441,7 +5550,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                 </label>
 
                 <label className="block space-y-1">
-                  <span className="text-xs font-semibold text-[#0F172A]">Guest Email</span>
+                  <span className="text-xs font-semibold text-[#0F2233]">Guest Email</span>
                   <input
                     type="email"
                     value={bookingModalDraft.guestEmail || ''}
@@ -5459,7 +5568,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
               {/* Financials, Supplier, Driver & Status — Cleanly Aligned */}
               <div className="grid grid-cols-2 sm:grid-cols-6 gap-3 items-start">
                 <label className="block space-y-1">
-                  <span className="block text-xs font-semibold text-[#0F172A] truncate">Adults</span>
+                  <span className="block text-xs font-semibold text-[#0F2233] truncate">Adults</span>
                   <input
                     type="number"
                     min={1}
@@ -5474,7 +5583,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                 </label>
 
                 <label className="block space-y-1">
-                  <span className="block text-xs font-semibold text-[#0F172A] truncate">Children</span>
+                  <span className="block text-xs font-semibold text-[#0F2233] truncate">Children</span>
                   <input
                     type="number"
                     min={0}
@@ -5489,7 +5598,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                 </label>
 
                 <label className="block space-y-1">
-                  <span className="block text-xs font-semibold text-[#0F172A] truncate">Infants (INF)</span>
+                  <span className="block text-xs font-semibold text-[#0F2233] truncate">Infants (INF)</span>
                   <input
                     type="number"
                     min={0}
@@ -5504,7 +5613,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                 </label>
 
                 <label className="block space-y-1">
-                  <span className="block text-xs font-semibold text-[#0F172A] truncate">
+                  <span className="block text-xs font-semibold text-[#0F2233] truncate">
                     Guest Selling Price (€)
                   </span>
                   <input
@@ -5521,7 +5630,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                 </label>
 
                 <label className="sm:col-span-2 block space-y-1">
-                  <span className="block text-xs font-semibold text-[#0F172A] truncate">Supplier</span>
+                  <span className="block text-xs font-semibold text-[#0F2233] truncate">Supplier</span>
                   <select
                     value={bookingModalDraft.supplierName}
                     onChange={(e) =>
@@ -5540,7 +5649,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                 </label>
 
                 <label className="block space-y-1">
-                  <span className="block text-xs font-semibold text-[#0F172A] truncate">Destination</span>
+                  <span className="block text-xs font-semibold text-[#0F2233] truncate">Destination</span>
                   <select
                     value={bookingModalDraft.destination}
                     onChange={(e) =>
@@ -5560,7 +5669,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                 </label>
 
                 <label className="col-span-2 block space-y-1">
-                  <span className="block text-xs font-semibold text-[#0F172A] truncate">Driver / Guide</span>
+                  <span className="block text-xs font-semibold text-[#0F2233] truncate">Driver / Guide</span>
                   <input
                     type="text"
                     value={bookingModalDraft.assignedDriverOrGuide}
@@ -5575,7 +5684,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                 </label>
 
                 <label className="col-span-2 block space-y-1">
-                  <span className="block text-xs font-semibold text-[#0F172A] truncate">Payment Status</span>
+                  <span className="block text-xs font-semibold text-[#0F2233] truncate">Payment Status</span>
                   <select
                     value={bookingModalDraft.paymentStatus}
                     onChange={(e) =>
@@ -5595,7 +5704,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                 </label>
 
                 <label className="col-span-2 block space-y-1">
-                  <span className="block text-xs font-semibold text-[#0F172A] truncate">Booking Status</span>
+                  <span className="block text-xs font-semibold text-[#0F2233] truncate">Booking Status</span>
                   <select
                     value={bookingModalDraft.status}
                     onChange={(e) =>
@@ -5620,11 +5729,13 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
               <div className="rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] p-4 space-y-3">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div>
-                    <div className="text-xs font-semibold text-[#0F172A]">
-                      Hotel Gate / Room Card Photo · صورة بوابة الفندق أو كارت الغرفة
+                    <div className="text-xs font-semibold text-[#0F2233]">
+                      {isAr ? 'صورة بوابة الفندق أو بطاقة الغرفة' : 'Hotel Gate / Room Card Photo'}
                     </div>
                     <p className="text-[11px] text-[#64748B]">
-                      Attach a hotel gate photo or room card for the driver.
+                      {isAr
+                        ? 'أرفق صورة بوابة الفندق أو كارت الغرفة لتسهيل وصول السائق.'
+                        : 'Attach a hotel gate photo or room card for the driver.'}
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
@@ -5654,10 +5765,18 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                       type="button"
                       onClick={() => ownerLocImgInputRef.current?.click()}
                       disabled={uploadingOwnerLocImg}
-                      className="inline-flex min-h-[36px] items-center gap-1.5 rounded-lg border border-[#CBD5E1] bg-white px-3 text-xs font-semibold text-[#0F172A] hover:border-[#0D9488] hover:text-[#0D9488] cursor-pointer"
+                      className="inline-flex min-h-[36px] items-center gap-1.5 rounded-lg border border-[#CBD5E1] bg-white px-3 text-xs font-semibold text-[#0F2233] hover:border-[#0D9488] hover:text-[#0D9488] cursor-pointer"
                     >
                       <ImagePlus className="h-3.5 w-3.5" aria-hidden="true" />
-                      <span>{uploadingOwnerLocImg ? 'Uploading…' : 'Upload Screenshot / صورة'}</span>
+                      <span>
+                        {uploadingOwnerLocImg
+                          ? isAr
+                            ? 'جاري الرفع…'
+                            : 'Uploading…'
+                          : isAr
+                          ? 'رفع صورة'
+                          : 'Upload Photo'}
+                      </span>
                     </button>
                     {bookingModalDraft.locationImageUrl && (
                       <button
@@ -5688,7 +5807,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
               </div>
 
               <label className="block space-y-1">
-                <span className="text-xs font-semibold text-[#0F172A]">Notes</span>
+                <span className="text-xs font-semibold text-[#0F2233]">Notes</span>
                 <textarea
                   rows={2}
                   dir="auto"
@@ -5720,6 +5839,8 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                       hotel: bookingModalDraft.hotel,
                       roomNumber: bookingModalDraft.roomNumber,
                       driverOrGuide: bookingModalDraft.assignedDriverOrGuide,
+                      guestLang: bookingModalDraft.guestLang,
+                      notes: bookingModalDraft.notes,
                     });
                     return (
                       <>
@@ -5731,7 +5852,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                             className="wasla-wa-glare inline-flex min-h-[40px] items-center gap-1.5 rounded-lg px-4 text-xs font-semibold text-white"
                           >
                             <MessageCircle className="h-3.5 w-3.5" aria-hidden="true" />
-                            <span>Send Pickup via WhatsApp</span>
+                            <span>{isAr ? 'إرسال البيك أب عبر واتساب' : 'Send Pickup via WhatsApp'}</span>
                           </a>
                         )}
                         <button
@@ -5742,10 +5863,10 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                               pickupTime: livePickup,
                             })
                           }
-                          className="inline-flex min-h-[40px] items-center gap-1.5 rounded-lg border border-[#FED7AA] bg-[#FFF7ED] px-4 text-xs font-semibold text-[#C2410C] hover:bg-[#FFEDD5] cursor-pointer"
+                          className="inline-flex min-h-[40px] items-center gap-1.5 rounded-lg border border-[#FED7AA] bg-[#FFF7ED] px-4 text-xs font-semibold text-[#D9461B] hover:bg-[#FFEDD5] cursor-pointer"
                         >
                           <Mail className="h-3.5 w-3.5" aria-hidden="true" />
-                          <span>Preview &amp; Send Pickup Email</span>
+                          <span>{isAr ? 'معاينة وإرسال إيميل البيك أب' : 'Preview & Send Pickup Email'}</span>
                         </button>
                         {onUpdateBooking && (
                           <>
@@ -5756,12 +5877,14 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                                 className="inline-flex min-h-[40px] items-center gap-1 rounded-lg border border-[#FECACA] bg-[#FEF2F2] px-3 text-xs font-semibold text-[#B91C1C] hover:bg-[#FEE2E2] cursor-pointer"
                               >
                                 <XCircle className="h-3.5 w-3.5" aria-hidden="true" />
-                                <span>Cancel Booking</span>
+                                <span>{isAr ? 'إلغاء الحجز' : 'Cancel Booking'}</span>
                               </button>
                             ) : (
                               <div className="inline-flex flex-wrap items-center gap-2 rounded-lg border border-[#EF4444] bg-[#FEF2F2] px-3 py-1.5">
                                 <span className="text-[11px] font-bold text-[#991B1B]">
-                                  تأكيد الإلغاء (خطوة ٢/٢): هل أنت متأكد؟
+                                  {isAr
+                                    ? 'تأكيد الإلغاء (خطوة 2/2): هل أنت متأكد؟'
+                                    : 'Confirm cancellation (step 2/2): Are you sure?'}
                                 </span>
                                 <button
                                   type="button"
@@ -5777,14 +5900,14 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                                   className="inline-flex min-h-[28px] items-center gap-1 rounded-md bg-[#DC2626] px-2.5 text-[11px] font-semibold text-white hover:bg-[#B91C1C] cursor-pointer"
                                 >
                                   <XCircle className="h-3 w-3" aria-hidden="true" />
-                                  <span>Confirm Cancel · تأكيد نهائي</span>
+                                  <span>{isAr ? 'تأكيد الإلغاء نهائياً' : 'Confirm Cancel'}</span>
                                 </button>
                                 <button
                                   type="button"
                                   onClick={() => setOwnerConfirmCancelStep(false)}
                                   className="inline-flex min-h-[28px] items-center rounded-md border border-[#CBD5E1] bg-white px-2.5 text-[11px] font-semibold text-[#334155] hover:bg-[#F8FAFC] cursor-pointer"
                                 >
-                                  تراجع
+                                  {isAr ? 'تراجع' : 'Back'}
                                 </button>
                               </div>
                             )}
@@ -5819,13 +5942,13 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                   <button
                     type="button"
                     onClick={() => setBookingModalMode('ticket')}
-                    className="min-h-[40px] rounded-lg border border-[#CBD5E1] px-4 text-xs font-semibold text-[#475569] hover:text-[#0F172A] cursor-pointer"
+                    className="min-h-[40px] rounded-lg border border-[#CBD5E1] px-4 text-xs font-semibold text-[#475569] hover:text-[#0F2233] cursor-pointer"
                   >
                     ← Back to Ticket
                   </button>
                   <button
                     type="submit"
-                    className="inline-flex min-h-[40px] items-center gap-1.5 rounded-lg bg-[#0F172A] px-5 text-xs font-semibold text-white hover:bg-[#1E293B] cursor-pointer"
+                    className="inline-flex min-h-[40px] items-center gap-1.5 rounded-lg bg-[#0F2233] px-5 text-xs font-semibold text-white hover:bg-[#19354F] cursor-pointer"
                   >
                     <Save className="h-3.5 w-3.5" aria-hidden="true" />
                     <span>Save &amp; View Ticket</span>
@@ -5841,7 +5964,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
       {/* In-App Email Viewer & Composer Modal */}
       {emailModal && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-[#0F172A]/60 p-4 backdrop-blur-[2px]"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-[#0F2233]/60 p-4 backdrop-blur-[2px]"
           onClick={() => setEmailModal(null)}
           role="dialog"
           aria-modal="true"
@@ -5861,14 +5984,14 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                   <span aria-hidden="true">·</span>
                   <span>{emailModal.status}</span>
                 </div>
-                <h2 className="text-base sm:text-lg font-semibold text-[#0F172A]">
+                <h2 className="text-base sm:text-lg font-semibold text-[#0F2233]">
                   {emailModal.subject}
                 </h2>
               </div>
               <button
                 type="button"
                 onClick={() => setEmailModal(null)}
-                className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-[#FECDD3] bg-white text-[#0F172A] hover:bg-[#FFF1F2] cursor-pointer"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-[#FECDD3] bg-white text-[#0F2233] hover:bg-[#FFF1F2] cursor-pointer"
                 aria-label="Close email viewer"
               >
                 <X className="h-4 w-4" />
@@ -5880,8 +6003,8 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
               <div className="rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] p-4 space-y-2 text-xs sm:text-sm">
                 <div className="grid grid-cols-1 sm:grid-cols-12 gap-1 sm:gap-2">
                   <span className="sm:col-span-2 font-semibold text-[#64748B]">From:</span>
-                  <span className="sm:col-span-10 font-medium text-[#0F172A]">
-                    Wasla Travel Operations &lt;{SITE_CONFIG.email}&gt;
+                  <span className="sm:col-span-10 font-medium text-[#0F2233]">
+                    {publicSettings?.email || SITE_CONFIG.email}
                   </span>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-12 gap-1 sm:gap-2 items-center">
@@ -5892,7 +6015,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                     onChange={(e) =>
                       setEmailModal((prev) => (prev ? { ...prev, to: e.target.value } : prev))
                     }
-                    className="sm:col-span-10 rounded-lg border border-[#CBD5E1] bg-white px-3 py-1.5 text-sm text-[#0F172A]"
+                    className="sm:col-span-10 rounded-lg border border-[#CBD5E1] bg-white px-3 py-1.5 text-sm text-[#0F2233]"
                   />
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-12 gap-1 sm:gap-2 items-center">
@@ -5906,7 +6029,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                         prev ? { ...prev, subject: e.target.value } : prev
                       )
                     }
-                    className="sm:col-span-10 rounded-lg border border-[#CBD5E1] bg-white px-3 py-1.5 text-sm font-medium text-[#0F172A]"
+                    className="sm:col-span-10 rounded-lg border border-[#CBD5E1] bg-white px-3 py-1.5 text-sm font-medium text-[#0F2233]"
                   />
                 </div>
               </div>
@@ -5925,7 +6048,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                         setEmailModal(null);
                         openOwnerBookingModal(bk);
                       }}
-                      className="text-xs font-semibold text-[#EA580C] hover:underline underline-offset-2 cursor-pointer"
+                      className="text-xs font-semibold text-[#EE5426] hover:underline underline-offset-2 cursor-pointer"
                     >
                       Open Booking {emailModal.relatedBooking.id} →
                     </button>
@@ -5938,7 +6061,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                   onChange={(e) =>
                     setEmailModal((prev) => (prev ? { ...prev, body: e.target.value } : prev))
                   }
-                  className="w-full rounded-xl border border-[#CBD5E1] bg-white p-4 text-[14.5px] leading-relaxed text-[#0F172A]"
+                  className="w-full rounded-xl border border-[#CBD5E1] bg-white p-4 text-[14.5px] leading-relaxed text-[#0F2233]"
                 />
               </div>
 
@@ -5959,7 +6082,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                       setEmailCopied(true);
                       window.setTimeout(() => setEmailCopied(false), 2000);
                     }}
-                    className="inline-flex min-h-[40px] items-center gap-1.5 rounded-lg border border-[#CBD5E1] bg-white px-4 text-xs font-semibold text-[#0F172A] hover:bg-[#F8FAFC] cursor-pointer"
+                    className="inline-flex min-h-[40px] items-center gap-1.5 rounded-lg border border-[#CBD5E1] bg-white px-4 text-xs font-semibold text-[#0F2233] hover:bg-[#F8FAFC] cursor-pointer"
                   >
                     {emailCopied ? (
                       <>
@@ -5987,7 +6110,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                         setEmailLoggedBanner(true);
                       }}
                       disabled={!emailModal.to.includes('@')}
-                      className="inline-flex min-h-[40px] items-center gap-1.5 rounded-lg bg-[#EA580C] px-4 text-xs font-semibold text-white hover:bg-[#C2410C] disabled:opacity-50 cursor-pointer"
+                      className="btn-wasla-primary min-h-[40px] gap-1.5 rounded-lg px-4 py-2 text-xs cursor-pointer"
                     >
                       <Send className="h-3.5 w-3.5" aria-hidden="true" />
                       <span>Log / Mark Sent Here</span>
@@ -6008,7 +6131,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                           );
                         }
                       }}
-                      className="inline-flex min-h-[40px] items-center gap-1.5 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-3.5 text-xs font-semibold text-[#475569] hover:text-[#0F172A]"
+                      className="inline-flex min-h-[40px] items-center gap-1.5 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-3.5 text-xs font-semibold text-[#475569] hover:text-[#0F2233]"
                     >
                       <Mail className="h-3.5 w-3.5" aria-hidden="true" />
                       <span>Open External App</span>
@@ -6019,7 +6142,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                 <button
                   type="button"
                   onClick={() => setEmailModal(null)}
-                  className="min-h-[40px] rounded-lg border border-[#CBD5E1] px-4 text-xs font-semibold text-[#0F172A] hover:bg-[#F8FAFC] cursor-pointer"
+                  className="min-h-[40px] rounded-lg border border-[#CBD5E1] px-4 text-xs font-semibold text-[#0F2233] hover:bg-[#F8FAFC] cursor-pointer"
                 >
                   Close
                 </button>

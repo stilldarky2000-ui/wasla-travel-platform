@@ -411,8 +411,8 @@ export const WaslaHotelMapPicker: React.FC<WaslaHotelMapPickerProps> = ({
   return (
     <div ref={containerRef} className="space-y-1.5">
       <div className="flex items-center justify-between gap-2">
-        <span className="text-xs font-semibold text-[#0F172A] flex items-center gap-1.5">
-          <MapPin className="h-3.5 w-3.5 text-[#EA580C]" aria-hidden="true" />
+        <span className="text-xs font-semibold text-[#0F2233] flex items-center gap-1.5">
+          <MapPin className="h-3.5 w-3.5 text-[#EE5426]" aria-hidden="true" />
           <span>{label}</span>
         </span>
       </div>
@@ -444,11 +444,11 @@ export const WaslaHotelMapPicker: React.FC<WaslaHotelMapPickerProps> = ({
                 }
               }
             }}
-            className="min-h-[44px] w-full rounded-lg border border-[#CBD5E1] bg-white ps-9 pe-9 text-sm text-[#0F172A] placeholder:text-[#7B8E95] focus:border-[#EA580C] focus:outline-none"
+            className="min-h-[44px] w-full rounded-lg border border-[#CBD5E1] bg-white ps-9 pe-9 text-sm text-[#0F2233] placeholder:text-[#7B8E95] focus:border-[#EE5426] focus:outline-none"
           />
           {isLoading ? (
             <Loader2
-              className="pointer-events-none absolute end-3 h-4 w-4 animate-spin text-[#EA580C]"
+              className="pointer-events-none absolute end-3 h-4 w-4 animate-spin text-[#EE5426]"
               aria-hidden="true"
             />
           ) : value ? (
@@ -465,7 +465,7 @@ export const WaslaHotelMapPicker: React.FC<WaslaHotelMapPickerProps> = ({
                 setDropdownOpen(true);
               }}
               aria-label="Clear hotel"
-              className="absolute end-2.5 inline-flex h-6 w-6 items-center justify-center rounded-full text-[#64748B] hover:bg-[#F1F5F9] hover:text-[#0F172A] cursor-pointer"
+              className="absolute end-2.5 inline-flex h-6 w-6 items-center justify-center rounded-full text-[#64748B] hover:bg-[#F1F5F9] hover:text-[#0F2233] cursor-pointer"
             >
               <X className="h-3.5 w-3.5" />
             </button>
@@ -503,11 +503,11 @@ export const WaslaHotelMapPicker: React.FC<WaslaHotelMapPickerProps> = ({
                 >
                   <div className="flex items-start gap-2 min-w-0">
                     <MapPin
-                      className="h-4 w-4 text-[#EA580C] shrink-0 mt-0.5"
+                      className="h-4 w-4 text-[#EE5426] shrink-0 mt-0.5"
                       aria-hidden="true"
                     />
                     <div className="min-w-0">
-                      <div className="text-xs font-semibold text-[#0F172A] truncate">
+                      <div className="text-xs font-semibold text-[#0F2233] truncate">
                         {mainText}
                       </div>
                       {secondaryText && (
@@ -520,7 +520,7 @@ export const WaslaHotelMapPicker: React.FC<WaslaHotelMapPickerProps> = ({
                       className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold tabular-nums ${
                         directionalFee === 0
                           ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                          : 'bg-[#FFF7ED] text-[#C2410C] border border-[#FED7AA]'
+                          : 'bg-[#FFF7ED] text-[#D9461B] border border-[#FED7AA]'
                       }`}
                     >
                       {directionalFee === 0
@@ -552,11 +552,11 @@ export const WaslaHotelMapPicker: React.FC<WaslaHotelMapPickerProps> = ({
                 >
                   <div className="flex items-start gap-2 min-w-0">
                     <Building2
-                      className="h-4 w-4 text-[#EA580C] shrink-0 mt-0.5"
+                      className="h-4 w-4 text-[#EE5426] shrink-0 mt-0.5"
                       aria-hidden="true"
                     />
                     <div className="min-w-0">
-                      <div className="text-xs font-semibold text-[#0F172A] truncate">
+                      <div className="text-xs font-semibold text-[#0F2233] truncate">
                         {hotelItem.name}
                       </div>
                       <div className="text-[11px] text-[#64748B] truncate">{hotelItem.area}</div>
@@ -567,7 +567,7 @@ export const WaslaHotelMapPicker: React.FC<WaslaHotelMapPickerProps> = ({
                       className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold tabular-nums ${
                         directionalFee === 0
                           ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                          : 'bg-[#FFF7ED] text-[#C2410C] border border-[#FED7AA]'
+                          : 'bg-[#FFF7ED] text-[#D9461B] border border-[#FED7AA]'
                       }`}
                     >
                       {directionalFee === 0

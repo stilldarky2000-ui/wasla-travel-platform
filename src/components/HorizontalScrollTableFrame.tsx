@@ -266,7 +266,7 @@ export const HorizontalScrollTableFrame: React.FC<HorizontalScrollTableFrameProp
         className={
           position === 'top'
             ? 'sticky top-0 z-20 flex items-center gap-2 border-b border-[#CBD5E1] bg-[#F8FAFC]/95 backdrop-blur-xs px-3 py-2'
-            : 'sticky bottom-2 z-20 mx-2 my-2 flex items-center gap-2 rounded-xl border-2 border-[#0F172A]/20 bg-white/95 backdrop-blur-sm px-3 py-2 shadow-lg'
+            : 'sticky bottom-2 z-20 mx-2 my-2 flex items-center gap-2 rounded-xl border-2 border-[#0F2233]/20 bg-white/95 backdrop-blur-sm px-3 py-2 shadow-lg'
         }
         aria-label={
           isAr ? 'شريط التمرير الأفقي للجدول' : 'Horizontal table scroll navigation'
@@ -282,7 +282,7 @@ export const HorizontalScrollTableFrame: React.FC<HorizontalScrollTableFrameProp
           disabled={!metrics.canScrollLeft}
           aria-label={isAr ? 'تحريك الجدول لليسار' : 'Scroll table left'}
           title={isAr ? 'يسار (سهم يسار في الكيبورد)' : 'Scroll Left (Left Arrow key)'}
-          className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-[#CBD5E1] bg-white text-[#0F172A] hover:border-[#EA580C] hover:bg-[#FFF7ED] hover:text-[#EA580C] disabled:opacity-35 disabled:hover:bg-white disabled:hover:border-[#CBD5E1] disabled:hover:text-[#0F172A] cursor-pointer disabled:cursor-not-allowed transition-colors"
+          className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-[#CBD5E1] bg-white text-[#0F2233] hover:border-[#EE5426] hover:bg-[#FFF7ED] hover:text-[#EE5426] disabled:opacity-35 disabled:hover:bg-white disabled:hover:border-[#CBD5E1] disabled:hover:text-[#0F2233] cursor-pointer disabled:cursor-not-allowed transition-colors"
         >
           <ChevronLeft className="h-4 w-4" aria-hidden="true" />
         </button>
@@ -313,7 +313,7 @@ export const HorizontalScrollTableFrame: React.FC<HorizontalScrollTableFrameProp
               width: `${metrics.thumbPercent}%`,
               left: `${thumbLeftPercent}%`,
             }}
-            className="absolute top-0 bottom-0 rounded-full bg-[#0F172A] hover:bg-[#EA580C] active:bg-[#EA580C] transition-colors cursor-grab active:cursor-grabbing"
+            className="absolute top-0 bottom-0 rounded-full bg-[#0F2233] hover:bg-[#EE5426] active:bg-[#EE5426] transition-colors cursor-grab active:cursor-grabbing"
           />
         </div>
 
@@ -327,7 +327,7 @@ export const HorizontalScrollTableFrame: React.FC<HorizontalScrollTableFrameProp
           disabled={!metrics.canScrollRight}
           aria-label={isAr ? 'تحريك الجدول لليمين' : 'Scroll table right'}
           title={isAr ? 'يمين (سهم يمين في الكيبورد)' : 'Scroll Right (Right Arrow key)'}
-          className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-[#CBD5E1] bg-white text-[#0F172A] hover:border-[#EA580C] hover:bg-[#FFF7ED] hover:text-[#EA580C] disabled:opacity-35 disabled:hover:bg-white disabled:hover:border-[#CBD5E1] disabled:hover:text-[#0F172A] cursor-pointer disabled:cursor-not-allowed transition-colors"
+          className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-[#CBD5E1] bg-white text-[#0F2233] hover:border-[#EE5426] hover:bg-[#FFF7ED] hover:text-[#EE5426] disabled:opacity-35 disabled:hover:bg-white disabled:hover:border-[#CBD5E1] disabled:hover:text-[#0F2233] cursor-pointer disabled:cursor-not-allowed transition-colors"
         >
           <ChevronRight className="h-4 w-4" aria-hidden="true" />
         </button>
@@ -337,9 +337,9 @@ export const HorizontalScrollTableFrame: React.FC<HorizontalScrollTableFrameProp
           dir={isAr ? 'rtl' : 'ltr'}
           className="hidden sm:inline-flex items-center gap-1.5 rounded-md border border-[#E2E8F0] bg-[#F8FAFC] px-2 py-1 text-[10.5px] font-bold text-[#475569] whitespace-nowrap shrink-0 tabular-nums"
         >
-          <Keyboard className="h-3 w-3 text-[#EA580C]" aria-hidden="true" />
+          <Keyboard className="h-3 w-3 text-[#EE5426]" aria-hidden="true" />
           <span>{isAr ? 'أسهم الكيبورد ← →' : 'Keys ← →'}</span>
-          <span className="font-mono text-[#0F172A]">{scrollPctLabel}%</span>
+          <span className="font-mono text-[#0F2233]">{scrollPctLabel}%</span>
         </div>
       </div>
     );
@@ -357,13 +357,13 @@ export const HorizontalScrollTableFrame: React.FC<HorizontalScrollTableFrameProp
         {metrics.hasOverflow && metrics.canScrollLeft && (
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute inset-y-0 left-0 z-10 w-5 bg-gradient-to-r from-[#0F172A]/12 to-transparent"
+            className="pointer-events-none absolute inset-y-0 left-0 z-10 w-5 bg-gradient-to-r from-[#0F2233]/12 to-transparent"
           />
         )}
         {metrics.hasOverflow && metrics.canScrollRight && (
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute inset-y-0 right-0 z-10 w-5 bg-gradient-to-l from-[#0F172A]/12 to-transparent"
+            className="pointer-events-none absolute inset-y-0 right-0 z-10 w-5 bg-gradient-to-l from-[#0F2233]/12 to-transparent"
           />
         )}
 

@@ -87,7 +87,7 @@ export const SmartImage: React.FC<SmartImageProps> = ({
       )}
       {errored ? (
         <div className="flex h-full w-full flex-col items-center justify-center gap-1.5 bg-gradient-to-br from-[#FFEDD5] to-[#FFF7ED] p-4 text-center text-[#475569]">
-          <ImageOff className="h-5 w-5 text-[#EA580C]" aria-hidden="true" />
+          <ImageOff className="h-5 w-5 text-[#EE5426]" aria-hidden="true" />
           {placeholderLabel && <span className="text-xs font-medium">{placeholderLabel}</span>}
         </div>
       ) : (

@@ -222,17 +222,17 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
         role="option"
         aria-selected={active}
         onClick={() => handleSelect(opt.code)}
-        className={`group flex min-h-[42px] items-center justify-between gap-2 rounded-xl px-2.5 py-2 text-start text-xs transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#EA580C]/50 ${
+        className={`group flex min-h-[42px] items-center justify-between gap-2 rounded-xl px-2.5 py-2 text-start text-xs transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#EE5426]/50 ${
           active
             ? 'bg-[#FFF7ED] text-[#9A3412] ring-1 ring-[#FDBA74]'
-            : 'text-[#0F172A] hover:bg-[#F8FAFC]'
+            : 'text-[#0F2233] hover:bg-[#F8FAFC]'
         }`}
       >
         <span className="flex items-center gap-2.5 min-w-0">
           <span
             className={`inline-flex h-6 w-7 shrink-0 items-center justify-center rounded-md font-mono text-[10px] font-bold tracking-wide transition-colors ${
               active
-                ? 'bg-[#EA580C] text-white'
+                ? 'bg-[#EE5426] text-white'
                 : 'bg-[#F1F5F9] text-[#475569] group-hover:bg-[#E2E8F0]'
             }`}
           >
@@ -247,7 +247,7 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
             </span>
           </span>
         </span>
-        {active && <Check className="h-3.5 w-3.5 shrink-0 text-[#EA580C]" aria-hidden="true" />}
+        {active && <Check className="h-3.5 w-3.5 shrink-0 text-[#EE5426]" aria-hidden="true" />}
       </button>
     );
   };
@@ -292,9 +292,9 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
         aria-haspopup="listbox"
         aria-expanded={open}
         aria-label={copy.heading}
-        className="inline-flex min-h-[38px] items-center gap-1.5 rounded-full border border-[#E2E8F0] bg-white px-3 py-1.5 text-xs font-semibold text-[#0F172A] hover:bg-[#FFF7ED] hover:border-[#FED7AA] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#EA580C]/50 transition-colors whitespace-nowrap shrink-0 cursor-pointer tabular-nums"
+        className="inline-flex min-h-[38px] items-center gap-1.5 rounded-full border border-[#E2E8F0] bg-white px-3 py-1.5 text-xs font-semibold text-[#0F2233] hover:bg-[#FFF7ED] hover:border-[#FED7AA] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#EE5426]/50 transition-colors whitespace-nowrap shrink-0 cursor-pointer tabular-nums"
       >
-        <Globe className="h-3.5 w-3.5 text-[#EA580C]" aria-hidden="true" />
+        <Globe className="h-3.5 w-3.5 text-[#EE5426]" aria-hidden="true" />
         <span className="font-mono text-[11px] font-bold">
           {current.short}
           {currency ? ` · ${currency}` : ''}
@@ -319,14 +319,14 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
             aria-label={copy.heading}
             dir={lang === 'ar' ? 'rtl' : 'ltr'}
             style={menuStyle}
-            className="wasla-lang-listbox flex flex-col overflow-hidden rounded-2xl border border-[#E2E8F0] bg-white text-[#0F172A] shadow-[0_24px_60px_rgba(15,23,42,0.28)]"
+            className="wasla-lang-listbox flex flex-col overflow-hidden rounded-2xl border border-[#E2E8F0] bg-white text-[#0F2233] shadow-[0_24px_60px_rgba(15,34,51,0.28)]"
           >
             {/* Header & Search */}
             <div className="border-b border-[#E2E8F0] bg-[#F8FAFC]/80 px-3 pt-3 pb-2.5 space-y-2.5 shrink-0">
               <div className="flex items-center justify-between gap-2">
                 <div className="flex items-center gap-2">
-                  <Globe className="h-4 w-4 text-[#EA580C]" aria-hidden="true" />
-                  <span className="text-xs font-bold text-[#0F172A]">{copy.heading}</span>
+                  <Globe className="h-4 w-4 text-[#EE5426]" aria-hidden="true" />
+                  <span className="text-xs font-bold text-[#0F2233]">{copy.heading}</span>
                   <span className="rounded-md bg-[#E2E8F0]/80 px-1.5 py-0.5 font-mono text-[10px] font-bold text-[#475569]">
                     {LANGUAGE_OPTIONS.length}
                   </span>
@@ -335,7 +335,7 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
                   type="button"
                   onClick={() => setOpen(false)}
                   aria-label="Close language switcher"
-                  className="inline-flex h-7 w-7 items-center justify-center rounded-lg text-[#64748B] hover:bg-[#E2E8F0]/70 hover:text-[#0F172A] transition-colors cursor-pointer"
+                  className="inline-flex h-7 w-7 items-center justify-center rounded-lg text-[#64748B] hover:bg-[#E2E8F0]/70 hover:text-[#0F2233] transition-colors cursor-pointer"
                 >
                   <X className="h-3.5 w-3.5" aria-hidden="true" />
                 </button>
@@ -357,8 +357,8 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
                           onClick={() => onChangeCurrency(opt.code)}
                           className={`rounded-lg px-2 py-1 text-[11px] font-semibold transition-colors cursor-pointer tabular-nums ${
                             active
-                              ? 'bg-[#EA580C] text-white'
-                              : 'text-[#475569] hover:bg-[#F1F5F9] hover:text-[#0F172A]'
+                              ? 'bg-[#EE5426] text-white'
+                              : 'text-[#475569] hover:bg-[#F1F5F9] hover:text-[#0F2233]'
                           }`}
                         >
                           {opt.code === 'EUR' ? '€ EUR' : opt.code === 'USD' ? '$ USD' : 'EGP'}
@@ -379,14 +379,14 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   placeholder={copy.searchPlaceholder}
-                  className="w-full rounded-xl border border-[#CBD5E1] bg-white py-2 ps-8 pe-8 text-xs text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#EA580C] focus:outline-none focus:ring-2 focus:ring-[#EA580C]/20"
+                  className="w-full rounded-xl border border-[#CBD5E1] bg-white py-2 ps-8 pe-8 text-xs text-[#0F2233] placeholder:text-[#94A3B8] focus:border-[#EE5426] focus:outline-none focus:ring-2 focus:ring-[#EE5426]/20"
                 />
                 {query && (
                   <button
                     type="button"
                     onClick={() => setQuery('')}
                     aria-label="Clear search"
-                    className="absolute end-2 top-1/2 inline-flex h-5 w-5 -translate-y-1/2 items-center justify-center rounded-md text-[#64748B] hover:bg-[#F1F5F9] hover:text-[#0F172A] cursor-pointer"
+                    className="absolute end-2 top-1/2 inline-flex h-5 w-5 -translate-y-1/2 items-center justify-center rounded-md text-[#64748B] hover:bg-[#F1F5F9] hover:text-[#0F2233] cursor-pointer"
                   >
                     <X className="h-3 w-3" aria-hidden="true" />
                   </button>
@@ -406,8 +406,8 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
                       onClick={() => setRegionTab(key)}
                       className={`shrink-0 rounded-lg px-2.5 py-1.5 text-[11px] font-semibold transition-colors cursor-pointer ${
                         selected
-                          ? 'bg-[#0F172A] text-white'
-                          : 'text-[#475569] hover:bg-[#E2E8F0]/70 hover:text-[#0F172A]'
+                          ? 'bg-[#0F2233] text-white'
+                          : 'text-[#475569] hover:bg-[#E2E8F0]/70 hover:text-[#0F2233]'
                       }`}
                     >
                       {copy.regions[key]}
@@ -428,7 +428,7 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
                       setQuery('');
                       setRegionTab('all');
                     }}
-                    className="inline-flex min-h-[36px] items-center rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-1.5 text-xs font-semibold text-[#0F172A] hover:bg-[#F1F5F9] cursor-pointer"
+                    className="inline-flex min-h-[36px] items-center rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-1.5 text-xs font-semibold text-[#0F2233] hover:bg-[#F1F5F9] cursor-pointer"
                   >
                     {copy.clearSearch}
                   </button>

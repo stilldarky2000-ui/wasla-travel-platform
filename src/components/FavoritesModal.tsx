@@ -86,7 +86,7 @@ export const FavoritesModal: React.FC<FavoritesModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-[#0F172A]/70 p-2 sm:p-4 md:p-6 backdrop-blur-xs"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-[#0F2233]/70 p-2 sm:p-4 md:p-6 backdrop-blur-xs"
       dir={isRtl ? 'rtl' : 'ltr'}
       role="dialog"
       aria-modal="true"
@@ -94,11 +94,11 @@ export const FavoritesModal: React.FC<FavoritesModalProps> = ({
       onClick={onClose}
     >
       <div
-        className="flex max-h-[92vh] w-full max-w-4xl flex-col overflow-hidden rounded-2xl border border-[#FED7AA] bg-white shadow-2xl"
+        className="card-wasla p-0 flex max-h-[92vh] w-full max-w-4xl flex-col overflow-hidden shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Top Header */}
-        <div className="shrink-0 bg-gradient-to-r from-[#FF7000] via-[#F54400] to-[#DE1B00] flex flex-wrap items-center justify-between gap-3 px-4 sm:px-6 py-4 text-white border-b border-white/15">
+        <div className="shrink-0 bg-gradient-to-r from-[#EE5426] to-[#D9461B] flex flex-wrap items-center justify-between gap-3 px-4 sm:px-6 py-4 text-white border-b border-white/15">
           <div className="flex items-center gap-2.5 min-w-0">
             <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-white/30 bg-white/15">
               <Heart className="h-4.5 w-4.5 fill-white text-white" aria-hidden="true" />
@@ -110,7 +110,7 @@ export const FavoritesModal: React.FC<FavoritesModalProps> = ({
               >
                 {labels.title} ({trips.length})
               </h2>
-              <p className="text-xs text-[#FFF7ED]/90 truncate sm:whitespace-normal">{labels.subtitle}</p>
+              <p className="text-xs text-[#FAF4ED]/90 truncate sm:whitespace-normal">{labels.subtitle}</p>
             </div>
           </div>
 
@@ -145,17 +145,17 @@ export const FavoritesModal: React.FC<FavoritesModalProps> = ({
               return (
                 <article
                   key={trip.id}
-                  className="flex flex-col justify-between rounded-2xl border border-[#FED7AA] bg-[#FFFFFF] overflow-hidden shadow-xs"
+                  className="card-wasla p-0 flex flex-col justify-between overflow-hidden"
                 >
                   <div>
-                    <div className="relative aspect-[16/10] w-full overflow-hidden border-b border-[#E2E8F0]">
+                    <div className="relative aspect-[16/10] w-full overflow-hidden border-b border-[#C8C2B8]/50 dark:border-[#334155]">
                       <SmartImage
                         src={trip.images?.[0]}
                         alt={tText(trip.name, lang)}
                         className="h-full w-full object-cover"
                         placeholderLabel={tText(trip.name, lang)}
                       />
-                      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#1C1008]/90 via-[#1C1008]/35 to-transparent" />
+                      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#0F2233]/90 via-[#0F2233]/35 to-transparent" />
 
                       <div className="absolute top-2.5 end-2.5 z-20 flex items-center gap-1.5">
                         <button
@@ -165,8 +165,8 @@ export const FavoritesModal: React.FC<FavoritesModalProps> = ({
                           title={copiedId === trip.id ? labels.copied : labels.share}
                           className={`inline-flex h-9 items-center justify-center gap-1 rounded-full transition-all cursor-pointer ${
                             copiedId === trip.id
-                              ? 'border border-white/60 bg-[#16A34A] px-2.5 text-white shadow-md'
-                              : 'w-9 border border-white/40 bg-[#0F172A]/65 text-white hover:bg-[#EA580C]/95 backdrop-blur-xs shadow-md'
+                              ? 'border border-white/60 bg-[#10B981] px-2.5 text-white shadow-md'
+                              : 'w-9 border border-white/40 bg-[#0F2233]/70 text-white hover:bg-[#EE5426] backdrop-blur-xs shadow-md'
                           }`}
                         >
                           {copiedId === trip.id ? (
@@ -184,14 +184,14 @@ export const FavoritesModal: React.FC<FavoritesModalProps> = ({
                           onClick={() => onToggleFavorite(trip)}
                           aria-label={labels.remove}
                           title={labels.remove}
-                          className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/40 bg-[#E11D48] text-white shadow-md hover:bg-[#BE123C] transition-all cursor-pointer"
+                          className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/40 bg-[#EF4444] text-white shadow-md hover:bg-[#DC2626] transition-all cursor-pointer"
                         >
                           <Heart className="h-4 w-4 fill-white text-white" aria-hidden="true" />
                         </button>
                       </div>
 
                       <div className="absolute bottom-2.5 inset-x-3.5 text-white space-y-1">
-                        <div className="flex items-center gap-1.5 text-[11px] font-medium text-[#FED7AA]">
+                        <div className="flex items-center gap-1.5 text-[11px] font-medium text-[#FAF4ED]">
                           <span className="rounded bg-white/20 px-2 py-0.5 text-white backdrop-blur-xs">
                             {catName}
                           </span>
@@ -205,13 +205,13 @@ export const FavoritesModal: React.FC<FavoritesModalProps> = ({
                     </div>
 
                     <div className="p-4 space-y-3 text-xs">
-                      <div className="flex items-center justify-between gap-2 pb-2.5 border-b border-[#E2E8F0]">
+                      <div className="flex items-center justify-between gap-2 pb-2.5 border-b border-[#C8C2B8]/50 dark:border-[#334155]">
                         <div className="flex items-center gap-1.5 text-[#334155]">
-                          <Clock className="h-3.5 w-3.5 text-[#EA580C] shrink-0" />
+                          <Clock className="h-3.5 w-3.5 text-[#EE5426] shrink-0" />
                           <span className="truncate">{tText(trip.duration, lang)}</span>
                         </div>
                         <div className="text-end">
-                          <div className="inline-flex items-center gap-1 rounded-full bg-[#FFF7ED] border border-[#FED7AA] px-2.5 py-1 text-xs font-bold text-[#9A3412] tabular-nums">
+                          <div className="inline-flex items-center gap-1 rounded-full bg-[#FAF4ED] border border-[#C8C2B8]/60 px-2.5 py-1 text-xs font-bold text-[#0F2233] tabular-nums">
                             <Star className="h-3.5 w-3.5 fill-[#F59E0B] text-[#F59E0B]" />
                             <span>{safeRating}</span>
                             <span className="font-normal text-[#64748B]">({trip.reviewCount})</span>
@@ -219,12 +219,12 @@ export const FavoritesModal: React.FC<FavoritesModalProps> = ({
                         </div>
                       </div>
 
-                      <p className="text-xs text-[#475569] leading-relaxed line-clamp-2">
+                      <p className="text-xs text-[#64748B] leading-relaxed line-clamp-2">
                         {tText(trip.shortDescription, lang)}
                       </p>
 
                       <div className="flex items-center gap-1.5 text-[11.5px] text-[#334155]">
-                        <MapPin className="h-3.5 w-3.5 text-[#EA580C] shrink-0" />
+                        <MapPin className="h-3.5 w-3.5 text-[#EE5426] shrink-0" />
                         <span className="truncate">{trip.destination}</span>
                       </div>
 
@@ -241,19 +241,19 @@ export const FavoritesModal: React.FC<FavoritesModalProps> = ({
                     </div>
                   </div>
 
-                  <div className="border-t border-[#FED7AA]/70 bg-[#FFF7ED]/60 px-4 py-3 flex items-center justify-between gap-3">
+                  <div className="border-t border-[#C8C2B8]/50 dark:border-[#334155] bg-[#FAF4ED]/80 dark:bg-[#0F2233]/60 px-4 py-3 flex items-center justify-between gap-3">
                     <div className="tabular-nums">
                       <p className="text-[10.5px] font-medium text-[#64748B]">
                         {tText({ en: 'From', ar: 'يبدأ من', de: 'Ab' }, lang)}
                       </p>
-                      <p className="text-base font-bold text-[#0F172A] leading-tight">
+                      <p className="text-base font-bold text-[#0F2233] leading-tight">
                         {formatCurrencyPrice(trip.price, currency)}
                       </p>
                     </div>
                     <button
                       type="button"
                       onClick={() => onSelectTripForBooking(trip)}
-                      className="wasla-book-glare min-h-[40px] rounded-full px-5 py-2 text-xs sm:text-sm font-bold text-white cursor-pointer whitespace-nowrap"
+                      className="btn-wasla-primary min-h-[40px] rounded-full px-5 py-2 text-xs sm:text-sm font-bold cursor-pointer whitespace-nowrap"
                     >
                       {labels.bookThis}
                     </button>

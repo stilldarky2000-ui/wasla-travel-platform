@@ -8,7 +8,10 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { createServer as createViteServer } from 'vite';
 import { GoogleGenAI, ThinkingLevel, Type } from '@google/genai';
-import nodemailer from 'nodemailer';
+import {
+  dispatchBookingNotifications,
+  getNotificationChannelStatus,
+} from './server/utils/bookingNotifications';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -317,6 +320,80 @@ function markBookingNotificationDelivered(bookingId: string): void {
   persistDeliveredNotifications();
 }
 
+interface StoredVoucherSnapshot {
+  id: string;
+  tripId?: string;
+  tripTitle: string;
+  destination?: string;
+  date: string;
+  tripStartTime?: string;
+  pickupTime?: string;
+  pickupSpot?: string;
+  assignedDriverOrGuide?: string;
+  guestName?: string;
+  guestCountry?: string;
+  guestLang?: string;
+  guestLanguage?: string;
+  hotel?: string;
+  roomNumber?: string;
+  adults?: number;
+  children?: number;
+  infants?: number;
+  grossEur?: number;
+  paymentStatus?: string;
+  status?: string;
+  notes?: string;
+  updatedAtMs: number;
+}
+
+const VOUCHER_STORE_FILE = path.join(os.tmpdir(), 'wasla-vouchers-store.json');
+
+function loadVoucherStore(): Map<string, StoredVoucherSnapshot> {
+  const map = new Map<string, StoredVoucherSnapshot>();
+  try {
+    if (!fs.existsSync(VOUCHER_STORE_FILE)) return map;
+    const raw = fs.readFileSync(VOUCHER_STORE_FILE, 'utf8');
+    const parsed = JSON.parse(raw) as Record<string, StoredVoucherSnapshot>;
+    for (const [k, v] of Object.entries(parsed)) {
+      if (v && typeof v.id === 'string') {
+        map.set(k.toUpperCase(), v);
+      }
+    }
+  } catch {
+    // Ignore corrupted cache
+  }
+  return map;
+}
+
+const voucherStore = loadVoucherStore();
+
+function persistVoucherStore(): void {
+  const payload: Record<string, StoredVoucherSnapshot> = {};
+  for (const [k, v] of voucherStore.entries()) {
+    payload[k] = v;
+  }
+  try {
+    const tmpPath = `${VOUCHER_STORE_FILE}.${process.pid}.tmp`;
+    fs.writeFileSync(tmpPath, JSON.stringify(payload), 'utf8');
+    fs.renameSync(tmpPath, VOUCHER_STORE_FILE);
+  } catch {
+    // Non-fatal
+  }
+}
+
+function upsertVoucherSnapshot(snapshot: Omit<StoredVoucherSnapshot, 'updatedAtMs'>): void {
+  const key = String(snapshot.id || '').trim().toUpperCase();
+  if (!/^[A-Z0-9_-]{3,64}$/.test(key)) return;
+  const existing = voucherStore.get(key);
+  voucherStore.set(key, {
+    ...existing,
+    ...snapshot,
+    id: key,
+    updatedAtMs: Date.now(),
+  });
+  persistVoucherStore();
+}
+
 interface VerifiedBookingReceipt {
   exists: boolean;
   reason?: string;
@@ -421,6 +498,32 @@ async function verifyBookingReceiptAndTrip(
   }
 }
 
+async function getServerPublicSiteSettings(): Promise<{
+  email?: string;
+  whatsappNumber?: string;
+  whatsappDisplay?: string;
+}> {
+  if (!FIREBASE_PROJECT_ID) return {};
+  try {
+    const resp = await fetch(`${FIRESTORE_DOCS_BASE}/site_settings/public`);
+    if (!resp.ok) return {};
+    const docJson = (await resp.json()) as {
+      fields?: {
+        email?: { stringValue?: string };
+        whatsappNumber?: { stringValue?: string };
+        whatsappDisplay?: { stringValue?: string };
+      };
+    };
+    return {
+      email: docJson.fields?.email?.stringValue?.trim() || undefined,
+      whatsappNumber: docJson.fields?.whatsappNumber?.stringValue?.trim() || undefined,
+      whatsappDisplay: docJson.fields?.whatsappDisplay?.stringValue?.trim() || undefined,
+    };
+  } catch {
+    return {};
+  }
+}
+
 function parseModelJson<T>(rawText: string | undefined, contextLabel: string): T {
   const cleaned = (rawText ?? '')
     .trim()
@@ -448,38 +551,34 @@ async function startServer() {
   });
 
   // ============================================================================
-  // OWNER NEW-BOOKING NOTIFICATIONS (OFFICIAL EMAIL + WHATSAPP PUSH ALERTS)
+  // AUTOMATED BOOKING NOTIFICATIONS (CUSTOMER EMAIL + OWNER EMAIL & WHATSAPP)
   // ============================================================================
-  const getNotificationChannelStatus = () => {
-    const hasSmtp = Boolean(
-      process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS
-    );
-    const hasResend = Boolean(process.env.RESEND_API_KEY);
-    const hasMetaWa = Boolean(
-      process.env.WHATSAPP_CLOUD_TOKEN && process.env.WHATSAPP_PHONE_NUMBER_ID
-    );
-    const hasTwilioWa = Boolean(
-      process.env.TWILIO_ACCOUNT_SID &&
-        process.env.TWILIO_AUTH_TOKEN &&
-        process.env.TWILIO_WHATSAPP_FROM
-    );
-    const hasCallMeBot = Boolean(process.env.CALLMEBOT_API_KEY);
-    const hasWebhook = Boolean(process.env.OWNER_ALERT_WEBHOOK_URL);
-
+  const resolveServerRecipients = async () => {
+    const serverSiteSettings = await getServerPublicSiteSettings();
+    const rawOwnerEmails = String(
+      process.env.OWNER_ALERT_EMAIL || serverSiteSettings.email || 'booking@waslatravel.com'
+    ).trim();
+    const ownerEmails = rawOwnerEmails
+      .split(',')
+      .map((e) => e.trim())
+      .filter((e) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e));
+    const ownerWhatsappDigits = String(
+      process.env.OWNER_WHATSAPP_TO || serverSiteSettings.whatsappNumber || '201129155520'
+    ).replace(/\D/g, '');
+    const ownerWhatsappDisplay =
+      serverSiteSettings.whatsappDisplay ||
+      (ownerWhatsappDigits ? `+${ownerWhatsappDigits}` : '+20 112 915 5520');
+    const appUrl = (process.env.APP_URL || 'https://waslatravel.com').replace(/\/$/, '');
+    const publicSupportEmail =
+      serverSiteSettings.email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(serverSiteSettings.email)
+        ? serverSiteSettings.email
+        : 'booking@waslatravel.com';
     return {
-      emailConfigured: hasSmtp || hasResend,
-      emailProvider: hasSmtp ? 'smtp' : hasResend ? 'resend' : 'none',
-      whatsappConfigured: hasMetaWa || hasTwilioWa || hasCallMeBot || hasWebhook,
-      whatsappProvider: hasMetaWa
-        ? 'whatsapp-cloud'
-        : hasTwilioWa
-        ? 'twilio'
-        : hasCallMeBot
-        ? 'callmebot'
-        : hasWebhook
-        ? 'webhook'
-        : 'none',
-      webhookConfigured: hasWebhook,
+      ownerEmails: ownerEmails.length > 0 ? ownerEmails : [publicSupportEmail],
+      publicSupportEmail,
+      ownerWhatsappDigits,
+      ownerWhatsappDisplay,
+      appUrl,
     };
   };
 
@@ -500,476 +599,220 @@ async function startServer() {
     useGlobalKey: true,
   });
 
-  app.get('/api/notifications/status', requireRole(['owner']), (_req, res) => {
-    res.json(getNotificationChannelStatus());
+  const ownerTestRateLimiter = createRateLimiter({
+    windowMs: 10 * 60_000,
+    maxRequests: 25,
+    keyPrefix: 'notify-owner-test',
+  });
+
+  app.get('/api/notifications/status', requireRole(['owner']), async (_req, res) => {
+    try {
+      const recipients = await resolveServerRecipients();
+      res.json({
+        ...getNotificationChannelStatus(),
+        ownerEmailTarget: recipients.ownerEmails.join(', '),
+      });
+    } catch {
+      res.json(getNotificationChannelStatus());
+    }
   });
 
   app.post(
     '/api/notifications/new-booking',
     notificationGlobalLimiter,
-    notificationRateLimiter,
+    (req, res, next) => {
+      if (Boolean((req.body as { isTest?: boolean } | undefined)?.isTest)) {
+        ownerTestRateLimiter(req, res, next);
+        return;
+      }
+      notificationRateLimiter(req, res, next);
+    },
     async (req, res) => {
-      const body = (req.body ?? {}) as {
-        id?: string;
-        tripId?: string;
-        tripTitle?: string;
-        destination?: string;
-        category?: string;
-        date?: string;
-        tripStartTime?: string;
-        guestName?: string;
-        guestCountry?: string;
-        guestWhatsapp?: string;
-        guestEmail?: string;
-        guestContact?: string;
-        hotel?: string;
-        roomNumber?: string;
-        adults?: number;
-        children?: number;
-        infants?: number;
-        grossEur?: number;
-        supplierName?: string;
-        paymentStatus?: string;
-        notes?: string;
-        isTest?: boolean;
-      };
-
-      const isTest = Boolean(body.isTest);
-      const bookingId = String(body.id || '').trim();
-      let verifiedReceipt: VerifiedBookingReceipt | null = null;
-
-      if (isTest) {
-        const token = extractBearerToken(req);
-        const verified = token ? await verifyFirebaseIdToken(token) : null;
-        const role = verified ? await resolveCallerRole(verified) : 'none';
-        if (role !== 'owner') {
-          res.status(verified ? 403 : 401).json({
-            ok: false,
-            error: 'Owner authentication is required to send test notifications.',
-          });
-          return;
-        }
-      } else {
-        if (!/^[a-zA-Z0-9_-]{3,64}$/.test(bookingId)) {
-          res.status(400).json({ ok: false, error: 'A valid saved booking ID is required.' });
-          return;
-        }
-
-        if (isBookingNotificationDelivered(bookingId)) {
-          res.json({ ok: true, deduplicated: true, delivered: true });
-          return;
-        }
-
-        if (inFlightBookingNotifications.has(bookingId)) {
-          res.status(409).json({
-            ok: false,
-            inFlight: true,
-            retryable: true,
-            error: 'Notification dispatch is already in progress for this booking.',
-          });
-          return;
-        }
-
-        verifiedReceipt = await verifyBookingReceiptAndTrip(
-          bookingId,
-          String(body.date || '').trim(),
-          String(body.tripId || '').trim()
-        );
-        if (!verifiedReceipt.exists) {
-          res.status(400).json({
-            ok: false,
-            error:
-              verifiedReceipt.reason || 'Booking must be persisted before triggering notifications.',
-          });
-          return;
-        }
-      }
-
-      const safeBookingId = bookingId || 'WT-TEST';
-      // Catalog facts come from Firestore whenever verified; client-submitted guest/total fields
-      // are explicitly labeled for Dispatch Desk review before confirmation.
-      const tripTitle = String(
-        verifiedReceipt?.verifiedTripTitle || body.tripTitle || 'Wasla Travel Excursion'
-      )
-        .trim()
-        .slice(0, 240);
-      const destination = String(
-        verifiedReceipt?.verifiedDestination || body.destination || 'Hurghada'
-      )
-        .trim()
-        .slice(0, 60);
-      const tripDate = String(
-        verifiedReceipt?.tripDate || body.date || new Date().toISOString().slice(0, 10)
-      )
-        .trim()
-        .slice(0, 20);
-      const supplierName = String(
-        verifiedReceipt?.verifiedSupplierName || body.supplierName || 'Wasla Operations'
-      )
-        .trim()
-        .slice(0, 120);
-      const catalogBasePriceEur = verifiedReceipt?.catalogBasePriceEur;
-      const startTime = String(body.tripStartTime || '').trim().slice(0, 80);
-      const guestName = String(body.guestName || 'Guest').trim().slice(0, 120);
-      const guestCountry = String(body.guestCountry || 'Guest').trim().slice(0, 80);
-      const guestWa = String(body.guestWhatsapp || '').trim().slice(0, 60);
-      const guestEmail = String(body.guestEmail || '').trim().slice(0, 160);
-      const guestContact = String(body.guestContact || guestWa || guestEmail || 'N/A')
-        .trim()
-        .slice(0, 160);
-      const hotel = String(body.hotel || 'Hotel Pickup').trim().slice(0, 200);
-      const roomNumber = String(body.roomNumber || '').trim().slice(0, 40);
-      const adults = Math.min(50, Math.max(1, Math.round(Number(body.adults) || 1)));
-      const children = Math.min(50, Math.max(0, Math.round(Number(body.children) || 0)));
-      const infants = Math.min(50, Math.max(0, Math.round(Number(body.infants) || 0)));
-      const grossEur = Math.min(100000, Math.max(0, Math.round(Number(body.grossEur) || 0)));
-      const paymentStatus = String(body.paymentStatus || 'Awaiting link').trim().slice(0, 40);
-      const notes = String(body.notes || '').trim().slice(0, 800);
-
-      // Recipients are ALWAYS controlled exclusively by server config (never client payload)
-      const targetOwnerEmail = String(
-        process.env.OWNER_ALERT_EMAIL || 'booking@waslatravel.com'
-      ).trim();
-      const targetOwnerWaDigits = String(
-        process.env.OWNER_WHATSAPP_TO || '201129155520'
-      ).replace(/\D/g, '');
-      const appUrl = (process.env.APP_URL || 'https://waslatravel.com').replace(/\/$/, '');
-
-      const bookedAtStr = new Date().toLocaleString('en-GB', {
-        timeZone: 'Africa/Cairo',
-        day: '2-digit',
-        month: 'short',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: false,
-      });
-
-      const paxLine = `${adults} Adults${children > 0 ? ` + ${children} Children` : ''}${
-        infants > 0 ? ` + ${infants} Infants` : ''
-      }`;
-
-      const guestWaDigits = guestWa.replace(/\D/g, '');
-      const guestWaLink = guestWaDigits ? `https://wa.me/${guestWaDigits}` : '';
-
-      const whatsappAlertText = [
-        isTest
-          ? `🧪 *TEST ALERT — Wasla Travel Owner Desk*`
-          : `🔔 *NEW BOOKING ALERT — ${safeBookingId}*`,
-        `━━━━━━━━━━━━━━━━━━`,
-        `🎫 *Excursion (Verified):* ${tripTitle} (${destination})`,
-        `📅 *Trip Date (Verified):* ${tripDate}${startTime ? ` · ${startTime}` : ''}`,
-        `🚐 *Supplier (Verified):* ${supplierName}`,
-        catalogBasePriceEur !== undefined
-          ? `🏷️ *Catalog Base Price:* €${catalogBasePriceEur}/adult`
-          : '',
-        `🕒 *Booked At:* ${bookedAtStr} (Egypt Time)`,
-        `👤 *Guest (Client Input):* ${guestName} (${guestCountry})`,
-        `🏨 *Hotel (Client Input):* ${hotel}${roomNumber ? ` · Room ${roomNumber}` : ''}`,
-        `👥 *Pax (Client Input):* ${paxLine}`,
-        `💶 *Submitted Total:* €${grossEur} (${paymentStatus} · verify in Dispatch Desk)`,
-        `📞 *Guest Contact:* ${guestContact}`,
-        notes ? `📝 *Notes:* ${notes}` : '',
-        guestWaLink ? `💬 *Message Guest:* ${guestWaLink}` : '',
-        `🔗 *Dispatch Desk:* ${appUrl}`,
-      ]
-        .filter(Boolean)
-        .join('\n');
-
-      const emailSubject = isTest
-        ? `[TEST] Wasla Travel Owner Booking Alert — ${safeBookingId}`
-        : `🔔 New Booking ${safeBookingId} — ${tripTitle} (${tripDate})`;
-
-      const escapeHtml = (str: string) =>
-        str
-          .replace(/&/g, '&amp;')
-          .replace(/</g, '&lt;')
-          .replace(/>/g, '&gt;')
-          .replace(/"/g, '&quot;');
-
-      const emailHtml = `
-      <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; max-width: 620px; margin: 0 auto; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 14px; overflow: hidden;">
-        <div style="background: #0f172a; color: #ffffff; padding: 20px 24px;">
-          <div style="font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: #fdba74; font-weight: 700;">
-            ${isTest ? 'TEST NOTIFICATION · WASLA TRAVEL' : 'NEW CUSTOMER BOOKING · WASLA TRAVEL'}
-          </div>
-          <h1 style="margin: 6px 0 0; font-size: 20px; font-weight: 800;">
-            ${escapeHtml(safeBookingId)} — ${escapeHtml(tripTitle)}
-          </h1>
-          <div style="margin-top: 6px; font-size: 13px; color: #cbd5e1;">
-            Booked at ${escapeHtml(bookedAtStr)} (Cairo Time) · ${escapeHtml(destination)}
-          </div>
-        </div>
-
-        <div style="padding: 22px 24px; color: #0f172a; font-size: 14px; line-height: 1.5;">
-          <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
-            <tr><td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0; color: #475569; width: 38%;">Guest Name (Client Input)</td><td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0; font-weight: 700;">${escapeHtml(guestName)} (${escapeHtml(guestCountry)})</td></tr>
-            <tr><td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0; color: #475569;">Trip Date (Verified)</td><td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0; font-weight: 700;">${escapeHtml(tripDate)}${startTime ? ` · ${escapeHtml(startTime)}` : ''}</td></tr>
-            <tr><td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0; color: #475569;">Hotel & Room (Client Input)</td><td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0; font-weight: 700;">${escapeHtml(hotel)}${roomNumber ? ` · Room ${escapeHtml(roomNumber)}` : ''}</td></tr>
-            <tr><td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0; color: #475569;">Passengers (Client Input)</td><td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0; font-weight: 700;">${escapeHtml(paxLine)}</td></tr>
-            ${
-              catalogBasePriceEur !== undefined
-                ? `<tr><td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0; color: #475569;">Catalog Base Price (Verified)</td><td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0; font-weight: 700;">€${catalogBasePriceEur} / adult</td></tr>`
-                : ''
-            }
-            <tr><td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0; color: #475569;">Client-Submitted Total</td><td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0; font-weight: 800; color: #15803d;">€${grossEur} (${escapeHtml(paymentStatus)} · verify saved booking in Dispatch Desk)</td></tr>
-            <tr><td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0; color: #475569;">Assigned Supplier (Verified)</td><td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0; font-weight: 700;">${escapeHtml(supplierName)}</td></tr>
-            <tr><td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0; color: #475569;">Guest WhatsApp</td><td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0; font-weight: 700;">${escapeHtml(guestWa || 'Not provided')}</td></tr>
-            <tr><td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0; color: #475569;">Guest Email</td><td style="padding: 8px 0; border-bottom: 1px solid #e2e8f0; font-weight: 700;">${escapeHtml(guestEmail || 'Not provided')}</td></tr>
-            ${notes ? `<tr><td style="padding: 8px 0; color: #475569;">Special Notes</td><td style="padding: 8px 0; font-weight: 600;">${escapeHtml(notes)}</td></tr>` : ''}
-          </table>
-
-          <div style="margin-top: 20px; padding: 12px 14px; background: #fff7ed; border: 1px solid #fed7aa; border-radius: 10px; font-size: 12px; color: #9a3412;">
-            <strong>Voucher Lock Status:</strong> Always verify the saved Firestore booking record inside Reservations &amp; Dispatch before confirming payment and unlocking the Digital Boarding Voucher.
-          </div>
-
-          <div style="margin-top: 20px;">
-            <a href="${escapeHtml(appUrl)}" style="display: inline-block; background: #ea580c; color: #ffffff; text-decoration: none; font-weight: 700; font-size: 13px; padding: 11px 18px; border-radius: 8px; margin-right: 10px;">
-              Open Reservations &amp; Dispatch
-            </a>
-            ${
-              guestWaLink
-                ? `<a href="${escapeHtml(guestWaLink)}" style="display: inline-block; background: #16a34a; color: #ffffff; text-decoration: none; font-weight: 700; font-size: 13px; padding: 11px 18px; border-radius: 8px;">Message Guest on WhatsApp</a>`
-                : ''
-            }
-          </div>
-        </div>
-      </div>
-    `;
-
-      const channelStatus = getNotificationChannelStatus();
-      const anyChannelConfigured =
-        channelStatus.emailConfigured ||
-        channelStatus.whatsappConfigured ||
-        channelStatus.webhookConfigured;
-
-      const result: {
-        ok: boolean;
-        delivered: boolean;
-        retryable?: boolean;
-        skipped?: string;
-        email: { sent: boolean; provider: string; to: string; error?: string };
-        whatsapp: { sent: boolean; provider: string; to: string; error?: string };
-        webhook: { sent: boolean; error?: string };
-      } = {
-        ok: true,
-        delivered: false,
-        email: { sent: false, provider: 'none', to: targetOwnerEmail },
-        whatsapp: { sent: false, provider: 'none', to: targetOwnerWaDigits },
-        webhook: { sent: false },
-      };
-
-      if (!isTest) {
-        inFlightBookingNotifications.add(bookingId);
-      }
-
+      let inFlightBookingId = '';
       try {
+        const body = (req.body ?? {}) as {
+          id?: string;
+          tripId?: string;
+          tripTitle?: string;
+          destination?: string;
+          category?: string;
+          date?: string;
+          tripStartTime?: string;
+          guestName?: string;
+          guestCountry?: string;
+          guestLanguage?: string;
+          guestLang?: string;
+          guestWhatsapp?: string;
+          guestEmail?: string;
+          guestContact?: string;
+          hotel?: string;
+          roomNumber?: string;
+          adults?: number;
+          children?: number;
+          infants?: number;
+          grossEur?: number;
+          supplierName?: string;
+          paymentStatus?: string;
+          notes?: string;
+          isTest?: boolean;
+        };
 
-    // 1. Official Email Delivery (SMTP first, then Resend fallback)
-    if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
-      result.email.provider = 'smtp';
-      try {
-        const port = Number(process.env.SMTP_PORT || 465);
-        const secure =
-          process.env.SMTP_SECURE !== undefined
-            ? process.env.SMTP_SECURE === 'true'
-            : port === 465;
-        const transporter = nodemailer.createTransport({
-          host: process.env.SMTP_HOST,
-          port,
-          secure,
-          auth: {
-            user: process.env.SMTP_USER,
-            pass: process.env.SMTP_PASS,
-          },
-        });
-        await transporter.sendMail({
-          from: process.env.SMTP_FROM || `Wasla Travel Bookings <${process.env.SMTP_USER}>`,
-          to: targetOwnerEmail,
-          ...(guestEmail && guestEmail.includes('@') ? { replyTo: guestEmail } : {}),
-          subject: emailSubject,
-          text: whatsappAlertText,
-          html: emailHtml,
-        });
-        result.email.sent = true;
-      } catch (err) {
-        result.email.error = err instanceof Error ? err.message : 'SMTP delivery failed';
-      }
-    } else if (process.env.RESEND_API_KEY) {
-      result.email.provider = 'resend';
-      try {
-        const resendRes = await fetch('https://api.resend.com/emails', {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            from: process.env.RESEND_FROM_EMAIL || 'Wasla Travel <onboarding@resend.dev>',
-            to: [targetOwnerEmail],
-            ...(guestEmail && guestEmail.includes('@') ? { reply_to: guestEmail } : {}),
-            subject: emailSubject,
-            text: whatsappAlertText,
-            html: emailHtml,
-          }),
-        });
-        if (!resendRes.ok) {
-          const errText = await resendRes.text();
-          result.email.error = `Resend API ${resendRes.status}: ${errText.slice(0, 180)}`;
-        } else {
-          result.email.sent = true;
-        }
-      } catch (err) {
-        result.email.error = err instanceof Error ? err.message : 'Resend delivery failed';
-      }
-    }
+        const isTest = Boolean(body.isTest);
+        const bookingId = String(body.id || '').trim();
+        let verifiedReceipt: VerifiedBookingReceipt | null = null;
 
-    // 2. Automatic Owner WhatsApp Alert (Meta Cloud API -> Twilio -> CallMeBot)
-    if (
-      process.env.WHATSAPP_CLOUD_TOKEN &&
-      process.env.WHATSAPP_PHONE_NUMBER_ID &&
-      targetOwnerWaDigits
-    ) {
-      result.whatsapp.provider = 'whatsapp-cloud';
-      try {
-        const waRes = await fetch(
-          `https://graph.facebook.com/v21.0/${process.env.WHATSAPP_PHONE_NUMBER_ID}/messages`,
-          {
-            method: 'POST',
-            headers: {
-              Authorization: `Bearer ${process.env.WHATSAPP_CLOUD_TOKEN}`,
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              messaging_product: 'whatsapp',
-              to: targetOwnerWaDigits,
-              type: 'text',
-              text: { body: whatsappAlertText },
-            }),
+        if (isTest) {
+          const token = extractBearerToken(req);
+          const verified = token ? await verifyFirebaseIdToken(token) : null;
+          const role = verified ? await resolveCallerRole(verified) : 'none';
+          if (role !== 'owner') {
+            res.status(verified ? 403 : 401).json({
+              ok: false,
+              error: 'Owner authentication is required to send test notifications.',
+            });
+            return;
           }
-        );
-        if (!waRes.ok) {
-          const errText = await waRes.text();
-          result.whatsapp.error = `Meta WhatsApp API ${waRes.status}: ${errText.slice(0, 180)}`;
         } else {
-          result.whatsapp.sent = true;
-        }
-      } catch (err) {
-        result.whatsapp.error =
-          err instanceof Error ? err.message : 'Meta WhatsApp delivery failed';
-      }
-    } else if (
-      process.env.TWILIO_ACCOUNT_SID &&
-      process.env.TWILIO_AUTH_TOKEN &&
-      process.env.TWILIO_WHATSAPP_FROM &&
-      targetOwnerWaDigits
-    ) {
-      result.whatsapp.provider = 'twilio';
-      try {
-        const twilioUrl = `https://api.twilio.com/2010-04-01/Accounts/${process.env.TWILIO_ACCOUNT_SID}/Messages.json`;
-        const authHeader = Buffer.from(
-          `${process.env.TWILIO_ACCOUNT_SID}:${process.env.TWILIO_AUTH_TOKEN}`
-        ).toString('base64');
-        const form = new URLSearchParams({
-          From: process.env.TWILIO_WHATSAPP_FROM.startsWith('whatsapp:')
-            ? process.env.TWILIO_WHATSAPP_FROM
-            : `whatsapp:+${process.env.TWILIO_WHATSAPP_FROM.replace(/\D/g, '')}`,
-          To: `whatsapp:+${targetOwnerWaDigits}`,
-          Body: whatsappAlertText,
-        });
-        const twRes = await fetch(twilioUrl, {
-          method: 'POST',
-          headers: {
-            Authorization: `Basic ${authHeader}`,
-            'Content-Type': 'application/x-www-form-urlencoded',
-          },
-          body: form.toString(),
-        });
-        if (!twRes.ok) {
-          const errText = await twRes.text();
-          result.whatsapp.error = `Twilio API ${twRes.status}: ${errText.slice(0, 180)}`;
-        } else {
-          result.whatsapp.sent = true;
-        }
-      } catch (err) {
-        result.whatsapp.error = err instanceof Error ? err.message : 'Twilio delivery failed';
-      }
-    } else if (process.env.CALLMEBOT_API_KEY && targetOwnerWaDigits) {
-      result.whatsapp.provider = 'callmebot';
-      try {
-        const cmUrl = `https://api.callmebot.com/whatsapp.php?phone=+${encodeURIComponent(
-          targetOwnerWaDigits
-        )}&text=${encodeURIComponent(whatsappAlertText)}&apikey=${encodeURIComponent(
-          process.env.CALLMEBOT_API_KEY
-        )}`;
-        const cmRes = await fetch(cmUrl, { method: 'GET' });
-        if (!cmRes.ok) {
-          result.whatsapp.error = `CallMeBot HTTP ${cmRes.status}`;
-        } else {
-          result.whatsapp.sent = true;
-        }
-      } catch (err) {
-        result.whatsapp.error =
-          err instanceof Error ? err.message : 'CallMeBot delivery failed';
-      }
-    }
+          if (!/^[a-zA-Z0-9_-]{3,64}$/.test(bookingId)) {
+            res.status(400).json({ ok: false, error: 'A valid saved booking ID is required.' });
+            return;
+          }
 
-    // 3. Optional Automation Webhook (Make.com / Zapier / n8n)
-    if (process.env.OWNER_ALERT_WEBHOOK_URL) {
-      try {
-        const hookRes = await fetch(process.env.OWNER_ALERT_WEBHOOK_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            event: isTest ? 'test_booking_alert' : 'new_booking',
-            bookingId: safeBookingId,
-            bookedAt: bookedAtStr,
+          if (isBookingNotificationDelivered(bookingId)) {
+            res.json({ ok: true, deduplicated: true, delivered: true });
+            return;
+          }
+
+          if (inFlightBookingNotifications.has(bookingId)) {
+            res.status(409).json({
+              ok: false,
+              inFlight: true,
+              retryable: true,
+              error: 'Notification dispatch is already in progress for this booking.',
+            });
+            return;
+          }
+
+          verifiedReceipt = await verifyBookingReceiptAndTrip(
+            bookingId,
+            String(body.date || '').trim(),
+            String(body.tripId || '').trim()
+          );
+          if (!verifiedReceipt.exists) {
+            res.status(400).json({
+              ok: false,
+              error:
+                verifiedReceipt.reason ||
+                'Booking must be persisted before triggering notifications.',
+            });
+            return;
+          }
+        }
+
+        const safeBookingId = bookingId || 'WT-TEST';
+        const tripTitle = String(
+          verifiedReceipt?.verifiedTripTitle || body.tripTitle || 'Wasla Travel Excursion'
+        )
+          .trim()
+          .slice(0, 240);
+        const destination = String(
+          verifiedReceipt?.verifiedDestination || body.destination || 'Hurghada'
+        )
+          .trim()
+          .slice(0, 60);
+        const tripDate = String(
+          verifiedReceipt?.tripDate || body.date || new Date().toISOString().slice(0, 10)
+        )
+          .trim()
+          .slice(0, 20);
+        const supplierName = String(
+          verifiedReceipt?.verifiedSupplierName || body.supplierName || 'Wasla Operations'
+        )
+          .trim()
+          .slice(0, 120);
+        const catalogBasePriceEur = verifiedReceipt?.catalogBasePriceEur;
+        const startTime = String(body.tripStartTime || '').trim().slice(0, 80);
+        const guestName = String(body.guestName || 'Guest').trim().slice(0, 120);
+        const guestCountry = String(body.guestCountry || 'Guest').trim().slice(0, 80);
+        const guestLanguage = String(body.guestLanguage || body.guestLang || 'English')
+          .trim()
+          .slice(0, 40);
+        const guestWa = String(body.guestWhatsapp || '').trim().slice(0, 60);
+        const guestEmail = String(body.guestEmail || '').trim().slice(0, 160);
+        const guestContact = String(body.guestContact || guestWa || guestEmail || 'N/A')
+          .trim()
+          .slice(0, 160);
+        const hotel = String(body.hotel || 'Hotel Pickup').trim().slice(0, 200);
+        const roomNumber = String(body.roomNumber || '').trim().slice(0, 40);
+        const adults = Math.min(50, Math.max(1, Math.round(Number(body.adults) || 1)));
+        const children = Math.min(50, Math.max(0, Math.round(Number(body.children) || 0)));
+        const infants = Math.min(50, Math.max(0, Math.round(Number(body.infants) || 0)));
+        const grossEur = Math.min(100000, Math.max(0, Math.round(Number(body.grossEur) || 0)));
+        const paymentStatus = String(body.paymentStatus || 'Awaiting link').trim().slice(0, 40);
+        const notes = String(body.notes || '').trim().slice(0, 800);
+
+        const recipients = await resolveServerRecipients();
+
+        if (!isTest) {
+          inFlightBookingId = bookingId;
+          inFlightBookingNotifications.add(bookingId);
+          upsertVoucherSnapshot({
+            id: safeBookingId,
+            tripId: String(body.tripId || '').trim().slice(0, 120) || undefined,
             tripTitle,
             destination,
-            tripDate,
-            startTime,
+            date: tripDate,
+            tripStartTime: startTime || undefined,
             guestName,
             guestCountry,
-            guestWhatsapp: guestWa,
-            guestEmail,
+            guestLang: String(body.guestLang || '').trim().slice(0, 12) || undefined,
+            guestLanguage,
             hotel,
-            roomNumber,
+            roomNumber: roomNumber || undefined,
             adults,
             children,
             infants,
             grossEur,
-            supplierName,
             paymentStatus,
-            notes,
-            ownerEmail: targetOwnerEmail,
-            ownerWhatsapp: targetOwnerWaDigits,
-            formattedWhatsappMessage: whatsappAlertText,
-          }),
-        });
-        if (hookRes.ok) {
-          result.webhook.sent = true;
-          if (!result.whatsapp.sent && result.whatsapp.provider === 'none') {
-            result.whatsapp.provider = 'webhook';
-            result.whatsapp.sent = true;
-          }
-        } else {
-          result.webhook.error = `Webhook HTTP ${hookRes.status}`;
+            status: verifiedReceipt?.status || 'Pending',
+            notes: notes || undefined,
+          });
         }
-      } catch (err) {
-        result.webhook.error = err instanceof Error ? err.message : 'Webhook failed';
-      }
-    }
 
-        const anyDelivered = result.email.sent || result.whatsapp.sent || result.webhook.sent;
-        result.delivered = anyDelivered;
+        const result = await dispatchBookingNotifications(
+          {
+            bookingId: safeBookingId,
+            eventType: isTest ? 'test' : 'booking_created',
+            tripTitle,
+            destination,
+            tripDate,
+            startTime: startTime || undefined,
+            supplierName,
+            catalogBasePriceEur,
+            guestName,
+            guestCountry,
+            guestLanguage,
+            guestWhatsapp: guestWa || undefined,
+            guestEmail: guestEmail || undefined,
+            guestContact,
+            hotel,
+            roomNumber: roomNumber || undefined,
+            adults,
+            children,
+            infants,
+            grossEur,
+            paymentStatus,
+            notes: notes || undefined,
+          },
+          recipients
+        );
 
-        if (!anyChannelConfigured) {
-          result.skipped = 'no_channels_configured';
+        if (result.skipped === 'no_channels_configured') {
           res.json(result);
           return;
         }
 
-        if (anyDelivered) {
+        if (result.delivered) {
           if (!isTest) {
             markBookingNotificationDelivered(bookingId);
           }
@@ -977,17 +820,240 @@ async function startServer() {
           return;
         }
 
+        // For owner test diagnostics, return HTTP 200 with structured per-channel error details
+        // so reverse proxies never replace a 502 JSON payload with a generic proxy HTML page.
+        if (isTest) {
+          res.status(200).json(result);
+          return;
+        }
+
         // All configured channels failed: do NOT poison dedupe cache; allow retry.
-        result.ok = false;
-        result.retryable = true;
         res.status(502).json(result);
+      } catch (err) {
+        const message = err instanceof Error ? err.message : 'Notification dispatch failed.';
+        res.status(500).json({
+          ok: false,
+          delivered: false,
+          error: message,
+        });
       } finally {
-        if (!isTest) {
-          inFlightBookingNotifications.delete(bookingId);
+        if (inFlightBookingId) {
+          inFlightBookingNotifications.delete(inFlightBookingId);
         }
       }
     }
   );
+
+  // Triggered automatically when Operations/Owner confirms a booking (status -> Confirmed)
+  app.post(
+    '/api/notifications/booking-confirmed',
+    requireRole(['owner', 'operations']),
+    notificationGlobalLimiter,
+    async (req, res) => {
+      let activeDedupeKey = '';
+      try {
+        const body = (req.body ?? {}) as {
+          id?: string;
+          tripTitle?: string;
+          destination?: string;
+          date?: string;
+          tripStartTime?: string;
+          pickupTime?: string;
+          pickupSpot?: string;
+          assignedDriverOrGuide?: string;
+          guestName?: string;
+          guestCountry?: string;
+          guestLanguage?: string;
+          guestLang?: string;
+          guestWhatsapp?: string;
+          guestEmail?: string;
+          guestContact?: string;
+          hotel?: string;
+          roomNumber?: string;
+          adults?: number;
+          children?: number;
+          infants?: number;
+          grossEur?: number;
+          supplierName?: string;
+          paymentStatus?: string;
+          notes?: string;
+        };
+
+        const bookingId = String(body.id || '').trim();
+        if (!/^[a-zA-Z0-9_-]{3,64}$/.test(bookingId)) {
+          res.status(400).json({ ok: false, error: 'A valid booking ID is required.' });
+          return;
+        }
+
+        const dedupeKey = `confirmed:${bookingId}`;
+        if (isBookingNotificationDelivered(dedupeKey)) {
+          res.json({ ok: true, deduplicated: true, delivered: true });
+          return;
+        }
+        if (inFlightBookingNotifications.has(dedupeKey)) {
+          res.status(409).json({
+            ok: false,
+            inFlight: true,
+            retryable: true,
+            error: 'Confirmation notification is already in progress for this booking.',
+          });
+          return;
+        }
+
+        const recipients = await resolveServerRecipients();
+        activeDedupeKey = dedupeKey;
+        inFlightBookingNotifications.add(dedupeKey);
+
+        upsertVoucherSnapshot({
+          id: bookingId,
+          tripTitle: String(body.tripTitle || 'Wasla Travel Excursion').trim().slice(0, 240),
+          destination: String(body.destination || 'Hurghada').trim().slice(0, 60),
+          date: String(body.date || new Date().toISOString().slice(0, 10)).trim().slice(0, 20),
+          tripStartTime: String(body.tripStartTime || '').trim().slice(0, 80) || undefined,
+          pickupTime: String(body.pickupTime || '').trim().slice(0, 24) || undefined,
+          pickupSpot: String(body.pickupSpot || '').trim().slice(0, 40) || undefined,
+          assignedDriverOrGuide:
+            String(body.assignedDriverOrGuide || '').trim().slice(0, 160) || undefined,
+          guestName: String(body.guestName || 'Guest').trim().slice(0, 120),
+          guestCountry: String(body.guestCountry || 'Guest').trim().slice(0, 80),
+          guestLang: String(body.guestLang || '').trim().slice(0, 12) || undefined,
+          guestLanguage: String(body.guestLanguage || body.guestLang || 'English')
+            .trim()
+            .slice(0, 40),
+          hotel: String(body.hotel || 'Hotel Pickup').trim().slice(0, 200),
+          roomNumber: String(body.roomNumber || '').trim().slice(0, 40) || undefined,
+          adults: Math.min(50, Math.max(1, Math.round(Number(body.adults) || 1))),
+          children: Math.min(50, Math.max(0, Math.round(Number(body.children) || 0))),
+          infants: Math.min(50, Math.max(0, Math.round(Number(body.infants) || 0))),
+          grossEur: Math.min(100000, Math.max(0, Math.round(Number(body.grossEur) || 0))),
+          paymentStatus: String(body.paymentStatus || 'Awaiting link').trim().slice(0, 40),
+          status: 'Confirmed',
+          notes: String(body.notes || '').trim().slice(0, 800) || undefined,
+        });
+
+        const result = await dispatchBookingNotifications(
+          {
+            bookingId,
+            eventType: 'booking_confirmed',
+            tripTitle: String(body.tripTitle || 'Wasla Travel Excursion').trim().slice(0, 240),
+            destination: String(body.destination || 'Hurghada').trim().slice(0, 60),
+            tripDate: String(body.date || new Date().toISOString().slice(0, 10)).trim().slice(0, 20),
+            startTime: String(body.tripStartTime || '').trim().slice(0, 80) || undefined,
+            pickupTime: String(body.pickupTime || '').trim().slice(0, 24) || undefined,
+            pickupSpot: String(body.pickupSpot || '').trim().slice(0, 40) || undefined,
+            assignedDriverOrGuide:
+              String(body.assignedDriverOrGuide || '').trim().slice(0, 160) || undefined,
+            supplierName: String(body.supplierName || 'Wasla Operations').trim().slice(0, 120),
+            guestName: String(body.guestName || 'Guest').trim().slice(0, 120),
+            guestCountry: String(body.guestCountry || 'Guest').trim().slice(0, 80),
+            guestLanguage: String(body.guestLanguage || body.guestLang || 'English')
+              .trim()
+              .slice(0, 40),
+            guestWhatsapp: String(body.guestWhatsapp || '').trim().slice(0, 60) || undefined,
+            guestEmail: String(body.guestEmail || '').trim().slice(0, 160) || undefined,
+            guestContact: String(body.guestContact || '').trim().slice(0, 160) || undefined,
+            hotel: String(body.hotel || 'Hotel Pickup').trim().slice(0, 200),
+            roomNumber: String(body.roomNumber || '').trim().slice(0, 40) || undefined,
+            adults: Math.min(50, Math.max(1, Math.round(Number(body.adults) || 1))),
+            children: Math.min(50, Math.max(0, Math.round(Number(body.children) || 0))),
+            infants: Math.min(50, Math.max(0, Math.round(Number(body.infants) || 0))),
+            grossEur: Math.min(100000, Math.max(0, Math.round(Number(body.grossEur) || 0))),
+            paymentStatus: String(body.paymentStatus || 'Awaiting link').trim().slice(0, 40),
+            notes: String(body.notes || '').trim().slice(0, 800) || undefined,
+          },
+          recipients
+        );
+
+        if (result.skipped === 'no_channels_configured') {
+          res.json(result);
+          return;
+        }
+
+        if (result.delivered) {
+          markBookingNotificationDelivered(dedupeKey);
+          res.json(result);
+          return;
+        }
+
+        res.status(502).json(result);
+      } catch (err) {
+        const message = err instanceof Error ? err.message : 'Confirmation notification failed.';
+        res.status(500).json({ ok: false, delivered: false, error: message });
+      } finally {
+        if (activeDedupeKey) {
+          inFlightBookingNotifications.delete(activeDedupeKey);
+        }
+      }
+    }
+  );
+
+  const voucherLookupLimiter = createRateLimiter({
+    windowMs: 60_000,
+    maxRequests: 40,
+    keyPrefix: 'voucher-lookup',
+  });
+
+  app.post(
+    '/api/vouchers/sync',
+    requireRole(['owner', 'operations']),
+    (req, res) => {
+      try {
+        const rawList = Array.isArray((req.body as { bookings?: unknown[] })?.bookings)
+          ? ((req.body as { bookings: Record<string, unknown>[] }).bookings)
+          : req.body && typeof req.body === 'object'
+          ? [req.body as Record<string, unknown>]
+          : [];
+        let count = 0;
+        for (const item of rawList.slice(0, 250)) {
+          const id = String(item.id || '').trim().toUpperCase();
+          if (!/^[A-Z0-9_-]{3,64}$/.test(id)) continue;
+          upsertVoucherSnapshot({
+            id,
+            tripId: String(item.tripId || '').trim().slice(0, 120) || undefined,
+            tripTitle: String(item.tripTitle || 'Wasla Travel Excursion').trim().slice(0, 240),
+            destination: String(item.destination || 'Hurghada').trim().slice(0, 60),
+            date: String(item.date || '').trim().slice(0, 20),
+            tripStartTime: String(item.tripStartTime || '').trim().slice(0, 80) || undefined,
+            pickupTime: String(item.pickupTime || '').trim().slice(0, 24) || undefined,
+            pickupSpot: String(item.pickupSpot || '').trim().slice(0, 40) || undefined,
+            assignedDriverOrGuide:
+              String(item.assignedDriverOrGuide || '').trim().slice(0, 160) || undefined,
+            guestName: String(item.guestName || 'Guest').trim().slice(0, 120),
+            guestCountry: String(item.guestCountry || '').trim().slice(0, 80) || undefined,
+            guestLang: String(item.guestLang || '').trim().slice(0, 12) || undefined,
+            guestLanguage: String(item.guestLanguage || '').trim().slice(0, 40) || undefined,
+            hotel: String(item.hotel || '').trim().slice(0, 200) || undefined,
+            roomNumber: String(item.roomNumber || '').trim().slice(0, 40) || undefined,
+            adults: Math.min(50, Math.max(1, Math.round(Number(item.adults) || 1))),
+            children: Math.min(50, Math.max(0, Math.round(Number(item.children) || 0))),
+            infants: Math.min(50, Math.max(0, Math.round(Number(item.infants) || 0))),
+            grossEur: Math.min(100000, Math.max(0, Math.round(Number(item.grossEur) || 0))),
+            paymentStatus: String(item.paymentStatus || '').trim().slice(0, 40) || undefined,
+            status: String(item.status || '').trim().slice(0, 40) || undefined,
+            notes: String(item.notes || '').trim().slice(0, 400) || undefined,
+          });
+          count++;
+        }
+        res.json({ ok: true, synced: count });
+      } catch {
+        res.status(500).json({ ok: false, error: 'Failed to sync voucher cache.' });
+      }
+    }
+  );
+
+  app.get('/api/vouchers/:bookingId', voucherLookupLimiter, (req, res) => {
+    const cleanId = String(req.params.bookingId || '').trim().toUpperCase();
+    if (!/^[A-Z0-9_-]{3,64}$/.test(cleanId)) {
+      res.status(400).json({ ok: false, error: 'Invalid booking reference.' });
+      return;
+    }
+    const found = voucherStore.get(cleanId);
+    if (!found) {
+      res.status(404).json({ ok: false, error: 'Voucher snapshot not found.' });
+      return;
+    }
+    res.json({ ok: true, voucher: found });
+  });
 
   app.get('/dev-sw.js', (_req, res) => {
     res.setHeader('Content-Type', 'application/javascript');

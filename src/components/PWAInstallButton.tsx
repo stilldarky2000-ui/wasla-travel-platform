@@ -55,7 +55,7 @@ export const PWAInstallButton: React.FC<PWAInstallButtonProps> = ({
             ? `inline-flex h-9 w-9 items-center justify-center rounded-full transition-colors cursor-pointer shrink-0 ${
                 darkMode
                   ? 'text-slate-300 hover:bg-white/10 hover:text-white'
-                  : 'text-[#475569] hover:bg-[#FFF7ED] hover:text-[#EA580C]'
+                  : 'text-[#475569] hover:bg-[#FFF7ED] hover:text-[#EE5426]'
               }`
             : `inline-flex items-center justify-center gap-1.5 rounded-full border font-semibold transition-all active:scale-95 cursor-pointer shrink-0 ${
                 compact
@@ -63,8 +63,8 @@ export const PWAInstallButton: React.FC<PWAInstallButtonProps> = ({
                   : 'min-h-[36px] sm:min-h-[40px] px-2.5 sm:px-3.5 py-1.5 text-xs'
               } ${
                 darkMode
-                  ? 'border-[#EA580C]/60 bg-[#EA580C]/15 text-[#FDBA74] hover:bg-[#EA580C] hover:text-white'
-                  : 'border-[#FED7AA] bg-[#FFF7ED] text-[#C2410C] hover:border-[#EA580C] hover:bg-[#EA580C] hover:text-white'
+                  ? 'border-[#EE5426]/60 bg-[#EE5426]/15 text-[#FDBA74] hover:bg-[#EE5426] hover:text-white'
+                  : 'border-[#FED7AA] bg-[#FFF7ED] text-[#D9461B] hover:border-[#EE5426] hover:bg-[#EE5426] hover:text-white'
               }`
         }
       >
@@ -74,14 +74,14 @@ export const PWAInstallButton: React.FC<PWAInstallButtonProps> = ({
 
       {showGuideModal && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-[#0F172A]/60 p-4 backdrop-blur-xs"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-[#0F2233]/65 p-4 backdrop-blur-xs"
           onClick={() => setShowGuideModal(false)}
           role="dialog"
           aria-modal="true"
           aria-labelledby="pwa-install-modal-title"
         >
           <div
-            className="w-full max-w-md rounded-2xl border border-[#E2E8F0] bg-white p-6 text-[#0F172A] shadow-2xl space-y-4"
+            className="card-wasla w-full max-w-md text-[#0F2233] shadow-2xl space-y-4"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-start justify-between gap-3">
@@ -90,7 +90,7 @@ export const PWAInstallButton: React.FC<PWAInstallButtonProps> = ({
                 <div>
                   <h3
                     id="pwa-install-modal-title"
-                    className="font-display text-lg font-bold text-[#0F172A]"
+                    className="font-display text-lg font-bold text-[#0F2233]"
                   >
                     {lang === 'ar'
                       ? 'تثبيت تطبيق Wasla Travel'
@@ -111,7 +111,7 @@ export const PWAInstallButton: React.FC<PWAInstallButtonProps> = ({
                 type="button"
                 onClick={() => setShowGuideModal(false)}
                 aria-label="Close"
-                className="rounded-lg border border-[#E2E8F0] p-1.5 text-[#64748B] hover:bg-[#F1F5F9] hover:text-[#0F172A] cursor-pointer"
+                className="rounded-lg border border-[#C8C2B8]/60 p-1.5 text-[#64748B] hover:bg-[#FAF4ED] hover:text-[#0F2233] cursor-pointer"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -121,7 +121,7 @@ export const PWAInstallButton: React.FC<PWAInstallButtonProps> = ({
               <button
                 type="button"
                 onClick={() => void install()}
-                className="wasla-book-glare w-full min-h-[44px] inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold text-white cursor-pointer"
+                className="btn-wasla-primary w-full min-h-[44px] rounded-full text-sm cursor-pointer"
               >
                 <Download className="h-4 w-4" aria-hidden="true" />
                 <span>
@@ -137,7 +137,7 @@ export const PWAInstallButton: React.FC<PWAInstallButtonProps> = ({
             <div className="space-y-3 rounded-xl border border-[#FED7AA] bg-[#FFF7ED]/70 p-4 text-xs text-[#334155]">
               {isIOS ? (
                 <div className="space-y-2">
-                  <div className="flex items-center gap-1.5 font-bold text-[#C2410C]">
+                  <div className="flex items-center gap-1.5 font-bold text-[#D9461B]">
                     <Share className="h-4 w-4 shrink-0" aria-hidden="true" />
                     <span>
                       {lang === 'ar'
@@ -182,7 +182,7 @@ export const PWAInstallButton: React.FC<PWAInstallButtonProps> = ({
                 </div>
               ) : (
                 <div className="space-y-2">
-                  <div className="flex items-center gap-1.5 font-bold text-[#C2410C]">
+                  <div className="flex items-center gap-1.5 font-bold text-[#D9461B]">
                     <Smartphone className="h-4 w-4 shrink-0" aria-hidden="true" />
                     <span>
                       {lang === 'ar'
@@ -257,7 +257,7 @@ export const PWAInstallButton: React.FC<PWAInstallButtonProps> = ({
             <button
               type="button"
               onClick={() => setShowGuideModal(false)}
-              className="w-full min-h-[40px] rounded-xl border border-[#CBD5E1] bg-[#F8FAFC] py-2 text-xs font-semibold text-[#0F172A] hover:bg-[#F1F5F9] cursor-pointer"
+              className="btn-wasla-outline w-full min-h-[40px] py-2 text-xs cursor-pointer"
             >
               {lang === 'ar' ? 'إغلاق' : lang === 'de' ? 'Schließen' : 'Close'}
             </button>

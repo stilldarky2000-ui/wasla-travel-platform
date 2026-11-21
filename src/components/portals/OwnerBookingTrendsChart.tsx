@@ -12,6 +12,7 @@ import {
 } from 'recharts';
 import { BarChart3, Calendar, DollarSign, TrendingUp, Users } from 'lucide-react';
 import { PlatformBooking } from '../../data/platformData';
+import { WASLA_BRAND } from '../../constants/brand';
 
 interface OwnerBookingTrendsChartProps {
   bookings: PlatformBooking[];
@@ -150,29 +151,29 @@ export const OwnerBookingTrendsChart: React.FC<OwnerBookingTrendsChartProps> = (
   }, [bookings, commissionRate, windowMode]);
 
   return (
-    <div className="rounded-xl border border-[#CBD5E1] bg-white p-5 sm:p-6 space-y-5 shadow-xs">
+    <div className="card-wasla p-5 sm:p-6 space-y-5">
       {/* Header & Controls */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-[#E2E8F0] pb-4">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-[#C8C2B8]/50 dark:border-[#334155] pb-4">
         <div className="space-y-1">
-          <div className="inline-flex items-center gap-2 text-xs font-semibold text-[#EA580C]">
+          <div className="inline-flex items-center gap-2 text-xs font-semibold text-[#EE5426]">
             <TrendingUp className="h-4 w-4" aria-hidden="true" />
             <span>30-Day Booking &amp; Revenue Trends · تحليل اتجاهات الحجوزات (30 يوماً)</span>
           </div>
-          <h2 className="text-base sm:text-lg font-semibold text-[#0F172A]">
+          <h2 className="text-base sm:text-lg font-semibold text-[#0F2233]">
             Daily Bookings, Guest Volume &amp; Commission Trajectory ({summary.rangeLabel})
           </h2>
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
           {/* Window Mode Toggle */}
-          <div className="inline-flex rounded-lg border border-[#CBD5E1] bg-[#F8FAFC] p-0.5 text-xs font-semibold">
+          <div className="inline-flex rounded-lg border border-[#C8C2B8] bg-[#FAF4ED] p-0.5 text-xs font-semibold">
             <button
               type="button"
               onClick={() => setWindowMode('smart30')}
               className={`rounded-md px-2.5 py-1.5 transition-colors cursor-pointer ${
                 windowMode === 'smart30'
-                  ? 'bg-[#0F172A] text-white shadow-xs'
-                  : 'text-[#475569] hover:text-[#0F172A]'
+                  ? 'bg-[#0F2233] text-white shadow-xs'
+                  : 'text-[#64748B] hover:text-[#0F2233]'
               }`}
             >
               Active 30-Day Window
@@ -182,8 +183,8 @@ export const OwnerBookingTrendsChart: React.FC<OwnerBookingTrendsChartProps> = (
               onClick={() => setWindowMode('trailing30')}
               className={`rounded-md px-2.5 py-1.5 transition-colors cursor-pointer ${
                 windowMode === 'trailing30'
-                  ? 'bg-[#0F172A] text-white shadow-xs'
-                  : 'text-[#475569] hover:text-[#0F172A]'
+                  ? 'bg-[#0F2233] text-white shadow-xs'
+                  : 'text-[#64748B] hover:text-[#0F2233]'
               }`}
             >
               Last 30 Calendar Days
@@ -191,14 +192,14 @@ export const OwnerBookingTrendsChart: React.FC<OwnerBookingTrendsChartProps> = (
           </div>
 
           {/* Metric View Toggle */}
-          <div className="inline-flex rounded-lg border border-[#FED7AA] bg-[#FFF7ED] p-0.5 text-xs font-semibold">
+          <div className="inline-flex rounded-lg border border-[#EE5426]/30 bg-[#FAF4ED] p-0.5 text-xs font-semibold">
             <button
               type="button"
               onClick={() => setChartMode('revenue')}
               className={`inline-flex items-center gap-1 rounded-md px-3 py-1.5 transition-colors cursor-pointer ${
                 chartMode === 'revenue'
-                  ? 'bg-[#EA580C] text-white shadow-xs'
-                  : 'text-[#9A3412] hover:text-[#7C2D12]'
+                  ? 'bg-[#EE5426] text-white shadow-xs'
+                  : 'text-[#0F2233] hover:text-[#EE5426]'
               }`}
             >
               <DollarSign className="h-3.5 w-3.5" aria-hidden="true" />
@@ -209,8 +210,8 @@ export const OwnerBookingTrendsChart: React.FC<OwnerBookingTrendsChartProps> = (
               onClick={() => setChartMode('volume')}
               className={`inline-flex items-center gap-1 rounded-md px-3 py-1.5 transition-colors cursor-pointer ${
                 chartMode === 'volume'
-                  ? 'bg-[#EA580C] text-white shadow-xs'
-                  : 'text-[#9A3412] hover:text-[#7C2D12]'
+                  ? 'bg-[#EE5426] text-white shadow-xs'
+                  : 'text-[#0F2233] hover:text-[#EE5426]'
               }`}
             >
               <BarChart3 className="h-3.5 w-3.5" aria-hidden="true" />
@@ -222,12 +223,12 @@ export const OwnerBookingTrendsChart: React.FC<OwnerBookingTrendsChartProps> = (
 
       {/* 30-Day Summary Strip */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div className="rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] p-3.5 space-y-0.5">
+        <div className="rounded-lg border border-[#C8C2B8]/60 bg-[#FAF4ED] p-3.5 space-y-0.5">
           <div className="flex items-center justify-between text-[11px] font-medium text-[#64748B]">
             <span>30-Day Active Bookings</span>
-            <Calendar className="h-3.5 w-3.5 text-[#EA580C]" aria-hidden="true" />
+            <Calendar className="h-3.5 w-3.5 text-[#EE5426]" aria-hidden="true" />
           </div>
-          <div className="text-xl font-bold text-[#0F172A] tabular-nums">
+          <div className="text-xl font-bold text-[#0F2233] tabular-nums">
             {summary.totalBookings}
           </div>
           <div className="text-[11px] text-[#64748B] tabular-nums">
@@ -235,12 +236,12 @@ export const OwnerBookingTrendsChart: React.FC<OwnerBookingTrendsChartProps> = (
           </div>
         </div>
 
-        <div className="rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] p-3.5 space-y-0.5">
+        <div className="rounded-lg border border-[#C8C2B8]/60 bg-[#FAF4ED] p-3.5 space-y-0.5">
           <div className="flex items-center justify-between text-[11px] font-medium text-[#64748B]">
             <span>Total Guests (Pax)</span>
-            <Users className="h-3.5 w-3.5 text-[#0284C7]" aria-hidden="true" />
+            <Users className="h-3.5 w-3.5 text-[#19354F]" aria-hidden="true" />
           </div>
-          <div className="text-xl font-bold text-[#0F172A] tabular-nums">
+          <div className="text-xl font-bold text-[#0F2233] tabular-nums">
             {summary.totalGuests}
           </div>
           <div className="text-[11px] text-[#64748B] tabular-nums">
@@ -252,66 +253,66 @@ export const OwnerBookingTrendsChart: React.FC<OwnerBookingTrendsChartProps> = (
           </div>
         </div>
 
-        <div className="rounded-lg border border-[#FED7AA] bg-[#FFF7ED]/70 p-3.5 space-y-0.5">
-          <div className="flex items-center justify-between text-[11px] font-semibold text-[#C2410C]">
+        <div className="rounded-lg border border-[#EE5426]/30 bg-[#FAF4ED] p-3.5 space-y-0.5">
+          <div className="flex items-center justify-between text-[11px] font-semibold text-[#D9461B]">
             <span>30-Day Gross Volume</span>
-            <DollarSign className="h-3.5 w-3.5 text-[#EA580C]" aria-hidden="true" />
+            <DollarSign className="h-3.5 w-3.5 text-[#EE5426]" aria-hidden="true" />
           </div>
-          <div className="text-xl font-bold text-[#9A3412] tabular-nums">
+          <div className="text-xl font-bold text-[#0F2233] tabular-nums">
             €{summary.totalGrossEur}
           </div>
-          <div className="text-[11px] text-[#C2410C] tabular-nums truncate">
+          <div className="text-[11px] text-[#D9461B] tabular-nums truncate">
             Peak: {summary.peakDayLabel}
           </div>
         </div>
 
-        <div className="rounded-lg border border-[#A7F3D0] bg-[#ECFDF5]/70 p-3.5 space-y-0.5">
-          <div className="flex items-center justify-between text-[11px] font-semibold text-[#047857]">
+        <div className="rounded-lg border border-[#10B981]/35 bg-[#FAF4ED] p-3.5 space-y-0.5">
+          <div className="flex items-center justify-between text-[11px] font-semibold text-[#10B981]">
             <span>30-Day Net Commission ({commissionRate}%)</span>
-            <TrendingUp className="h-3.5 w-3.5 text-[#059669]" aria-hidden="true" />
+            <TrendingUp className="h-3.5 w-3.5 text-[#10B981]" aria-hidden="true" />
           </div>
-          <div className="text-xl font-bold text-[#065F46] tabular-nums">
+          <div className="text-xl font-bold text-[#0F2233] tabular-nums">
             €{summary.totalCommissionEur}
           </div>
-          <div className="text-[11px] text-[#047857] tabular-nums">
+          <div className="text-[11px] text-[#64748B] tabular-nums">
             Supplier Net: €{summary.totalGrossEur - summary.totalCommissionEur}
           </div>
         </div>
       </div>
 
       {/* Main Recharts Visualization */}
-      <div className="h-72 sm:h-80 w-full rounded-xl border border-[#E2E8F0] bg-[#F8FAFC]/60 p-3 sm:p-4">
+      <div className="h-72 sm:h-80 w-full rounded-xl border border-[#C8C2B8]/50 bg-[#FAF4ED]/60 p-3 sm:p-4">
         <ResponsiveContainer width="100%" height="100%">
           {chartMode === 'revenue' ? (
             <ComposedChart data={dailySeries} margin={{ top: 10, right: 12, left: 0, bottom: 0 }}>
               <defs>
                 <linearGradient id="waslaGrossFill" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#EA580C" stopOpacity={0.32} />
-                  <stop offset="95%" stopColor="#EA580C" stopOpacity={0.02} />
+                  <stop offset="5%" stopColor={WASLA_BRAND.colors.orange} stopOpacity={0.32} />
+                  <stop offset="95%" stopColor={WASLA_BRAND.colors.orange} stopOpacity={0.02} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" vertical={false} />
+              <CartesianGrid strokeDasharray="3 3" stroke={WASLA_BRAND.colors.dividerLight} vertical={false} />
               <XAxis
                 dataKey="label"
-                tick={{ fontSize: 11, fill: '#475569' }}
+                tick={{ fontSize: 11, fill: WASLA_BRAND.colors.mutedText }}
                 tickLine={false}
-                axisLine={{ stroke: '#CBD5E1' }}
+                axisLine={{ stroke: WASLA_BRAND.colors.dividerLight }}
                 minTickGap={18}
               />
               <YAxis
                 tickFormatter={(v) => `€${v}`}
-                tick={{ fontSize: 11, fill: '#475569' }}
+                tick={{ fontSize: 11, fill: WASLA_BRAND.colors.mutedText }}
                 tickLine={false}
                 axisLine={false}
                 width={48}
               />
               <Tooltip
                 contentStyle={{
-                  backgroundColor: '#FFFFFF',
-                  borderColor: '#CBD5E1',
+                  backgroundColor: WASLA_BRAND.colors.white,
+                  borderColor: WASLA_BRAND.colors.dividerLight,
                   borderRadius: '10px',
                   fontSize: '12px',
-                  boxShadow: '0 8px 24px rgba(15, 23, 42, 0.08)',
+                  boxShadow: '0 8px 24px rgba(15, 34, 51, 0.08)',
                 }}
                 formatter={(value: unknown, name: unknown) => [
                   `€${Number(value) || 0}`,
@@ -323,14 +324,14 @@ export const OwnerBookingTrendsChart: React.FC<OwnerBookingTrendsChartProps> = (
                 type="monotone"
                 dataKey="grossEur"
                 name="Gross Sales (€)"
-                stroke="#EA580C"
+                stroke={WASLA_BRAND.colors.orange}
                 strokeWidth={2.5}
                 fill="url(#waslaGrossFill)"
               />
               <Bar
                 dataKey="commissionEur"
                 name={`Platform Commission (${commissionRate}%)`}
-                fill="#0D9488"
+                fill={WASLA_BRAND.colors.success}
                 radius={[4, 4, 0, 0]}
                 maxBarSize={22}
               />
@@ -339,32 +340,32 @@ export const OwnerBookingTrendsChart: React.FC<OwnerBookingTrendsChartProps> = (
             <ComposedChart data={dailySeries} margin={{ top: 10, right: 12, left: 0, bottom: 0 }}>
               <defs>
                 <linearGradient id="waslaGuestsFill" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#0284C7" stopOpacity={0.28} />
-                  <stop offset="95%" stopColor="#0284C7" stopOpacity={0.02} />
+                  <stop offset="5%" stopColor={WASLA_BRAND.colors.navyLight} stopOpacity={0.28} />
+                  <stop offset="95%" stopColor={WASLA_BRAND.colors.navyLight} stopOpacity={0.02} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" vertical={false} />
+              <CartesianGrid strokeDasharray="3 3" stroke={WASLA_BRAND.colors.dividerLight} vertical={false} />
               <XAxis
                 dataKey="label"
-                tick={{ fontSize: 11, fill: '#475569' }}
+                tick={{ fontSize: 11, fill: WASLA_BRAND.colors.mutedText }}
                 tickLine={false}
-                axisLine={{ stroke: '#CBD5E1' }}
+                axisLine={{ stroke: WASLA_BRAND.colors.dividerLight }}
                 minTickGap={18}
               />
               <YAxis
                 allowDecimals={false}
-                tick={{ fontSize: 11, fill: '#475569' }}
+                tick={{ fontSize: 11, fill: WASLA_BRAND.colors.mutedText }}
                 tickLine={false}
                 axisLine={false}
                 width={36}
               />
               <Tooltip
                 contentStyle={{
-                  backgroundColor: '#FFFFFF',
-                  borderColor: '#CBD5E1',
+                  backgroundColor: WASLA_BRAND.colors.white,
+                  borderColor: WASLA_BRAND.colors.dividerLight,
                   borderRadius: '10px',
                   fontSize: '12px',
-                  boxShadow: '0 8px 24px rgba(15, 23, 42, 0.08)',
+                  boxShadow: '0 8px 24px rgba(15, 34, 51, 0.08)',
                 }}
               />
               <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '8px' }} />
@@ -372,21 +373,21 @@ export const OwnerBookingTrendsChart: React.FC<OwnerBookingTrendsChartProps> = (
                 type="monotone"
                 dataKey="guestsCount"
                 name="Total Guests (Pax)"
-                stroke="#0284C7"
+                stroke={WASLA_BRAND.colors.navyLight}
                 strokeWidth={2.2}
                 fill="url(#waslaGuestsFill)"
               />
               <Bar
                 dataKey="bookingsCount"
                 name="Confirmed/Active Bookings"
-                fill="#EA580C"
+                fill={WASLA_BRAND.colors.orange}
                 radius={[4, 4, 0, 0]}
                 maxBarSize={22}
               />
               <Bar
                 dataKey="cancelledCount"
                 name="Cancelled / No-Show"
-                fill="#EF4444"
+                fill={WASLA_BRAND.colors.danger}
                 radius={[4, 4, 0, 0]}
                 maxBarSize={16}
               />
@@ -400,15 +401,15 @@ export const OwnerBookingTrendsChart: React.FC<OwnerBookingTrendsChartProps> = (
         {destinationShares.map((item) => (
           <div
             key={item.destination}
-            className="rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-2 flex items-center justify-between gap-2 text-xs"
+            className="rounded-lg border border-[#C8C2B8]/60 bg-[#FAF4ED] px-3 py-2 flex items-center justify-between gap-2 text-xs"
           >
             <div className="min-w-0">
-              <div className="font-semibold text-[#0F172A] truncate">{item.destination}</div>
+              <div className="font-semibold text-[#0F2233] truncate">{item.destination}</div>
               <div className="text-[11px] text-[#64748B] tabular-nums">
                 {item.count} bookings · €{item.grossEur}
               </div>
             </div>
-            <span className="shrink-0 rounded-full bg-[#FFF7ED] border border-[#FED7AA] px-2 py-0.5 text-[11px] font-bold text-[#EA580C] tabular-nums">
+            <span className="shrink-0 rounded-full bg-[#EE5426]/10 border border-[#EE5426]/30 px-2 py-0.5 text-[11px] font-bold text-[#EE5426] tabular-nums">
               {item.pct}%
             </span>
           </div>

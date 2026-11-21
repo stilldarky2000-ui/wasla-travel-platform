@@ -59,7 +59,9 @@ import { buildPostTripReviewUrl, copyTextToClipboard } from '../../lib/shareTrip
 import {
   buildGuestPickupMailtoUrl,
   buildGuestPickupWhatsAppUrl,
+  buildLocalizedPickupConfirmationEmail,
   normalizeWhatsAppDigits,
+  resolveGuestLanguageCode,
 } from '../../lib/whatsapp';
 import { CURATED_EGYPT_HOTELS } from '../WaslaHotelMapPicker';
 import { HorizontalScrollTableFrame } from '../HorizontalScrollTableFrame';
@@ -149,57 +151,69 @@ function addOneDayIso(isoDate: string): string {
 function buildDispatchEmailTemplate(
   templateId: DispatchTemplateId,
   b: PlatformBooking,
-  isAr: boolean
+  _operatorIsAr: boolean
 ): { subject: string; body: string; logType: PlatformEmailLog['type'] } {
-  const spotLabel =
-    b.pickupSpot === 'Outside Main Gate'
-      ? isAr
-        ? 'أمام البوابة الرئيسية للفندق'
-        : 'Outside Main Gate'
-      : isAr
-      ? 'الريسبشن الداخلي للفندق'
-      : 'Inside Hotel Reception';
+  const guestLangCode = resolveGuestLanguageCode(undefined, b.notes, b.guestLang);
+  const guestIsAr = guestLangCode === 'ar';
+
+  if (templateId === 'pickup') {
+    const localized = buildLocalizedPickupConfirmationEmail({
+      bookingId: b.id,
+      guestName: b.guestName,
+      tripTitle: b.tripTitle,
+      date: b.date,
+      tripStartTime: b.tripStartTime,
+      pickupTime: b.pickupTime,
+      pickupSpot: b.pickupSpot,
+      hotel: b.hotel,
+      roomNumber: b.roomNumber,
+      guestCountry: b.guestCountry,
+      adults: b.adults,
+      children: b.children,
+      infants: b.infants,
+      grossEur: b.grossEur,
+      paymentStatus: b.paymentStatus,
+      driverOrGuide: b.assignedDriverOrGuide,
+      notes: b.notes,
+      guestLang: b.guestLang,
+    });
+    return {
+      logType: 'Booking Confirmation',
+      subject: localized.subject,
+      body: localized.body,
+    };
+  }
 
   if (templateId === 'welcome') {
     return {
       logType: 'Booking Confirmation',
-      subject: isAr
+      subject: guestIsAr
         ? `استلام طلب حجزك ${b.id} — ${b.tripTitle}`
         : `Booking Request Received (${b.id}) — ${b.tripTitle}`,
-      body: isAr
-        ? `مرحباً ${b.guestName}،\n\nشكرًا لحجزك مع وصلة ترافيل. استلمنا طلب حجزك رقم ${b.id} لرحلة "${b.tripTitle}" بتاريخ ${b.date} (${b.adults} بالغين${b.children > 0 ? ` + ${b.children} أطفال` : ''}${(b.infants ?? 0) > 0 ? ` + ${b.infants} رضع` : ''}).\n\nنقوم حالياً بمراجعة الإتاحة وتحديد موعد البيك أب الدقيق لفندقك (${b.hotel})، وسنرسل لك التأكيد النهائي وتذكرة الصعود قريباً.\n\nمع التحية،\nقسم الحجوزات والتشغيل — وصلة ترافيل`
-        : `Dear ${b.guestName},\n\nThank you for choosing Wasla Travel. We have received your booking request (${b.id}) for "${b.tripTitle}" on ${b.date} (${b.adults} Adults${b.children > 0 ? `, ${b.children} Children` : ''}${(b.infants ?? 0) > 0 ? `, ${b.infants} Infants` : ''}).\n\nOur Reservations & Dispatch team is verifying seat availability and assigning your exact pickup time from ${b.hotel}. Your final Digital Boarding Voucher will unlock as soon as confirmed.\n\nWarm regards,\nWasla Travel Reservations & Dispatch`,
+      body: guestIsAr
+        ? `مرحباً ${b.guestName}،\n\nشكرًا لحجزك مع وصلة ترافيل. استلمنا طلب حجزك رقم ${b.id} لرحلة "${b.tripTitle}" بتاريخ ${b.date} (${b.adults} بالغين${b.children > 0 ? ` + ${b.children} أطفال` : ''}${(b.infants ?? 0) > 0 ? ` + ${b.infants} رضع` : ''}).\n\nنقوم حالياً بمراجعة الإتاحة وتحديد موعد البيك أب الدقيق لفندقك (${b.hotel})، وسنرسل لك التأكيد النهائي وتذكرة الصعود قريباً.\n\nمع التحية،\nفريق عمليات وصلة ترافيل`
+        : `Dear ${b.guestName},\n\nThank you for choosing Wasla Travel. We have received your booking request (${b.id}) for "${b.tripTitle}" on ${b.date} (${b.adults} Adults${b.children > 0 ? `, ${b.children} Children` : ''}${(b.infants ?? 0) > 0 ? `, ${b.infants} Infants` : ''}).\n\nOur Reservations & Dispatch team is verifying seat availability and assigning your exact pickup time from ${b.hotel}. Your final Digital Boarding Voucher will unlock as soon as confirmed.\n\nWarm regards,\nWasla Travel Operations Desk`,
     };
   }
 
   if (templateId === 'payment') {
     return {
       logType: 'Payment Link',
-      subject: isAr
+      subject: guestIsAr
         ? `تأكيد الإتاحة وخيارات الدفع — حجز ${b.id} (€${b.grossEur})`
         : `Availability Confirmed & Payment Options — ${b.id} (€${b.grossEur})`,
-      body: isAr
-        ? `مرحباً ${b.guestName}،\n\nيسعدنا إبلاغك بتأكيد الإتاحة لرحلتك "${b.tripTitle}" (${b.id}) بتاريخ ${b.date}.\n\n• إجمالي المبلغ: €${b.grossEur}\n• طريقة الدفع الحالية: ${b.paymentStatus}\n• العملات المقبولة عند الدفع كاش: يورو (EUR) أو دولار (USD) أو جنيه مصري (EGP)\n\nيمكنك السداد كاش عند الاستلام من الفندق بأي عملة تفضلها، أو الرد علينا إذا كنت تفضل الدفع أونلاين عبر رابط دفع رسمي.\n\nمع التحية،\nقسم الحجوزات والتشغيل — وصلة ترافيل`
-        : `Dear ${b.guestName},\n\nWe are pleased to confirm seat availability for "${b.tripTitle}" (${b.id}) on ${b.date}.\n\n• Total Amount: €${b.grossEur}\n• Registered Payment Method: ${b.paymentStatus}\n• Accepted Currencies for Cash on Pickup: EUR, USD, or EGP\n\nYou may pay Cash on pickup in EUR, USD, or EGP, or reply to this message if you would like us to send an official online payment link.\n\nWarm regards,\nWasla Travel Reservations & Dispatch`,
-    };
-  }
-
-  if (templateId === 'pickup') {
-    return {
-      logType: 'Booking Confirmation',
-      subject: isAr
-        ? `تأكيد البيك أب النهائي وتذكرة الصعود — ${b.id} (${b.date})`
-        : `Final Hotel Pickup & Boarding Confirmation — ${b.id} (${b.date})`,
-      body: isAr
-        ? `مرحباً ${b.guestName}،\n\nتم تأكيد حجزك النهائي وفتح تذكرة الصعود الرقمية الخاصة بك رقم ${b.id}:\n\n• الرحلة: ${b.tripTitle}\n• التاريخ: ${b.date}${b.tripStartTime ? `\n• موعد انطلاق الرحلة: ${b.tripStartTime}` : ''}\n• موعد البيك أب من الفندق: ${b.pickupTime || 'يُحدد'}\n• الفندق: ${b.hotel}${b.roomNumber ? ` (غرفة ${b.roomNumber})` : ''}\n• مكان الانتظار: ${spotLabel}\n• السائق / المندوب: ${b.assignedDriverOrGuide || 'سيتم إرسال الاسم قبل التحرك'}\n• الإجمالي: €${b.grossEur} (${b.paymentStatus} — يُقبل الدفع باليورو أو الدولار أو الجنيه المصري)\n\nيرجى التواجد قبل الموعد بـ 10 دقائق وإبراز تذكرتك الرقمية.\n\nمع التحية،\nقسم الحجوزات والتشغيل — وصلة ترافيل`
-        : `Dear ${b.guestName},\n\nYour booking (${b.id}) is officially confirmed and your Digital Boarding Voucher is now unlocked:\n\n• Excursion: ${b.tripTitle}\n• Date: ${b.date}${b.tripStartTime ? `\n• Trip Departure: ${b.tripStartTime}` : ''}\n• Confirmed Hotel Pickup Time: ${b.pickupTime || 'TBD'}\n• Hotel: ${b.hotel}${b.roomNumber ? ` (Room ${b.roomNumber})` : ''}\n• Meeting Spot: ${spotLabel}\n• Driver / Representative: ${b.assignedDriverOrGuide || 'Assigned prior to pickup'}\n• Total Amount: €${b.grossEur} (${b.paymentStatus} — EUR, USD, or EGP accepted)\n\nPlease be ready 10 minutes before your pickup time.\n\nWarm regards,\nWasla Travel Reservations & Dispatch`,
+      body: guestIsAr
+        ? `مرحباً ${b.guestName}،\n\nيسعدنا إبلاغك بتأكيد الإتاحة لرحلتك "${b.tripTitle}" (${b.id}) بتاريخ ${b.date}.\n\n• إجمالي المبلغ: €${b.grossEur}\n• طريقة الدفع الحالية: ${b.paymentStatus}\n• العملات المقبولة عند الدفع كاش: يورو (EUR) أو دولار (USD) أو جنيه مصري (EGP)\n\nيمكنك السداد كاش عند الاستلام من الفندق بأي عملة تفضلها، أو الرد علينا إذا كنت تفضل الدفع أونلاين عبر رابط دفع رسمي.\n\nمع التحية،\nفريق عمليات وصلة ترافيل`
+        : `Dear ${b.guestName},\n\nWe are pleased to confirm seat availability for "${b.tripTitle}" (${b.id}) on ${b.date}.\n\n• Total Amount: €${b.grossEur}\n• Registered Payment Method: ${b.paymentStatus}\n• Accepted Currencies for Cash on Pickup: EUR, USD, or EGP\n\nYou may pay Cash on pickup in EUR, USD, or EGP, or reply to this message if you would like us to send an official online payment link.\n\nWarm regards,\nWasla Travel Operations Desk`,
     };
   }
 
   return {
     logType: 'Booking Confirmation',
-    subject: isAr ? `متابعة بخصوص حجزك ${b.id} — ${b.tripTitle}` : `Update Regarding Your Booking ${b.id} — ${b.tripTitle}`,
-    body: isAr
+    subject: guestIsAr
+      ? `متابعة بخصوص حجزك ${b.id} — ${b.tripTitle}`
+      : `Update Regarding Your Booking ${b.id} — ${b.tripTitle}`,
+    body: guestIsAr
       ? `مرحباً ${b.guestName}،\n\nبخصوص حجزك رقم ${b.id} لرحلة "${b.tripTitle}" بتاريخ ${b.date}:\n\n`
       : `Dear ${b.guestName},\n\nRegarding your booking ${b.id} for "${b.tripTitle}" on ${b.date}:\n\n`,
   };
@@ -1280,7 +1294,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
   };
 
   return (
-    <div className="min-h-[calc(100vh-40px)] bg-[#F1F5F9] text-[#0F172A]">
+    <div className="min-h-[calc(100vh-40px)] bg-[#F1F5F9] text-[#0F2233]">
       <div className="mx-auto max-w-[1440px] px-4 sm:px-6 py-6 space-y-5">
         {/* ============================================================ */}
         {/* EXECUTIVE HEADER + 4-WORKSPACE TABS                          */}
@@ -1292,7 +1306,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
           >
             <div className="space-y-1 min-w-0">
               <div className="flex flex-wrap items-center gap-2 text-xs text-[#334155] tabular-nums">
-                <span className="font-bold text-[#0F172A]">{SITE_CONFIG.domain}</span>
+                <span className="font-bold text-[#0F2233]">{SITE_CONFIG.domain}</span>
                 <span aria-hidden="true">·</span>
                 <span className="font-medium">
                   {isAr
@@ -1313,7 +1327,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                   </>
                 )}
               </div>
-              <h1 className="font-display text-xl sm:text-2xl font-bold tracking-[-0.02em] text-[#0F172A]">
+              <h1 className="font-display text-xl sm:text-2xl font-bold tracking-[-0.02em] text-[#0F2233]">
                 {isAr ? 'مركز الحجوزات والتشغيل' : 'Reservations & Dispatch'}
               </h1>
             </div>
@@ -1330,8 +1344,8 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                   onClick={() => setWorkspaceLang('en')}
                   className={`rounded-md px-3 py-1.5 transition-colors cursor-pointer whitespace-nowrap ${
                     !isAr
-                      ? 'bg-[#0F172A] text-white shadow-xs'
-                      : 'text-[#475569] hover:text-[#0F172A]'
+                      ? 'bg-[#0F2233] text-white shadow-xs'
+                      : 'text-[#475569] hover:text-[#0F2233]'
                   }`}
                 >
                   English
@@ -1341,8 +1355,8 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                   onClick={() => setWorkspaceLang('ar')}
                   className={`rounded-md px-3 py-1.5 transition-colors cursor-pointer whitespace-nowrap ${
                     isAr
-                      ? 'bg-[#0F172A] text-white shadow-xs'
-                      : 'text-[#475569] hover:text-[#0F172A]'
+                      ? 'bg-[#0F2233] text-white shadow-xs'
+                      : 'text-[#475569] hover:text-[#0F2233]'
                   }`}
                 >
                   العربية
@@ -1353,7 +1367,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                 <button
                   type="button"
                   onClick={openCreateModal}
-                  className="inline-flex min-h-[38px] items-center gap-1.5 rounded-lg bg-[#EA580C] px-4 py-2 text-xs font-bold text-white hover:bg-[#C2410C] transition-colors whitespace-nowrap shrink-0 cursor-pointer shadow-xs"
+                  className="btn-wasla-primary min-h-[38px] gap-1.5 rounded-lg px-4 py-2 text-xs font-bold whitespace-nowrap shrink-0 cursor-pointer"
                 >
                   <Plus className="h-4 w-4" aria-hidden="true" />
                   <span>{isAr ? 'إضافة حجز جديد' : 'New Booking'}</span>
@@ -1407,8 +1421,8 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                   onClick={() => setActiveTab(tab.id)}
                   className={`inline-flex min-h-[40px] items-center gap-2 rounded-lg px-4 py-2 text-xs font-bold transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                     isActive
-                      ? 'bg-[#0F172A] text-white shadow-xs'
-                      : 'border border-transparent text-[#334155] hover:border-[#CBD5E1] hover:bg-white hover:text-[#0F172A]'
+                      ? 'bg-[#0F2233] text-white shadow-xs'
+                      : 'border border-transparent text-[#334155] hover:border-[#CBD5E1] hover:bg-white hover:text-[#0F2233]'
                   }`}
                 >
                   <Icon className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
@@ -1420,7 +1434,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                           ? 'bg-[#DC2626] text-white'
                           : isActive
                           ? 'bg-white/20 text-white'
-                          : 'bg-[#E2E8F0] text-[#0F172A]'
+                          : 'bg-[#E2E8F0] text-[#0F2233]'
                       }`}
                     >
                       {tab.count}
@@ -1485,7 +1499,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                 </div>
                 <div
                   className={`font-mono text-2xl font-extrabold tabular-nums ${
-                    attentionBookingsCount > 0 ? 'text-[#DC2626]' : 'text-[#0F172A]'
+                    attentionBookingsCount > 0 ? 'text-[#DC2626]' : 'text-[#0F2233]'
                   }`}
                 >
                   {attentionBookingsCount}
@@ -1509,7 +1523,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                 }}
                 className={`rounded-xl border-2 p-4 text-start space-y-1 transition-all cursor-pointer ${
                   statusFilter === 'Pending'
-                    ? 'border-[#EA580C] bg-[#FFF7ED]'
+                    ? 'border-[#EE5426] bg-[#FFF7ED]'
                     : 'border-[#CBD5E1] bg-white hover:border-[#94A3B8]'
                 }`}
               >
@@ -1517,9 +1531,9 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                   <span>
                     {isAr ? 'بانتظار التأكيد / تعيين سائق' : 'Awaiting Confirm / Driver'}
                   </span>
-                  <Users className="h-4 w-4 text-[#EA580C]" aria-hidden="true" />
+                  <Users className="h-4 w-4 text-[#EE5426]" aria-hidden="true" />
                 </div>
-                <div className="font-mono text-2xl font-extrabold text-[#0F172A] tabular-nums">
+                <div className="font-mono text-2xl font-extrabold text-[#0F2233] tabular-nums">
                   {unassignedDriversCount}
                 </div>
                 <div className="text-[11px] font-medium text-[#475569]">
@@ -1532,7 +1546,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
               <button
                 type="button"
                 onClick={() => setActiveTab('directory')}
-                className="rounded-xl border-2 border-[#CBD5E1] bg-white hover:border-[#0F172A] p-4 text-start space-y-1 transition-all cursor-pointer"
+                className="rounded-xl border-2 border-[#CBD5E1] bg-white hover:border-[#0F2233] p-4 text-start space-y-1 transition-all cursor-pointer"
               >
                 <div className="flex items-center justify-between text-xs font-bold text-[#334155]">
                   <span>
@@ -1579,7 +1593,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                   }
                   className={`inline-flex min-h-[34px] items-center gap-1.5 rounded-lg px-3.5 font-bold transition-colors cursor-pointer ${
                     urgencyFilter === 'attention'
-                      ? 'bg-[#0F172A] text-white'
+                      ? 'bg-[#0F2233] text-white'
                       : 'bg-[#DC2626] text-white hover:bg-[#B91C1C]'
                   }`}
                 >
@@ -1600,7 +1614,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
             <div className="rounded-xl border border-[#CBD5E1] bg-white p-4 space-y-3 shadow-xs">
               <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#E2E8F0] pb-3">
                 <div>
-                  <h2 className="text-sm font-bold text-[#0F172A]">
+                  <h2 className="text-sm font-bold text-[#0F2233]">
                     {isAr
                       ? 'جدول الحجوزات والتشغيل (الأحدث فوق بالترتيب الزمني)'
                       : 'Live Bookings & Dispatch Sheet (Ordered Newest First)'}
@@ -1617,7 +1631,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                     <button
                       type="button"
                       onClick={() => setSelectedBookingIds([])}
-                      className="inline-flex min-h-[36px] items-center gap-1 rounded-lg border border-[#CBD5E1] bg-[#F8FAFC] px-3 text-xs font-bold text-[#334155] hover:text-[#0F172A] cursor-pointer"
+                      className="inline-flex min-h-[36px] items-center gap-1 rounded-lg border border-[#CBD5E1] bg-[#F8FAFC] px-3 text-xs font-bold text-[#334155] hover:text-[#0F2233] cursor-pointer"
                     >
                       <X className="h-3.5 w-3.5" aria-hidden="true" />
                       <span>
@@ -1631,7 +1645,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                   <button
                     type="button"
                     onClick={handleDownloadCsv}
-                    className="inline-flex min-h-[38px] items-center gap-1.5 rounded-lg border-2 border-[#0F172A] bg-[#0F172A] px-4 py-2 text-xs font-bold text-white hover:bg-[#1E293B] transition-colors whitespace-nowrap cursor-pointer tabular-nums shadow-xs"
+                    className="inline-flex min-h-[38px] items-center gap-1.5 rounded-lg border-2 border-[#0F2233] bg-[#0F2233] px-4 py-2 text-xs font-bold text-white hover:bg-[#19354F] transition-colors whitespace-nowrap cursor-pointer tabular-nums shadow-xs"
                   >
                     <Download className="h-3.5 w-3.5" aria-hidden="true" />
                     <span>
@@ -1660,7 +1674,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                     placeholder={
                       isAr ? 'بحث برقم الحجز، الاسم، الفندق...' : 'Search ref, guest, hotel…'
                     }
-                    className="min-h-[38px] w-full rounded-lg border border-[#CBD5E1] ps-9 pe-3 text-xs font-medium text-[#0F172A] focus:border-[#0F172A] focus:outline-none"
+                    className="min-h-[38px] w-full rounded-lg border border-[#CBD5E1] ps-9 pe-3 text-xs font-medium text-[#0F2233] focus:border-[#0F2233] focus:outline-none"
                   />
                 </label>
 
@@ -1669,7 +1683,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                   onChange={(e) =>
                     setUrgencyFilter(e.target.value as 'all' | 'urgent' | 'attention')
                   }
-                  className="min-h-[38px] rounded-lg border border-[#CBD5E1] bg-white px-3 text-xs font-bold text-[#0F172A]"
+                  className="min-h-[38px] rounded-lg border border-[#CBD5E1] bg-white px-3 text-xs font-bold text-[#0F2233]"
                   aria-label="Filter by urgency"
                 >
                   <option value="all">{isAr ? 'كل الأولويات' : 'All Priorities'}</option>
@@ -1684,7 +1698,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                 <select
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value as BookingStatus | 'all')}
-                  className="min-h-[38px] rounded-lg border border-[#CBD5E1] bg-white px-3 text-xs font-semibold text-[#0F172A]"
+                  className="min-h-[38px] rounded-lg border border-[#CBD5E1] bg-white px-3 text-xs font-semibold text-[#0F2233]"
                   aria-label="Filter by status"
                 >
                   <option value="all">{isAr ? 'كل الحالات' : 'All Statuses'}</option>
@@ -1702,7 +1716,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                 <select
                   value={categoryFilter}
                   onChange={(e) => setCategoryFilter(e.target.value)}
-                  className="min-h-[38px] rounded-lg border border-[#CBD5E1] bg-white px-3 text-xs font-semibold text-[#0F172A]"
+                  className="min-h-[38px] rounded-lg border border-[#CBD5E1] bg-white px-3 text-xs font-semibold text-[#0F2233]"
                   aria-label="Filter by category"
                 >
                   <option value="all">{isAr ? 'كل الأنشطة' : 'All Activities'}</option>
@@ -1720,7 +1734,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                 <select
                   value={supplierFilter}
                   onChange={(e) => setSupplierFilter(e.target.value)}
-                  className="min-h-[38px] rounded-lg border border-[#CBD5E1] bg-white px-3 text-xs font-semibold text-[#0F172A]"
+                  className="min-h-[38px] rounded-lg border border-[#CBD5E1] bg-white px-3 text-xs font-semibold text-[#0F2233]"
                   aria-label="Filter by supplier"
                 >
                   <option value="all">{isAr ? 'كل الموردين' : 'All Suppliers'}</option>
@@ -1735,7 +1749,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                   type="date"
                   value={dateFilter}
                   onChange={(e) => setDateFilter(e.target.value)}
-                  className="min-h-[38px] rounded-lg border border-[#CBD5E1] bg-white px-3 text-xs font-semibold text-[#0F172A] tabular-nums"
+                  className="min-h-[38px] rounded-lg border border-[#CBD5E1] bg-white px-3 text-xs font-semibold text-[#0F2233] tabular-nums"
                   aria-label="Filter by date"
                 />
               </div>
@@ -1744,7 +1758,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
             {/* Bookings Table */}
             {filteredBookings.length === 0 ? (
               <div className="rounded-xl border border-[#CBD5E1] bg-white p-10 text-center space-y-3">
-                <p className="text-sm font-bold text-[#0F172A]">
+                <p className="text-sm font-bold text-[#0F2233]">
                   {isAr ? 'لا توجد حجوزات مطابقة للفلتر الحالي' : 'No bookings match your active filters'}
                 </p>
                 <button
@@ -1757,7 +1771,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                     setSupplierFilter('all');
                     setDateFilter('');
                   }}
-                  className="rounded-lg bg-[#EA580C] px-4 py-2 text-xs font-bold text-white cursor-pointer"
+                  className="btn-wasla-primary rounded-lg px-4 py-2 text-xs font-bold cursor-pointer"
                 >
                   {isAr ? 'إعادة ضبط الفلاتر' : 'Reset Filters'}
                 </button>
@@ -1770,13 +1784,13 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
               >
                   <table className="w-full text-start border-collapse text-xs">
                     <thead>
-                      <tr className="border-b-2 border-[#CBD5E1] bg-[#0F172A] text-[11px] font-bold text-white">
+                      <tr className="border-b-2 border-[#CBD5E1] bg-[#0F2233] text-[11px] font-bold text-white">
                         <th className="py-3 px-2.5 w-9 text-center whitespace-nowrap">
                           <input
                             type="checkbox"
                             checked={allFilteredSelected}
                             onChange={toggleSelectAllFiltered}
-                            className="h-4 w-4 rounded border-[#CBD5E1] text-[#EA580C] focus:ring-[#EA580C] cursor-pointer"
+                            className="h-4 w-4 rounded border-[#CBD5E1] text-[#EE5426] focus:ring-[#EE5426] cursor-pointer"
                             aria-label="Select all visible bookings"
                           />
                         </th>
@@ -1857,14 +1871,14 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                                 type="checkbox"
                                 checked={isChecked}
                                 onChange={() => toggleSelectBooking(b.id)}
-                                className="h-4 w-4 rounded border-[#CBD5E1] text-[#EA580C] focus:ring-[#EA580C] cursor-pointer"
+                                className="h-4 w-4 rounded border-[#CBD5E1] text-[#EE5426] focus:ring-[#EE5426] cursor-pointer"
                                 aria-label={`Select booking ${b.id}`}
                               />
                             </td>
 
                             {/* Ref & RED Alert (Strictly Urgent or Empty) */}
                             <td className="py-3 px-2.5 whitespace-nowrap space-y-1">
-                              <div className="font-mono text-xs font-extrabold text-[#0F172A]">
+                              <div className="font-mono text-xs font-extrabold text-[#0F2233]">
                                 {b.id}
                               </div>
                               {attention.needsAttention && (
@@ -1893,14 +1907,14 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
 
                             {/* Exact Booked At Timestamp */}
                             <td className="py-3 px-2.5 whitespace-nowrap tabular-nums">
-                              <div className="font-mono text-xs font-bold text-[#0F172A]">
+                              <div className="font-mono text-xs font-bold text-[#0F2233]">
                                 {bookedTime.clock}
                               </div>
                               <div className="text-[11px] font-medium text-[#334155]">
                                 {bookedTime.date}
                               </div>
                               {bookedTime.relative && (
-                                <div className="text-[10.5px] font-semibold text-[#EA580C]">
+                                <div className="text-[10.5px] font-semibold text-[#EE5426]">
                                   {bookedTime.relative}
                                 </div>
                               )}
@@ -1908,13 +1922,13 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
 
                             {/* Trip Date & Manual Pickup Time */}
                             <td className="py-3 px-2.5 whitespace-nowrap tabular-nums space-y-0.5">
-                              <div className="font-mono font-bold text-[#0F172A]">{b.date}</div>
+                              <div className="font-mono font-bold text-[#0F2233]">{b.date}</div>
                               {b.tripStartTime && (
                                 <div className="text-[11px] text-[#334155]">
                                   {isAr ? 'بداية الرحلة:' : 'Start:'} {b.tripStartTime}
                                 </div>
                               )}
-                              <div className="text-[11px] font-bold text-[#0F172A]">
+                              <div className="text-[11px] font-bold text-[#0F2233]">
                                 {isAr ? 'البيك أب:' : 'Pickup:'}{' '}
                                 <span
                                   className={
@@ -1939,7 +1953,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
 
                             {/* Excursion & Destination */}
                             <td className="py-3 px-2.5 min-w-[175px]">
-                              <div className="font-bold text-[#0F172A] line-clamp-1">
+                              <div className="font-bold text-[#0F2233] line-clamp-1">
                                 {b.tripTitle}
                               </div>
                               <div className="text-[11px] font-medium text-[#475569]">
@@ -1967,9 +1981,9 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                             {/* Guest & Hotel + Quick WA/Email */}
                             <td className="py-3 px-2.5 min-w-[195px] space-y-1">
                               <div className="flex items-center gap-1.5 flex-wrap">
-                                <span className="font-bold text-[#0F172A]">{b.guestName}</span>
+                                <span className="font-bold text-[#0F2233]">{b.guestName}</span>
                                 {b.guestCountry && (
-                                  <span className="rounded bg-[#F1F5F9] border border-[#CBD5E1] px-1.5 py-0.5 text-[10px] font-bold text-[#0F172A]">
+                                  <span className="rounded bg-[#F1F5F9] border border-[#CBD5E1] px-1.5 py-0.5 text-[10px] font-bold text-[#0F2233]">
                                     {b.guestCountry}
                                   </span>
                                 )}
@@ -2000,6 +2014,8 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                                     hotel: b.hotel,
                                     roomNumber: b.roomNumber,
                                     driverOrGuide: b.assignedDriverOrGuide,
+                                    guestLang: b.guestLang,
+                                    notes: b.notes,
                                   });
                                   const emailDispatch = buildGuestPickupMailtoUrl({
                                     guestEmail: b.guestEmail,
@@ -2014,6 +2030,8 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                                     hotel: b.hotel,
                                     roomNumber: b.roomNumber,
                                     driverOrGuide: b.assignedDriverOrGuide,
+                                    guestLang: b.guestLang,
+                                    notes: b.notes,
                                   });
                                   return (
                                     <>
@@ -2041,7 +2059,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                                               );
                                             }
                                           }}
-                                          className="inline-flex items-center gap-1 rounded border border-[#EA580C] bg-[#FFF7ED] px-2 py-0.5 text-[10px] font-bold text-[#C2410C] hover:bg-[#FFEDD5]"
+                                          className="inline-flex items-center gap-1 rounded border border-[#EE5426] bg-[#FFF7ED] px-2 py-0.5 text-[10px] font-bold text-[#D9461B] hover:bg-[#FFEDD5]"
                                         >
                                           <Mail className="h-2.5 w-2.5" aria-hidden="true" />
                                           <span>{isAr ? 'إيميل' : 'Email'}</span>
@@ -2072,14 +2090,14 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                             </td>
 
                             {/* Pax */}
-                            <td className="py-3 px-2.5 text-end whitespace-nowrap font-mono font-bold text-[#0F172A] tabular-nums">
+                            <td className="py-3 px-2.5 text-end whitespace-nowrap font-mono font-bold text-[#0F2233] tabular-nums">
                               {b.adults}A{b.children > 0 ? `+${b.children}C` : ''}
                               {(b.infants ?? 0) > 0 ? `+${b.infants}INF` : ''}
                             </td>
 
                             {/* Gross EUR */}
                             <td className="py-3 px-2.5 text-end whitespace-nowrap tabular-nums">
-                              <div className="font-mono text-xs font-extrabold text-[#0F172A]">
+                              <div className="font-mono text-xs font-extrabold text-[#0F2233]">
                                 €{b.grossEur}
                               </div>
                               <div className="text-[10px] font-medium text-[#475569]">
@@ -2099,7 +2117,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                                     paymentStatus: e.target.value as PaymentStatus,
                                   })
                                 }
-                                className="rounded-lg border border-[#CBD5E1] bg-white px-2 py-1 text-xs font-semibold text-[#0F172A]"
+                                className="rounded-lg border border-[#CBD5E1] bg-white px-2 py-1 text-xs font-semibold text-[#0F2233]"
                               >
                                 <option value="Awaiting link">
                                   {isAr ? 'بانتظار الرابط' : 'Awaiting link'}
@@ -2162,7 +2180,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                               className="py-3 px-2.5 min-w-[160px] space-y-1"
                               onClick={(e) => e.stopPropagation()}
                             >
-                              <div className="text-[11px] font-bold text-[#0F172A] truncate">
+                              <div className="text-[11px] font-bold text-[#0F2233] truncate">
                                 {b.supplierName}
                               </div>
                               <input
@@ -2176,7 +2194,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                                 placeholder={
                                   isAr ? 'اسم السائق / المرشد...' : 'Assign driver / guide…'
                                 }
-                                className="w-full rounded border border-[#CBD5E1] bg-white px-2 py-1 text-xs font-medium text-[#0F172A] focus:border-[#EA580C] focus:outline-none"
+                                className="w-full rounded border border-[#CBD5E1] bg-white px-2 py-1 text-xs font-medium text-[#0F2233] focus:border-[#EE5426] focus:outline-none"
                               />
                             </td>
 
@@ -2188,7 +2206,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                               <button
                                 type="button"
                                 onClick={() => openBookingTicket(b)}
-                                className="inline-flex items-center gap-1 rounded-lg border border-[#0F172A] bg-white px-2.5 py-1.5 text-[11px] font-bold text-[#0F172A] hover:bg-[#0F172A] hover:text-white transition-colors cursor-pointer"
+                                className="inline-flex items-center gap-1 rounded-lg border border-[#0F2233] bg-white px-2.5 py-1.5 text-[11px] font-bold text-[#0F2233] hover:bg-[#0F2233] hover:text-white transition-colors cursor-pointer"
                               >
                                 <Eye className="h-3 w-3" aria-hidden="true" />
                                 <span>{isAr ? 'التذكرة' : 'Ticket'}</span>
@@ -2213,7 +2231,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
             <div className="rounded-xl border border-[#CBD5E1] bg-white px-5 py-4 flex flex-col lg:flex-row lg:items-center justify-between gap-4 shadow-xs">
               <div className="space-y-1">
                 <div className="flex flex-wrap items-center gap-2.5 text-xs">
-                  <span className="font-bold text-[#0F172A]">
+                  <span className="font-bold text-[#0F2233]">
                     {isAr ? 'قنوات تواصل العمليات:' : 'Official Operations Channels:'}
                   </span>
                   <a
@@ -2229,13 +2247,13 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                   <span aria-hidden="true" className="text-[#CBD5E1]">
                     |
                   </span>
-                  <span dir="ltr" className="font-mono font-bold text-[#0F172A]">
+                  <span dir="ltr" className="font-mono font-bold text-[#0F2233]">
                     {liveDeskEmail}
                   </span>
                   <button
                     type="button"
                     onClick={() => void handleCopyDeskItem('email', liveDeskEmail)}
-                    className="inline-flex items-center gap-1 font-bold text-[#EA580C] hover:underline cursor-pointer"
+                    className="inline-flex items-center gap-1 font-bold text-[#EE5426] hover:underline cursor-pointer"
                   >
                     {copiedKey === 'email' ? (
                       <Check className="h-3 w-3" />
@@ -2253,7 +2271,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                     </span>
                   </button>
                 </div>
-                <h2 className="text-base font-bold text-[#0F172A]">
+                <h2 className="text-base font-bold text-[#0F2233]">
                   {isAr
                     ? 'محادثات الضيوف، قوالب الرسائل الـ 4، وسجل الإيميلات'
                     : 'Guest Live Chats, 4 Dispatch Templates & Email Log'}
@@ -2266,8 +2284,8 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                   onClick={() => setCommsSubView('chats')}
                   className={`inline-flex items-center gap-1.5 rounded-md px-3.5 py-1.5 cursor-pointer whitespace-nowrap ${
                     commsSubView === 'chats'
-                      ? 'bg-[#0F172A] text-white shadow-xs'
-                      : 'text-[#334155] hover:text-[#0F172A]'
+                      ? 'bg-[#0F2233] text-white shadow-xs'
+                      : 'text-[#334155] hover:text-[#0F2233]'
                   }`}
                 >
                   <MessageSquare className="h-3.5 w-3.5" aria-hidden="true" />
@@ -2280,8 +2298,8 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                   onClick={() => setCommsSubView('dispatch')}
                   className={`inline-flex items-center gap-1.5 rounded-md px-3.5 py-1.5 cursor-pointer whitespace-nowrap ${
                     commsSubView === 'dispatch'
-                      ? 'bg-[#EA580C] text-white shadow-xs'
-                      : 'text-[#334155] hover:text-[#0F172A]'
+                      ? 'bg-[#EE5426] text-white shadow-xs'
+                      : 'text-[#334155] hover:text-[#0F2233]'
                   }`}
                 >
                   <Mail className="h-3.5 w-3.5" aria-hidden="true" />
@@ -2299,7 +2317,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                 {/* Left 7 Cols: 4 Editable Guest Dispatch Templates */}
                 <div className="lg:col-span-7 rounded-xl border border-[#CBD5E1] bg-white p-5 space-y-4 shadow-xs">
                   <div className="border-b border-[#E2E8F0] pb-3">
-                    <h3 className="text-base font-bold text-[#0F172A]">
+                    <h3 className="text-base font-bold text-[#0F2233]">
                       {isAr
                         ? 'قوالب مراسلة الضيوف الـ 4 (قابلة للتعديل قبل الإرسال)'
                         : '4 Editable Guest Dispatch Message Templates'}
@@ -2313,13 +2331,13 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
 
                   {/* Step 1: Select Booking */}
                   <div className="space-y-1.5">
-                    <label className="block text-xs font-bold text-[#0F172A]">
+                    <label className="block text-xs font-bold text-[#0F2233]">
                       {isAr ? '1. اختر حجز العميل:' : '1. Select Guest Booking:'}
                     </label>
                     <select
                       value={activeDispatchBooking?.id || ''}
                       onChange={(e) => setDispatchBookingId(e.target.value)}
-                      className="min-h-[42px] w-full rounded-lg border-2 border-[#CBD5E1] bg-white px-3 text-xs font-bold text-[#0F172A] focus:border-[#0F172A] focus:outline-none"
+                      className="min-h-[42px] w-full rounded-lg border-2 border-[#CBD5E1] bg-white px-3 text-xs font-bold text-[#0F2233] focus:border-[#0F2233] focus:outline-none"
                     >
                       {sortedBookings.map((b) => (
                         <option key={b.id} value={b.id}>
@@ -2332,7 +2350,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
 
                   {/* Step 2: Select 1 of the 4 Templates */}
                   <div className="space-y-1.5">
-                    <span className="block text-xs font-bold text-[#0F172A]">
+                    <span className="block text-xs font-bold text-[#0F2233]">
                       {isAr ? '2. اختر قالب الرسالة:' : '2. Choose Message Template:'}
                     </span>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -2382,11 +2400,11 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                             onClick={() => setDispatchTemplateId(tpl.id)}
                             className={`rounded-xl border-2 p-3 text-start transition-all cursor-pointer ${
                               active
-                                ? 'border-[#EA580C] bg-[#FFF7ED]'
+                                ? 'border-[#EE5426] bg-[#FFF7ED]'
                                 : 'border-[#CBD5E1] bg-white hover:border-[#94A3B8]'
                             }`}
                           >
-                            <div className="text-xs font-bold text-[#0F172A]">{tpl.title}</div>
+                            <div className="text-xs font-bold text-[#0F2233]">{tpl.title}</div>
                             <div className="text-[11px] font-medium text-[#475569] mt-0.5">
                               {tpl.sub}
                             </div>
@@ -2400,19 +2418,19 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                   {activeDispatchBooking && (
                     <div className="space-y-3 pt-1">
                       <label className="block space-y-1">
-                        <span className="text-xs font-bold text-[#0F172A]">
+                        <span className="text-xs font-bold text-[#0F2233]">
                           {isAr ? 'عنوان الرسالة / الإيميل:' : 'Email / Message Subject:'}
                         </span>
                         <input
                           type="text"
                           value={dispatchSubject}
                           onChange={(e) => setDispatchSubject(e.target.value)}
-                          className="min-h-[40px] w-full rounded-lg border-2 border-[#CBD5E1] bg-white px-3 text-xs font-bold text-[#0F172A] focus:border-[#EA580C] focus:outline-none"
+                          className="min-h-[40px] w-full rounded-lg border-2 border-[#CBD5E1] bg-white px-3 text-xs font-bold text-[#0F2233] focus:border-[#EE5426] focus:outline-none"
                         />
                       </label>
 
                       <label className="block space-y-1">
-                        <span className="text-xs font-bold text-[#0F172A]">
+                        <span className="text-xs font-bold text-[#0F2233]">
                           {isAr
                             ? 'نص الرسالة (يمكنك التعديل قبل الإرسال):'
                             : 'Message Body (Editable before sending):'}
@@ -2421,7 +2439,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                           rows={8}
                           value={dispatchBody}
                           onChange={(e) => setDispatchBody(e.target.value)}
-                          className="w-full rounded-xl border-2 border-[#CBD5E1] bg-white p-3.5 text-xs sm:text-sm font-medium leading-relaxed text-[#0F172A] focus:border-[#EA580C] focus:outline-none"
+                          className="w-full rounded-xl border-2 border-[#CBD5E1] bg-white p-3.5 text-xs sm:text-sm font-medium leading-relaxed text-[#0F2233] focus:border-[#EE5426] focus:outline-none"
                         />
                       </label>
 
@@ -2483,7 +2501,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                               );
                               window.setTimeout(() => setDispatchSentToast(''), 3500);
                             }}
-                            className="inline-flex min-h-[42px] items-center gap-2 rounded-xl bg-[#EA580C] px-4 text-xs font-bold text-white hover:bg-[#C2410C] shadow-xs"
+                            className="btn-wasla-primary min-h-[42px] rounded-xl px-4 py-2 text-xs font-bold"
                           >
                             <Mail className="h-4 w-4" aria-hidden="true" />
                             <span>
@@ -2495,9 +2513,9 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                         <button
                           type="button"
                           onClick={() => openBookingTicket(activeDispatchBooking)}
-                          className="inline-flex min-h-[42px] items-center gap-1.5 rounded-xl border-2 border-[#CBD5E1] bg-white px-3.5 text-xs font-bold text-[#0F172A] hover:border-[#0F172A] cursor-pointer"
+                          className="inline-flex min-h-[42px] items-center gap-1.5 rounded-xl border-2 border-[#CBD5E1] bg-white px-3.5 text-xs font-bold text-[#0F2233] hover:border-[#0F2233] cursor-pointer"
                         >
-                          <Eye className="h-3.5 w-3.5 text-[#EA580C]" />
+                          <Eye className="h-3.5 w-3.5 text-[#EE5426]" />
                           <span>{isAr ? 'فتح تذكرة الحجز' : 'Open Ticket'}</span>
                         </button>
                       </div>
@@ -2508,7 +2526,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                 {/* Right 5 Cols: Clickable Sent & Received Email Log */}
                 <div className="lg:col-span-5 rounded-xl border border-[#CBD5E1] bg-white overflow-hidden shadow-xs">
                   <div className="px-5 py-4 border-b border-[#E2E8F0]">
-                    <h3 className="text-sm font-bold text-[#0F172A]">
+                    <h3 className="text-sm font-bold text-[#0F2233]">
                       {isAr
                         ? `سجل الإيميلات الواردة والمرسلة (${emailLogs.length})`
                         : `Inbound & Sent Email History (${emailLogs.length})`}
@@ -2538,7 +2556,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                               className={`inline-flex items-center gap-1 rounded px-2 py-0.5 text-[10px] font-extrabold uppercase ${
                                 log.direction === 'inbound'
                                   ? 'bg-[#DC2626] text-white'
-                                  : 'bg-[#0F172A] text-white'
+                                  : 'bg-[#0F2233] text-white'
                               }`}
                             >
                               {log.direction === 'inbound'
@@ -2553,7 +2571,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                               {log.sentAt}
                             </span>
                           </div>
-                          <div className="font-bold text-[#0F172A] line-clamp-1">
+                          <div className="font-bold text-[#0F2233] line-clamp-1">
                             {log.subject}
                           </div>
                           {log.body && (
@@ -2561,7 +2579,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                               {log.body}
                             </p>
                           )}
-                          <div className="flex items-center justify-between gap-2 text-[11px] font-semibold text-[#EA580C] pt-0.5">
+                          <div className="flex items-center justify-between gap-2 text-[11px] font-semibold text-[#EE5426] pt-0.5">
                             <span dir="ltr" className="truncate font-mono text-[#334155]">
                               {log.direction === 'inbound'
                                 ? `From: ${log.from || log.to}`
@@ -2584,7 +2602,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                 <div className="lg:col-span-4 rounded-xl border border-[#CBD5E1] bg-white p-4 space-y-3.5 shadow-xs">
                   <div className="space-y-2.5">
                     <div className="flex items-center justify-between">
-                      <h3 className="text-sm font-bold text-[#0F172A]">
+                      <h3 className="text-sm font-bold text-[#0F2233]">
                         {isAr
                           ? `محادثات الضيوف (${chats.length})`
                           : `Guest Conversations (${chats.length})`}
@@ -2605,7 +2623,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                         placeholder={
                           isAr ? 'ابحث باسم العميل أو رقم الحجز...' : 'Search customer, ref, hotel…'
                         }
-                        className="min-h-[40px] w-full rounded-xl border-2 border-[#CBD5E1] bg-white ps-9 pe-3 text-xs font-semibold text-[#0F172A] focus:border-[#0F172A] focus:outline-none"
+                        className="min-h-[40px] w-full rounded-xl border-2 border-[#CBD5E1] bg-white ps-9 pe-3 text-xs font-semibold text-[#0F2233] focus:border-[#0F2233] focus:outline-none"
                       />
                     </label>
                   </div>
@@ -2628,12 +2646,12 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                           }}
                           className={`w-full text-start rounded-xl border-2 p-3.5 transition-all cursor-pointer space-y-1.5 ${
                             active
-                              ? 'border-[#EA580C] bg-[#FFF7ED]/60 shadow-xs'
-                              : 'border-[#CBD5E1] bg-white hover:border-[#0F172A]'
+                              ? 'border-[#EE5426] bg-[#FFF7ED]/60 shadow-xs'
+                              : 'border-[#CBD5E1] bg-white hover:border-[#0F2233]'
                           }`}
                         >
                           <div className="flex items-center justify-between gap-2">
-                            <span className="font-mono text-xs font-extrabold text-[#EA580C]">
+                            <span className="font-mono text-xs font-extrabold text-[#EE5426]">
                               {thread.bookingRef}
                             </span>
                             <div className="flex items-center gap-1.5">
@@ -2642,13 +2660,13 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                                   {isAr ? 'جديد' : 'NEW'}
                                 </span>
                               )}
-                              <span className="rounded bg-[#0F172A] px-2 py-0.5 text-[10px] font-bold uppercase text-white">
+                              <span className="rounded bg-[#0F2233] px-2 py-0.5 text-[10px] font-bold uppercase text-white">
                                 {thread.customerLang}
                               </span>
                             </div>
                           </div>
 
-                          <p className="text-sm font-bold text-[#0F172A] leading-snug">
+                          <p className="text-sm font-bold text-[#0F2233] leading-snug">
                             {thread.customerName}
                           </p>
 
@@ -2658,7 +2676,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                           {lastMsg && (
                             <p
                               dir="auto"
-                              className="text-xs font-medium text-[#0F172A] line-clamp-1 pt-1 border-t border-[#E2E8F0]"
+                              className="text-xs font-medium text-[#0F2233] line-clamp-1 pt-1 border-t border-[#E2E8F0]"
                             >
                               {lastMsg.text}
                             </p>
@@ -2675,9 +2693,9 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                     <div className="border-b border-[#CBD5E1] bg-[#F8FAFC] px-5 py-4 space-y-3">
                       <div className="flex flex-wrap items-start justify-between gap-3">
                         <div className="space-y-0.5">
-                          <div className="flex flex-wrap items-center gap-2 text-xs font-bold text-[#EA580C]">
+                          <div className="flex flex-wrap items-center gap-2 text-xs font-bold text-[#EE5426]">
                             <span>{isAr ? 'محادثة العميل' : 'Active Guest Thread'}</span>
-                            <span className="font-mono text-[#0F172A]">
+                            <span className="font-mono text-[#0F2233]">
                               {activeThread.bookingRef}
                             </span>
                             {matchedBooking && (
@@ -2690,20 +2708,20 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                               </span>
                             )}
                           </div>
-                          <h3 className="text-lg font-bold text-[#0F172A]">
+                          <h3 className="text-lg font-bold text-[#0F2233]">
                             {activeThread.customerName}
                           </h3>
                         </div>
 
                         <div className="flex flex-wrap items-center gap-2">
-                          <span className="rounded-lg border border-[#CBD5E1] bg-white px-3 py-1.5 text-xs font-bold text-[#0F172A] uppercase">
+                          <span className="rounded-lg border border-[#CBD5E1] bg-white px-3 py-1.5 text-xs font-bold text-[#0F2233] uppercase">
                             {isAr ? 'اللغة:' : 'Lang:'} {activeThread.customerLang}
                           </span>
                           {matchedBooking && (
                             <button
                               type="button"
                               onClick={() => openBookingTicket(matchedBooking)}
-                              className="inline-flex min-h-[36px] items-center gap-1.5 rounded-lg border-2 border-[#0F172A] bg-white px-3 text-xs font-bold text-[#0F172A] hover:bg-[#0F172A] hover:text-white cursor-pointer"
+                              className="inline-flex min-h-[36px] items-center gap-1.5 rounded-lg border-2 border-[#0F2233] bg-white px-3 text-xs font-bold text-[#0F2233] hover:bg-[#0F2233] hover:text-white cursor-pointer"
                             >
                               <Eye className="h-3.5 w-3.5" aria-hidden="true" />
                               <span>{isAr ? 'تذكرة الحجز' : 'View Ticket'}</span>
@@ -2718,7 +2736,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                             <span className="block text-[10.5px] font-bold text-[#475569]">
                               {isAr ? 'الرحلة والتاريخ' : 'Trip & Date'}
                             </span>
-                            <strong className="font-bold text-[#0F172A] line-clamp-1">
+                            <strong className="font-bold text-[#0F2233] line-clamp-1">
                               {matchedBooking.tripTitle}
                             </strong>
                             <span className="block font-mono text-[#334155]">
@@ -2729,10 +2747,10 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                             <span className="block text-[10.5px] font-bold text-[#475569]">
                               {isAr ? 'الفندق والبيك أب' : 'Hotel & Pickup'}
                             </span>
-                            <strong className="font-bold text-[#0F172A] line-clamp-1">
+                            <strong className="font-bold text-[#0F2233] line-clamp-1">
                               {matchedBooking.hotel}
                             </strong>
-                            <span className="block font-bold text-[#EA580C]">
+                            <span className="block font-bold text-[#EE5426]">
                               {matchedBooking.pickupTime || 'TBD'} ·{' '}
                               {matchedBooking.pickupSpot === 'Outside Main Gate'
                                 ? isAr
@@ -2747,7 +2765,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                             <span className="block text-[10.5px] font-bold text-[#475569]">
                               {isAr ? 'السائق والدفع' : 'Driver & Payment'}
                             </span>
-                            <strong className="font-bold text-[#0F172A] line-clamp-1">
+                            <strong className="font-bold text-[#0F2233] line-clamp-1">
                               {matchedBooking.assignedDriverOrGuide ||
                                 (isAr ? 'لم يعين بعد' : 'Unassigned')}
                             </strong>
@@ -2766,8 +2784,8 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                           key={msg.id}
                           className={`max-w-[85%] rounded-2xl px-4 py-3 ${
                             msg.sender === 'operator'
-                              ? 'ms-auto border-2 border-[#C2410C] bg-[#EA580C] text-white'
-                              : 'border-2 border-[#CBD5E1] bg-white text-[#0F172A] shadow-2xs'
+                              ? 'ms-auto border-2 border-[#D9461B] bg-[#EE5426] text-white'
+                              : 'border-2 border-[#CBD5E1] bg-white text-[#0F2233] shadow-2xs'
                           }`}
                         >
                           <p
@@ -2800,11 +2818,11 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                                     activeThread.customerLang
                                   )
                                 }
-                                className="inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[11px] font-bold text-[#0F172A] hover:bg-[#F1F5F9] cursor-pointer"
+                                className="inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[11px] font-bold text-[#0F2233] hover:bg-[#F1F5F9] cursor-pointer"
                               >
                                 <ChevronDown
                                   className={`h-3 w-3 transition-transform ${
-                                    expandedTranslations[msg.id] ? 'rotate-180 text-[#EA580C]' : ''
+                                    expandedTranslations[msg.id] ? 'rotate-180 text-[#EE5426]' : ''
                                   }`}
                                 />
                                 <span>{isAr ? 'ترجمة' : 'Translate'}</span>
@@ -2813,7 +2831,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                               {expandedTranslations[msg.id] && (
                                 <div
                                   dir="auto"
-                                  className="mt-1.5 rounded-lg bg-[#F8FAFC] border border-[#CBD5E1] px-3 py-2 text-xs font-medium text-[#0F172A]"
+                                  className="mt-1.5 rounded-lg bg-[#F8FAFC] border border-[#CBD5E1] px-3 py-2 text-xs font-medium text-[#0F2233]"
                                 >
                                   {translatingIds[msg.id] ? (
                                     <span className="inline-flex items-center gap-1.5 text-[#475569]">
@@ -2846,7 +2864,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                             type="button"
                             disabled={aiLoading}
                             onClick={() => void handleDraftWithAi()}
-                            className="inline-flex items-center gap-1.5 rounded-lg border border-[#4338CA] bg-[#EEF2FF] px-3 py-1.5 font-bold text-[#4338CA] hover:bg-[#E0E7FF] disabled:opacity-60 cursor-pointer"
+                            className="inline-flex items-center gap-1.5 rounded-lg border border-[#0F2233] bg-[#FAF4ED] px-3 py-1.5 font-bold text-[#0F2233] hover:bg-[#0F2233] hover:text-white disabled:opacity-60 cursor-pointer transition-colors"
                           >
                             {aiLoading ? (
                               <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -2868,7 +2886,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                             value={replyLangOverride}
                             onChange={(e) => setReplyLangOverride(e.target.value)}
                             aria-label="Target reply language"
-                            className="rounded-lg border border-[#CBD5E1] bg-white px-2.5 py-1.5 text-xs font-bold text-[#0F172A] cursor-pointer"
+                            className="rounded-lg border border-[#CBD5E1] bg-white px-2.5 py-1.5 text-xs font-bold text-[#0F2233] cursor-pointer"
                           >
                             <option value="auto">
                               {isAr
@@ -2911,7 +2929,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                               ? 'اكتب ردك هنا ثم اضغط إرسال...'
                               : 'Type your reply here and press Send…'
                           }
-                          className="flex-1 min-h-[56px] rounded-xl border-2 border-[#CBD5E1] bg-white px-3.5 py-2.5 text-sm font-medium text-[#0F172A] focus:border-[#EA580C] focus:outline-none"
+                          className="flex-1 min-h-[56px] rounded-xl border-2 border-[#CBD5E1] bg-white px-3.5 py-2.5 text-sm font-medium text-[#0F2233] focus:border-[#EE5426] focus:outline-none"
                         />
                         <div className="flex items-center gap-2 shrink-0">
                           {matchedBooking &&
@@ -2933,7 +2951,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                             )}
                           <button
                             type="submit"
-                            className="inline-flex min-h-[46px] items-center justify-center gap-1.5 rounded-xl bg-[#EA580C] px-5 text-xs font-bold text-white hover:bg-[#C2410C] cursor-pointer"
+                            className="btn-wasla-primary min-h-[46px] gap-1.5 rounded-xl px-5 py-2 text-xs font-bold cursor-pointer"
                           >
                             <Send className="h-4 w-4" />
                             <span>{isAr ? 'إرسال' : 'Send'}</span>
@@ -2955,7 +2973,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
           <div className="space-y-4" dir={isAr ? 'rtl' : 'ltr'}>
             <div className="rounded-xl border border-[#CBD5E1] bg-white px-5 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2 shadow-xs">
               <div>
-                <h2 className="text-base font-bold text-[#0F172A]">
+                <h2 className="text-base font-bold text-[#0F2233]">
                   {isAr
                     ? 'شكاوى الضيوف، تأجيل الطقس، وطلبات الاسترداد'
                     : 'Customer Cases, Weather Rescheduling & Refund Requests'}
@@ -2966,7 +2984,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                     : 'Click any customer email or WhatsApp chat below to open the full message reader screen and reply directly.'}
                 </p>
               </div>
-              <div className="text-xs font-bold text-[#0F172A] tabular-nums shrink-0">
+              <div className="text-xs font-bold text-[#0F2233] tabular-nums shrink-0">
                 {isAr
                   ? `${openComplaintsCount} حالة مفتوحة · ${complaints.length - openComplaintsCount} مغلقة`
                   : `${openComplaintsCount} open · ${complaints.length - openComplaintsCount} resolved`}
@@ -3000,8 +3018,8 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                     key={c.id}
                     className={`rounded-2xl bg-white overflow-hidden transition-all ${
                       isOpen
-                        ? 'border-2 border-[#0F172A] shadow-md'
-                        : 'border border-[#CBD5E1] hover:border-[#0F172A] shadow-xs'
+                        ? 'border-2 border-[#0F2233] shadow-md'
+                        : 'border border-[#CBD5E1] hover:border-[#0F2233] shadow-xs'
                     }`}
                   >
                     {/* Header Row */}
@@ -3015,17 +3033,17 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                           <span className="rounded bg-[#DC2626] px-2 py-0.5 font-mono text-[11px] font-bold text-white">
                             {c.id}
                           </span>
-                          <span className="font-mono font-bold text-[#0F172A]">
+                          <span className="font-mono font-bold text-[#0F2233]">
                             {isAr ? `حجز ${c.bookingRef}` : `Booking ${c.bookingRef}`}
                           </span>
                           <span aria-hidden="true">·</span>
-                          <span className="font-bold text-[#EA580C]">{c.issueType}</span>
+                          <span className="font-bold text-[#EE5426]">{c.issueType}</span>
                           <span aria-hidden="true">·</span>
                           <span className="font-semibold text-[#334155]">
                             {isAr ? `الأولوية: ${c.severity}` : `Severity: ${c.severity}`}
                           </span>
                         </div>
-                        <p className="text-base font-bold text-[#0F172A]">
+                        <p className="text-base font-bold text-[#0F2233]">
                           {c.customerName} — {c.tripTitle}
                         </p>
                         <p className="text-xs font-medium text-[#334155] leading-relaxed">
@@ -3040,7 +3058,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                                 : `WhatsApp & Chat (${chatMessages.length})`}
                             </span>
                           </span>
-                          <span className="inline-flex items-center gap-1 rounded-md border border-[#EA580C] bg-[#FFF7ED] px-2.5 py-1 text-[#C2410C]">
+                          <span className="inline-flex items-center gap-1 rounded-md border border-[#EE5426] bg-[#FFF7ED] px-2.5 py-1 text-[#D9461B]">
                             <Mail className="h-3.5 w-3.5" />
                             <span>
                               {isAr
@@ -3059,7 +3077,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                           <button
                             type="button"
                             onClick={() => handleRescheduleTomorrow(linkedBooking)}
-                            className="inline-flex min-h-[36px] items-center gap-1.5 rounded-lg border-2 border-[#0F172A] bg-white px-3 text-xs font-bold text-[#0F172A] hover:bg-[#0F172A] hover:text-white cursor-pointer"
+                            className="inline-flex min-h-[36px] items-center gap-1.5 rounded-lg border-2 border-[#0F2233] bg-white px-3 text-xs font-bold text-[#0F2233] hover:bg-[#0F2233] hover:text-white cursor-pointer"
                             title={
                               isAr
                                 ? 'تأجيل الرحلة لليوم التالي بسبب الطقس بدلاً من الإلغاء'
@@ -3079,7 +3097,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                               status: e.target.value as ComplaintCase['status'],
                             })
                           }
-                          className="min-h-[36px] rounded-lg border-2 border-[#CBD5E1] bg-white px-2.5 text-xs font-bold text-[#0F172A]"
+                          className="min-h-[36px] rounded-lg border-2 border-[#CBD5E1] bg-white px-2.5 text-xs font-bold text-[#0F2233]"
                         >
                           <option value="Open">{isAr ? 'مفتوحة (Open)' : 'Open'}</option>
                           <option value="Investigating">
@@ -3117,8 +3135,8 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                               }
                               className={`rounded-lg px-3 py-1.5 cursor-pointer ${
                                 channelTab === 'all'
-                                  ? 'bg-[#0F172A] text-white'
-                                  : 'text-[#334155] hover:text-[#0F172A]'
+                                  ? 'bg-[#0F2233] text-white'
+                                  : 'text-[#334155] hover:text-[#0F2233]'
                               }`}
                             >
                               {isAr
@@ -3135,8 +3153,8 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                               }
                               className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 cursor-pointer ${
                                 channelTab === 'email'
-                                  ? 'bg-[#EA580C] text-white'
-                                  : 'text-[#334155] hover:text-[#0F172A]'
+                                  ? 'bg-[#EE5426] text-white'
+                                  : 'text-[#334155] hover:text-[#0F2233]'
                               }`}
                             >
                               <Mail className="h-3.5 w-3.5" />
@@ -3157,7 +3175,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                               className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 cursor-pointer ${
                                 channelTab === 'whatsapp'
                                   ? 'bg-[#15803D] text-white'
-                                  : 'text-[#334155] hover:text-[#0F172A]'
+                                  : 'text-[#334155] hover:text-[#0F2233]'
                               }`}
                             >
                               <MessageCircle className="h-3.5 w-3.5" />
@@ -3194,7 +3212,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                               <button
                                 type="button"
                                 onClick={() => openBookingTicket(linkedBooking)}
-                                className="inline-flex min-h-[34px] items-center gap-1.5 rounded-lg border border-[#0F172A] bg-white px-3 text-xs font-bold text-[#0F172A] hover:bg-[#0F172A] hover:text-white cursor-pointer"
+                                className="inline-flex min-h-[34px] items-center gap-1.5 rounded-lg border border-[#0F2233] bg-white px-3 text-xs font-bold text-[#0F2233] hover:bg-[#0F2233] hover:text-white cursor-pointer"
                               >
                                 <Eye className="h-3.5 w-3.5" />
                                 <span>{isAr ? 'تذكرة الحجز' : 'View Ticket'}</span>
@@ -3207,7 +3225,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                         {(channelTab === 'all' || channelTab === 'email') && (
                           <div className="rounded-xl border border-[#CBD5E1] bg-white p-4 space-y-3">
                             <div className="flex items-center justify-between border-b border-[#E2E8F0] pb-2">
-                              <span className="inline-flex items-center gap-1.5 text-xs font-bold text-[#C2410C]">
+                              <span className="inline-flex items-center gap-1.5 text-xs font-bold text-[#D9461B]">
                                 <Mail className="h-4 w-4" />
                                 <span>
                                   {isAr
@@ -3239,7 +3257,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                                         caseItem: c,
                                       })
                                     }
-                                    className="w-full text-start rounded-xl border-2 border-[#CBD5E1] bg-[#FFFDFB] hover:border-[#EA580C] hover:bg-[#FFF7ED]/50 p-3.5 text-xs space-y-2 transition-all cursor-pointer"
+                                    className="w-full text-start rounded-xl border-2 border-[#CBD5E1] bg-[#FFFDFB] hover:border-[#EE5426] hover:bg-[#FFF7ED]/50 p-3.5 text-xs space-y-2 transition-all cursor-pointer"
                                   >
                                     <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#E2E8F0] pb-2">
                                       <div className="flex flex-wrap items-center gap-2">
@@ -3247,7 +3265,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                                           className={`rounded px-2 py-0.5 text-[10px] font-extrabold uppercase ${
                                             em.direction === 'inbound'
                                               ? 'bg-[#DC2626] text-white'
-                                              : 'bg-[#0F172A] text-white'
+                                              : 'bg-[#0F2233] text-white'
                                           }`}
                                         >
                                           {em.direction === 'inbound'
@@ -3258,15 +3276,15 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                                             ? 'رد مرسل من العمليات'
                                             : 'SENT BY OPERATIONS'}
                                         </span>
-                                        <span className="font-bold text-[#0F172A] text-sm">
+                                        <span className="font-bold text-[#0F2233] text-sm">
                                           {em.subject}
                                         </span>
                                       </div>
-                                      <span className="text-[11px] font-bold text-[#EA580C]">
+                                      <span className="text-[11px] font-bold text-[#EE5426]">
                                         {isAr ? 'فتح وقراءة الإيميل ↗' : 'Open Email Reader ↗'}
                                       </span>
                                     </div>
-                                    <div className="text-xs font-medium text-[#0F172A] whitespace-pre-wrap leading-relaxed line-clamp-3">
+                                    <div className="text-xs font-medium text-[#0F2233] whitespace-pre-wrap leading-relaxed line-clamp-3">
                                       {em.body || em.subject}
                                     </div>
                                     <div className="text-[11px] font-semibold text-[#475569] flex items-center justify-between">
@@ -3337,8 +3355,8 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                                     }}
                                     className={`max-w-[88%] rounded-xl px-4 py-2.5 cursor-pointer ${
                                       msg.sender === 'operator'
-                                        ? 'ms-auto bg-[#EA580C] text-white'
-                                        : 'border border-[#CBD5E1] bg-[#F8FAFC] text-[#0F172A]'
+                                        ? 'ms-auto bg-[#EE5426] text-white'
+                                        : 'border border-[#CBD5E1] bg-[#F8FAFC] text-[#0F2233]'
                                     }`}
                                   >
                                     <p
@@ -3369,14 +3387,14 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                         )}
 
                         {/* Direct Reply Composer */}
-                        <div className="rounded-xl border-2 border-[#0F172A] bg-white p-4 space-y-2.5">
+                        <div className="rounded-xl border-2 border-[#0F2233] bg-white p-4 space-y-2.5">
                           <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
                             <div className="flex flex-wrap items-center gap-2">
                               <button
                                 type="button"
                                 disabled={!!complaintAiLoading[c.id]}
                                 onClick={() => void handleComplaintSmartDraft(c)}
-                                className="inline-flex items-center gap-1.5 rounded-lg border border-[#4338CA] bg-[#EEF2FF] px-3 py-1.5 font-bold text-[#4338CA] hover:bg-[#E0E7FF] disabled:opacity-60 cursor-pointer"
+                                className="inline-flex items-center gap-1.5 rounded-lg border border-[#0F2233] bg-[#FAF4ED] px-3 py-1.5 font-bold text-[#0F2233] hover:bg-[#0F2233] hover:text-white disabled:opacity-60 cursor-pointer transition-colors"
                               >
                                 {complaintAiLoading[c.id] ? (
                                   <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -3403,7 +3421,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                                   }))
                                 }
                                 aria-label="Complaint reply language"
-                                className="rounded-lg border border-[#CBD5E1] bg-white px-2.5 py-1.5 text-xs font-bold text-[#0F172A] cursor-pointer"
+                                className="rounded-lg border border-[#CBD5E1] bg-white px-2.5 py-1.5 text-xs font-bold text-[#0F2233] cursor-pointer"
                               >
                                 <option value="auto">
                                   {isAr
@@ -3453,14 +3471,14 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                                 ? `اكتب ردك إلى ${c.customerName} هنا...`
                                 : `Write your response to ${c.customerName} here…`
                             }
-                            className="w-full min-h-[60px] rounded-xl border border-[#CBD5E1] bg-white px-3.5 py-2.5 text-sm font-medium text-[#0F172A] focus:border-[#EA580C] focus:outline-none"
+                            className="w-full min-h-[60px] rounded-xl border border-[#CBD5E1] bg-white px-3.5 py-2.5 text-sm font-medium text-[#0F2233] focus:border-[#EE5426] focus:outline-none"
                           />
 
                           <div className="flex flex-wrap items-center justify-end gap-2">
                             <button
                               type="button"
                               onClick={() => handleSendComplaintEmail(c)}
-                              className="inline-flex min-h-[38px] items-center gap-1.5 rounded-xl border border-[#EA580C] bg-[#FFF7ED] px-3.5 text-xs font-bold text-[#C2410C] hover:bg-[#FFEDD5] cursor-pointer"
+                              className="inline-flex min-h-[38px] items-center gap-1.5 rounded-xl border border-[#EE5426] bg-[#FFF7ED] px-3.5 text-xs font-bold text-[#D9461B] hover:bg-[#FFEDD5] cursor-pointer"
                             >
                               <Mail className="h-3.5 w-3.5" />
                               <span>{isAr ? 'رد عبر الإيميل' : 'Reply via Email'}</span>
@@ -3480,7 +3498,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                               type="button"
                               disabled={!replyDraft.trim()}
                               onClick={() => handleSendComplaintChatReply(c)}
-                              className="inline-flex min-h-[38px] items-center gap-1.5 rounded-xl bg-[#EA580C] px-4 text-xs font-bold text-white hover:bg-[#C2410C] disabled:opacity-50 cursor-pointer"
+                              className="btn-wasla-primary min-h-[38px] gap-1.5 rounded-xl px-4 py-2 text-xs font-bold cursor-pointer"
                             >
                               <Send className="h-3.5 w-3.5" />
                               <span>{isAr ? 'إرسال في الشات' : 'Send to Chat'}</span>
@@ -3504,12 +3522,12 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
             {/* Financial & Multi-Currency Settlement Banner */}
             <div className="rounded-xl border border-[#CBD5E1] bg-white p-5 flex flex-col lg:flex-row lg:items-center justify-between gap-4 shadow-xs">
               <div className="space-y-1">
-                <div className="text-xs font-bold uppercase tracking-wider text-[#EA580C]">
+                <div className="text-xs font-bold uppercase tracking-wider text-[#EE5426]">
                   {isAr
                     ? 'كشوفات التشغيل وتسوية الحسابات مع الموردين'
                     : 'Supplier Operational Manifests & Financial Settlement Ledger'}
                 </div>
-                <h2 className="text-lg font-bold text-[#0F172A]">
+                <h2 className="text-lg font-bold text-[#0F2233]">
                   {isAr
                     ? `كشف حجوزات الموردين والأفراد والتواريخ والجنسيات والحسابات (${suppliers.length} مورد)`
                     : `Full Supplier Bookings, Pax Counts, Dates, Nationalities & Cash/Link Settlements (${suppliers.length} Partners)`}
@@ -3534,14 +3552,14 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                     placeholder={
                       isAr ? 'ابحث باسم المورد أو المدينة...' : 'Search supplier or city...'
                     }
-                    className="min-h-[38px] w-full rounded-lg border border-[#CBD5E1] bg-white ps-8 pe-3 text-xs font-semibold text-[#0F172A] focus:border-[#0F172A] focus:outline-none"
+                    className="min-h-[38px] w-full rounded-lg border border-[#CBD5E1] bg-white ps-8 pe-3 text-xs font-semibold text-[#0F2233] focus:border-[#0F2233] focus:outline-none"
                   />
                 </label>
 
                 <button
                   type="button"
                   onClick={() => exportBookingsToCsv(sortedBookings, 'all-suppliers-ledger')}
-                  className="inline-flex min-h-[38px] items-center gap-1.5 rounded-lg bg-[#0F172A] px-4 py-2 text-xs font-bold text-white hover:bg-[#1E293B] cursor-pointer"
+                  className="inline-flex min-h-[38px] items-center gap-1.5 rounded-lg bg-[#0F2233] px-4 py-2 text-xs font-bold text-white hover:bg-[#19354F] cursor-pointer"
                 >
                   <Download className="h-3.5 w-3.5" />
                   <span>
@@ -3563,12 +3581,12 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                 return (
                   <div className="space-y-4">
                     {/* Sticky Top Return / Close / Export Action Bar */}
-                    <div className="sticky top-0 z-30 rounded-xl border-2 border-[#0F172A] bg-white/95 backdrop-blur-sm p-4 shadow-md flex flex-wrap items-center justify-between gap-3">
+                    <div className="sticky top-0 z-30 rounded-xl border-2 border-[#0F2233] bg-white/95 backdrop-blur-sm p-4 shadow-md flex flex-wrap items-center justify-between gap-3">
                       <div className="flex flex-wrap items-center gap-3 min-w-0">
                         <button
                           type="button"
                           onClick={() => setSelectedSupplierName(null)}
-                          className="inline-flex min-h-[38px] items-center gap-1.5 rounded-lg border-2 border-[#0F172A] bg-white px-3.5 text-xs font-extrabold text-[#0F172A] hover:bg-[#0F172A] hover:text-white transition-colors cursor-pointer shrink-0"
+                          className="inline-flex min-h-[38px] items-center gap-1.5 rounded-lg border-2 border-[#0F2233] bg-white px-3.5 text-xs font-extrabold text-[#0F2233] hover:bg-[#0F2233] hover:text-white transition-colors cursor-pointer shrink-0"
                         >
                           <ArrowLeft
                             className={`h-4 w-4 shrink-0 ${isAr ? 'rotate-180' : ''}`}
@@ -3580,12 +3598,12 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                         </button>
 
                         <div className="min-w-0">
-                          <div className="text-[11px] font-bold uppercase tracking-wider text-[#EA580C]">
+                          <div className="text-[11px] font-bold uppercase tracking-wider text-[#EE5426]">
                             {isAr
                               ? 'شيت كشف الركاب والتسويات المالية للمورد'
                               : 'Supplier Passenger Manifest & Settlement Sheet'}
                           </div>
-                          <h3 className="text-base sm:text-lg font-extrabold text-[#0F172A] truncate">
+                          <h3 className="text-base sm:text-lg font-extrabold text-[#0F2233] truncate">
                             {openedSupplier.supplier.name}{' '}
                             <span className="text-xs font-semibold text-[#475569]">
                               · {openedSupplier.supplier.city}
@@ -3605,7 +3623,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                                 .replace(/\s+/g, '-')
                             )
                           }
-                          className="inline-flex min-h-[38px] items-center gap-1.5 rounded-lg bg-[#EA580C] px-4 text-xs font-bold text-white hover:bg-[#C2410C] cursor-pointer shadow-xs"
+                          className="btn-wasla-primary min-h-[38px] gap-1.5 rounded-lg px-4 py-2 text-xs font-bold cursor-pointer"
                         >
                           <Download className="h-3.5 w-3.5" aria-hidden="true" />
                           <span>
@@ -3618,7 +3636,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                         <button
                           type="button"
                           onClick={() => setSelectedSupplierName(null)}
-                          className="inline-flex min-h-[38px] items-center gap-1.5 rounded-lg border-2 border-[#CBD5E1] bg-[#F8FAFC] px-3.5 text-xs font-extrabold text-[#0F172A] hover:border-[#DC2626] hover:bg-[#FEF2F2] hover:text-[#DC2626] transition-colors cursor-pointer"
+                          className="inline-flex min-h-[38px] items-center gap-1.5 rounded-lg border-2 border-[#CBD5E1] bg-[#F8FAFC] px-3.5 text-xs font-extrabold text-[#0F2233] hover:border-[#DC2626] hover:bg-[#FEF2F2] hover:text-[#DC2626] transition-colors cursor-pointer"
                           aria-label={isAr ? 'إغلاق الشيت' : 'Close supplier sheet'}
                         >
                           <X className="h-4 w-4" aria-hidden="true" />
@@ -3633,7 +3651,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                         <div className="text-[11px] font-bold text-[#475569]">
                           {isAr ? 'إجمالي الحجوزات' : 'Total Bookings'}
                         </div>
-                        <div className="mt-1 font-mono text-lg font-extrabold text-[#0F172A] tabular-nums">
+                        <div className="mt-1 font-mono text-lg font-extrabold text-[#0F2233] tabular-nums">
                           {openedSupplier.allBookings.length}
                         </div>
                         <div className="text-[10.5px] font-semibold text-[#475569]">
@@ -3646,7 +3664,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                         <div className="text-[11px] font-bold text-[#475569]">
                           {isAr ? 'إجمالي الأفراد' : 'Total Pax'}
                         </div>
-                        <div className="mt-1 font-mono text-lg font-extrabold text-[#EA580C] tabular-nums">
+                        <div className="mt-1 font-mono text-lg font-extrabold text-[#EE5426] tabular-nums">
                           {openedSupplier.totalPax}
                         </div>
                         <div className="text-[10.5px] font-semibold text-[#475569]">
@@ -3659,7 +3677,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                         <div className="text-[11px] font-bold text-[#475569]">
                           {isAr ? 'إجمالي المبيعات' : 'Gross Sales'}
                         </div>
-                        <div className="mt-1 font-mono text-lg font-extrabold text-[#0F172A] tabular-nums">
+                        <div className="mt-1 font-mono text-lg font-extrabold text-[#0F2233] tabular-nums">
                           €{openedSupplier.grossEur}
                         </div>
                         <div className="text-[10.5px] font-semibold text-[#475569]">
@@ -3679,20 +3697,20 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                         </div>
                       </div>
 
-                      <div className="rounded-xl border border-[#CBD5E1] bg-white p-3.5">
-                        <div className="text-[11px] font-bold text-[#475569]">
+                      <div className="card-wasla rounded-xl p-3.5">
+                        <div className="text-[11px] font-bold text-[#64748B]">
                           {isAr ? 'مدفوع أونلاين لوصلة' : 'Paid Online (Wasla)'}
                         </div>
-                        <div className="mt-1 font-mono text-lg font-extrabold text-[#0369A1] tabular-nums">
+                        <div className="mt-1 font-mono text-lg font-extrabold text-[#0F2233] tabular-nums">
                           €{openedSupplier.onlineCollectedByWaslaEur}
                         </div>
-                        <div className="text-[10.5px] font-semibold text-[#475569]">
+                        <div className="text-[10.5px] font-semibold text-[#64748B]">
                           {isAr ? `عمولة وصلة (${safeCommissionPct}%):` : `Wasla Comm (${safeCommissionPct}%):`} €
                           {openedSupplier.waslaCommissionEur}
                         </div>
                       </div>
 
-                      <div className="rounded-xl border-2 border-[#0F172A]/20 bg-[#F8FAFC] p-3.5">
+                      <div className="rounded-xl border-2 border-[#0F2233]/20 bg-[#FAF4ED] p-3.5">
                         <div className="text-[11px] font-bold text-[#475569]">
                           {isAr ? 'صافي التسوية النهائية' : 'Net Settlement'}
                         </div>
@@ -3707,10 +3725,10 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                           </>
                         ) : openedSupplier.balanceToWaslaEur < 0 ? (
                           <>
-                            <div className="mt-1 font-mono text-lg font-extrabold text-[#C2410C] tabular-nums">
+                            <div className="mt-1 font-mono text-lg font-extrabold text-[#D9461B] tabular-nums">
                               €{Math.abs(openedSupplier.balanceToWaslaEur)}
                             </div>
-                            <div className="text-[10.5px] font-bold text-[#C2410C]">
+                            <div className="text-[10.5px] font-bold text-[#D9461B]">
                               {isAr ? 'مستحق للمورد من وصلة' : 'Wasla pays Supplier'}
                             </div>
                           </>
@@ -3738,7 +3756,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                         <button
                           type="button"
                           onClick={() => setSelectedSupplierName(null)}
-                          className="inline-flex min-h-[38px] items-center gap-1.5 rounded-lg bg-[#0F172A] px-4 text-xs font-bold text-white hover:bg-[#1E293B] cursor-pointer"
+                          className="inline-flex min-h-[38px] items-center gap-1.5 rounded-lg bg-[#0F2233] px-4 text-xs font-bold text-white hover:bg-[#19354F] cursor-pointer"
                         >
                           <ArrowLeft
                             className={`h-3.5 w-3.5 ${isAr ? 'rotate-180' : ''}`}
@@ -3759,7 +3777,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                       >
                         <table className="w-full text-start border-collapse text-xs">
                           <thead>
-                            <tr className="border-b-2 border-[#CBD5E1] bg-[#0F172A] text-[11px] font-bold text-white">
+                            <tr className="border-b-2 border-[#CBD5E1] bg-[#0F2233] text-[11px] font-bold text-white">
                               <th className="py-3 px-3 text-start whitespace-nowrap">
                                 {isAr ? 'رقم الحجز' : 'Ref'}
                               </th>
@@ -3813,29 +3831,29 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                                   onClick={() => openBookingTicket(bk)}
                                   className="bg-white hover:bg-[#FFF7ED] cursor-pointer transition-colors"
                                 >
-                                  <td className="py-3 px-3 font-mono font-extrabold text-[#EA580C] whitespace-nowrap">
+                                  <td className="py-3 px-3 font-mono font-extrabold text-[#EE5426] whitespace-nowrap">
                                     {bk.id}
                                   </td>
                                   <td className="py-3 px-3 font-mono tabular-nums whitespace-nowrap">
-                                    <div className="font-bold text-[#0F172A]">{bk.date}</div>
+                                    <div className="font-bold text-[#0F2233]">{bk.date}</div>
                                     <div className="text-[11px] font-semibold text-[#475569]">
                                       {bk.pickupTime || 'TBD'}
                                     </div>
                                   </td>
-                                  <td className="py-3 px-3 font-semibold text-[#0F172A] min-w-[180px]">
+                                  <td className="py-3 px-3 font-semibold text-[#0F2233] min-w-[180px]">
                                     <div className="line-clamp-1">{bk.tripTitle}</div>
                                     <div className="text-[10.5px] font-medium text-[#475569]">
                                       {bk.destination} · {bk.category}
                                     </div>
                                   </td>
-                                  <td className="py-3 px-3 font-semibold text-[#0F172A] whitespace-nowrap">
+                                  <td className="py-3 px-3 font-semibold text-[#0F2233] whitespace-nowrap">
                                     <span>{bk.guestName}</span>{' '}
                                     <span className="rounded bg-[#F1F5F9] border border-[#CBD5E1] px-1.5 py-0.5 text-[10px] font-bold text-[#334155]">
                                       {bk.guestCountry || 'Guest'}
                                     </span>
                                   </td>
                                   <td className="py-3 px-3 text-[#334155] min-w-[170px]">
-                                    <div className="font-semibold text-[#0F172A] truncate max-w-[200px]">
+                                    <div className="font-semibold text-[#0F2233] truncate max-w-[200px]">
                                       {bk.hotel}
                                     </div>
                                     {bk.roomNumber && (
@@ -3859,7 +3877,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                                     </span>
                                   </td>
                                   <td className="py-3 px-3 text-[11px] font-semibold whitespace-nowrap">
-                                    <div className="text-[#0F172A]">{bk.paymentStatus}</div>
+                                    <div className="text-[#0F2233]">{bk.paymentStatus}</div>
                                     <div className="text-[10px] text-[#64748B]">
                                       EUR / USD / EGP
                                     </div>
@@ -3867,7 +3885,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                                   <td className="py-3 px-3 text-end font-mono font-bold whitespace-nowrap tabular-nums">
                                     €{gross}
                                   </td>
-                                  <td className="py-3 px-3 text-end font-mono font-bold text-[#EA580C] whitespace-nowrap tabular-nums">
+                                  <td className="py-3 px-3 text-end font-mono font-bold text-[#EE5426] whitespace-nowrap tabular-nums">
                                     €{comm}
                                   </td>
                                   <td className="py-3 px-3 text-end font-mono font-bold text-[#15803D] whitespace-nowrap tabular-nums">
@@ -3880,7 +3898,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                                     <button
                                       type="button"
                                       onClick={() => openBookingTicket(bk)}
-                                      className="inline-flex items-center gap-1 rounded-lg border border-[#0F172A] bg-white px-2.5 py-1 text-[11px] font-bold text-[#0F172A] hover:bg-[#0F172A] hover:text-white cursor-pointer"
+                                      className="inline-flex items-center gap-1 rounded-lg border border-[#0F2233] bg-white px-2.5 py-1 text-[11px] font-bold text-[#0F2233] hover:bg-[#0F2233] hover:text-white cursor-pointer"
                                     >
                                       <Eye className="h-3 w-3" aria-hidden="true" />
                                       <span>{isAr ? 'فتح' : 'Open'}</span>
@@ -3905,7 +3923,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                         <button
                           type="button"
                           onClick={() => setSelectedSupplierName(null)}
-                          className="inline-flex min-h-[38px] items-center gap-1.5 rounded-lg border border-[#0F172A] bg-white px-4 text-xs font-bold text-[#0F172A] hover:bg-[#0F172A] hover:text-white cursor-pointer"
+                          className="inline-flex min-h-[38px] items-center gap-1.5 rounded-lg border border-[#0F2233] bg-white px-4 text-xs font-bold text-[#0F2233] hover:bg-[#0F2233] hover:text-white cursor-pointer"
                         >
                           <ArrowLeft
                             className={`h-3.5 w-3.5 ${isAr ? 'rotate-180' : ''}`}
@@ -3916,7 +3934,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                         <button
                           type="button"
                           onClick={() => setSelectedSupplierName(null)}
-                          className="inline-flex min-h-[38px] items-center gap-1.5 rounded-lg bg-[#0F172A] px-4 text-xs font-bold text-white hover:bg-[#1E293B] cursor-pointer"
+                          className="inline-flex min-h-[38px] items-center gap-1.5 rounded-lg bg-[#0F2233] px-4 text-xs font-bold text-white hover:bg-[#19354F] cursor-pointer"
                         >
                           <X className="h-3.5 w-3.5" aria-hidden="true" />
                           <span>{isAr ? 'إغلاق / إلغاء' : 'Close / Cancel'}</span>
@@ -3937,7 +3955,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                 >
                   <table className="w-full text-start border-collapse text-xs">
                     <thead>
-                      <tr className="border-b-2 border-[#CBD5E1] bg-[#0F172A] text-[11px] font-bold text-white">
+                      <tr className="border-b-2 border-[#CBD5E1] bg-[#0F2233] text-[11px] font-bold text-white">
                         <th className="py-3 px-4 text-start whitespace-nowrap">
                           {isAr ? 'المورد والمدينة' : 'Supplier & City'}
                         </th>
@@ -3980,7 +3998,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                           className="cursor-pointer bg-white hover:bg-[#FFF7ED]/70 transition-colors"
                         >
                           <td className="py-3.5 px-4">
-                            <div className="font-bold text-[#0F172A] text-sm">
+                            <div className="font-bold text-[#0F2233] text-sm">
                               {item.supplier.name}
                             </div>
                             <div className="text-[11px] font-medium text-[#475569]">
@@ -3989,18 +4007,18 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                           </td>
 
                           <td className="py-3.5 px-3 text-center whitespace-nowrap tabular-nums">
-                            <div className="font-mono font-extrabold text-[#0F172A] text-sm">
+                            <div className="font-mono font-extrabold text-[#0F2233] text-sm">
                               {item.allBookings.length}
                             </div>
                             <div className="text-[10.5px] font-semibold text-[#334155]">
                               <span className="text-[#15803D]">{item.confirmedCount}C</span> ·{' '}
                               <span className="text-[#B45309]">{item.pendingCount}P</span> ·{' '}
-                              <span className="text-[#0F172A]">{item.completedCount}D</span>
+                              <span className="text-[#0F2233]">{item.completedCount}D</span>
                             </div>
                           </td>
 
                           <td className="py-3.5 px-3 text-center whitespace-nowrap tabular-nums">
-                            <div className="font-mono font-extrabold text-[#EA580C] text-sm">
+                            <div className="font-mono font-extrabold text-[#EE5426] text-sm">
                               {item.totalPax} {isAr ? 'فرد' : 'pax'}
                             </div>
                             <div className="text-[10.5px] font-semibold text-[#334155]">
@@ -4009,7 +4027,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                           </td>
 
                           <td className="py-3.5 px-3 max-w-[230px] space-y-1">
-                            <div className="text-[11px] font-mono font-bold text-[#0F172A] truncate">
+                            <div className="text-[11px] font-mono font-bold text-[#0F2233] truncate">
                               {item.dates.length > 0
                                 ? item.dates.join(', ')
                                 : isAr
@@ -4020,7 +4038,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                               {item.nationalities.slice(0, 4).map((nat) => (
                                 <span
                                   key={nat}
-                                  className="rounded bg-[#F1F5F9] border border-[#CBD5E1] px-1.5 py-0.5 text-[10px] font-bold text-[#0F172A]"
+                                  className="rounded bg-[#F1F5F9] border border-[#CBD5E1] px-1.5 py-0.5 text-[10px] font-bold text-[#0F2233]"
                                 >
                                   {nat}
                                 </span>
@@ -4028,7 +4046,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                             </div>
                           </td>
 
-                          <td className="py-3.5 px-3 text-end font-mono font-bold text-[#0F172A] whitespace-nowrap tabular-nums">
+                          <td className="py-3.5 px-3 text-end font-mono font-bold text-[#0F2233] whitespace-nowrap tabular-nums">
                             €{item.grossEur}
                           </td>
 
@@ -4036,11 +4054,11 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                             €{item.cashCollectedBySupplierEur}
                           </td>
 
-                          <td className="py-3.5 px-3 text-end font-mono font-bold text-[#0369A1] whitespace-nowrap tabular-nums">
+                          <td className="py-3.5 px-3 text-end font-mono font-bold text-[#0F2233] whitespace-nowrap tabular-nums">
                             €{item.onlineCollectedByWaslaEur}
                           </td>
 
-                          <td className="py-3.5 px-3 text-end font-mono font-bold text-[#EA580C] whitespace-nowrap tabular-nums">
+                          <td className="py-3.5 px-3 text-end font-mono font-bold text-[#EE5426] whitespace-nowrap tabular-nums">
                             €{item.waslaCommissionEur}
                           </td>
 
@@ -4056,10 +4074,10 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                               </span>
                             ) : item.balanceToWaslaEur < 0 ? (
                               <span className="inline-flex flex-col items-end">
-                                <strong className="font-mono text-xs font-extrabold text-[#C2410C]">
+                                <strong className="font-mono text-xs font-extrabold text-[#D9461B]">
                                   €{Math.abs(item.balanceToWaslaEur)}
                                 </strong>
-                                <span className="text-[10px] font-bold text-[#C2410C]">
+                                <span className="text-[10px] font-bold text-[#D9461B]">
                                   {isAr ? 'مستحق للمورد من وصلة' : 'Wasla pays Supplier'}
                                 </span>
                               </span>
@@ -4078,7 +4096,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                               <button
                                 type="button"
                                 onClick={() => setSelectedSupplierName(item.supplier.name)}
-                                className="inline-flex items-center gap-1 rounded-lg border border-[#0F172A] bg-white px-2.5 py-1.5 text-[11px] font-bold text-[#0F172A] hover:bg-[#0F172A] hover:text-white cursor-pointer"
+                                className="inline-flex items-center gap-1 rounded-lg border border-[#0F2233] bg-white px-2.5 py-1.5 text-[11px] font-bold text-[#0F2233] hover:bg-[#0F2233] hover:text-white cursor-pointer"
                               >
                                 <FileText className="h-3 w-3" />
                                 <span>{isAr ? 'فتح الشيت' : 'Open Sheet'}</span>
@@ -4091,7 +4109,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                                     item.supplier.name.toLowerCase().replace(/\s+/g, '-')
                                   )
                                 }
-                                className="inline-flex items-center gap-1 rounded-lg bg-[#EA580C] px-2.5 py-1.5 text-[11px] font-bold text-white hover:bg-[#C2410C] cursor-pointer"
+                                className="btn-wasla-primary gap-1 rounded-lg px-2.5 py-1.5 text-[11px] font-bold cursor-pointer"
                               >
                                 <Download className="h-3 w-3" />
                                 <span>CSV</span>
@@ -4114,17 +4132,17 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
       {/* ============================================================ */}
       {readerModal && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-[#0F172A]/70 p-4 backdrop-blur-xs"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-[#0F2233]/70 p-4 backdrop-blur-xs"
           onClick={() => setReaderModal(null)}
           role="dialog"
           aria-modal="true"
         >
           <div
-            className="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl border-2 border-[#0F172A] bg-white shadow-2xl"
+            className="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl border-2 border-[#0F2233] bg-white shadow-2xl"
             onClick={(e) => e.stopPropagation()}
             dir={isAr ? 'rtl' : 'ltr'}
           >
-            <div className="sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-[#CBD5E1] bg-[#0F172A] px-5 py-4 text-white">
+            <div className="sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-[#CBD5E1] bg-[#0F2233] px-5 py-4 text-white">
               <div className="flex items-center gap-2.5 min-w-0">
                 {readerModal.kind === 'email' ? (
                   <Mail className="h-5 w-5 text-[#FDBA74] shrink-0" />
@@ -4161,7 +4179,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
               <div className="p-5 space-y-4 text-xs sm:text-sm">
                 <div className="rounded-xl border border-[#CBD5E1] bg-[#F8FAFC] p-3.5 space-y-1.5 text-xs">
                   <div className="flex flex-wrap items-center justify-between gap-2">
-                    <span className="font-bold text-[#0F172A]">
+                    <span className="font-bold text-[#0F2233]">
                       {isAr ? 'من:' : 'From:'}{' '}
                       <span className="font-mono">
                         {readerModal.email.from ||
@@ -4172,19 +4190,19 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                     </span>
                     <span className="font-mono text-[#475569]">{readerModal.email.sentAt}</span>
                   </div>
-                  <div className="font-bold text-[#0F172A]">
+                  <div className="font-bold text-[#0F2233]">
                     {isAr ? 'إلى:' : 'To:'}{' '}
                     <span className="font-mono">{readerModal.email.to}</span>
                   </div>
                   {readerModal.email.bookingRef && (
-                    <div className="font-bold text-[#EA580C]">
+                    <div className="font-bold text-[#EE5426]">
                       {isAr ? 'رقم الحجز:' : 'Booking Ref:'}{' '}
                       <span className="font-mono">{readerModal.email.bookingRef}</span>
                     </div>
                   )}
                 </div>
 
-                <div className="rounded-xl border-2 border-[#CBD5E1] bg-white p-4 text-sm font-medium leading-relaxed text-[#0F172A] whitespace-pre-wrap">
+                <div className="rounded-xl border-2 border-[#CBD5E1] bg-white p-4 text-sm font-medium leading-relaxed text-[#0F2233] whitespace-pre-wrap">
                   {readerModal.email.body || readerModal.email.subject}
                 </div>
 
@@ -4195,7 +4213,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                         ? readerModal.email.from || readerModal.email.to
                         : readerModal.email.to
                     )}?subject=${encodeURIComponent(`Re: ${readerModal.email.subject}`)}`}
-                    className="inline-flex min-h-[40px] items-center gap-1.5 rounded-xl bg-[#EA580C] px-4 text-xs font-bold text-white hover:bg-[#C2410C]"
+                    className="btn-wasla-primary min-h-[40px] gap-1.5 rounded-xl px-4 py-2 text-xs font-bold"
                   >
                     <Mail className="h-3.5 w-3.5" />
                     <span>{isAr ? 'الرد على هذا الإيميل' : 'Reply to Email'}</span>
@@ -4203,7 +4221,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                   <button
                     type="button"
                     onClick={() => setReaderModal(null)}
-                    className="min-h-[40px] rounded-xl border border-[#CBD5E1] bg-white px-4 text-xs font-bold text-[#0F172A] cursor-pointer"
+                    className="min-h-[40px] rounded-xl border border-[#CBD5E1] bg-white px-4 text-xs font-bold text-[#0F2233] cursor-pointer"
                   >
                     {isAr ? 'إغلاق' : 'Close'}
                   </button>
@@ -4217,8 +4235,8 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                       key={m.id}
                       className={`max-w-[85%] rounded-xl px-4 py-3 ${
                         m.sender === 'operator'
-                          ? 'ms-auto bg-[#EA580C] text-white'
-                          : 'border border-[#CBD5E1] bg-white text-[#0F172A]'
+                          ? 'ms-auto bg-[#EE5426] text-white'
+                          : 'border border-[#CBD5E1] bg-white text-[#0F2233]'
                       }`}
                     >
                       <p dir="auto" className="text-sm font-medium whitespace-pre-wrap">
@@ -4255,7 +4273,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                   <button
                     type="button"
                     onClick={() => setReaderModal(null)}
-                    className="min-h-[40px] rounded-xl border border-[#CBD5E1] bg-white px-4 text-xs font-bold text-[#0F172A] cursor-pointer"
+                    className="min-h-[40px] rounded-xl border border-[#CBD5E1] bg-white px-4 text-xs font-bold text-[#0F2233] cursor-pointer"
                   >
                     {isAr ? 'إغلاق' : 'Close'}
                   </button>
@@ -4271,7 +4289,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
       {/* ============================================================ */}
       {modalMode && modalDraft && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-[#0F172A]/65 p-4 backdrop-blur-[2px]"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-[#0F2233]/65 p-4 backdrop-blur-[2px]"
           onClick={() => {
             setModalMode(null);
             setModalDraft(null);
@@ -4286,7 +4304,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
           >
             <div className="sticky top-0 z-10 flex flex-wrap items-center justify-between gap-3 border-b border-[#E2E8F0] bg-white/95 px-6 py-4 backdrop-blur-sm">
               <div>
-                <div className="flex flex-wrap items-center gap-2 text-xs font-bold text-[#EA580C]">
+                <div className="flex flex-wrap items-center gap-2 text-xs font-bold text-[#EE5426]">
                   <span>
                     {modalMode === 'ticket'
                       ? isAr
@@ -4302,7 +4320,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                     </span>
                   )}
                 </div>
-                <h2 className="text-lg font-bold text-[#0F172A]">
+                <h2 className="text-lg font-bold text-[#0F2233]">
                   {modalMode === 'create'
                     ? isAr
                       ? 'إضافة حجز يدوي جديد'
@@ -4316,7 +4334,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                   <button
                     type="button"
                     onClick={() => setModalMode('edit')}
-                    className="inline-flex min-h-[36px] items-center gap-1.5 rounded-lg border border-[#EA580C] bg-[#FFF7ED] px-3.5 text-xs font-bold text-[#C2410C] hover:bg-[#FFEDD5] cursor-pointer"
+                    className="inline-flex min-h-[36px] items-center gap-1.5 rounded-lg border border-[#EE5426] bg-[#FFF7ED] px-3.5 text-xs font-bold text-[#D9461B] hover:bg-[#FFEDD5] cursor-pointer"
                   >
                     <Pencil className="h-3.5 w-3.5" />
                     <span>{isAr ? 'تعديل الحجز والبيك أب' : 'Edit Booking & Pickup'}</span>
@@ -4326,9 +4344,9 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                   <button
                     type="button"
                     onClick={() => setModalMode('ticket')}
-                    className="inline-flex min-h-[36px] items-center gap-1.5 rounded-lg border border-[#CBD5E1] bg-[#F8FAFC] px-3.5 text-xs font-bold text-[#0F172A] hover:bg-[#E2E8F0] cursor-pointer"
+                    className="inline-flex min-h-[36px] items-center gap-1.5 rounded-lg border border-[#CBD5E1] bg-[#F8FAFC] px-3.5 text-xs font-bold text-[#0F2233] hover:bg-[#E2E8F0] cursor-pointer"
                   >
-                    <Eye className="h-3.5 w-3.5 text-[#EA580C]" />
+                    <Eye className="h-3.5 w-3.5 text-[#EE5426]" />
                     <span>{isAr ? 'عرض التذكرة' : 'Back to Ticket'}</span>
                   </button>
                 )}
@@ -4338,7 +4356,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                     setModalMode(null);
                     setModalDraft(null);
                   }}
-                  className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-[#CBD5E1] text-[#0F172A] hover:bg-[#F1F5F9] cursor-pointer"
+                  className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-[#CBD5E1] text-[#0F2233] hover:bg-[#F1F5F9] cursor-pointer"
                   aria-label="Close"
                 >
                   <X className="h-4 w-4" />
@@ -4402,8 +4420,8 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                 })()}
 
                 {/* Ticket Body */}
-                <div className="overflow-hidden rounded-2xl border-2 border-[#0F172A] bg-white shadow-md">
-                  <div className="bg-[#0F172A] px-6 py-4 text-white flex flex-wrap items-center justify-between gap-3">
+                <div className="overflow-hidden rounded-2xl border-2 border-[#0F2233] bg-white shadow-md">
+                  <div className="bg-[#0F2233] px-6 py-4 text-white flex flex-wrap items-center justify-between gap-3">
                     <div>
                       <span className="block text-[10px] font-bold uppercase tracking-widest text-[#FDBA74]">
                         {isAr
@@ -4419,7 +4437,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                       </div>
                     </div>
                     <div className="flex flex-col items-end gap-1">
-                      <span className="rounded-lg bg-[#EA580C] px-3 py-1 font-mono text-xs font-bold text-white">
+                      <span className="rounded-lg bg-[#EE5426] px-3 py-1 font-mono text-xs font-bold text-white">
                         {modalDraft.id}
                       </span>
                       <div className="flex items-center gap-1.5 text-[11px]">
@@ -4439,7 +4457,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                         <span className="block text-[11px] font-bold text-[#475569]">
                           {isAr ? 'اسم العميل' : 'Guest Name'}
                         </span>
-                        <strong className="mt-1 block text-sm font-bold text-[#0F172A]">
+                        <strong className="mt-1 block text-sm font-bold text-[#0F2233]">
                           {modalDraft.guestName}
                         </strong>
                       </div>
@@ -4448,7 +4466,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                         <span className="block text-[11px] font-bold text-[#9A3412]">
                           {isAr ? 'الجنسية' : 'Nationality'}
                         </span>
-                        <strong className="mt-1 block text-sm font-bold text-[#EA580C]">
+                        <strong className="mt-1 block text-sm font-bold text-[#EE5426]">
                           {modalDraft.guestCountry || 'Guest'}
                         </strong>
                       </div>
@@ -4468,7 +4486,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                         <span className="block text-[11px] font-bold text-[#475569]">
                           {isAr ? 'التاريخ وموعد البيك أب اليدوي' : 'Trip Date & Manual Pickup Time'}
                         </span>
-                        <div className="font-bold text-[#0F172A] tabular-nums">
+                        <div className="font-bold text-[#0F2233] tabular-nums">
                           {isAr ? 'التاريخ:' : 'Date:'} {modalDraft.date}
                         </div>
                         {modalDraft.tripStartTime && (
@@ -4476,7 +4494,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                             {isAr ? 'انطلاق الرحلة:' : 'Trip Start:'} {modalDraft.tripStartTime}
                           </div>
                         )}
-                        <div className="font-bold text-[#EA580C]">
+                        <div className="font-bold text-[#EE5426]">
                           {isAr ? 'البيك أب:' : 'Hotel Pickup:'} {modalDraft.pickupTime || 'TBD'} (
                           {modalDraft.pickupSpot === 'Outside Main Gate'
                             ? isAr
@@ -4493,7 +4511,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                         <span className="block text-[11px] font-bold text-[#475569]">
                           {isAr ? 'الفندق ورقم الغرفة' : 'Hotel & Room Number'}
                         </span>
-                        <strong className="block text-sm font-bold text-[#0F172A]">
+                        <strong className="block text-sm font-bold text-[#0F2233]">
                           {modalDraft.hotel}
                         </strong>
                         <span className="block font-semibold text-[#334155]">
@@ -4511,7 +4529,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                         <span className="block text-[11px] font-bold text-[#475569]">
                           {isAr ? 'عدد الأفراد' : 'Passengers Manifest'}
                         </span>
-                        <strong className="block text-sm font-bold text-[#0F172A] tabular-nums">
+                        <strong className="block text-sm font-bold text-[#0F2233] tabular-nums">
                           {modalDraft.adults} {isAr ? 'بالغ' : 'Adults'}
                           {modalDraft.children > 0
                             ? ` + ${modalDraft.children} ${isAr ? 'طفل' : 'Children'}`
@@ -4533,7 +4551,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                           const net = modalDraft.grossEur - comm;
                           return (
                             <>
-                              <strong className="block text-xs font-bold text-[#0F172A] tabular-nums">
+                              <strong className="block text-xs font-bold text-[#0F2233] tabular-nums">
                                 {isAr
                                   ? `عمولة وصلة (${safeCommissionPct}%): €${comm} · صافي المورد: €${net}`
                                   : `Wasla Comm (${safeCommissionPct}%): €${comm} · Supplier Net: €${net}`}
@@ -4555,7 +4573,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
 
                     {modalDraft.locationImageUrl && (
                       <div className="rounded-xl border border-[#CBD5E1] bg-[#F8FAFC] p-3 space-y-1.5">
-                        <span className="block text-xs font-bold text-[#0F172A]">
+                        <span className="block text-xs font-bold text-[#0F2233]">
                           {modalDraft.destination === 'Marsa Alam'
                             ? isAr
                               ? 'صورة جواز السفر المرفقة لتصريح مرسى علم'
@@ -4590,6 +4608,8 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                     hotel: modalDraft.hotel || 'Hotel',
                     roomNumber: modalDraft.roomNumber,
                     driverOrGuide: modalDraft.assignedDriverOrGuide,
+                    guestLang: modalDraft.guestLang,
+                    notes: modalDraft.notes,
                   });
                   const liveEmailUrl = buildGuestPickupMailtoUrl({
                     guestEmail: modalDraft.guestEmail,
@@ -4604,6 +4624,8 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                     hotel: modalDraft.hotel || 'Hotel',
                     roomNumber: modalDraft.roomNumber,
                     driverOrGuide: modalDraft.assignedDriverOrGuide,
+                    guestLang: modalDraft.guestLang,
+                    notes: modalDraft.notes,
                   });
                   return (
                     <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[#CBD5E1] bg-[#F8FAFC] p-4">
@@ -4632,7 +4654,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                                 );
                               }
                             }}
-                            className="inline-flex min-h-[38px] items-center gap-1.5 rounded-lg border border-[#EA580C] bg-[#FFF7ED] px-3.5 text-xs font-bold text-[#C2410C] hover:bg-[#FFEDD5]"
+                            className="inline-flex min-h-[38px] items-center gap-1.5 rounded-lg border border-[#EE5426] bg-[#FFF7ED] px-3.5 text-xs font-bold text-[#D9461B] hover:bg-[#FFEDD5]"
                           >
                             <Mail className="h-3.5 w-3.5" />
                             <span>{isAr ? 'إرسال إيميل' : 'Send Email'}</span>
@@ -4641,7 +4663,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                         <button
                           type="button"
                           onClick={() => handleRescheduleTomorrow(modalDraft)}
-                          className="inline-flex min-h-[38px] items-center gap-1.5 rounded-lg border border-[#0F172A] bg-white px-3.5 text-xs font-bold text-[#0F172A] hover:bg-[#0F172A] hover:text-white cursor-pointer"
+                          className="inline-flex min-h-[38px] items-center gap-1.5 rounded-lg border border-[#0F2233] bg-white px-3.5 text-xs font-bold text-[#0F2233] hover:bg-[#0F2233] hover:text-white cursor-pointer"
                         >
                           <Calendar className="h-3.5 w-3.5" />
                           <span>
@@ -4656,7 +4678,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                         <button
                           type="button"
                           onClick={() => setModalMode('edit')}
-                          className="inline-flex min-h-[38px] items-center gap-1.5 rounded-lg bg-[#EA580C] px-4 text-xs font-bold text-white hover:bg-[#C2410C] cursor-pointer"
+                          className="btn-wasla-primary min-h-[38px] gap-1.5 rounded-lg px-4 py-2 text-xs font-bold cursor-pointer"
                         >
                           <Pencil className="h-3.5 w-3.5" />
                           <span>{isAr ? 'تعديل' : 'Edit'}</span>
@@ -4681,7 +4703,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
               <form onSubmit={handleSaveBookingModal} className="p-6 space-y-5">
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
                   <label className="block space-y-1">
-                    <span className="text-xs font-bold text-[#0F172A]">
+                    <span className="text-xs font-bold text-[#0F2233]">
                       {isAr ? 'اسم العميل' : 'Guest Name'}
                     </span>
                     <input
@@ -4698,7 +4720,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                   </label>
 
                   <label className="block space-y-1">
-                    <span className="text-xs font-bold text-[#0F172A]">
+                    <span className="text-xs font-bold text-[#0F2233]">
                       {isAr ? 'الجنسية' : 'Nationality'}
                     </span>
                     <input
@@ -4714,7 +4736,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                   </label>
 
                   <label className="block space-y-1">
-                    <span className="text-xs font-bold text-[#0F172A]">
+                    <span className="text-xs font-bold text-[#0F2233]">
                       {isAr ? 'اسم الرحلة' : 'Excursion Title'}
                     </span>
                     <input
@@ -4733,7 +4755,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
 
                 <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 items-end">
                   <label className="sm:col-span-3 block space-y-1">
-                    <span className="text-xs font-bold text-[#0F172A]">
+                    <span className="text-xs font-bold text-[#0F2233]">
                       {isAr ? 'تاريخ الرحلة' : 'Trip Date'}
                     </span>
                     <input
@@ -4748,7 +4770,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                   </label>
 
                   <label className="sm:col-span-2 block space-y-1">
-                    <span className="text-xs font-bold text-[#0F172A]">
+                    <span className="text-xs font-bold text-[#0F2233]">
                       {isAr ? 'الوجهة' : 'Destination'}
                     </span>
                     <select
@@ -4770,7 +4792,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                   </label>
 
                   <label className="sm:col-span-2 block space-y-1">
-                    <span className="text-xs font-bold text-[#0F172A]">
+                    <span className="text-xs font-bold text-[#0F2233]">
                       {isAr ? 'النشاط' : 'Category'}
                     </span>
                     <select
@@ -4800,7 +4822,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                   </label>
 
                   <label className="sm:col-span-3 block space-y-1">
-                    <span className="text-xs font-bold text-[#0F172A]">
+                    <span className="text-xs font-bold text-[#0F2233]">
                       {isAr ? 'الفندق' : 'Hotel'}
                     </span>
                     <input
@@ -4823,7 +4845,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                   </label>
 
                   <label className="sm:col-span-2 block space-y-1">
-                    <span className="text-xs font-bold text-[#0F172A]">
+                    <span className="text-xs font-bold text-[#0F2233]">
                       {isAr ? 'رقم الغرفة' : 'Room No.'}
                     </span>
                     <input
@@ -4841,9 +4863,9 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
 
                 {/* Manual Pickup Time Assignment (No Auto Subtraction) */}
                 <div className="rounded-xl border border-[#FED7AA] bg-[#FFF7ED]/70 p-4 space-y-3">
-                  <div className="flex items-center justify-between gap-2 text-xs font-bold text-[#0F172A]">
+                  <div className="flex items-center justify-between gap-2 text-xs font-bold text-[#0F2233]">
                     <span className="inline-flex items-center gap-1.5">
-                      <Clock className="h-4 w-4 text-[#EA580C]" />
+                      <Clock className="h-4 w-4 text-[#EE5426]" />
                       <span>
                         {isAr
                           ? 'تحديد موعد البيك أب يدوياً (لا يتم خصمه تلقائياً من بداية الرحلة)'
@@ -4854,7 +4876,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
 
                   <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 items-end">
                     <label className="sm:col-span-3 block space-y-1">
-                      <span className="text-xs font-bold text-[#0F172A]">
+                      <span className="text-xs font-bold text-[#0F2233]">
                         {isAr ? 'بداية الرحلة' : 'Trip Start Time'}
                       </span>
                       <input
@@ -4865,12 +4887,12 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                             prev ? { ...prev, tripStartTime: e.target.value } : prev
                           )
                         }
-                        className="min-h-[38px] w-full rounded-lg border border-[#CBD5E1] bg-white px-3 text-xs font-bold text-[#EA580C]"
+                        className="min-h-[38px] w-full rounded-lg border border-[#CBD5E1] bg-white px-3 text-xs font-bold text-[#EE5426]"
                       />
                     </label>
 
                     <label className="sm:col-span-2 block space-y-1">
-                      <span className="text-xs font-bold text-[#0F172A]">
+                      <span className="text-xs font-bold text-[#0F2233]">
                         {isAr ? 'ساعة البيك أب' : 'Pickup Clock'}
                       </span>
                       <input
@@ -4883,7 +4905,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                     </label>
 
                     <div className="sm:col-span-2 space-y-1">
-                      <span className="block text-xs font-bold text-[#0F172A]">AM / PM</span>
+                      <span className="block text-xs font-bold text-[#0F2233]">AM / PM</span>
                       <div className="grid grid-cols-2 rounded-lg border border-[#CBD5E1] bg-white p-0.5">
                         {(['AM', 'PM'] as const).map((period) => (
                           <button
@@ -4892,8 +4914,8 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                             onClick={() => setPickupPeriod(period)}
                             className={`min-h-[32px] rounded-md text-xs font-bold cursor-pointer ${
                               pickupPeriod === period
-                                ? 'bg-[#EA580C] text-white'
-                                : 'text-[#475569] hover:text-[#0F172A]'
+                                ? 'bg-[#EE5426] text-white'
+                                : 'text-[#475569] hover:text-[#0F2233]'
                             }`}
                           >
                             {period}
@@ -4903,7 +4925,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                     </div>
 
                     <div className="sm:col-span-5 space-y-1">
-                      <span className="block text-xs font-bold text-[#0F172A]">
+                      <span className="block text-xs font-bold text-[#0F2233]">
                         {isAr ? 'مكان الانتظار' : 'Meeting Point'}
                       </span>
                       <div className="grid grid-cols-2 gap-2">
@@ -4932,8 +4954,8 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                               }
                               className={`min-h-[36px] rounded-lg border px-2.5 text-xs font-bold cursor-pointer ${
                                 active
-                                  ? 'border-[#EA580C] bg-[#EA580C] text-white'
-                                  : 'border-[#CBD5E1] bg-white text-[#0F172A]'
+                                  ? 'border-[#EE5426] bg-[#EE5426] text-white'
+                                  : 'border-[#CBD5E1] bg-white text-[#0F2233]'
                               }`}
                             >
                               {opt.label}
@@ -4948,7 +4970,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                 {/* Contact, Pax, Price, Supplier, Status */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                   <label className="block space-y-1">
-                    <span className="text-xs font-bold text-[#0F172A]">
+                    <span className="text-xs font-bold text-[#0F2233]">
                       {isAr ? 'رقم واتساب العميل' : 'Guest WhatsApp'}
                     </span>
                     <input
@@ -4963,7 +4985,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                     />
                   </label>
                   <label className="block space-y-1">
-                    <span className="text-xs font-bold text-[#0F172A]">
+                    <span className="text-xs font-bold text-[#0F2233]">
                       {isAr ? 'إيميل العميل' : 'Guest Email'}
                     </span>
                     <input
@@ -4981,7 +5003,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
 
                 <div className="grid grid-cols-2 sm:grid-cols-12 gap-3 items-end">
                   <label className="sm:col-span-2 block space-y-1">
-                    <span className="text-xs font-bold text-[#0F172A]">
+                    <span className="text-xs font-bold text-[#0F2233]">
                       {isAr ? 'بالغين' : 'Adults'}
                     </span>
                     <input
@@ -4997,7 +5019,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                     />
                   </label>
                   <label className="sm:col-span-2 block space-y-1">
-                    <span className="text-xs font-bold text-[#0F172A]">
+                    <span className="text-xs font-bold text-[#0F2233]">
                       {isAr ? 'أطفال' : 'Children'}
                     </span>
                     <input
@@ -5013,7 +5035,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                     />
                   </label>
                   <label className="sm:col-span-2 block space-y-1">
-                    <span className="text-xs font-bold text-[#0F172A]">
+                    <span className="text-xs font-bold text-[#0F2233]">
                       {isAr ? 'رضع (INF)' : 'Infants'}
                     </span>
                     <input
@@ -5029,7 +5051,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                     />
                   </label>
                   <label className="sm:col-span-3 block space-y-1">
-                    <span className="text-xs font-bold text-[#0F172A]">
+                    <span className="text-xs font-bold text-[#0F2233]">
                       {isAr ? 'الإجمالي (€)' : 'Total Price (€)'}
                     </span>
                     <input
@@ -5045,7 +5067,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                     />
                   </label>
                   <label className="sm:col-span-3 block space-y-1">
-                    <span className="text-xs font-bold text-[#0F172A]">
+                    <span className="text-xs font-bold text-[#0F2233]">
                       {isAr ? 'المورد' : 'Supplier'}
                     </span>
                     <select
@@ -5066,7 +5088,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                   </label>
 
                   <label className="sm:col-span-4 block space-y-1">
-                    <span className="text-xs font-bold text-[#0F172A]">
+                    <span className="text-xs font-bold text-[#0F2233]">
                       {isAr ? 'السائق / المرشد' : 'Driver / Guide'}
                     </span>
                     <input
@@ -5081,7 +5103,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                     />
                   </label>
                   <label className="sm:col-span-4 block space-y-1">
-                    <span className="text-xs font-bold text-[#0F172A]">
+                    <span className="text-xs font-bold text-[#0F2233]">
                       {isAr ? 'طريقة الدفع' : 'Payment Method'}
                     </span>
                     <select
@@ -5102,7 +5124,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                     </select>
                   </label>
                   <label className="sm:col-span-4 block space-y-1">
-                    <span className="text-xs font-bold text-[#0F172A]">
+                    <span className="text-xs font-bold text-[#0F2233]">
                       {isAr ? 'حالة الحجز' : 'Booking Status'}
                     </span>
                     <select
@@ -5129,7 +5151,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                 <div className="rounded-xl border border-[#CBD5E1] bg-[#F8FAFC] p-4 space-y-2.5">
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <div>
-                      <div className="text-xs font-bold text-[#0F172A]">
+                      <div className="text-xs font-bold text-[#0F2233]">
                         {modalDraft.destination === 'Marsa Alam'
                           ? isAr
                             ? 'صورة جواز السفر (أساسي لتصاريح مرسى علم)'
@@ -5166,7 +5188,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                         type="button"
                         onClick={() => locImageInputRef.current?.click()}
                         disabled={uploadingLocImage}
-                        className="inline-flex min-h-[34px] items-center gap-1.5 rounded-lg border border-[#CBD5E1] bg-white px-3 text-xs font-bold text-[#0F172A] hover:border-[#EA580C] cursor-pointer"
+                        className="inline-flex min-h-[34px] items-center gap-1.5 rounded-lg border border-[#CBD5E1] bg-white px-3 text-xs font-bold text-[#0F2233] hover:border-[#EE5426] cursor-pointer"
                       >
                         <ImagePlus className="h-3.5 w-3.5" />
                         <span>
@@ -5206,7 +5228,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                 </div>
 
                 <label className="block space-y-1">
-                  <span className="text-xs font-bold text-[#0F172A]">
+                  <span className="text-xs font-bold text-[#0F2233]">
                     {isAr ? 'ملاحظات التشغيل' : 'Operations Notes'}
                   </span>
                   <textarea
@@ -5287,7 +5309,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                     <button
                       type="submit"
                       disabled={savingBooking}
-                      className="min-h-[40px] rounded-lg bg-[#EA580C] px-5 text-xs font-bold text-white hover:bg-[#C2410C] disabled:opacity-60 cursor-pointer"
+                      className="btn-wasla-primary min-h-[40px] rounded-lg px-5 py-2 text-xs font-bold cursor-pointer"
                     >
                       {savingBooking
                         ? isAr

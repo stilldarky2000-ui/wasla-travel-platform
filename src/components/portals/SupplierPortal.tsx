@@ -626,13 +626,13 @@ export const SupplierPortal: React.FC<SupplierPortalProps> = ({
   };
 
   return (
-    <div className="min-h-[calc(100vh-40px)] bg-[#F8FAFC] text-[#0F172A]">
+    <div className="min-h-[calc(100vh-40px)] bg-[#F8FAFC] text-[#0F2233]">
       <div className="mx-auto max-w-[1280px] px-4 sm:px-6 py-6 space-y-6">
         {/* Top Bar */}
         <div className="rounded-xl border border-[#E2E8F0] bg-white px-5 py-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="text-xs text-[#475569]">Supplier Portal · Self-Service Partner Desk</div>
-            <h1 className="text-xl font-semibold text-[#0F172A]">{activeSupplierName}</h1>
+            <h1 className="text-xl font-semibold text-[#0F2233]">{activeSupplierName}</h1>
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
@@ -651,7 +651,7 @@ export const SupplierPortal: React.FC<SupplierPortalProps> = ({
                 <select
                   value={selectedSupplierName}
                   onChange={(e) => setSelectedSupplierName(e.target.value)}
-                  className="min-h-[38px] rounded-lg border border-[#CBD5E1] bg-white px-3 text-xs font-semibold text-[#0F172A]"
+                  className="min-h-[38px] rounded-lg border border-[#CBD5E1] bg-white px-3 text-xs font-semibold text-[#0F2233]"
                 >
                   {suppliers.map((s) => (
                     <option key={s.id} value={s.name}>
@@ -668,7 +668,7 @@ export const SupplierPortal: React.FC<SupplierPortalProps> = ({
                 setActiveTab('listings');
                 setShowAddForm((v) => !v);
               }}
-              className="inline-flex min-h-[38px] items-center gap-1.5 rounded-lg bg-[#EA580C] px-4 text-xs font-semibold text-white hover:bg-[#C2410C] cursor-pointer"
+              className="btn-wasla-primary min-h-[38px] gap-1.5 rounded-lg px-4 py-2 text-xs cursor-pointer"
             >
               <Plus className="h-4 w-4" aria-hidden="true" />
               <span>Add New Trip / Service</span>
@@ -677,12 +677,12 @@ export const SupplierPortal: React.FC<SupplierPortalProps> = ({
         </div>
 
         {/* Navigation Tabs */}
-        <div className="inline-flex rounded-lg bg-[#E8EEF0] p-1">
+        <div className="inline-flex rounded-lg bg-[#FAF4ED] border border-[#C8C2B8]/50 p-1">
           <button
             type="button"
             onClick={() => setActiveTab('listings')}
             className={`rounded-md px-4 py-2 text-xs font-semibold cursor-pointer ${
-              activeTab === 'listings' ? 'bg-white text-[#0F172A] shadow-xs' : 'text-[#475569]'
+              activeTab === 'listings' ? 'bg-white text-[#0F2233] shadow-xs' : 'text-[#64748B]'
             }`}
           >
             My Trips & Services ({supplierTrips.length})
@@ -691,7 +691,7 @@ export const SupplierPortal: React.FC<SupplierPortalProps> = ({
             type="button"
             onClick={() => setActiveTab('bookings')}
             className={`rounded-md px-4 py-2 text-xs font-semibold cursor-pointer ${
-              activeTab === 'bookings' ? 'bg-white text-[#0F172A] shadow-xs' : 'text-[#475569]'
+              activeTab === 'bookings' ? 'bg-white text-[#0F2233] shadow-xs' : 'text-[#64748B]'
             }`}
           >
             Confirmed Dispatches ({supplierBookings.length})
@@ -699,7 +699,7 @@ export const SupplierPortal: React.FC<SupplierPortalProps> = ({
         </div>
 
         {addedBanner && (
-          <div className="rounded-xl border border-[#EA580C]/30 bg-white px-4 py-3 text-sm font-medium text-[#EA580C] flex items-center justify-between">
+          <div className="rounded-xl border border-[#EE5426]/30 bg-white px-4 py-3 text-sm font-medium text-[#EE5426] flex items-center justify-between">
             <span>{addedBanner}</span>
             <button
               type="button"
@@ -714,14 +714,14 @@ export const SupplierPortal: React.FC<SupplierPortalProps> = ({
         {showAddForm && activeTab === 'listings' && (
           <form
             onSubmit={handleCreateTrip}
-            className="rounded-xl border border-[#EA580C]/30 bg-white p-6 space-y-4"
+            className="rounded-xl border border-[#EE5426]/30 bg-white p-6 space-y-4"
           >
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-              <h2 className="text-base font-semibold text-[#0F172A]">
+              <h2 className="text-base font-semibold text-[#0F2233]">
                 Submit New Listing (Auto-translated to EN / AR / DE ·{' '}
                 {isOwnerUser ? 'Publishes immediately' : 'Sent for Owner Approval'})
               </h2>
-              <span className="inline-flex items-center gap-1.5 text-xs font-medium text-[#EA580C]">
+              <span className="inline-flex items-center gap-1.5 text-xs font-medium text-[#EE5426]">
                 <Languages className="h-3.5 w-3.5" aria-hidden="true" />
                 <span>Write in Arabic, English, or German</span>
               </span>
@@ -729,7 +729,7 @@ export const SupplierPortal: React.FC<SupplierPortalProps> = ({
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
               <label className="sm:col-span-2 block space-y-1">
-                <span className="text-xs font-semibold text-[#0F172A]">Trip / Service Title</span>
+                <span className="text-xs font-semibold text-[#0F2233]">Trip / Service Title</span>
                 <input
                   type="text"
                   required
@@ -741,7 +741,7 @@ export const SupplierPortal: React.FC<SupplierPortalProps> = ({
               </label>
 
               <label className="block space-y-1">
-                <span className="text-xs font-semibold text-[#0F172A]">Category</span>
+                <span className="text-xs font-semibold text-[#0F2233]">Category</span>
                 <select
                   value={category}
                   onChange={(e) => setCategory(e.target.value as ActivityCategoryId)}
@@ -759,7 +759,7 @@ export const SupplierPortal: React.FC<SupplierPortalProps> = ({
               </label>
 
               <label className="block space-y-1">
-                <span className="text-xs font-semibold text-[#0F172A]">Destination</span>
+                <span className="text-xs font-semibold text-[#0F2233]">Destination</span>
                 <select
                   value={destination}
                   onChange={(e) => setDestination(e.target.value as DestinationRegion)}
@@ -775,7 +775,7 @@ export const SupplierPortal: React.FC<SupplierPortalProps> = ({
 
             <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
               <label className="block space-y-1">
-                <span className="text-xs font-semibold text-[#0F172A]">Whole-Euro Price (€)</span>
+                <span className="text-xs font-semibold text-[#0F2233]">Whole-Euro Price (€)</span>
                 <input
                   type="number"
                   min={5}
@@ -785,7 +785,7 @@ export const SupplierPortal: React.FC<SupplierPortalProps> = ({
                 />
               </label>
               <label className="block space-y-1">
-                <span className="text-xs font-semibold text-[#0F172A]">Duration</span>
+                <span className="text-xs font-semibold text-[#0F2233]">Duration</span>
                 <input
                   type="text"
                   value={duration}
@@ -794,7 +794,7 @@ export const SupplierPortal: React.FC<SupplierPortalProps> = ({
                 />
               </label>
               <label className="block space-y-1">
-                <span className="text-xs font-semibold text-[#0F172A]">Pickup area</span>
+                <span className="text-xs font-semibold text-[#0F2233]">Pickup area</span>
                 <input
                   type="text"
                   value={pickup}
@@ -803,7 +803,7 @@ export const SupplierPortal: React.FC<SupplierPortalProps> = ({
                 />
               </label>
               <label className="block space-y-1">
-                <span className="text-xs font-semibold text-[#0F172A]">Min Child Age</span>
+                <span className="text-xs font-semibold text-[#0F2233]">Min Child Age</span>
                 <input
                   type="number"
                   min={0}
@@ -816,7 +816,7 @@ export const SupplierPortal: React.FC<SupplierPortalProps> = ({
 
             <div className="rounded-xl border border-[#FED7AA] bg-[#FFF7ED]/50 p-3 space-y-2">
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <span className="text-xs font-semibold text-[#0F172A]">
+                <span className="text-xs font-semibold text-[#0F2233]">
                   توقيت بداية الرحلة · Trip Start Time(s) (separate from Hotel Pickup)
                 </span>
                 <div className="flex flex-wrap gap-1.5">
@@ -848,7 +848,7 @@ export const SupplierPortal: React.FC<SupplierPortalProps> = ({
             </div>
 
             <label className="block space-y-1">
-              <span className="text-xs font-semibold text-[#0F172A]">Short description</span>
+              <span className="text-xs font-semibold text-[#0F2233]">Short description</span>
               <textarea
                 rows={2}
                 required
@@ -861,7 +861,7 @@ export const SupplierPortal: React.FC<SupplierPortalProps> = ({
 
             {/* Full Structured Itinerary & Guest Safety Information */}
             <div className="rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] p-4 space-y-3">
-              <div className="text-xs font-semibold text-[#0F172A]">
+              <div className="text-xs font-semibold text-[#0F2233]">
                 Highlights, Full Description, Exclusions &amp; Safety Info (one item per line)
               </div>
 
@@ -967,7 +967,7 @@ export const SupplierPortal: React.FC<SupplierPortalProps> = ({
             <div className="rounded-xl border border-[#CBD5E1] bg-[#F8FAFC] p-4 space-y-3">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div>
-                  <span className="text-xs font-semibold text-[#0F172A]">
+                  <span className="text-xs font-semibold text-[#0F2233]">
                     Full-Page Route Itinerary (مسار الرحلة خطوة بخطوة)
                   </span>
                   <p className="text-[11px] text-[#475569]">
@@ -982,7 +982,7 @@ export const SupplierPortal: React.FC<SupplierPortalProps> = ({
                       { id: `sup-stop-${Date.now()}`, kind: 'stop', title: '', subtitle: '', durationOrTime: '' },
                     ])
                   }
-                  className="inline-flex items-center gap-1 rounded-lg border border-[#EA580C] bg-white px-2.5 py-1 text-xs font-semibold text-[#EA580C] hover:bg-[#FFF7ED] cursor-pointer"
+                  className="inline-flex items-center gap-1 rounded-lg border border-[#EE5426] bg-white px-2.5 py-1 text-xs font-semibold text-[#EE5426] hover:bg-[#FFF7ED] cursor-pointer"
                 >
                   <Plus className="h-3.5 w-3.5" aria-hidden="true" />
                   <span>Add Itinerary Stop</span>
@@ -1065,7 +1065,7 @@ export const SupplierPortal: React.FC<SupplierPortalProps> = ({
             <div className="rounded-xl border border-[#CBD5E1] bg-[#F8FAFC] p-4 space-y-3">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div>
-                  <span className="text-xs font-semibold text-[#0F172A]">
+                  <span className="text-xs font-semibold text-[#0F2233]">
                     Historical Facts & Cultural Context (حقائق تاريخية للرحلة - اختياري)
                   </span>
                   <p className="text-[11px] text-[#475569]">
@@ -1080,7 +1080,7 @@ export const SupplierPortal: React.FC<SupplierPortalProps> = ({
                       { id: `sup-fact-${Date.now()}`, era: '', metric: '', title: '', fact: '' },
                     ])
                   }
-                  className="inline-flex items-center gap-1 rounded-lg border border-[#EA580C] bg-white px-2.5 py-1 text-xs font-semibold text-[#EA580C] hover:bg-[#FFF7ED] cursor-pointer"
+                  className="inline-flex items-center gap-1 rounded-lg border border-[#EE5426] bg-white px-2.5 py-1 text-xs font-semibold text-[#EE5426] hover:bg-[#FFF7ED] cursor-pointer"
                 >
                   <Plus className="h-3.5 w-3.5" aria-hidden="true" />
                   <span>Add Historical Fact</span>
@@ -1160,7 +1160,7 @@ export const SupplierPortal: React.FC<SupplierPortalProps> = ({
             {/* Operating Days & Date Availability */}
             <div className="rounded-xl border border-[#CBD5E1] bg-[#F8FAFC] p-4 space-y-2.5">
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <span className="text-xs font-semibold text-[#0F172A]">
+                <span className="text-xs font-semibold text-[#0F2233]">
                   Operating Days & Date Range Availability (أيام التشغيل)
                 </span>
                 <span className="text-[11px] text-[#475569]">
@@ -1186,7 +1186,7 @@ export const SupplierPortal: React.FC<SupplierPortalProps> = ({
                         }
                         className={`min-h-[32px] rounded-lg border px-2.5 text-xs font-semibold transition-colors cursor-pointer ${
                           selected
-                            ? 'border-[#EA580C] bg-[#EA580C] text-white'
+                            ? 'border-[#EE5426] bg-[#EE5426] text-white'
                             : 'border-[#CBD5E1] bg-white text-[#475569]'
                         }`}
                       >
@@ -1202,7 +1202,7 @@ export const SupplierPortal: React.FC<SupplierPortalProps> = ({
                       type="date"
                       value={availableFrom}
                       onChange={(e) => setAvailableFrom(e.target.value)}
-                      className="min-h-[32px] rounded-lg border border-[#CBD5E1] bg-white px-2 text-xs text-[#0F172A]"
+                      className="min-h-[32px] rounded-lg border border-[#CBD5E1] bg-white px-2 text-xs text-[#0F2233]"
                     />
                   </label>
                   <label className="flex items-center gap-1.5 text-[11px] font-semibold text-[#475569]">
@@ -1212,7 +1212,7 @@ export const SupplierPortal: React.FC<SupplierPortalProps> = ({
                       value={availableTo}
                       min={availableFrom || undefined}
                       onChange={(e) => setAvailableTo(e.target.value)}
-                      className="min-h-[32px] rounded-lg border border-[#CBD5E1] bg-white px-2 text-xs text-[#0F172A]"
+                      className="min-h-[32px] rounded-lg border border-[#CBD5E1] bg-white px-2 text-xs text-[#0F2233]"
                     />
                   </label>
                 </div>
@@ -1223,8 +1223,8 @@ export const SupplierPortal: React.FC<SupplierPortalProps> = ({
             <div className="rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] p-4 space-y-3">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div className="flex items-center gap-2">
-                  <ImagePlus className="h-4 w-4 text-[#EA580C]" aria-hidden="true" />
-                  <span className="text-xs font-semibold text-[#0F172A]">
+                  <ImagePlus className="h-4 w-4 text-[#EE5426]" aria-hidden="true" />
+                  <span className="text-xs font-semibold text-[#0F2233]">
                     Trip Photos & Gallery Captions (Upload up to 8 high-quality photos · Auto-optimized)
                   </span>
                 </div>
@@ -1245,7 +1245,7 @@ export const SupplierPortal: React.FC<SupplierPortalProps> = ({
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="inline-flex min-h-[40px] items-center justify-center gap-2 rounded-lg border border-dashed border-[#EA580C] bg-white px-4 text-xs font-semibold text-[#EA580C] hover:bg-[#FFF7ED] cursor-pointer"
+                  className="inline-flex min-h-[40px] items-center justify-center gap-2 rounded-lg border border-dashed border-[#EE5426] bg-white px-4 text-xs font-semibold text-[#EE5426] hover:bg-[#FFF7ED] cursor-pointer"
                 >
                   <Upload className="h-4 w-4" aria-hidden="true" />
                   <span>Upload Photos from Device</span>
@@ -1262,7 +1262,7 @@ export const SupplierPortal: React.FC<SupplierPortalProps> = ({
                   <button
                     type="button"
                     onClick={handleAddImageUrl}
-                    className="min-h-[40px] rounded-lg border border-[#CBD5E1] bg-white px-3 text-xs font-semibold text-[#0F172A] hover:bg-[#F1F5F9] cursor-pointer"
+                    className="min-h-[40px] rounded-lg border border-[#CBD5E1] bg-white px-3 text-xs font-semibold text-[#0F2233] hover:bg-[#F1F5F9] cursor-pointer"
                   >
                     Add URL
                   </button>
@@ -1270,7 +1270,7 @@ export const SupplierPortal: React.FC<SupplierPortalProps> = ({
               </div>
 
               {uploadNote && (
-                <p className="text-[11px] font-medium text-[#EA580C]">{uploadNote}</p>
+                <p className="text-[11px] font-medium text-[#EE5426]">{uploadNote}</p>
               )}
 
               {uploadedImages.length > 0 ? (
@@ -1303,7 +1303,7 @@ export const SupplierPortal: React.FC<SupplierPortalProps> = ({
                       </div>
                       <div className="flex items-center justify-between px-2 py-1 text-[10px] border-t border-[#E2E8F0]">
                         {idx === 0 ? (
-                          <span className="font-semibold text-[#EA580C]">Cover Photo</span>
+                          <span className="font-semibold text-[#EE5426]">Cover Photo</span>
                         ) : (
                           <button
                             type="button"
@@ -1317,7 +1317,7 @@ export const SupplierPortal: React.FC<SupplierPortalProps> = ({
                                 ...prev.filter((_, i) => i !== idx),
                               ]);
                             }}
-                            className="font-medium text-[#475569] hover:text-[#EA580C] cursor-pointer"
+                            className="font-medium text-[#475569] hover:text-[#EE5426] cursor-pointer"
                           >
                             Set as cover
                           </button>
@@ -1351,7 +1351,7 @@ export const SupplierPortal: React.FC<SupplierPortalProps> = ({
                           setUploadedImages([imgSrc]);
                           setGalleryCaptions(['']);
                         }}
-                        className="wasla-img-glare shrink-0 rounded-lg border border-[#CBD5E1] overflow-hidden hover:border-[#EA580C] cursor-pointer"
+                        className="wasla-img-glare shrink-0 rounded-lg border border-[#CBD5E1] overflow-hidden hover:border-[#EE5426] cursor-pointer"
                         title="Use this starter photo"
                       >
                         <img
@@ -1367,10 +1367,10 @@ export const SupplierPortal: React.FC<SupplierPortalProps> = ({
             </div>
 
             {/* Trip Options Builder (Fixed Trip Name, Flexible Options) */}
-            <div className="rounded-xl border border-[#EA580C]/25 bg-[#FFF7ED]/40 p-4 space-y-3">
+            <div className="rounded-xl border border-[#EE5426]/25 bg-[#FFF7ED]/40 p-4 space-y-3">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div>
-                  <span className="text-xs font-semibold text-[#0F172A]">
+                  <span className="text-xs font-semibold text-[#0F2233]">
                     Trip Options & Pricing Variants (أوبشن الرحلة)
                   </span>
                   <p className="text-[11px] text-[#475569]">
@@ -1386,7 +1386,7 @@ export const SupplierPortal: React.FC<SupplierPortalProps> = ({
                       { id: `opt-${Date.now()}`, title: '', detail: '', price: 50 },
                     ])
                   }
-                  className="self-start sm:self-auto inline-flex min-h-[34px] items-center gap-1 rounded-lg border border-[#EA580C] bg-white px-3 text-xs font-semibold text-[#EA580C] hover:bg-[#FFF7ED] cursor-pointer whitespace-nowrap"
+                  className="self-start sm:self-auto inline-flex min-h-[34px] items-center gap-1 rounded-lg border border-[#EE5426] bg-white px-3 text-xs font-semibold text-[#EE5426] hover:bg-[#FFF7ED] cursor-pointer whitespace-nowrap"
                 >
                   <Plus className="h-3.5 w-3.5" aria-hidden="true" />
                   <span>Add Option</span>
@@ -1465,7 +1465,7 @@ export const SupplierPortal: React.FC<SupplierPortalProps> = ({
             </div>
 
             <div className="flex flex-wrap items-center justify-between gap-4">
-              <div className="flex flex-wrap items-center gap-5 text-xs font-medium text-[#0F172A]">
+              <div className="flex flex-wrap items-center gap-5 text-xs font-medium text-[#0F2233]">
                 <label className="inline-flex items-center gap-2 cursor-pointer">
                   <input
                     type="checkbox"
@@ -1496,7 +1496,7 @@ export const SupplierPortal: React.FC<SupplierPortalProps> = ({
                 <button
                   type="button"
                   onClick={() => setPreviewTripDraft(buildDraftTripObject())}
-                  className="inline-flex items-center gap-1.5 min-h-[40px] rounded-lg border border-[#EA580C] bg-[#FFF7ED] px-4 text-xs font-semibold text-[#EA580C] hover:bg-[#FFEDD5] cursor-pointer"
+                  className="inline-flex items-center gap-1.5 min-h-[40px] rounded-lg border border-[#EE5426] bg-[#FFF7ED] px-4 text-xs font-semibold text-[#EE5426] hover:bg-[#FFEDD5] cursor-pointer"
                 >
                   <Eye className="h-3.5 w-3.5" aria-hidden="true" />
                   <span>Preview Full Trip Page</span>
@@ -1511,7 +1511,7 @@ export const SupplierPortal: React.FC<SupplierPortalProps> = ({
                 <button
                   type="submit"
                   disabled={publishing}
-                  className="inline-flex items-center gap-2 min-h-[40px] rounded-lg bg-[#EA580C] px-5 text-xs font-semibold text-white hover:bg-[#C2410C] disabled:opacity-60 cursor-pointer"
+                  className="btn-wasla-primary min-h-[40px] rounded-lg px-5 py-2 text-xs cursor-pointer"
                 >
                   <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
                   <span>
@@ -1541,7 +1541,7 @@ export const SupplierPortal: React.FC<SupplierPortalProps> = ({
                     setEditingTrip(tr);
                   }
                 }}
-                className="group rounded-xl border-2 border-[#E2E8F0] bg-white overflow-hidden flex flex-col justify-between cursor-pointer hover:border-[#EA580C] hover:shadow-sm transition-all text-start"
+                className="card-wasla p-0 group overflow-hidden flex flex-col justify-between cursor-pointer hover:border-[#EE5426] transition-all text-start"
                 title="اضغط لفتح تعديل هذه الرحلة مباشرة"
               >
                 <div className="flex gap-4 p-4">
@@ -1556,12 +1556,12 @@ export const SupplierPortal: React.FC<SupplierPortalProps> = ({
                     <div className="text-[11px] font-medium text-[#475569]">
                       {tr.destination} · {tr.category}
                     </div>
-                    <h3 className="text-sm font-semibold text-[#0F172A] group-hover:text-[#EA580C] line-clamp-2 transition-colors">
+                    <h3 className="text-sm font-semibold text-[#0F2233] group-hover:text-[#EE5426] line-clamp-2 transition-colors">
                       {tr.name.en}
                     </h3>
                     <div className="text-xs text-[#475569] tabular-nums">
-                      {tr.duration.en} · <span className="font-medium text-[#EA580C]">{formatTripScheduleSummary(tr, 'en', true)}</span> ·{' '}
-                      <strong className="text-[#0F172A]">€{tr.price}</strong>
+                      {tr.duration.en} · <span className="font-medium text-[#EE5426]">{formatTripScheduleSummary(tr, 'en', true)}</span> ·{' '}
+                      <strong className="text-[#0F2233]">€{tr.price}</strong>
                       {tr.options && tr.options.length > 0 && (
                         <span> · {tr.options.length} options</span>
                       )}
@@ -1584,7 +1584,7 @@ export const SupplierPortal: React.FC<SupplierPortalProps> = ({
                   )}
                   <div className="flex items-center gap-2 shrink-0">
                     <span className="tabular-nums">★ {tr.rating.toFixed(1)}</span>
-                    <span className="inline-flex items-center gap-1 rounded-md border border-[#FED7AA] bg-[#FFF7ED] px-2 py-0.5 text-[11px] font-semibold text-[#C2410C] group-hover:bg-[#EA580C] group-hover:text-white transition-colors">
+                    <span className="inline-flex items-center gap-1 rounded-md border border-[#FED7AA] bg-[#FFF7ED] px-2 py-0.5 text-[11px] font-semibold text-[#D9461B] group-hover:bg-[#EE5426] group-hover:text-white transition-colors">
                       <Pencil className="h-3 w-3" aria-hidden="true" />
                       <span>تعديل · Edit</span>
                     </span>
@@ -1596,13 +1596,13 @@ export const SupplierPortal: React.FC<SupplierPortalProps> = ({
         )}
 
         {activeTab === 'bookings' && (
-          <div className="rounded-xl border border-[#E2E8F0] bg-white overflow-hidden">
+          <div className="card-wasla p-0 overflow-hidden">
             {supplierBookings.length === 0 ? (
-              <div className="p-10 text-center text-sm text-[#475569]">
+              <div className="p-10 text-center text-sm text-[#64748B]">
                 No bookings assigned to {activeSupplierName} yet.
               </div>
             ) : (
-              <div className="divide-y divide-[#EEF2F3]">
+              <div className="divide-y divide-[#C8C2B8]/40">
                 {supplierBookings.map((b) => {
                   const matchedTrip = findEditableTripForBooking(b);
                   return (
@@ -1612,12 +1612,12 @@ export const SupplierPortal: React.FC<SupplierPortalProps> = ({
                     >
                       <div className="space-y-1">
                         <div className="flex flex-wrap items-center gap-2 text-xs">
-                          <span className="font-mono font-semibold text-[#EA580C]">{b.id}</span>
+                          <span className="font-mono font-semibold text-[#EE5426]">{b.id}</span>
                           <span aria-hidden="true">·</span>
                           <span
                             className={
                               getBookingUrgency(b).isUrgent
-                                ? 'font-bold text-[#B91C1C]'
+                                ? 'font-bold text-[#EF4444]'
                                 : 'text-[#64748B]'
                             }
                           >
@@ -1629,37 +1629,37 @@ export const SupplierPortal: React.FC<SupplierPortalProps> = ({
                             {b.tripStartTime ? ` · Start: ${b.tripStartTime}` : ''} · Pickup: {b.pickupTime || 'TBD'}
                           </span>
                           <span aria-hidden="true">·</span>
-                          <span className="font-semibold text-[#0F172A]">{b.status}</span>
+                          <span className="font-semibold text-[#0F2233]">{b.status}</span>
                         </div>
                         {matchedTrip ? (
                           <button
                             type="button"
                             onClick={() => setEditingTrip(matchedTrip)}
-                            className="inline-flex flex-wrap items-center gap-2 text-start text-sm font-semibold text-[#0F172A] hover:text-[#EA580C] cursor-pointer group"
+                            className="inline-flex flex-wrap items-center gap-2 text-start text-sm font-semibold text-[#0F2233] hover:text-[#EE5426] cursor-pointer group"
                             title="اضغط لفتح تعديل هذه الرحلة مباشرة"
                           >
                             <span className="group-hover:underline">{b.tripTitle}</span>
-                            <span className="inline-flex items-center gap-1 rounded-md border border-[#FED7AA] bg-[#FFF7ED] px-2 py-0.5 text-[11px] font-semibold text-[#C2410C] group-hover:bg-[#EA580C] group-hover:text-white transition-colors">
+                            <span className="inline-flex items-center gap-1 rounded-md border border-[#EE5426]/30 bg-[#FAF4ED] px-2 py-0.5 text-[11px] font-semibold text-[#D9461B] group-hover:bg-[#EE5426] group-hover:text-white transition-colors">
                               <Pencil className="h-3 w-3" aria-hidden="true" />
                               <span>تعديل الرحلة</span>
                             </span>
                           </button>
                         ) : (
-                          <p className="text-sm font-semibold text-[#0F172A]">{b.tripTitle}</p>
+                          <p className="text-sm font-semibold text-[#0F2233]">{b.tripTitle}</p>
                         )}
-                        <p className="text-xs text-[#475569]">
+                        <p className="text-xs text-[#64748B]">
                           {b.guestName} ({b.adults}A{b.children > 0 ? `+${b.children}C` : ''}{(b.infants ?? 0) > 0 ? `+${b.infants}INF` : ''}) · {b.hotel}
                           {b.roomNumber ? ` · Room ${b.roomNumber}` : ''}
                           {b.pickupSpot ? ` · ${b.pickupSpot}` : ''}
                         </p>
                         <div className="flex flex-wrap items-center gap-2 text-[11px] text-[#64748B]">
                           <span className="inline-flex items-center gap-1">
-                            <ShieldCheck className="h-3 w-3 text-[#0E7490]" aria-hidden="true" />
+                            <ShieldCheck className="h-3 w-3 text-[#EE5426]" aria-hidden="true" />
                             Guest contact &amp; payments are handled centrally by Wasla Operations.
                           </span>
                         </div>
                         {b.supplierNotes && (
-                          <p className="text-xs text-[#EA580C]">Dispatch Note: {b.supplierNotes}</p>
+                          <p className="text-xs text-[#EE5426]">Dispatch Note: {b.supplierNotes}</p>
                         )}
                       </div>
 
@@ -1680,7 +1680,7 @@ export const SupplierPortal: React.FC<SupplierPortalProps> = ({
                                   setDriverDrafts((prev) => ({ ...prev, [b.id]: e.target.value }))
                                 }
                                 placeholder="Driver / boat / guide…"
-                                className="min-h-[38px] rounded-lg border border-[#CBD5E1] px-3 text-xs disabled:bg-[#F1F5F9] disabled:text-[#64748B]"
+                                className="min-h-[38px] rounded-lg border border-[#C8C2B8] px-3 text-xs disabled:bg-[#FAF4ED] disabled:text-[#64748B]"
                               />
                               {!isCompleted && (canMarkAssigned || (b.status === 'Driver assigned' && hasDriverChanged && trimmedDriver.length >= 2)) && (
                                 <button
@@ -1696,7 +1696,7 @@ export const SupplierPortal: React.FC<SupplierPortalProps> = ({
                                       return next;
                                     });
                                   }}
-                                  className="inline-flex min-h-[38px] items-center gap-1.5 rounded-lg bg-[#EA580C] px-3.5 text-xs font-semibold text-white hover:bg-[#C2410C] cursor-pointer"
+                                  className="btn-wasla-primary min-h-[38px] gap-1.5 rounded-lg px-3.5 py-2 text-xs cursor-pointer"
                                 >
                                   <Check className="h-3.5 w-3.5" aria-hidden="true" />
                                   <span>
