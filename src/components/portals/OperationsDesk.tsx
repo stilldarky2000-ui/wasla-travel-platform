@@ -1,4 +1,4 @@
-import { OperationsInbox } from '../conversations/ConversationPanel';
+import { ConversationWorkspace } from '../conversations/ConversationPanel';
 import { createBookingReference } from '../../lib/bookingReference';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { authFetch } from '../../lib/apiAuth';
@@ -894,9 +894,9 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
   const handleSendReply = (e: React.FormEvent) => {
     e.preventDefault();
     if (!activeThread || !composerText.trim()) return;
-    onSendChatMessage(activeThread.id, composerText.trim());
-    setComposerText('');
-    setAiDraftMeta(null);
+    window.dispatchEvent(new CustomEvent('wasla:open-conversation', {
+      detail: { bookingId: activeThread.bookingRef, text: composerText.trim() },
+    }));
   };
 
   const handleToggleMessageTranslation = async (
@@ -2187,8 +2187,8 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
         {/* ============================================================ */}
         {/* TAB 2: GUEST COMMUNICATIONS (CHATS + 4 DISPATCH TEMPLATES)   */}
         {/* ============================================================ */}
-        {activeTab === 'chat' && <OperationsInbox bookings={bookings} ar={isAr} />}
-        {activeTab === 'chat' && <details className="mt-4 rounded-xl border p-3"><summary>{isAr ? 'أدوات الإرسال السابقة وسجل المحادثات القديم' : 'Legacy dispatch tools and conversation archive'}</summary><div>
+        {activeTab === 'chat' && <ConversationWorkspace bookings={bookings} ar={isAr} />}
+        {activeTab === 'chat' && (
 
           <div className="space-y-4" dir={isAr ? 'rtl' : 'ltr'}>
             {/* Top Bar — WhatsApp Button Kept, Raw Visible Phone Number Hidden */}
@@ -2242,7 +2242,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                 </h2>
               </div>
 
-              <div className="inline-flex items-center rounded-lg border border-[#CBD5E1] bg-[#F8FAFC] p-1 text-xs font-bold shrink-0 self-start lg:self-auto">
+              <div className="inline-flex max-w-full flex-wrap sm:flex-nowrap items-center rounded-lg border border-[#CBD5E1] bg-[#F8FAFC] p-1 text-xs font-bold self-start lg:self-auto">
                 <button
                   type="button"
                   onClick={() => setCommsSubView('chats')}
@@ -2277,7 +2277,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
             </div>
 
             {commsSubView === 'dispatch' ? (
-              <div inert className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start" aria-label="Legacy chats: read only">
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
                 {/* Left 7 Cols: 4 Editable Guest Dispatch Templates */}
                 <div className="lg:col-span-7 rounded-xl border border-[#CBD5E1] bg-white p-5 space-y-4 shadow-xs">
                   <div className="border-b border-[#E2E8F0] pb-3">
@@ -2928,7 +2928,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
               </div>
             )}
           </div>
-        </div></details>}
+        )}
 
         {/* ============================================================ */}
         {/* TAB 3: CASES & REFUNDS (CLICKABLE EMAIL & WHATSAPP READER)   */}

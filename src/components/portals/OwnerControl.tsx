@@ -1,4 +1,4 @@
-import { OperationsInbox } from '../conversations/ConversationPanel';
+import { ConversationWorkspace } from '../conversations/ConversationPanel';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { authFetch } from '../../lib/apiAuth';
 import {
@@ -3655,7 +3655,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
         {/* ============================================================ */}
         {/* TAB 3: UNIFIED INBOX, CONTACT DISPATCH & AI COPILOT          */}
         {/* ============================================================ */}
-        {activeTab === 'copilot' && <OperationsInbox bookings={bookings} ar={isAr} />}
+        {activeTab === 'copilot' && <ConversationWorkspace bookings={bookings} ar={isAr} />}
         {activeTab === 'copilot' && (
           <div className="space-y-5" dir={isAr ? 'rtl' : 'ltr'}>
             {/* Clean Flat Conversations Hub Header + Sub-View Switcher (Inbox vs AI Radar) */}

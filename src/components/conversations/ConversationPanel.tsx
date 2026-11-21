@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { authFetch } from '../../lib/apiAuth';
+import { readConversationResponse } from '../../lib/conversationApi';
 import type { PlatformBooking } from '../../data/platformData';
 
 interface Message { id: string; text: string; authorName: string; sender: string; createdAt: string; internal?: boolean; emailStatus?: string; }
@@ -24,8 +25,10 @@ export function ConversationPanel({ bookingId, staff = false, ar = false, initia
   const base = `/api/${staff ? 'staff' : 'guest'}/conversations/${encodeURIComponent(bookingId)}`;
   const call = useCallback(async (suffix = '', options: RequestInit = {}) => {
     const response = await (staff ? authFetch : fetch)(base + suffix, { ...options, cache: 'no-store', headers: { 'Content-Type': 'application/json', ...(staff ? {} : { 'X-Conversation-Token': token }) } });
-    const result = await response.json().catch(() => ({}));
-    if (!response.ok) throw new Error(result.error || (ar ? 'تعذر إكمال الطلب. حاول مرة أخرى.' : 'Request failed. Please retry.'));
+    const result = await readConversationResponse(response, ar);
+    if (!suffix && !options.method && (!Array.isArray(result.items) || !result.booking)) {
+      throw new Error(ar ? 'إصدار خدمة المحادثات غير متوافق. يلزم تحديث السيرفر.' : 'Messaging API version mismatch. Update the backend.');
+    }
     return result;
   }, [base, staff, token]);
   const refresh = useCallback(async (older = false) => {
@@ -79,7 +82,7 @@ export function ConversationPanel({ bookingId, staff = false, ar = false, initia
       // Internal notes never enter the customer-draft prompt.
       const history = data.items.map(m => ({ sender: m.sender, text: m.text }));
       const response = await authFetch('/api/assistant', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ customerName: data.booking.guestName, language: data.booking.guestLang || 'en', ...(language !== 'auto' ? { targetLanguageOverride: language } : {}), bookingRef: bookingId, tripTitle: data.booking.tripTitle, latestMessage: [...history].reverse().find(m => m.sender === 'customer')?.text || '', conversationHistory: history, bookingContext: data.booking, operatorIntent: text }) });
-      const result = await response.json(); if (!response.ok || !result.draft) throw new Error(result.error || 'Reply assistant is unavailable. You can still reply manually.');
+      const result = await readConversationResponse(response, ar); if (!result.draft) throw new Error('Reply assistant is unavailable. You can still reply manually.');
       if (version !== generation.current) return;
       setText(current => current === original ? result.draft : current);
       setNotice(ar ? 'مسودة مقترحة — راجعها قبل الإرسال. لا يتم إرسالها تلقائيًا.' : 'Suggested draft — review before sending. Nothing was sent automatically.');
@@ -115,9 +118,9 @@ export function ConversationPanel({ bookingId, staff = false, ar = false, initia
   </section>;
 }
 
-export function OperationsInbox({ bookings, ar = false }: { bookings: PlatformBooking[]; ar?: boolean }) {
-  const [selected, setSelected] = useState('');
-  const [forwardedDraft, setForwardedDraft] = useState('');
+export function OperationsInbox({ bookings, ar = false, initialBookingId = '', initialDraft = '' }: { bookings: PlatformBooking[]; ar?: boolean; initialBookingId?: string; initialDraft?: string }) {
+  const [selected, setSelected] = useState(initialBookingId || bookings[0]?.id || '');
+  const [forwardedDraft, setForwardedDraft] = useState(initialDraft);
   const sectionRef = useRef<HTMLElement | null>(null);
   useEffect(() => {
     const open = (event: Event) => {
@@ -136,22 +139,61 @@ export function OperationsInbox({ bookings, ar = false }: { bookings: PlatformBo
   const [error, setError] = useState('');
   const load = useCallback(async (page = '') => {
     const response = await authFetch('/api/staff/conversations?' + new URLSearchParams({ pageToken: page }));
-    if (!response.ok) throw new Error(ar ? 'تعذر تحديث قائمة المحادثات.' : 'Could not refresh conversations.');
-    const result = await response.json();
+    const result = await readConversationResponse(response, ar);
+    if (!Array.isArray(result.items)) throw new Error(ar ? 'إصدار خدمة المحادثات غير متوافق. يلزم تحديث السيرفر.' : 'Messaging API version mismatch. Update the backend.');
+    setError('');
     setSummaries(previous => [...new Map([...previous, ...result.items].map(item => [item.id, item])).values()]); setNext(result.nextPageToken);
   }, [ar]);
   useEffect(() => { void load().catch(e => setError(e.message)); const timer = window.setInterval(() => { void load().catch(e => setError(e.message)); }, 30000); return () => window.clearInterval(timer); }, [load]);
   const summary = new Map(summaries.map(s => [s.id, s]));
   const visible = bookings.filter(b => `${b.id} ${b.guestName} ${b.tripTitle}`.toLowerCase().includes(query.toLowerCase()) && (filter === 'all' || (summary.get(b.id)?.status || 'new') === filter)).sort((a, b) => String(summary.get(b.id)?.updatedAt || '').localeCompare(String(summary.get(a.id)?.updatedAt || '')));
-  return <section ref={sectionRef} className="rounded-2xl border border-[#CBD5E1] bg-[#FAF4ED] p-4 space-y-4" dir={ar ? 'rtl' : 'ltr'}>
-    <h2 className="text-xl font-bold text-[#0F2233]">{ar ? 'صندوق محادثات الحجوزات' : 'Booking conversations'}</h2>
-    <p className="text-sm text-slate-600">{ar ? 'رسائل الموقع والملاحظات الداخلية. واتساب والإيميل الخارجي لا تتم مزامنتهما هنا تلقائيًا.' : 'Website messages and internal notes. External WhatsApp and email replies are not automatically synced here.'}</p>
+  return <section ref={sectionRef} className="min-w-0 space-y-3" dir={ar ? 'rtl' : 'ltr'}>
+    <p className="text-xs text-slate-500">{ar ? 'رسائل الموقع مرتبطة بالحجز. الملاحظات الداخلية للفريق فقط.' : 'Website messages stay with the booking. Internal notes are team-only.'}</p>
     {error && <p role="alert" className="text-red-700">{error}</p>}
-    <div className="grid min-w-0 grid-cols-1 gap-4 lg:grid-cols-[270px_minmax(0,1fr)]">
+    <div className="grid min-w-0 grid-cols-1 gap-4 lg:grid-cols-[minmax(230px,0.8fr)_minmax(0,2fr)]">
       <nav aria-label="Conversations" className={box + ' space-y-3'}><input aria-label="Search conversations" className="w-full border p-2 rounded-lg" placeholder={ar ? 'ابحث بالاسم أو رقم الحجز' : 'Search name or booking'} value={query} onChange={e => setQuery(e.target.value)} /><select aria-label="Filter conversations" value={filter} onChange={e => setFilter(e.target.value)} className="w-full border rounded p-2"><option value="all">{ar ? 'كل الحجوزات' : 'All bookings'}</option>{Object.entries(labels).map(([value, label]) => <option key={value} value={value}>{label[ar ? 0 : 1]}</option>)}</select><div className="max-h-[600px] overflow-auto space-y-2">{visible.map(booking => <button key={booking.id} type="button" onClick={() => { setSelected(booking.id); setForwardedDraft(''); }} className={`text-start w-full rounded-lg border p-3 ${selected === booking.id ? 'border-[#EE5426] bg-orange-50' : 'border-slate-200'}`}><strong className="block">{booking.guestName}</strong><small className="block">{booking.id} · {booking.date}</small><small className="block truncate">{summary.get(booking.id)?.lastText || booking.tripTitle}</small><small className="text-[#EE5426]">{labels[summary.get(booking.id)?.status || '']?.[ar ? 0 : 1] || (ar ? 'لم تبدأ محادثة' : 'No conversation yet')}</small></button>)}</div>{!visible.length && <p>{ar ? 'لا توجد نتائج.' : 'No results.'}</p>}{next && <button type="button" className="underline" onClick={() => void load(next).catch(e => setError(e.message))}>{ar ? 'تحميل المزيد' : 'Load more'}</button>}</nav>
       {selected ? <ConversationPanel key={selected} bookingId={selected} staff ar={ar} initialText={forwardedDraft} /> : <p className={box}>{ar ? 'اختر حجزًا لعرض المحادثة أو بدء التواصل.' : 'Choose a booking to view or start a conversation.'}</p>}
     </div>
   </section>;
+}
+
+/** Keep the existing portals intact. Fetch private messages only when requested. */
+export function ConversationWorkspace({ bookings, ar = false }: { bookings: PlatformBooking[]; ar?: boolean }) {
+  const [request, setRequest] = useState<{ bookingId: string; text: string } | null>(null);
+  const dialog = useRef<HTMLDialogElement | null>(null);
+  const trigger = useRef<HTMLButtonElement | null>(null);
+  useEffect(() => {
+    const open = (event: Event) => {
+      const detail = (event as CustomEvent).detail;
+      setRequest({ bookingId: String(detail?.bookingId || ''), text: String(detail?.text || '') });
+    };
+    window.addEventListener('wasla:open-conversation', open);
+    return () => window.removeEventListener('wasla:open-conversation', open);
+  }, []);
+  useEffect(() => {
+    if (!request) return;
+    const element = dialog.current;
+    const overflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    if (element && !element.open) element.showModal();
+    return () => { element?.close(); document.body.style.overflow = overflow; trigger.current?.focus(); };
+  }, [request]);
+  return <>
+    <div className="flex justify-end mb-2" dir={ar ? 'rtl' : 'ltr'}>
+      <button ref={trigger} type="button" onClick={() => setRequest({ bookingId: '', text: '' })} className="inline-flex items-center gap-2 rounded-lg border border-[#99D5CB] bg-[#F0FDFA] px-3 py-2 text-xs font-bold text-[#0F766E] hover:bg-[#CCFBF1]">
+        <span aria-hidden="true">✉</span>{ar ? 'رسائل الحجز داخل الموقع' : 'Website booking messages'}
+      </button>
+    </div>
+    <dialog ref={dialog} onCancel={() => setRequest(null)} onClose={() => setRequest(null)} aria-labelledby="booking-conversation-title" className="m-auto max-h-[94dvh] w-[min(1180px,96vw)] max-w-none rounded-2xl border border-[#CBD5E1] bg-[#FAFDFB] p-0 shadow-2xl backdrop:bg-[#0F2233]/40">
+      {request && <div dir={ar ? 'rtl' : 'ltr'}>
+        <header className="sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-[#B8E2D9] bg-[#F0FDFA] px-4 py-3">
+          <div><h2 id="booking-conversation-title" className="font-bold text-[#0F766E]">{ar ? 'محادثات الحجز' : 'Booking conversations'}</h2><p className="text-xs text-[#475569]">{ar ? 'فريق العمليات · رسائل العميل والملاحظات الداخلية' : 'Operations · Guest messages and internal notes'}</p></div>
+          <button type="button" onClick={() => setRequest(null)} aria-label={ar ? 'إغلاق المحادثات' : 'Close conversations'} className="rounded-lg border border-[#B8E2D9] bg-white px-3 py-2 text-sm font-bold text-[#0F2233]">{ar ? 'إغلاق' : 'Close'} ×</button>
+        </header>
+        <div className="p-3 sm:p-4"><OperationsInbox key={request.bookingId + request.text} bookings={bookings} ar={ar} initialBookingId={request.bookingId} initialDraft={request.text} /></div>
+      </div>}
+    </dialog>
+  </>;
 }
 
 export function GuestConversationPage() {
