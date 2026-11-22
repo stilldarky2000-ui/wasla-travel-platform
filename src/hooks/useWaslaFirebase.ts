@@ -1488,37 +1488,30 @@ export function useWaslaFirebase() {
         )
       );
     } else {
-      // Public Customer Storefront: read ONLY Approved trips & Approved reviews
-      unsubscribers.push(
-        onSnapshot(
-          query(collection(db, 'trips'), where('approvalStatus', '==', 'Approved')),
-          (snap) => {
-            if (!snap.empty) {
-              setFirestoreSeeded(true);
-              setTrips(mergeTripsWithStarterCatalog(snap.docs.map((d) => d.data() as Trip)));
-            }
-            setTripsLoading(false);
-          },
-          () => {
-            // Keep default starter catalog visible if database isn't initialized yet
-            setTripsLoading(false);
+      // Public Customer Storefront: read ONLY Approved trips (reviews are local, below)
+      // One-time fetch (not a live listener): public visitors load the
+      // approved catalog once per visit to conserve the free Firestore
+      // read quota. The displayed catalog and layout are unchanged.
+      void (async () => {
+        try {
+          const snap = await getDocs(
+            query(collection(db, 'trips'), where('approvalStatus', '==', 'Approved'))
+          );
+          if (!snap.empty) {
+            setFirestoreSeeded(true);
+            setTrips(mergeTripsWithStarterCatalog(snap.docs.map((d) => d.data() as Trip)));
           }
-        )
-      );
+        } catch {
+          // Keep default starter catalog visible if database isn't initialized yet
+        } finally {
+          setTripsLoading(false);
+        }
+      })();
 
-      unsubscribers.push(
-        onSnapshot(
-          query(collection(db, 'trip_reviews'), where('approvalStatus', '==', 'Approved')),
-          (snap) => {
-            if (!snap.empty) {
-              setTripReviews(snap.docs.map((d) => d.data() as TripReviewRecord));
-            }
-          },
-          () => {
-            // Keep default starter reviews visible if database isn't initialized yet
-          }
-        )
-      );
+      // Public reviews are curated locally (INITIAL_TRIP_REVIEWS in
+      // src/data/platformData.ts) and updated manually by the owner, so the
+      // storefront makes zero Firestore reads for reviews. Staff workspaces
+      // still read trip_reviews from Firestore exactly as before.
 
       // Live unlock listener when a signed-in partner waits for Owner approval
       if (user && user.emailVerified) {
