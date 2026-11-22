@@ -34,6 +34,7 @@ interface TripReviewProps {
   bookingStatusById?: Record<string, string>;
   storefrontBookingRefs?: SafeStorefrontBookingRef[];
   onOpenReviewModal?: (bookingId?: string) => void;
+  hideReviewPrompt?: boolean;
 }
 
 interface PostTripReviewModalProps {
@@ -821,6 +822,7 @@ export const TripReview: React.FC<TripReviewProps> = ({
   bookingStatusById,
   storefrontBookingRefs,
   onOpenReviewModal,
+  hideReviewPrompt = false,
 }) => {
   const copy = getLocalizedReviewCopy(lang);
 
@@ -903,19 +905,17 @@ export const TripReview: React.FC<TripReviewProps> = ({
     return Boolean(rev.verifiedBooking);
   };
 
-  const stats = useMemo(() => {
-    if (reviews.length === 0) {
-      return {
-        average: trip.rating.toFixed(1),
-        count: trip.reviewCount,
-      };
-    }
-    const sum = reviews.reduce((acc, r) => acc + Number(r.rating || 5), 0);
-    return {
-      average: (sum / reviews.length).toFixed(1),
-      count: reviews.length,
-    };
-  }, [reviews, trip.rating, trip.reviewCount]);
+  // One source of truth for the numbers shown everywhere on the page:
+  // the trip-level aggregates (same values as the page header and title
+  // line). The curated review cards below are a displayed subset, not a
+  // second, conflicting count.
+  const stats = useMemo(
+    () => ({
+      average: trip.rating.toFixed(1),
+      count: trip.reviewCount,
+    }),
+    [trip.rating, trip.reviewCount]
+  );
 
   return (
     <section className="space-y-4" aria-label={copy.heading}>
@@ -934,7 +934,7 @@ export const TripReview: React.FC<TripReviewProps> = ({
           </div>
         </div>
 
-        {!previewMode && (
+        {!previewMode && !hideReviewPrompt && (
           <div className="flex flex-wrap items-center gap-2.5">
             {eligibleBooking ? (
               <span className="inline-flex items-center gap-1.5 rounded-lg border border-[#A7F3D0] bg-[#ECFDF5] px-2.5 py-1.5 text-xs font-semibold text-[#047857] tabular-nums">
