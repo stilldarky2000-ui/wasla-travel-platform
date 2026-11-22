@@ -27,7 +27,6 @@ import {
   Printer,
   Share2,
   ShieldCheck,
-  Sparkles,
   Star,
   Tag,
   Users,
@@ -222,7 +221,7 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
   const [transferZoneId, setTransferZoneId] = useState<string>('hurghada');
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
-  const [descExpanded, setDescExpanded] = useState(true);
+  const [descExpanded, setDescExpanded] = useState(false);
   const [adults, setAdults] = useState(2);
   const [children, setChildren] = useState(0);
   const [infants, setInfants] = useState(0);
@@ -235,6 +234,9 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
   const [guestName, setGuestName] = useState('');
   const [whatsapp, setWhatsapp] = useState('');
   const [whatsappOptIn, setWhatsappOptIn] = useState(true);
+  const [bookingStep, setBookingStep] = useState(1);
+  const [extrasOpen, setExtrasOpen] = useState(false);
+  const [receiptOpen, setReceiptOpen] = useState(false);
   const [guideLanguage, setGuideLanguage] = useState<string>(() =>
     lang === 'de' ? 'German' : lang === 'ar' ? 'Arabic' : 'English'
   );
@@ -271,9 +273,12 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
     setFlightTimeInput('');
     setSelectedOptionId(trip.options?.[0]?.id ?? '');
     setTransferZoneId('hurghada');
+    setBookingStep(1);
+    setExtrasOpen(false);
+    setReceiptOpen(false);
     setActiveImageIndex(0);
     setLightboxOpen(false);
-    setDescExpanded(true);
+    setDescExpanded(false);
     setAdults(2);
     setChildren(0);
     setInfants(0);
@@ -403,7 +408,7 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
     adultsUnit: tText({ en: 'Adults', ar: 'بالغ', de: 'Erwachsene' }, lang),
     childrenUnit: tText({ en: 'Children', ar: 'طفل', de: 'Kinder' }, lang),
     infantsUnit: tText(
-      { en: 'Infants (INF)', ar: 'رضيع (INF)', de: 'Kleinkinder (INF)' },
+      { en: 'Infants', ar: 'رضيع', de: 'Kleinkinder' },
       lang
     ),
     freeLabel: tText({ en: 'Free', ar: 'مجاناً', de: 'Kostenlos' }, lang),
@@ -415,7 +420,7 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
     selectedPkg: tText({ en: 'Package', ar: 'الباقة', de: 'Option' }, lang),
     manifestLine: tText({ en: 'Manifest', ar: 'إجمالي الكشف', de: 'Personenzahl' }, lang),
     totalLabel: tText(
-      { en: 'Total Selling Price', ar: 'إجمالي سعر البيع', de: 'Gesamtverkaufspreis' },
+      { en: 'Total', ar: 'الإجمالي', de: 'Gesamt' },
       lang
     ),
     paxWord: tText({ en: 'pax', ar: 'فرد', de: 'Pers.' }, lang),
@@ -464,6 +469,10 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (bookingStep === 1) {
+      handleAdvanceToDetails();
+      return;
+    }
     if (!isSelectedDateOperating) {
       setError(
         tText(
@@ -584,60 +593,28 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
 
   };
 
+  const handleAdvanceToDetails = () => {
+    if (!isSelectedDateOperating) {
+      setError(
+        tText(
+          {
+            en: `This excursion does not run on ${date}. Operating schedule: ${operatingDaysLabel}. Please choose an available date.`,
+            ar: `هذه الرحلة لا تعمل في تاريخ ${date}. أيام التشغيل: ${operatingDaysLabel}. يرجى اختيار تاريخ متاح.`,
+            de: `Dieser Ausflug findet am ${date} nicht statt (${operatingDaysLabel}). Bitte wählen Sie ein verfügbares Datum.`,
+          },
+          lang
+        )
+      );
+      return;
+    }
+    setError('');
+    setBookingStep(2);
+  };
+
   const jumpToSection = (sectionId: string) => {
     const el = document.getElementById(sectionId);
     if (el) {
       el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-  };
-
-  const handleMobileStickyBookClick = () => {
-    const formEl = document.getElementById('trip-booking-form') as HTMLFormElement | null;
-    if (!formEl) return;
-
-    const rect = formEl.getBoundingClientRect();
-    const isFormOnScreen = rect.top < window.innerHeight * 0.7 && rect.bottom > 120;
-
-    // If the user is still up at the trip photos/description, scroll smoothly to the booking form top
-    if (!isFormOnScreen) {
-      formEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      return;
-    }
-
-    // User is already looking at the booking form: check the next required field or submit
-    if (!hotel.trim()) {
-      const hotelInput = formEl.querySelector<HTMLInputElement>('input[type="text"]');
-      if (hotelInput) {
-        hotelInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        window.setTimeout(() => hotelInput.focus({ preventScroll: true }), 220);
-        return;
-      }
-    }
-
-    const requiredIds = [
-      { id: 'trip-booking-name', valid: guestName.trim().length > 0 },
-      { id: 'trip-booking-whatsapp', valid: whatsapp.trim().replace(/\D/g, '').length >= 6 },
-      { id: 'trip-booking-email', valid: /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()) },
-      ...(isMarsaAlamTrip
-        ? [{ id: 'trip-booking-room', valid: roomNumber.trim().length > 0 }]
-        : []),
-    ];
-
-    const firstIncomplete = requiredIds.find((item) => !item.valid);
-    if (firstIncomplete) {
-      const inputEl = document.getElementById(firstIncomplete.id) as HTMLInputElement | null;
-      if (inputEl) {
-        inputEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        window.setTimeout(() => inputEl.focus({ preventScroll: true }), 220);
-        return;
-      }
-    }
-
-    // All required text inputs are filled (or Marsa Alam passport check needs to trigger) -> submit form
-    if (typeof formEl.requestSubmit === 'function') {
-      formEl.requestSubmit();
-    } else {
-      formEl.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
     }
   };
 
@@ -705,13 +682,7 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
             >
               {tText({ en: 'Overview', ar: 'نظرة عامة', de: 'Überblick' }, lang)}
             </button>
-            <button
-              type="button"
-              onClick={() => jumpToSection('trip-sec-gallery')}
-              className="rounded-lg px-2.5 py-1.5 hover:bg-white hover:text-[#EE5426] transition-colors cursor-pointer whitespace-nowrap shrink-0"
-            >
-              {tText({ en: 'Gallery', ar: 'المعرض', de: 'Galerie' }, lang)}
-            </button>
+            
             <button
               type="button"
               onClick={() => jumpToSection('trip-sec-highlights')}
@@ -821,7 +792,58 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
               id="trip-sec-overview"
               className="card-wasla scroll-mt-24 p-5 sm:p-6 space-y-5"
             >
-              <div className="group relative aspect-[16/10] w-full overflow-hidden rounded-xl border border-[#C8C2B8]/60 bg-[#0F2233]">
+                            {/* Title, Unboxed Metadata & Short Description */}
+              <div className="space-y-3 pt-1">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-xs font-semibold text-[#475569] tabular-nums">
+                    <span className="inline-flex items-center gap-1 text-[#EE5426]">
+                      <MapPin className="h-3.5 w-3.5" aria-hidden="true" />
+                      {trip.destination}
+                    </span>
+                    <span aria-hidden="true">·</span>
+                    <span className="inline-flex items-center gap-1 text-[#0F2233]">
+                      <Star className="h-3.5 w-3.5 fill-[#F59E0B] text-[#F59E0B]" aria-hidden="true" />
+                      {trip.rating.toFixed(1)} ({trip.reviewCount}{' '}
+                      {tText({ en: 'reviews', ar: 'تقييم', de: 'Bewertungen' }, lang)})
+                    </span>
+                    <span aria-hidden="true">·</span>
+                    <span className="inline-flex items-center gap-1 text-[#15803D]">
+                      <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
+                      {verifiedPartnerLabel}
+                    </span>
+                    {trip.familyFriendly && (
+                      <span className="rounded-full bg-[#EE5426] px-2 py-0.5 text-[10.5px] font-bold text-white">
+                        {t.familyFriendly}
+                      </span>
+                    )}
+                    {trip.womenFriendly && (
+                      <span className="rounded-full border border-[#C8C2B8] px-2 py-0.5 text-[10.5px] font-bold text-[#0F2233]">
+                        {t.womenFriendly}
+                      </span>
+                    )}
+                  </div>
+                  <div className="text-end">
+                    <span className="text-[11px] font-medium text-[#64748B] block">
+                      {tText({ en: 'Starting from', ar: 'يبدأ من', de: 'Ab' }, lang)}
+                    </span>
+                    <span className="font-display text-2xl font-bold text-[#0F2233] tabular-nums">
+                      {formatPrice(activeUnitPrice)}
+                    </span>
+                  </div>
+                </div>
+
+                <h1
+                  id="trip-modal-title"
+                  className="font-display text-2xl sm:text-3xl font-semibold tracking-tight text-[#0F2233] text-balance"
+                >
+                  {title}
+                </h1>
+                <p className="text-[15.5px] leading-relaxed text-[#384C54]">
+                  {tText(trip.shortDescription, lang)}
+                </p>
+              </div>
+
+<div className="group relative aspect-[16/10] w-full overflow-hidden rounded-xl border border-[#C8C2B8]/60 bg-[#0F2233]">
                 <SmartImage
                   src={galleryImages[safeImgIdx]}
                   alt={getCaptionForImage(safeImgIdx)}
@@ -882,85 +904,31 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
                 </div>
               </div>
 
-              {/* Title, Unboxed Metadata & Short Description */}
-              <div className="space-y-3 pt-1">
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                  <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-xs font-semibold text-[#475569] tabular-nums">
-                    <span className="inline-flex items-center gap-1 text-[#EE5426]">
-                      <MapPin className="h-3.5 w-3.5" aria-hidden="true" />
-                      {trip.destination}
-                    </span>
-                    <span aria-hidden="true">·</span>
-                    <span className="inline-flex items-center gap-1 text-[#0F2233]">
-                      <Star className="h-3.5 w-3.5 fill-[#F59E0B] text-[#F59E0B]" aria-hidden="true" />
-                      {trip.rating.toFixed(1)} ({trip.reviewCount}{' '}
-                      {tText({ en: 'reviews', ar: 'تقييم', de: 'Bewertungen' }, lang)})
-                    </span>
-                    <span aria-hidden="true">·</span>
-                    <span className="inline-flex items-center gap-1 text-[#15803D]">
-                      <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
-                      {verifiedPartnerLabel}
-                    </span>
-                  </div>
-                  <div className="text-end">
-                    <span className="text-[11px] font-medium text-[#64748B] block">
-                      {tText({ en: 'Starting from', ar: 'يبدأ من', de: 'Ab' }, lang)}
-                    </span>
-                    <span className="font-display text-2xl font-bold text-[#EE5426] tabular-nums">
-                      {formatPrice(activeUnitPrice)}
-                    </span>
-                  </div>
+              {/* Quick Facts Row (borderless) */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-x-4 gap-y-4 border-t border-[#C8C2B8]/60 pt-4">
+                <div className="space-y-1">
+                  <span className="block text-[11px] font-semibold uppercase tracking-wide text-[#64748B]">
+                    {tText({ en: 'Duration', ar: 'المدة الزمنية', de: 'Dauer' }, lang)}
+                  </span>
+                  <p className="text-sm font-semibold text-[#0F2233]">{tText(trip.duration, lang)}</p>
                 </div>
-
-                <h1
-                  id="trip-modal-title"
-                  className="font-display text-2xl sm:text-3xl font-semibold tracking-tight text-[#0F2233] text-balance"
-                >
-                  {title}
-                </h1>
-                <p className="text-[15.5px] leading-relaxed text-[#384C54]">
-                  {tText(trip.shortDescription, lang)}
-                </p>
-              </div>
-
-              {/* 4-Card Quick Specs Strip */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
-                <div className="rounded-xl border-[1.5px] border-[#94A3B8] bg-[#F8FAFC] p-3.5 space-y-1">
-                  <div className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-[#475569]">
-                    <Clock className="h-3.5 w-3.5 text-[#EE5426]" aria-hidden="true" />
-                    <span>{tText({ en: 'Duration', ar: 'المدة الزمنية', de: 'Dauer' }, lang)}</span>
-                  </div>
-                  <p className="text-xs sm:text-sm font-semibold text-[#0F2233] tabular-nums">
-                    {tText(trip.duration, lang)}
-                  </p>
+                <div className="space-y-1">
+                  <span className="block text-[11px] font-semibold uppercase tracking-wide text-[#64748B]">
+                    {tText({ en: 'Departure', ar: 'ميعاد التحرك', de: 'Startzeit' }, lang)}
+                  </span>
+                  <p className="text-sm font-semibold text-[#0F2233] tabular-nums">{scheduleSummary}</p>
                 </div>
-
-                <div className="rounded-xl border-[1.5px] border-[#94A3B8] bg-[#F8FAFC] p-3.5 space-y-1">
-                  <div className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-[#475569]">
-                    <Sparkles className="h-3.5 w-3.5 text-[#EE5426]" aria-hidden="true" />
-                    <span>{tText({ en: 'Departure', ar: 'ميعاد التحرك', de: 'Startzeit' }, lang)}</span>
-                  </div>
-                  <p className="text-xs sm:text-sm font-semibold text-[#EE5426] line-clamp-2 tabular-nums">
-                    {scheduleSummary}
-                  </p>
+                <div className="space-y-1">
+                  <span className="block text-[11px] font-semibold uppercase tracking-wide text-[#64748B]">
+                    {tText({ en: 'Hotel Pickup', ar: 'الاستلام والتوصيل', de: 'Abholung' }, lang)}
+                  </span>
+                  <p className="text-sm font-semibold text-[#0F2233]">{tText(trip.pickup, lang)}</p>
                 </div>
-
-                <div className="rounded-xl border-[1.5px] border-[#94A3B8] bg-[#F8FAFC] p-3.5 space-y-1">
-                  <div className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-[#475569]">
-                    <Navigation className="h-3.5 w-3.5 text-[#EE5426]" aria-hidden="true" />
-                    <span>{tText({ en: 'Hotel Pickup', ar: 'الاستلام والتوصيل', de: 'Abholung' }, lang)}</span>
-                  </div>
-                  <p className="text-xs font-semibold text-[#0F2233] line-clamp-2">
-                    {tText(trip.pickup, lang)}
-                  </p>
-                </div>
-
-                <div className="rounded-xl border-[1.5px] border-[#94A3B8] bg-[#F8FAFC] p-3.5 space-y-1">
-                  <div className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-[#475569]">
-                    <Globe className="h-3.5 w-3.5 text-[#EE5426]" aria-hidden="true" />
-                    <span>{tText({ en: 'Live Guide', ar: 'لغات الإرشاد', de: 'Sprachen' }, lang)}</span>
-                  </div>
-                  <p className="text-xs font-semibold text-[#0F2233] line-clamp-2">
+                <div className="space-y-1">
+                  <span className="block text-[11px] font-semibold uppercase tracking-wide text-[#64748B]">
+                    {tText({ en: 'Live Guide', ar: 'لغات الإرشاد', de: 'Sprachen' }, lang)}
+                  </span>
+                  <p className="text-sm font-semibold text-[#0F2233]">
                     {trip.languages && trip.languages.length > 0
                       ? trip.languages.join(' · ')
                       : 'English · العربية · Deutsch'}
@@ -968,170 +936,9 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
                 </div>
               </div>
 
-              {/* Package Options Comparison Cards */}
-              {trip.options && trip.options.length > 0 && (
-                <div className="pt-4 border-t-[1.5px] border-[#94A3B8] space-y-3">
-                  <div className="flex items-center justify-between gap-2">
-                    <h2 className="text-sm font-semibold text-[#0F2233]">
-                      {tText(
-                        {
-                          en: 'Available Packages & Options (Click to select)',
-                          ar: 'الباقات والاختيارات المتاحة للرحلة (اضغط لاختيار الباقة)',
-                          de: 'Verfügbare Pakete & Optionen (Klicken zum Auswählen)',
-                        },
-                        lang
-                      )}
-                    </h2>
-                    <span className="text-xs font-medium text-[#475569] tabular-nums">
-                      {trip.options.length}{' '}
-                      {tText({ en: 'options', ar: 'باقات', de: 'Optionen' }, lang)}
-                    </span>
-                  </div>
-                  <div className="grid grid-cols-1 gap-2.5">
-                    {trip.options.map((opt) => {
-                      const isSelected = selectedOption?.id === opt.id;
-                      return (
-                        <button
-                          key={opt.id}
-                          type="button"
-                          onClick={() => setSelectedOptionId(opt.id)}
-                          className={`w-full text-start rounded-xl border-[1.5px] p-3.5 transition-all cursor-pointer flex items-start justify-between gap-3 ${
-                            isSelected
-                              ? 'border-[#EE5426] bg-[#FFF7ED]/70 ring-1 ring-[#EE5426]'
-                              : 'border-[#94A3B8] bg-[#F8FAFC] hover:border-[#475569] hover:bg-white'
-                          }`}
-                        >
-                          <div className="space-y-1 min-w-0">
-                            <div className="flex items-center gap-2">
-                              <span
-                                className={`inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-full border ${
-                                  isSelected
-                                    ? 'border-[#EE5426] bg-[#EE5426] text-white'
-                                    : 'border-[#64748B] bg-white'
-                                }`}
-                              >
-                                {isSelected && <Check className="h-2.5 w-2.5" />}
-                              </span>
-                              <span className="text-sm font-semibold text-[#0F2233]">
-                                {tText(opt.title, lang)}
-                              </span>
-                            </div>
-                            {opt.detail && (
-                              <p className="text-xs text-[#475569] ps-6 leading-relaxed">
-                                {tText(opt.detail, lang)}
-                              </p>
-                            )}
-                          </div>
-                          <div className="shrink-0 text-end">
-                            <span className="block font-display text-base font-bold text-[#EE5426] tabular-nums">
-                              {formatPrice(opt.price)}
-                            </span>
-                            <span className="block text-[10px] font-medium text-[#64748B]">
-                              {tText({ en: 'per adult', ar: 'للفرد البالغ', de: 'pro Erw.' }, lang)}
-                            </span>
-                          </div>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-            </div>
+</div>
 
-            {/* SECTION 1: Dedicated Image Gallery Showcase */}
-            <section
-              id="trip-sec-gallery"
-              aria-labelledby="trip-gallery-heading"
-              className="card-wasla scroll-mt-24 p-5 sm:p-6 space-y-4"
-            >
-              <div className="border-b-[1.5px] border-[#94A3B8] pb-3 flex flex-wrap items-center justify-between gap-2">
-                <div className="flex items-center gap-2">
-                  <Camera className="h-4.5 w-4.5 text-[#EE5426]" aria-hidden="true" />
-                  <h2 id="trip-gallery-heading" className="font-display text-lg font-bold text-[#0F2233]">
-                    {tText(
-                      {
-                        en: 'Dedicated Excursion Gallery',
-                        ar: 'معرض صور الرحلة المخصص',
-                        de: 'Ausflugs-Bildergalerie',
-                      },
-                      lang
-                    )}
-                  </h2>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setLightboxOpen(true)}
-                  className="inline-flex min-h-[36px] items-center gap-1.5 rounded-lg border-[1.5px] border-[#94A3B8] bg-[#F8FAFC] px-3 py-1.5 text-xs font-semibold text-[#0F2233] hover:border-[#EE5426] hover:text-[#EE5426] transition-colors cursor-pointer whitespace-nowrap shrink-0 tabular-nums"
-                >
-                  <Maximize2 className="h-3.5 w-3.5 text-[#EE5426]" aria-hidden="true" />
-                  <span>
-                    {tText(
-                      {
-                        en: `View Fullscreen (${galleryImages.length})`,
-                        ar: `عرض بملء الشاشة (${galleryImages.length})`,
-                        de: `Vollbild (${galleryImages.length})`,
-                      },
-                      lang
-                    )}
-                  </span>
-                </button>
-              </div>
-
-              <div
-                className={`grid gap-3.5 ${
-                  galleryImages.length === 1
-                    ? 'grid-cols-1'
-                    : galleryImages.length === 2
-                    ? 'grid-cols-1 sm:grid-cols-2'
-                    : 'grid-cols-1 sm:grid-cols-2'
-                }`}
-              >
-                {galleryImages.map((imgUrl, idx) => {
-                  const caption = getCaptionForImage(idx);
-                  const isActive = safeImgIdx === idx;
-                  return (
-                    <button
-                      key={idx}
-                      type="button"
-                      onClick={() => {
-                        setActiveImageIndex(idx);
-                        setLightboxOpen(true);
-                      }}
-                      className={`group text-start overflow-hidden rounded-xl border-[1.5px] bg-[#F8FAFC] transition-all cursor-pointer ${
-                        isActive
-                          ? 'border-[#EE5426] ring-1 ring-[#EE5426]/40'
-                          : 'border-[#94A3B8] hover:border-[#475569]'
-                      }`}
-                    >
-                      <div className="relative aspect-[4/3] w-full overflow-hidden bg-[#0F2233]">
-                        <SmartImage
-                          src={imgUrl}
-                          alt={caption}
-                          loading={idx < 2 ? 'eager' : 'lazy'}
-                          className="h-full w-full transition-transform duration-300 group-hover:scale-[1.03]"
-                          placeholderLabel={caption}
-                        />
-                        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
-                        <span className="absolute top-2.5 end-2.5 rounded-md bg-black/60 px-2 py-0.5 text-[11px] font-semibold text-white tabular-nums">
-                          {idx + 1} / {galleryImages.length}
-                        </span>
-                      </div>
-                      <div className="px-3.5 py-2.5 border-t-[1.5px] border-[#94A3B8]/80 flex items-center justify-between gap-2">
-                        <p className="text-xs font-medium text-[#0F2233] line-clamp-2 leading-snug">
-                          {caption}
-                        </p>
-                        <Maximize2
-                          className="h-3.5 w-3.5 shrink-0 text-[#64748B] group-hover:text-[#EE5426] transition-colors"
-                          aria-hidden="true"
-                        />
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-            </section>
-
-            {/* SECTION 2: Itinerary Highlights (Clean Bullet Points) */}
+{/* SECTION 2: Itinerary Highlights (Clean Bullet Points) */}
             <section
               id="trip-sec-highlights"
               aria-labelledby="trip-highlights-heading"
@@ -1142,12 +949,12 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
                   {t.modalHighlightsTitle}
                 </h2>
                 <span className="text-xs font-medium text-[#64748B] tabular-nums">
-                  {trip.highlights.length}{' '}
+                  {Math.min(trip.highlights.length, 5)}{' '}
                   {tText({ en: 'key highlights', ar: 'نقاط مميزة', de: 'Highlights' }, lang)}
                 </span>
               </div>
               <ul className="list-disc ps-5 space-y-2.5 text-[14.5px] leading-relaxed text-[#0F2233] marker:text-[#EE5426]">
-                {trip.highlights.map((item, idx) => (
+                {trip.highlights.slice(0, 5).map((item, idx) => (
                   <li key={idx}>{tText(item, lang)}</li>
                 ))}
               </ul>
@@ -1370,7 +1177,7 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
                 <div className="space-y-3">
                   <h2
                     id="trip-includes-heading"
-                    className="font-display text-base font-semibold text-[#0F2233] flex items-center gap-2 border-b-[1.5px] border-[#94A3B8] pb-2.5"
+                    className="font-display text-base font-semibold text-[#0F2233] flex items-center gap-2 border-b border-[#C8C2B8]/60 pb-2.5"
                   >
                     <Check className="h-4 w-4 text-[#16A34A]" aria-hidden="true" />
                     <span>
@@ -1396,7 +1203,7 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
 
                 {Boolean(trip.tips && trip.tips.length > 0) && (
                   <div className="space-y-3 sm:border-s-[1.5px] sm:border-[#94A3B8] sm:ps-6">
-                    <h2 className="font-display text-base font-semibold text-[#0F2233] flex items-center gap-2 border-b-[1.5px] border-[#94A3B8] pb-2.5">
+                    <h2 className="font-display text-base font-semibold text-[#0F2233] flex items-center gap-2 border-b border-[#C8C2B8]/60 pb-2.5">
                       <X className="h-4 w-4 text-[#DC2626]" aria-hidden="true" />
                       <span>{t.modalTipsTitle}</span>
                     </h2>
@@ -1412,7 +1219,7 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
                 )}
               </div>
 
-              <div className="pt-3.5 border-t-[1.5px] border-[#94A3B8]/80 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs font-medium text-[#475569]">
+              <div className="pt-3.5 border-t border-[#C8C2B8]/60 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs font-medium text-[#475569]">
                 <span className="inline-flex items-center gap-1.5 text-[#0F2233] font-semibold">
                   <ShieldCheck className="h-3.5 w-3.5 text-[#16A34A]" aria-hidden="true" />
                   {tText({ en: 'Whole-euro transparent pricing', ar: 'أسعار واضحة باليورو بدون رسوم خفية', de: 'Transparente Euro-Endpreise' }, lang)}
@@ -1420,170 +1227,194 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
                 <span aria-hidden="true">·</span>
                 <span>{t.modalPayAfter}</span>
                 <span aria-hidden="true">·</span>
-                <span>{t.modalNoBotNote}</span>
+                <span>
+                        {tText(
+                          {
+                            en: 'Free cancellation up to 24h before',
+                            ar: 'إلغاء مجاني قبل ٢٤ ساعة',
+                            de: 'Kostenlos stornierbar bis 24h vorher',
+                          },
+                          lang
+                        )}
+                      </span>
               </div>
             </section>
 
-            {/* SECTION 6: Not Suitable For & Meeting Point */}
-            {Boolean(trip.notSuitableFor?.length || trip.meetingPoint) && (
-              <section className="rounded-2xl border-[1.5px] border-[#94A3B8] bg-white p-5 sm:p-6 shadow-sm">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                  {trip.notSuitableFor && trip.notSuitableFor.length > 0 && (
-                    <div className="space-y-3">
-                      <h2 className="font-display text-base font-semibold text-[#0F2233] flex items-center gap-2 border-b-[1.5px] border-[#94A3B8] pb-2.5">
-                        <AlertCircle className="h-4 w-4 text-[#D97706]" aria-hidden="true" />
-                        <span>{t.modalNotSuitableTitle}</span>
-                      </h2>
-                      <ul className="space-y-2 text-sm text-[#384C54]">
-                        {trip.notSuitableFor.map((item, idx) => (
-                          <li key={idx} className="flex items-start gap-2">
-                            <span aria-hidden="true" className="text-[#D97706] font-bold">•</span>
-                            <span className="leading-relaxed">{tText(item, lang)}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-
-                  {trip.meetingPoint && (
-                    <div
-                      className={`space-y-3 ${
-                        trip.notSuitableFor?.length ? 'sm:border-s-[1.5px] sm:border-[#94A3B8] sm:ps-6' : ''
-                      }`}
-                    >
-                      <h2 className="font-display text-base font-semibold text-[#0F2233] flex items-center gap-2 border-b-[1.5px] border-[#94A3B8] pb-2.5">
-                        <Navigation className="h-4 w-4 text-[#EE5426]" aria-hidden="true" />
-                        <span>{t.modalMeetingPointTitle}</span>
-                      </h2>
-                      <p className="text-sm leading-relaxed text-[#384C54]">
-                        {tText(trip.meetingPoint, lang)}
-                      </p>
-                      {trip.meetingPointUrl && (
-                        <a
-                          href={trip.meetingPointUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 rounded-lg border-[1.5px] border-[#EE5426]/65 bg-[#FFF7ED] px-3 py-2 text-xs font-semibold text-[#EE5426] hover:bg-[#EE5426] hover:text-white transition-colors"
-                        >
-                          <MapPin className="h-3.5 w-3.5" aria-hidden="true" />
-                          <span>
-                            {tText(
-                              {
-                                en: 'Open Location in Google Maps',
-                                ar: 'فتح موقع نقطة التجمع على خرائط جوجل',
-                                de: 'Standort in Google Maps öffnen',
-                              },
-                              lang
-                            )}
-                          </span>
-                          <ExternalLink className="h-3 w-3" aria-hidden="true" />
-                        </a>
+            {/* SECTION 6: Important Information (single collapsible, theme surface, no inner cards) */}
+            {Boolean(
+              trip.notSuitableFor?.length ||
+                trip.meetingPoint ||
+                trip.whatToBring?.length ||
+                trip.notAllowed?.length ||
+                trip.knowBeforeYouGo?.length ||
+                trip.familyFriendly ||
+                trip.womenFriendly ||
+                trip.minChildAge !== undefined ||
+                trip.kidsDiscount
+            ) && (
+              <section id="trip-sec-know" className="card-wasla scroll-mt-24 p-5 sm:p-6">
+                <details>
+                  <summary className="cursor-pointer list-none flex items-center justify-between gap-2">
+                    <span className="font-display text-lg font-semibold text-[#0F2233]">
+                      {tText(
+                        {
+                          en: 'Important information',
+                          ar: 'معلومات مهمة',
+                          de: 'Wichtige Informationen',
+                        },
+                        lang
                       )}
-                    </div>
-                  )}
-                </div>
-              </section>
-            )}
+                    </span>
+                    <span className="text-xs font-semibold text-[#EE5426]" aria-hidden="true">
+                      ▾
+                    </span>
+                  </summary>
 
-            {/* SECTION 7: Important Info (What to Bring, Not Allowed, Know Before You Go) */}
-            {Boolean(trip.whatToBring?.length || trip.notAllowed?.length || trip.knowBeforeYouGo?.length) && (
-              <section
-                id="trip-sec-know"
-                className="scroll-mt-24 rounded-2xl border-[1.5px] border-[#EE5426]/60 bg-[#FFF7ED]/65 p-5 sm:p-6 shadow-sm space-y-5"
-              >
-                <h2 className="font-display text-lg font-semibold text-[#0F2233] border-b-[1.5px] border-[#EE5426]/45 pb-3">
-                  {t.modalSomethingToKnowTitle}
-                </h2>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-6 pt-5">
+                    {trip.notSuitableFor && trip.notSuitableFor.length > 0 && (
+                      <div className="space-y-2.5">
+                        <h3 className="text-sm font-semibold text-[#0F2233] flex items-center gap-2">
+                          <AlertCircle className="h-4 w-4 text-[#D97706]" aria-hidden="true" />
+                          <span>{t.modalNotSuitableTitle}</span>
+                        </h3>
+                        <ul className="space-y-2 text-sm text-[#384C54]">
+                          {trip.notSuitableFor.map((item, idx) => (
+                            <li key={idx} className="flex items-start gap-2">
+                              <span aria-hidden="true" className="text-[#D97706] font-bold">•</span>
+                              <span className="leading-relaxed">{tText(item, lang)}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                  {trip.whatToBring && trip.whatToBring.length > 0 && (
-                    <div className="rounded-xl border-[1.5px] border-[#94A3B8] bg-white p-4 space-y-2.5">
-                      <h3 className="text-xs font-semibold text-[#0F2233] flex items-center gap-1.5 border-b border-[#94A3B8]/60 pb-2">
-                        <Luggage className="h-4 w-4 text-[#EE5426]" aria-hidden="true" />
-                        <span>{t.modalWhatToBringTitle}</span>
-                      </h3>
-                      <ul className="space-y-2 text-xs text-[#384C54] leading-relaxed">
-                        {trip.whatToBring.map((item, idx) => (
-                          <li key={idx} className="flex items-start gap-2">
-                            <span className="text-[#EE5426] font-bold">•</span>
-                            <span>{tText(item, lang)}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
+                    {trip.meetingPoint && (
+                      <div className="space-y-2.5">
+                        <h3 className="text-sm font-semibold text-[#0F2233] flex items-center gap-2">
+                          <Navigation className="h-4 w-4 text-[#EE5426]" aria-hidden="true" />
+                          <span>{t.modalMeetingPointTitle}</span>
+                        </h3>
+                        <p className="text-sm leading-relaxed text-[#384C54]">
+                          {tText(trip.meetingPoint, lang)}
+                        </p>
+                        {trip.meetingPointUrl && (
+                          <a
+                            href={trip.meetingPointUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1.5 rounded-lg border border-[#EE5426]/65 bg-[#FFF7ED] px-3 py-2 text-xs font-semibold text-[#EE5426] hover:bg-[#EE5426] hover:text-white transition-colors"
+                          >
+                            <MapPin className="h-3.5 w-3.5" aria-hidden="true" />
+                            <span>
+                              {tText(
+                                {
+                                  en: 'Open Location in Google Maps',
+                                  ar: 'فتح موقع نقطة التجمع على خرائط جوجل',
+                                  de: 'Standort in Google Maps öffnen',
+                                },
+                                lang
+                              )}
+                            </span>
+                            <ExternalLink className="h-3 w-3" aria-hidden="true" />
+                          </a>
+                        )}
+                      </div>
+                    )}
 
-                  {trip.notAllowed && trip.notAllowed.length > 0 && (
-                    <div className="rounded-xl border-[1.5px] border-[#DC2626]/50 bg-white p-4 space-y-2.5">
-                      <h3 className="text-xs font-semibold text-[#0F2233] flex items-center gap-1.5 border-b border-[#DC2626]/35 pb-2">
-                        <Ban className="h-4 w-4 text-[#DC2626]" aria-hidden="true" />
-                        <span>{t.modalNotAllowedTitle}</span>
-                      </h3>
-                      <ul className="space-y-2 text-xs text-[#384C54] leading-relaxed">
-                        {trip.notAllowed.map((item, idx) => (
-                          <li key={idx} className="flex items-start gap-2">
-                            <span className="text-[#DC2626] font-bold">•</span>
-                            <span>{tText(item, lang)}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                </div>
+                    {trip.whatToBring && trip.whatToBring.length > 0 && (
+                      <div className="space-y-2.5">
+                        <h3 className="text-sm font-semibold text-[#0F2233] flex items-center gap-2">
+                          <Luggage className="h-4 w-4 text-[#EE5426]" aria-hidden="true" />
+                          <span>{t.modalWhatToBringTitle}</span>
+                        </h3>
+                        <ul className="space-y-2 text-sm text-[#384C54]">
+                          {trip.whatToBring.map((item, idx) => (
+                            <li key={idx} className="flex items-start gap-2">
+                              <span aria-hidden="true" className="text-[#EE5426] font-bold">•</span>
+                              <span className="leading-relaxed">{tText(item, lang)}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
 
-                {trip.knowBeforeYouGo && trip.knowBeforeYouGo.length > 0 && (
-                  <div className="rounded-xl border-[1.5px] border-[#94A3B8] bg-white p-4 space-y-2.5">
-                    <h3 className="text-xs font-semibold text-[#0F2233] flex items-center gap-1.5 border-b border-[#94A3B8]/60 pb-2">
-                      <Info className="h-4 w-4 text-[#EE5426]" aria-hidden="true" />
-                      <span>{t.modalKnowBeforeYouGoTitle}</span>
-                    </h3>
-                    <ul className="space-y-2 text-xs text-[#384C54] leading-relaxed">
-                      {trip.knowBeforeYouGo.map((item, idx) => (
-                        <li key={idx} className="flex items-start gap-2">
-                          <span className="text-[#EE5426] font-bold">•</span>
-                          <span>{tText(item, lang)}</span>
-                        </li>
-                      ))}
-                    </ul>
+                    {trip.notAllowed && trip.notAllowed.length > 0 && (
+                      <div className="space-y-2.5">
+                        <h3 className="text-sm font-semibold text-[#0F2233] flex items-center gap-2">
+                          <Ban className="h-4 w-4 text-[#DC2626]" aria-hidden="true" />
+                          <span>{t.modalNotAllowedTitle}</span>
+                        </h3>
+                        <ul className="space-y-2 text-sm text-[#384C54]">
+                          {trip.notAllowed.map((item, idx) => (
+                            <li key={idx} className="flex items-start gap-2">
+                              <span aria-hidden="true" className="text-[#DC2626] font-bold">•</span>
+                              <span className="leading-relaxed">{tText(item, lang)}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    {trip.knowBeforeYouGo && trip.knowBeforeYouGo.length > 0 && (
+                      <div className="space-y-2.5">
+                        <h3 className="text-sm font-semibold text-[#0F2233] flex items-center gap-2">
+                          <Info className="h-4 w-4 text-[#EE5426]" aria-hidden="true" />
+                          <span>{t.modalKnowBeforeYouGoTitle}</span>
+                        </h3>
+                        <ul className="space-y-2 text-sm text-[#384C54]">
+                          {trip.knowBeforeYouGo.map((item, idx) => (
+                            <li key={idx} className="flex items-start gap-2">
+                              <span aria-hidden="true" className="text-[#EE5426] font-bold">•</span>
+                              <span className="leading-relaxed">{tText(item, lang)}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    {(trip.familyFriendly ||
+                      trip.womenFriendly ||
+                      trip.minChildAge !== undefined ||
+                      trip.kidsDiscount) && (
+                      <div className="space-y-2.5">
+                        <h3 className="text-sm font-semibold text-[#0F2233] flex items-center gap-2">
+                          <Users className="h-4 w-4 text-[#EE5426]" aria-hidden="true" />
+                          <span>{t.modalChildPolicy}</span>
+                        </h3>
+                        <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-sm text-[#384C54] tabular-nums">
+                          {trip.familyFriendly && (
+                            <span className="font-semibold text-[#0F2233]">✓ {t.familyFriendly}</span>
+                          )}
+                          {trip.familyFriendly && trip.womenFriendly && <span aria-hidden="true">·</span>}
+                          {trip.womenFriendly && (
+                            <span className="font-semibold text-[#0F2233]">✓ {t.womenFriendly}</span>
+                          )}
+                          {trip.minChildAge !== undefined && (
+                            <>
+                              <span aria-hidden="true">·</span>
+                              <span className="text-[#0F2233] font-semibold">
+                                {t.minChildAge}: {trip.minChildAge}+
+                              </span>
+                            </>
+                          )}
+                          {trip.kidsDiscount && (
+                            <>
+                              <span aria-hidden="true">·</span>
+                              <span className="text-[#0F2233]">
+                                {t.kidsDiscount}: {tText(trip.kidsDiscount, lang)}
+                              </span>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    )}
                   </div>
-                )}
+                </details>
               </section>
             )}
-
-            {/* SECTION 8: Family & Child Policy (Clean Unboxed Metadata) */}
-            <section className="rounded-2xl bg-white p-5 sm:p-6 border-[1.5px] border-[#94A3B8] shadow-sm space-y-2.5">
-              <div className="flex items-center gap-2 text-sm font-semibold text-[#0F2233] border-b border-[#94A3B8]/70 pb-2.5">
-                <Users className="h-4 w-4 text-[#EE5426] shrink-0" aria-hidden="true" />
-                <span>{t.modalChildPolicy}</span>
-              </div>
-              <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs font-medium text-[#384C54] tabular-nums">
-                {trip.familyFriendly && (
-                  <span className="font-semibold text-[#EE5426]">✓ {t.familyFriendly}</span>
-                )}
-                {trip.familyFriendly && trip.womenFriendly && <span aria-hidden="true">·</span>}
-                {trip.womenFriendly && (
-                  <span className="font-semibold text-[#EE5426]">✓ {t.womenFriendly}</span>
-                )}
-                {trip.minChildAge !== undefined && (
-                  <>
-                    <span aria-hidden="true">·</span>
-                    <span className="text-[#0F2233] font-semibold">
-                      {t.minChildAge}: {trip.minChildAge}+
-                    </span>
-                  </>
-                )}
-                {trip.kidsDiscount && (
-                  <>
-                    <span aria-hidden="true">·</span>
-                    <span className="text-[#0F2233]">
-                      {t.kidsDiscount}: {tText(trip.kidsDiscount, lang)}
-                    </span>
-                  </>
-                )}
-              </div>
-            </section>
           </div>
 
+          
           {/* RIGHT COLUMN: Sticky Booking & Price Calculator (5 Cols) */}
           <div className="card-wasla lg:col-span-5 lg:sticky lg:top-20 p-5 sm:p-7 space-y-4">
             {pendingTicketRequest ? (
@@ -1693,8 +1524,8 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
                       <span className="text-[#64748B]">
                         {tText(
                           {
-                            en: 'Guests & Manifest',
-                            ar: 'الأفراد (كشف الباص/المركب)',
+                            en: 'Guests',
+                            ar: 'الأفراد',
                             de: 'Personenanzahl',
                           },
                           lang
@@ -1707,7 +1538,7 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
                           ? ` · ${pendingTicketRequest.children} ${tText({ en: 'Child', ar: 'طفل', de: 'Kind' }, lang)}`
                           : ''}
                         {(pendingTicketRequest.infants ?? 0) > 0
-                          ? ` · ${pendingTicketRequest.infants} INF`
+                          ? ` · ${pendingTicketRequest.infants} ${receiptLabels.infantsUnit}`
                           : ''}
                         {' '}({pendingTicketRequest.adults + pendingTicketRequest.children + (pendingTicketRequest.infants ?? 0)}{' '}
                         {receiptLabels.paxWord})
@@ -2045,7 +1876,7 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
                       <strong className="font-semibold text-[#0F2233]">
                         {confirmedRequest.adults}A
                         {confirmedRequest.children > 0 ? ` + ${confirmedRequest.children}C` : ''}
-                        {(confirmedRequest.infants ?? 0) > 0 ? ` + ${confirmedRequest.infants}INF` : ''}
+                        {(confirmedRequest.infants ?? 0) > 0 ? ` + ${confirmedRequest.infants} ${receiptLabels.infantsUnit}` : ''}
                         {' '}({confirmedRequest.adults + confirmedRequest.children + (confirmedRequest.infants ?? 0)} {receiptLabels.paxWord})
                       </strong>
                     </div>
@@ -2254,682 +2085,896 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
                 );
               })()
             ) : (
-              <form id="trip-booking-form" onSubmit={handleSubmit} className="space-y-4 scroll-mt-24">
-                <div className="flex items-center justify-between border-b-[1.5px] border-[#94A3B8] pb-3">
-                  <span className="text-xs font-semibold text-[#0F2233]">
-                    {tText({ en: 'Booking details', ar: 'تفاصيل الحجز', de: 'Buchungsdetails' }, lang)}
-                  </span>
-                  <span className="text-xs font-medium text-[#EE5426]">{t.modalPayAfter}</span>
-                </div>
-
-                {trip.options && trip.options.length > 0 && (
-                  <label className="block space-y-1.5">
-                    <span className="text-xs font-semibold text-[#0F2233]">
-                      {t.modalOptionsLabel}
-                    </span>
-                    <select
-                      value={selectedOption?.id ?? ''}
-                      onChange={(e) => setSelectedOptionId(e.target.value)}
-                      className="min-h-[44px] w-full rounded-lg border-[1.5px] border-[#94A3B8] bg-white px-3 text-xs sm:text-sm font-medium text-[#0F2233] focus:border-[#EE5426] focus:outline-none"
-                    >
-                      {trip.options.map((opt) => (
-                        <option key={opt.id} value={opt.id}>
-                          {tText(opt.title, lang)} — {formatLinePrice(opt.price)}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-                )}
-
-                <div className="space-y-1.5">
-                  <div className="flex items-center justify-between gap-2">
-                    <label htmlFor="trip-booking-date" className="text-xs font-semibold text-[#0F2233]">
-                      {t.modalDateLabel}
-                    </label>
-                    <span className="text-[11px] font-medium text-[#475569]">{operatingDaysLabel}</span>
-                  </div>
-                  <input
-                    id="trip-booking-date"
-                    type="date"
-                    value={date}
-                    min={trip.availableFrom && trip.availableFrom > todayIso ? trip.availableFrom : todayIso}
-                    max={trip.availableTo || undefined}
-                    onChange={(e) => {
-                      setDate(e.target.value);
-                      setError('');
-                    }}
-                    className={`min-h-[44px] w-full rounded-lg border-[1.5px] bg-white px-3.5 text-sm text-[#0F2233] focus:outline-none tabular-nums ${
-                      !isSelectedDateOperating
-                        ? 'border-[#DC2626] focus:border-[#DC2626]'
-                        : 'border-[#94A3B8] focus:border-[#EE5426]'
-                    }`}
-                  />
-                  {!isSelectedDateOperating && (
-                    <div className="rounded-lg border border-[#FECACA] bg-[#FEF2F2] px-3 py-2 text-xs text-[#991B1B] space-y-1.5">
-                      <p className="font-medium">
-                        {tText(
-                          {
-                            en: `Not operating on ${date}. Runs: ${operatingDaysLabel}.`,
-                            ar: `الرحلة غير متاحة يوم ${date}. أيام التشغيل: ${operatingDaysLabel}.`,
-                            de: `Am ${date} nicht verfügbar. Betriebstage: ${operatingDaysLabel}.`,
-                          },
-                          lang
-                        )}
-                      </p>
-                      {suggestedNextOperatingDate && (
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setDate(suggestedNextOperatingDate);
-                            setError('');
-                          }}
-                          className="btn-wasla-primary inline-flex items-center rounded-md px-2.5 py-1 text-[11px] font-semibold cursor-pointer tabular-nums"
-                        >
-                          {tText(
-                            {
-                              en: `Select next available: ${suggestedNextOperatingDate}`,
-                              ar: `اختر أقرب يوم متاح: ${suggestedNextOperatingDate}`,
-                              de: `Nächstes Datum wählen: ${suggestedNextOperatingDate}`,
-                            },
-                            lang
-                          )}
-                        </button>
-                      )}
-                    </div>
-                  )}
-                </div>
-
-                {isTransferTrip ? (
-                  <label className="block space-y-1.5">
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="text-xs font-semibold text-[#0F2233]">
-                        {tText(
-                          {
-                            en: 'Flight / Transfer Time',
-                            ar: 'ميعاد الطيارة / التوصيل',
-                            de: 'Flug- / Abholzeit',
-                          },
-                          lang
-                        )}
+<form id="trip-booking-form" onSubmit={handleSubmit} className="space-y-4 scroll-mt-24">
+                {/* Card header: from-price, unified rating, one trust line */}
+                <div className="border-b border-[#C8C2B8]/60 pb-3 space-y-1.5">
+                  <div className="flex items-baseline justify-between gap-2">
+                    <div className="tabular-nums">
+                      <span className="text-[11px] font-medium text-[#64748B]">
+                        {tText({ en: 'From', ar: 'يبدأ من', de: 'Ab' }, lang)}{' '}
                       </span>
-                      <span className="text-[11px] font-medium text-[#EE5426]">
-                        {scheduleSummary}
+                      <span className="font-display text-xl font-bold text-[#0F2233]">
+                        {formatPrice(activeUnitPrice)}
+                      </span>
+                      <span className="text-[11px] font-medium text-[#64748B]">
+                        {' '}/ {tText({ en: 'person', ar: 'للفرد', de: 'Person' }, lang)}
                       </span>
                     </div>
-                    <input
-                      type="text"
-                      value={flightTimeInput}
-                      onChange={(e) => setFlightTimeInput(e.target.value)}
-                      placeholder={tText(
-                        {
-                          en: 'e.g. Flight EZY8831 · 14:20 (or leave blank if TBD)',
-                          ar: 'مثال: الرحلة DE1234 الساعة 14:20 أو الوصول 10:30 ص',
-                          de: 'z. B. Flug DE1234 um 14:20 Uhr',
-                        },
-                        lang
-                      )}
-                      className="min-h-[44px] w-full rounded-lg border-[1.5px] border-[#94A3B8] bg-white px-3.5 text-sm text-[#0F2233] placeholder:text-[#7B8E95] focus:border-[#EE5426] focus:outline-none"
-                    />
-                  </label>
-                ) : startTimeOptions.length > 1 ? (
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="text-xs font-semibold text-[#0F2233]">
-                        {tText(
-                          {
-                            en: 'Select Trip Start Time',
-                            ar: 'اختر توقيت بداية الرحلة',
-                            de: 'Gewünschte Startzeit wählen',
-                          },
-                          lang
-                        )}
-                      </span>
-                      <span className="text-[11px] text-[#64748B]">
-                        {tText(
-                          {
-                            en: 'Hotel pickup sent evening prior',
-                            ar: 'البيك أب يُحدد قبلها بليلة',
-                            de: 'Abholzeit folgt am Vorabend',
-                          },
-                          lang
-                        )}
-                      </span>
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                      {startTimeOptions.map((slot) => {
-                        const activeSlot = (selectedDepartureTime || startTimeOptions[0]) === slot;
-                        return (
-                          <button
-                            key={slot}
-                            type="button"
-                            onClick={() => setSelectedDepartureTime(slot)}
-                            className={`min-h-[38px] rounded-xl border-[1.5px] px-3 py-1.5 text-xs font-semibold transition-all cursor-pointer tabular-nums ${
-                              activeSlot
-                                ? 'border-[#EE5426] bg-[#FFF7ED] text-[#9A3412] shadow-xs'
-                                : 'border-[#94A3B8] bg-white text-[#334155] hover:border-[#EE5426]'
-                            }`}
-                          >
-                            {formatSlotLabel(slot, lang)}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-                ) : (
-                  <div className="rounded-xl border-[1.5px] border-[#EE5426]/55 bg-[#FFF7ED]/70 px-3.5 py-2.5 flex items-center justify-between gap-3">
-                    <div className="min-w-0">
-                      <span className="block text-[11px] font-semibold text-[#9A3412]">
-                        {tText(
-                          {
-                            en: 'Trip Start Time',
-                            ar: 'توقيت بداية الرحلة',
-                            de: 'Offizielle Startzeit',
-                          },
-                          lang
-                        )}
-                      </span>
-                      <span className="block text-[11px] text-[#64748B]">
-                        {tText(
-                          {
-                            en: 'Exact hotel pickup time dispatched evening before',
-                            ar: 'موعد البيك أب من الفندق يصلك مساءً حسب موقع فندقك',
-                            de: 'Genaue Hotelabholzeit folgt am Vorabend je nach Zone',
-                          },
-                          lang
-                        )}
-                      </span>
-                    </div>
-                    <span className="shrink-0 font-bold text-xs text-[#EE5426] tabular-nums">
-                      {startTimeOptions[0] ? formatSlotLabel(startTimeOptions[0], lang) : scheduleSummary}
+                    <span className="inline-flex items-center gap-1 text-xs font-semibold text-[#0F2233] tabular-nums">
+                      <Star className="h-3.5 w-3.5 fill-[#F59E0B] text-[#F59E0B]" aria-hidden="true" />
+                      {trip.rating.toFixed(1)} ({trip.reviewCount}{' '}
+                      {tText({ en: 'reviews', ar: 'تقييم', de: 'Bewertungen' }, lang)})
                     </span>
                   </div>
-                )}
-
-                <div className="space-y-2">
-                  <div className="grid grid-cols-3 gap-2 sm:gap-2.5">
-                    <div className="rounded-lg border-[1.5px] border-[#94A3B8] bg-white p-2.5 sm:p-3">
-                      <span className="block text-xs font-semibold text-[#0F2233] truncate">{t.modalAdults}</span>
-                      <span className="block text-[11px] text-[#475569] tabular-nums truncate">{formatLinePrice(activeUnitPrice)}</span>
-                      <div className="mt-2 flex items-center justify-between gap-1">
-                        <button
-                          type="button"
-                          onClick={() => setAdults((a) => Math.max(1, a - 1))}
-                          className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-[#94A3B8] text-[#0F2233] hover:bg-[#FFF7ED] cursor-pointer"
-                          aria-label="Decrease adults"
-                        >
-                          <Minus className="h-3.5 w-3.5" />
-                        </button>
-                        <span className="text-sm font-semibold tabular-nums">{safeAdults}</span>
-                        <button
-                          type="button"
-                          onClick={() => setAdults((a) => Math.min(12, a + 1))}
-                          className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-[#94A3B8] text-[#0F2233] hover:bg-[#FFF7ED] cursor-pointer"
-                          aria-label="Increase adults"
-                        >
-                          <Plus className="h-3.5 w-3.5" />
-                        </button>
-                      </div>
-                    </div>
-
-                    <div className="rounded-lg border-[1.5px] border-[#94A3B8] bg-white p-2.5 sm:p-3">
-                      <span className="block text-xs font-semibold text-[#0F2233] truncate">{t.modalChildren}</span>
-                      <span className="block text-[11px] text-[#475569] tabular-nums truncate">{formatLinePrice(childPrice)}</span>
-                      <div className="mt-2 flex items-center justify-between gap-1">
-                        <button
-                          type="button"
-                          onClick={() => setChildren((c) => Math.max(0, c - 1))}
-                          className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-[#94A3B8] text-[#0F2233] hover:bg-[#FFF7ED] cursor-pointer"
-                          aria-label="Decrease children"
-                        >
-                          <Minus className="h-3.5 w-3.5" />
-                        </button>
-                        <span className="text-sm font-semibold tabular-nums">{children}</span>
-                        <button
-                          type="button"
-                          onClick={() => setChildren((c) => Math.min(10, c + 1))}
-                          className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-[#94A3B8] text-[#0F2233] hover:bg-[#FFF7ED] cursor-pointer"
-                          aria-label="Increase children"
-                        >
-                          <Plus className="h-3.5 w-3.5" />
-                        </button>
-                      </div>
-                    </div>
-
-                    <div className="rounded-lg border-[1.5px] border-[#94A3B8] bg-white p-2.5 sm:p-3">
-                      <span className="block text-xs font-semibold text-[#0F2233] truncate">
-                        {tText({ en: 'Infants (INF)', ar: 'الرضع (INF)', de: 'Kleinkinder (INF)' }, lang)}
-                      </span>
-                      <span className="block text-[11px] font-semibold text-[#16A34A] tabular-nums">
-                        {tText({ en: 'Free (€0)', ar: 'مجاناً (0€)', de: 'Kostenlos (0€)' }, lang)}
-                      </span>
-                      <div className="mt-2 flex items-center justify-between gap-1">
-                        <button
-                          type="button"
-                          onClick={() => setInfants((i) => Math.max(0, i - 1))}
-                          className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-[#94A3B8] text-[#0F2233] hover:bg-[#FFF7ED] cursor-pointer"
-                          aria-label="Decrease infants"
-                        >
-                          <Minus className="h-3.5 w-3.5" />
-                        </button>
-                        <span className="text-sm font-semibold tabular-nums">{infants}</span>
-                        <button
-                          type="button"
-                          onClick={() => setInfants((i) => Math.min(10, i + 1))}
-                          className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-[#94A3B8] text-[#0F2233] hover:bg-[#FFF7ED] cursor-pointer"
-                          aria-label="Increase infants"
-                        >
-                          <Plus className="h-3.5 w-3.5" />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between rounded-lg bg-[#FFF7ED] border border-[#EE5426]/45 px-3 py-1.5 text-[11px] font-medium text-[#9A3412] tabular-nums">
-                    <span>
-                      {tText(
-                        {
-                          en: 'Total passengers on transfer & boat manifest (incl. INF):',
-                          ar: 'إجمالي الأفراد في كشف الباص والمركب (شامل الرضع INF):',
-                          de: 'Gesamtpersonen auf der Passagierliste (inkl. INF):',
-                        },
-                        lang
-                      )}
-                    </span>
-                    <strong className="font-bold text-[#EE5426]">
-                      {adults + children + infants} {receiptLabels.paxWord}
-                    </strong>
-                  </div>
-                </div>
-
-                <div className="space-y-1.5">
-                  <WaslaHotelMapPicker
-                    value={hotel}
-                    onChange={setHotel}
-                    destination={trip.destination}
-                    hasOuterZoneTransfer={hasOuterZoneTransfer}
-                    transferZoneId={transferZoneId}
-                    onAutoDetectTransferZone={setTransferZoneId}
-                    lang={lang}
-                    label={t.modalHotelLabel}
-                    placeholder={t.modalHotelPlaceholder}
-                  />
-                  <div className="space-y-1 pt-0.5">
-                    <p className="text-xs font-medium text-[#EE5426] leading-snug">
-                      {tText(trip.pickup, lang)}
-                    </p>
-                    {hasOuterZoneTransfer && (
-                      <p className="text-[11px] text-[#475569] leading-snug">
-                        {t.modalTransferZoneNotice}
-                      </p>
-                    )}
-                  </div>
-                </div>
-
-                <label className="block space-y-1.5">
-                  <span className="text-xs font-semibold text-[#0F2233] leading-snug">{t.modalNameLabel}</span>
-                  <input
-                    id="trip-booking-name"
-                    type="text"
-                    required
-                    value={guestName}
-                    onChange={(e) => setGuestName(e.target.value)}
-                    className="min-h-[44px] w-full rounded-lg border-[1.5px] border-[#94A3B8] bg-white px-3.5 text-sm text-[#0F2233] focus:border-[#EE5426] focus:outline-none"
-                  />
-                </label>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-end">
-                  <label className="flex flex-col justify-end gap-1.5 h-full">
-                    <span className="text-xs font-semibold text-[#0F2233] leading-snug">{t.modalWhatsappLabel}</span>
-                    <input
-                      id="trip-booking-whatsapp"
-                      type="tel"
-                      required
-                      placeholder={t.modalWhatsappPlaceholder}
-                      value={whatsapp}
-                      onChange={(e) => setWhatsapp(e.target.value)}
-                      className="min-h-[44px] w-full rounded-lg border-[1.5px] border-[#94A3B8] bg-white px-3.5 text-sm text-[#0F2233] placeholder:text-[#7B8E95] focus:border-[#EE5426] focus:outline-none tabular-nums"
-                    />
-                  </label>
-                  <label className="flex flex-col justify-end gap-1.5 h-full">
-                    <span className="text-xs font-semibold text-[#0F2233] leading-snug">{t.modalEmailLabel}</span>
-                    <input
-                      id="trip-booking-email"
-                      type="email"
-                      required
-                      placeholder={t.modalEmailPlaceholder}
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="min-h-[44px] w-full rounded-lg border-[1.5px] border-[#94A3B8] bg-white px-3.5 text-sm text-[#0F2233] placeholder:text-[#7B8E95] focus:border-[#EE5426] focus:outline-none"
-                    />
-                  </label>
-                </div>
-
-                <label className="block space-y-1.5">
-                  <span className="text-xs font-semibold text-[#0F2233] inline-flex items-center gap-1.5">
-                    <Globe className="h-3.5 w-3.5 text-[#EE5426]" aria-hidden="true" />
-                    <span>
-                      {tText(
-                        {
-                          en: 'Preferred Language (Guide & Confirmation Email)',
-                          ar: 'اللغة المفضلة (للمرشد وإيميل التأكيد)',
-                          de: 'Bevorzugte Sprache (Guide & Bestätigungs-E-Mail)',
-                        },
-                        lang
-                      )}
-                    </span>
-                  </span>
-                  <select
-                    value={guideLanguage}
-                    onChange={(e) => {
-                      setGuideLanguage(e.target.value);
-                      setGuestLanguageTouched(true);
-                    }}
-                    className="min-h-[44px] w-full rounded-lg border-[1.5px] border-[#94A3B8] bg-white px-3.5 text-sm font-medium text-[#0F2233] focus:border-[#EE5426] focus:outline-none"
-                  >
-                    <option value="English">English</option>
-                    <option value="German">Deutsch (German)</option>
-                    <option value="Arabic">العربية (Arabic)</option>
-                    <option value="French">Français (French)</option>
-                    <option value="Italian">Italiano (Italian)</option>
-                    <option value="Spanish">Español (Spanish)</option>
-                    <option value="Dutch">Nederlands (Dutch)</option>
-                    <option value="Polish">Polski (Polish)</option>
-                    <option value="Russian">Русский (Russian)</option>
-                  </select>
-                </label>
-
-                <label className="flex items-start gap-2.5 rounded-xl border border-[#CBD5E1] bg-[#F8FAFC] px-3.5 py-2.5 cursor-pointer select-none">
-                  <input
-                    type="checkbox"
-                    checked={whatsappOptIn}
-                    onChange={(e) => setWhatsappOptIn(e.target.checked)}
-                    className="mt-0.5 h-4 w-4 shrink-0 rounded border-[#94A3B8] accent-[#16A34A] cursor-pointer"
-                  />
-                  <span className="text-[11.5px] leading-relaxed text-[#334155]">
+                  <p className="text-[11.5px] font-medium text-[#475569]">
                     {tText(
                       {
-                        en: 'I agree to receive my hotel pickup time and trip updates from Wasla Travel via WhatsApp.',
-                        ar: 'أوافق على تواصل فريق وصلة ترافيل معي عبر واتساب لإرسال موعد البيك أب وتفاصيل الرحلة.',
-                        de: 'Ich stimme zu, meine Hotel-Abholzeit und Tour-Updates von Wasla Travel per WhatsApp zu erhalten.',
+                        en: 'Free cancellation up to 24h before',
+                        ar: 'إلغاء مجاني قبل ٢٤ ساعة',
+                        de: 'Kostenlos stornierbar bis 24h vorher',
                       },
                       lang
                     )}
-                  </span>
-                </label>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-end">
-                  <label className="flex flex-col justify-end gap-1.5 h-full">
-                    <span className="text-xs font-semibold text-[#0F2233] leading-snug">
+                    {' · '}
+                    {tText(
+                      {
+                        en: 'Confirmation via WhatsApp',
+                        ar: 'التأكيد عبر واتساب',
+                        de: 'Bestätigung per WhatsApp',
+                      },
+                      lang
+                    )}
+                  </p>
+                  <div className="flex items-center gap-2 pt-1 text-[11px] font-semibold">
+                    <span className={bookingStep === 1 ? 'text-[#EE5426]' : 'text-[#64748B]'}>
+                      1 ·{' '}
                       {tText(
-                        {
-                          en: isMarsaAlamTrip
-                            ? 'Hotel Room No. * (Required for Marsa Alam)'
-                            : 'Hotel Room No. (Optional)',
-                          ar: isMarsaAlamTrip
-                            ? 'رقم الغرفة * (إلزامي لرحلات مرسى علم)'
-                            : 'رقم الغرفة (اختياري)',
-                          de: isMarsaAlamTrip
-                            ? 'Zimmernummer * (Pflicht für Marsa Alam)'
-                            : 'Zimmernummer (Optional)',
-                        },
+                        { en: 'Check availability', ar: 'التحقق من التوفر', de: 'Verfügbarkeit prüfen' },
                         lang
                       )}
                     </span>
-                    <input
-                      id="trip-booking-room"
-                      type="text"
-                      required={isMarsaAlamTrip}
-                      value={roomNumber}
-                      onChange={(e) => setRoomNumber(e.target.value)}
-                      placeholder={tText(
-                        {
-                          en: isMarsaAlamTrip ? 'e.g. 214 (Required)' : 'e.g. 214 or TBD',
-                          ar: isMarsaAlamTrip ? 'مثال: 214 (أساسي للتصريح)' : 'مثال: 214 أو عند الوصول',
-                          de: 'z. B. 214',
-                        },
-                        lang
-                      )}
-                      className="min-h-[44px] w-full rounded-lg border-[1.5px] border-[#94A3B8] bg-white px-3.5 text-sm text-[#0F2233] placeholder:text-[#7B8E95] focus:border-[#EE5426] focus:outline-none tabular-nums"
-                    />
-                  </label>
-                  <label className="flex flex-col justify-end gap-1.5 h-full">
-                    <span className="text-xs font-semibold text-[#0F2233] leading-snug inline-flex items-center gap-1">
-                      <Tag className="h-3 w-3 text-[#EE5426]" aria-hidden="true" />
-                      {tText(
-                        {
-                          en: 'Promo / Partner Code (Optional)',
-                          ar: 'كود خصم / إحالة (اختياري)',
-                          de: 'Aktionscode (Optional)',
-                        },
-                        lang
-                      )}
+                    <span className="flex-1 border-t border-[#C8C2B8]/70" aria-hidden="true" />
+                    <span className={bookingStep === 2 ? 'text-[#EE5426]' : 'text-[#64748B]'}>
+                      2 ·{' '}
+                      {tText({ en: 'Your details', ar: 'بياناتك', de: 'Ihre Daten' }, lang)}
                     </span>
-                    <input
-                      type="text"
-                      value={promoCode}
-                      onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
-                      placeholder={tText({ en: 'Verified by Operations', ar: 'يُراجع مع العمليات', de: 'Wird geprüft' }, lang)}
-                      className="min-h-[44px] w-full rounded-lg border-[1.5px] border-[#94A3B8] bg-white px-3.5 text-sm font-mono uppercase text-[#0F2233] placeholder:font-sans placeholder:normal-case placeholder:text-[#7B8E95] focus:border-[#EE5426] focus:outline-none"
-                    />
-                  </label>
+                  </div>
                 </div>
 
-                {requiresPassportNotice && (
-                  <div className="rounded-xl border-[1.5px] border-[#EE5426] bg-[#FFF7ED] p-3.5 space-y-2.5 text-xs text-[#0F2233]">
-                    <div className="flex items-start justify-between gap-2">
-                      <div>
-                        <strong className="font-bold text-[#9A3412] block">
-                          {tText(
-                            {
-                              en: 'Passport Photo Upload * (Required for Marsa Alam Permits)',
-                              ar: 'رفع صورة جواز السفر * (أساسي لتصاريح رحلات مرسى علم)',
-                              de: 'Passfoto hochladen * (Pflicht für Marsa Alam Genehmigung)',
-                            },
-                            lang
-                          )}
-                        </strong>
-                        <p className="text-[11px] text-[#475569] mt-0.5">
-                          {tText(
-                            {
-                              en: 'Coast Guard & Marina permits in Marsa Alam require a clear photo of your passport data page along with your room number.',
-                              ar: 'تتطلب تصاريح حرس الحدود والمارينا في مرسى علم رفع صورة واضحة لصفحة جواز السفر مع رقم الغرفة على التطبيق.',
-                              de: 'Für die Küstenwache in Marsa Alam ist ein Foto der Passdatenseite sowie Ihre Zimmernummer erforderlich.',
-                            },
-                            lang
-                          )}
+                {bookingStep === 1 ? (
+                  <>
+                    {trip.options && trip.options.length === 1 && (
+                      <div className="space-y-1.5">
+                        <span className="text-xs font-semibold text-[#0F2233]">
+                          {t.modalOptionsLabel}
+                        </span>
+                        <p className="rounded-lg border border-[#C8C2B8]/70 bg-[#F8FAFC] px-3.5 py-2.5 text-sm font-medium text-[#0F2233]">
+                          {tText(trip.options[0].title, lang)} ·{' '}
+                          {formatLinePrice(trip.options[0].price)}
                         </p>
                       </div>
-                      <Camera className="h-4 w-4 text-[#EE5426] shrink-0 mt-0.5" aria-hidden="true" />
-                    </div>
+                    )}
 
-                    <div className="flex flex-wrap items-center gap-2.5">
-                      <label className="btn-wasla-primary inline-flex min-h-[38px] items-center gap-2 rounded-lg px-3.5 py-1.5 text-xs font-bold cursor-pointer">
-                        <Camera className="h-3.5 w-3.5" aria-hidden="true" />
-                        <span>
-                          {passportUploading
-                            ? tText({ en: 'Processing...', ar: 'جاري المعالجة...', de: 'Lädt...' }, lang)
-                            : passportPhotoDataUrl
-                            ? tText({ en: 'Change Passport Photo', ar: 'تغيير صورة جواز السفر', de: 'Passfoto ändern' }, lang)
-                            : tText({ en: 'Upload Passport Photo', ar: 'ارفع صورة جواز السفر', de: 'Passfoto auswählen' }, lang)}
+                    {trip.options && trip.options.length > 1 && (
+                      <div className="space-y-2" role="radiogroup" aria-label={t.modalOptionsLabel}>
+                        <span className="text-xs font-semibold text-[#0F2233]">
+                          {t.modalOptionsLabel}
                         </span>
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={(e) => void handlePassportFileChange(e)}
-                          className="hidden"
-                        />
-                      </label>
-                      {passportPhotoDataUrl && (
-                        <div className="inline-flex items-center gap-2 rounded-lg border border-[#16A34A]/40 bg-[#F0FDF4] px-2.5 py-1 text-[11px] font-semibold text-[#15803D]">
-                          <Check className="h-3.5 w-3.5 shrink-0" />
-                          <span className="truncate max-w-[160px]">
-                            {passportPhotoName ||
-                              tText({ en: 'Passport attached', ar: 'تم إرفاق الجواز', de: 'Pass beigefügt' }, lang)}
-                          </span>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setPassportPhotoDataUrl('');
-                              setPassportPhotoName('');
-                            }}
-                            className="text-[#DC2626] hover:underline ms-1 cursor-pointer"
-                          >
-                            ×
-                          </button>
+                        {trip.options.map((opt) => {
+                          const isSelected = selectedOption?.id === opt.id;
+                          return (
+                            <button
+                              key={opt.id}
+                              type="button"
+                              role="radio"
+                              aria-checked={isSelected}
+                              onClick={() => setSelectedOptionId(opt.id)}
+                              className={`w-full text-start rounded-xl border p-3 transition-all cursor-pointer flex items-start justify-between gap-3 ${
+                                isSelected
+                                  ? 'border-[#EE5426] bg-[#FFF7ED]/60 ring-1 ring-[#EE5426]/40'
+                                  : 'border-[#C8C2B8]/70 bg-white hover:border-[#94A3B8]'
+                              }`}
+                            >
+                              <span className="space-y-0.5 min-w-0">
+                                <span className="flex items-center gap-2">
+                                  <span
+                                    className={`inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-full border ${
+                                      isSelected
+                                        ? 'border-[#EE5426] bg-[#EE5426] text-white'
+                                        : 'border-[#64748B] bg-white'
+                                    }`}
+                                  >
+                                    {isSelected && <Check className="h-2.5 w-2.5" />}
+                                  </span>
+                                  <span className="text-sm font-semibold text-[#0F2233]">
+                                    {tText(opt.title, lang)}
+                                  </span>
+                                </span>
+                                {opt.detail && (
+                                  <span className="block text-xs text-[#475569] ps-6 leading-relaxed">
+                                    {tText(opt.detail, lang)}
+                                  </span>
+                                )}
+                              </span>
+                              <span className="shrink-0 text-end">
+                                <span className="block text-sm font-bold text-[#0F2233] tabular-nums">
+                                  {formatLinePrice(opt.price)}
+                                </span>
+                                <span className="block text-[10px] font-medium text-[#64748B]">
+                                  {tText({ en: 'per adult', ar: 'للفرد البالغ', de: 'pro Erw.' }, lang)}
+                                </span>
+                              </span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
+
+                    <div className="space-y-1.5">
+                      <div className="flex items-center justify-between gap-2">
+                        <label htmlFor="trip-booking-date" className="text-xs font-semibold text-[#0F2233]">
+                          {tText({ en: 'Date', ar: 'التاريخ', de: 'Datum' }, lang)}
+                        </label>
+                        <span className="text-[11px] font-medium text-[#475569]">{operatingDaysLabel}</span>
+                      </div>
+                      <input
+                        id="trip-booking-date"
+                        type="date"
+                        value={date}
+                        min={trip.availableFrom && trip.availableFrom > todayIso ? trip.availableFrom : todayIso}
+                        max={trip.availableTo || undefined}
+                        onChange={(e) => {
+                          setDate(e.target.value);
+                          setError('');
+                        }}
+                        className={`min-h-[48px] w-full rounded-lg border bg-white px-3.5 text-sm text-[#0F2233] focus:outline-none tabular-nums ${
+                          !isSelectedDateOperating
+                            ? 'border-[#DC2626] focus:border-[#DC2626]'
+                            : 'border-[#C8C2B8] focus:border-[#EE5426]'
+                        }`}
+                      />
+                      {!isSelectedDateOperating && (
+                        <div className="rounded-lg border border-[#FECACA] bg-[#FEF2F2] px-3 py-2 text-xs text-[#991B1B] space-y-1.5">
+                          <p className="font-medium">
+                            {tText(
+                              {
+                                en: `Not operating on ${date}. Runs: ${operatingDaysLabel}.`,
+                                ar: `الرحلة غير متاحة يوم ${date}. أيام التشغيل: ${operatingDaysLabel}.`,
+                                de: `Am ${date} nicht verfügbar. Betriebstage: ${operatingDaysLabel}.`,
+                              },
+                              lang
+                            )}
+                          </p>
+                          {suggestedNextOperatingDate && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setDate(suggestedNextOperatingDate);
+                                setError('');
+                              }}
+                              className="btn-wasla-primary inline-flex items-center rounded-md px-2.5 py-1 text-[11px] font-semibold cursor-pointer tabular-nums"
+                            >
+                              {tText(
+                                {
+                                  en: `Select next available: ${suggestedNextOperatingDate}`,
+                                  ar: `اختر أقرب يوم متاح: ${suggestedNextOperatingDate}`,
+                                  de: `Nächstes Datum wählen: ${suggestedNextOperatingDate}`,
+                                },
+                                lang
+                              )}
+                            </button>
+                          )}
                         </div>
                       )}
                     </div>
-                  </div>
+
+                    {isTransferTrip ? (
+                      <label className="block space-y-1.5">
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="text-xs font-semibold text-[#0F2233]">
+                            {tText(
+                              {
+                                en: 'Flight / Transfer Time',
+                                ar: 'ميعاد الطيارة / التوصيل',
+                                de: 'Flug- / Abholzeit',
+                              },
+                              lang
+                            )}
+                          </span>
+                          <span className="text-[11px] font-medium text-[#475569]">
+                            {scheduleSummary}
+                          </span>
+                        </div>
+                        <input
+                          type="text"
+                          value={flightTimeInput}
+                          onChange={(e) => setFlightTimeInput(e.target.value)}
+                          placeholder={tText(
+                            {
+                              en: 'e.g. Flight EZY8831 · 14:20 (or leave blank if TBD)',
+                              ar: 'مثال: الرحلة DE1234 الساعة 14:20 أو الوصول 10:30 ص',
+                              de: 'z. B. Flug DE1234 um 14:20 Uhr',
+                            },
+                            lang
+                          )}
+                          className="min-h-[48px] w-full rounded-lg border border-[#C8C2B8] bg-white px-3.5 text-sm text-[#0F2233] placeholder:text-[#7B8E95] focus:border-[#EE5426] focus:outline-none"
+                        />
+                      </label>
+                    ) : startTimeOptions.length > 1 ? (
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="text-xs font-semibold text-[#0F2233]">
+                            {tText({ en: 'Time', ar: 'الوقت', de: 'Uhrzeit' }, lang)}
+                          </span>
+                          <span className="text-[11px] text-[#64748B]">
+                            {tText(
+                              {
+                                en: 'Hotel pickup sent evening prior',
+                                ar: 'البيك أب يُحدد قبلها بليلة',
+                                de: 'Abholzeit folgt am Vorabend',
+                              },
+                              lang
+                            )}
+                          </span>
+                        </div>
+                        <div className="grid grid-cols-2 gap-2">
+                          {startTimeOptions.map((slot) => {
+                            const activeSlot = (selectedDepartureTime || startTimeOptions[0]) === slot;
+                            const fullLabel = formatSlotLabel(slot, lang);
+                            const labelMatch = fullLabel.match(/^(.*?)\s*\((.*)\)\s*$/);
+                            const timePart = labelMatch ? labelMatch[1] : fullLabel;
+                            const notePart = labelMatch ? labelMatch[2] : '';
+                            return (
+                              <button
+                                key={slot}
+                                type="button"
+                                onClick={() => setSelectedDepartureTime(slot)}
+                                aria-pressed={activeSlot}
+                                className={`min-h-[52px] rounded-xl border px-2 py-1.5 transition-all cursor-pointer tabular-nums flex flex-col items-center justify-center ${
+                                  activeSlot
+                                    ? 'border-[#EE5426] bg-[#FFF7ED] ring-1 ring-[#EE5426]/40'
+                                    : 'border-[#C8C2B8] bg-white hover:border-[#EE5426]'
+                                }`}
+                              >
+                                <span className="text-[13px] font-bold text-[#0F2233] leading-tight">
+                                  {timePart}
+                                </span>
+                                {notePart && (
+                                  <span className="text-[10.5px] font-medium text-[#64748B] leading-tight">
+                                    {notePart}
+                                  </span>
+                                )}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="rounded-xl border border-[#C8C2B8]/60 bg-[#F8FAFC] px-3.5 py-2.5 flex items-center justify-between gap-3">
+                        <div className="min-w-0">
+                          <span className="block text-[11px] font-semibold text-[#0F2233]">
+                            {tText(
+                              {
+                                en: 'Trip Start Time',
+                                ar: 'توقيت بداية الرحلة',
+                                de: 'Offizielle Startzeit',
+                              },
+                              lang
+                            )}
+                          </span>
+                          <span className="block text-[11px] text-[#64748B]">
+                            {tText(
+                              {
+                                en: 'Exact hotel pickup time dispatched evening before',
+                                ar: 'موعد البيك أب من الفندق يصلك مساءً حسب موقع فندقك',
+                                de: 'Genaue Hotelabholzeit folgt am Vorabend je nach Zone',
+                              },
+                              lang
+                            )}
+                          </span>
+                        </div>
+                        <span className="shrink-0 font-bold text-xs text-[#0F2233] tabular-nums">
+                          {startTimeOptions[0] ? formatSlotLabel(startTimeOptions[0], lang) : scheduleSummary}
+                        </span>
+                      </div>
+                    )}
+
+                    <div>
+                      <div className="flex items-center justify-between gap-3 py-2 border-b border-[#C8C2B8]/40">
+                        <div>
+                          <span className="block text-sm font-semibold text-[#0F2233]">{t.modalAdults}</span>
+                          <span className="block text-[11px] text-[#64748B] tabular-nums">
+                            {formatLinePrice(activeUnitPrice)}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2.5">
+                          <button
+                            type="button"
+                            onClick={() => setAdults((a) => Math.max(1, a - 1))}
+                            className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-[#C8C2B8] bg-white text-[#0F2233] hover:border-[#EE5426] cursor-pointer"
+                            aria-label="Decrease adults"
+                          >
+                            <Minus className="h-4 w-4" />
+                          </button>
+                          <span className="text-sm font-bold tabular-nums min-w-[18px] text-center">{safeAdults}</span>
+                          <button
+                            type="button"
+                            onClick={() => setAdults((a) => Math.min(12, a + 1))}
+                            className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-[#C8C2B8] bg-white text-[#0F2233] hover:border-[#EE5426] cursor-pointer"
+                            aria-label="Increase adults"
+                          >
+                            <Plus className="h-4 w-4" />
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between gap-3 py-2 border-b border-[#C8C2B8]/40">
+                        <div>
+                          <span className="block text-sm font-semibold text-[#0F2233]">{t.modalChildren}</span>
+                          <span className="block text-[11px] text-[#64748B] tabular-nums">
+                            {formatLinePrice(childPrice)}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2.5">
+                          <button
+                            type="button"
+                            onClick={() => setChildren((c) => Math.max(0, c - 1))}
+                            className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-[#C8C2B8] bg-white text-[#0F2233] hover:border-[#EE5426] cursor-pointer"
+                            aria-label="Decrease children"
+                          >
+                            <Minus className="h-4 w-4" />
+                          </button>
+                          <span className="text-sm font-bold tabular-nums min-w-[18px] text-center">{children}</span>
+                          <button
+                            type="button"
+                            onClick={() => setChildren((c) => Math.min(10, c + 1))}
+                            className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-[#C8C2B8] bg-white text-[#0F2233] hover:border-[#EE5426] cursor-pointer"
+                            aria-label="Increase children"
+                          >
+                            <Plus className="h-4 w-4" />
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between gap-3 py-2">
+                        <div>
+                          <span className="block text-sm font-semibold text-[#0F2233]">
+                            {tText({ en: 'Infants', ar: 'الرضع', de: 'Kleinkinder' }, lang)}
+                          </span>
+                          <span className="block text-[11px] font-semibold text-[#15803D]">
+                            {tText({ en: 'Free', ar: 'مجاناً', de: 'Kostenlos' }, lang)}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2.5">
+                          <button
+                            type="button"
+                            onClick={() => setInfants((i) => Math.max(0, i - 1))}
+                            className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-[#C8C2B8] bg-white text-[#0F2233] hover:border-[#EE5426] cursor-pointer"
+                            aria-label="Decrease infants"
+                          >
+                            <Minus className="h-4 w-4" />
+                          </button>
+                          <span className="text-sm font-bold tabular-nums min-w-[18px] text-center">{infants}</span>
+                          <button
+                            type="button"
+                            onClick={() => setInfants((i) => Math.min(10, i + 1))}
+                            className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-[#C8C2B8] bg-white text-[#0F2233] hover:border-[#EE5426] cursor-pointer"
+                            aria-label="Increase infants"
+                          >
+                            <Plus className="h-4 w-4" />
+                          </button>
+                        </div>
+                      </div>
+
+                      <p className="pt-1 text-xs font-medium text-[#64748B] tabular-nums">
+                        {trip.category === 'sea'
+                          ? tText({ en: 'Total passengers:', ar: 'إجمالي الركاب:', de: 'Gesamtpassagiere:' }, lang)
+                          : tText({ en: 'Total travelers:', ar: 'إجمالي المسافرين:', de: 'Reisende gesamt:' }, lang)}{' '}
+                        <strong className="font-bold text-[#0F2233]">
+                          {totalHeadcount} {receiptLabels.paxWord}
+                        </strong>
+                      </p>
+                    </div>
+
+                    {hasOuterZoneTransfer && trip.destination === 'Hurghada' && (
+                      <label className="block space-y-1.5">
+                        <span className="text-xs font-semibold text-[#0F2233]">
+                          {tText(
+                            { en: 'Pickup area', ar: 'منطقة الاستلام', de: 'Abholgebiet' },
+                            lang
+                          )}
+                        </span>
+                        <select
+                          value={transferZoneId}
+                          onChange={(e) => setTransferZoneId(e.target.value)}
+                          className="min-h-[48px] w-full rounded-lg border border-[#C8C2B8] bg-white px-3 text-sm font-medium text-[#0F2233] focus:border-[#EE5426] focus:outline-none"
+                        >
+                          {OUTER_TRANSFER_ZONES.map((z) => (
+                            <option key={z.id} value={z.id}>
+                              {tText(z.label, lang)}
+                            </option>
+                          ))}
+                        </select>
+                        {zoneFeePerPerson > 0 && (
+                          <span className="block text-[11.5px] font-medium text-[#9A3412] tabular-nums">
+                            +{formatLinePrice(zoneFeePerPerson)} × {payingGuestsCount} = +
+                            {formatLinePrice(transferSurchargeTotal)}{' '}
+                            {tText(
+                              { en: 'added to your total', ar: 'مضافة إلى إجماليك', de: 'wird zum Gesamtpreis addiert' },
+                              lang
+                            )}
+                          </span>
+                        )}
+                      </label>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    <div className="space-y-1.5">
+                      <WaslaHotelMapPicker
+                        value={hotel}
+                        onChange={setHotel}
+                        destination={trip.destination}
+                        hasOuterZoneTransfer={hasOuterZoneTransfer}
+                        transferZoneId={transferZoneId}
+                        onAutoDetectTransferZone={setTransferZoneId}
+                        lang={lang}
+                        label={t.modalHotelLabel}
+                        placeholder={t.modalHotelPlaceholder}
+                      />
+                      <div className="space-y-1 pt-0.5">
+                        <p className="text-xs font-medium text-[#475569] leading-snug">
+                          {tText(trip.pickup, lang)}
+                        </p>
+                        {hasOuterZoneTransfer && (
+                          <p className="text-[11px] text-[#475569] leading-snug">
+                            {t.modalTransferZoneNotice}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
+                    <label className="block space-y-1.5">
+                      <span className="text-xs font-semibold text-[#0F2233] leading-snug">{t.modalNameLabel}</span>
+                      <input
+                        type="text"
+                        required
+                        value={guestName}
+                        onChange={(e) => setGuestName(e.target.value)}
+                        className="min-h-[48px] w-full rounded-lg border border-[#C8C2B8] bg-white px-3.5 text-sm text-[#0F2233] focus:border-[#EE5426] focus:outline-none"
+                      />
+                    </label>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-end">
+                      <label className="flex flex-col justify-end gap-1.5 h-full">
+                        <span className="text-xs font-semibold text-[#0F2233] leading-snug">{t.modalWhatsappLabel}</span>
+                        <input
+                          type="tel"
+                          required
+                          placeholder={t.modalWhatsappPlaceholder}
+                          value={whatsapp}
+                          onChange={(e) => setWhatsapp(e.target.value)}
+                          className="min-h-[48px] w-full rounded-lg border border-[#C8C2B8] bg-white px-3.5 text-sm text-[#0F2233] placeholder:text-[#7B8E95] focus:border-[#EE5426] focus:outline-none tabular-nums"
+                        />
+                      </label>
+                      <label className="flex flex-col justify-end gap-1.5 h-full">
+                        <span className="text-xs font-semibold text-[#0F2233] leading-snug">{t.modalEmailLabel}</span>
+                        <input
+                          type="email"
+                          required
+                          placeholder={t.modalEmailPlaceholder}
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          className="min-h-[48px] w-full rounded-lg border border-[#C8C2B8] bg-white px-3.5 text-sm text-[#0F2233] placeholder:text-[#7B8E95] focus:border-[#EE5426] focus:outline-none"
+                        />
+                      </label>
+                    </div>
+
+                    <label className="block space-y-1.5">
+                      <span className="text-xs font-semibold text-[#0F2233] inline-flex items-center gap-1.5">
+                        <Globe className="h-3.5 w-3.5 text-[#EE5426]" aria-hidden="true" />
+                        <span>
+                          {tText(
+                            {
+                              en: 'Preferred Language (Guide & Confirmation Email)',
+                              ar: 'اللغة المفضلة (للمرشد وإيميل التأكيد)',
+                              de: 'Bevorzugte Sprache (Guide & Bestätigungs-E-Mail)',
+                            },
+                            lang
+                          )}
+                        </span>
+                      </span>
+                      <select
+                        value={guideLanguage}
+                        onChange={(e) => {
+                          setGuideLanguage(e.target.value);
+                          setGuestLanguageTouched(true);
+                        }}
+                        className="min-h-[48px] w-full rounded-lg border border-[#C8C2B8] bg-white px-3.5 text-sm font-medium text-[#0F2233] focus:border-[#EE5426] focus:outline-none"
+                      >
+                        <option value="English">English</option>
+                        <option value="German">Deutsch (German)</option>
+                        <option value="Arabic">العربية (Arabic)</option>
+                        <option value="French">Français (French)</option>
+                        <option value="Italian">Italiano (Italian)</option>
+                        <option value="Spanish">Español (Spanish)</option>
+                        <option value="Dutch">Nederlands (Dutch)</option>
+                        <option value="Polish">Polski (Polish)</option>
+                        <option value="Russian">Русский (Russian)</option>
+                      </select>
+                    </label>
+
+                    <label className="flex items-start gap-2 cursor-pointer select-none">
+                      <input
+                        type="checkbox"
+                        checked={whatsappOptIn}
+                        onChange={(e) => setWhatsappOptIn(e.target.checked)}
+                        className="mt-0.5 h-3.5 w-3.5 shrink-0 cursor-pointer accent-[#16A34A]"
+                      />
+                      <span className="text-[11.5px] leading-relaxed text-[#64748B]">
+                        {tText(
+                          {
+                            en: 'I agree to receive my hotel pickup time and trip updates from Wasla Travel via WhatsApp.',
+                            ar: 'أوافق على تواصل فريق وصلة ترافيل معي عبر واتساب لإرسال موعد البيك أب وتفاصيل الرحلة.',
+                            de: 'Ich stimme zu, meine Hotel-Abholzeit und Tour-Updates von Wasla Travel per WhatsApp zu erhalten.',
+                          },
+                          lang
+                        )}
+                      </span>
+                    </label>
+
+                    {!isMarsaAlamTrip && (
+                      <button
+                        type="button"
+                        onClick={() => setExtrasOpen((o) => !o)}
+                        aria-expanded={extrasOpen}
+                        className="text-xs font-semibold text-[#EE5426] hover:underline cursor-pointer"
+                      >
+                        {extrasOpen ? '− ' : '+ '}
+                        {tText(
+                          {
+                            en: 'Add room no. / promo code / notes',
+                            ar: 'إضافة رقم الغرفة / كود الخصم / ملاحظات',
+                            de: 'Zimmernr. / Aktionscode / Hinweise hinzufügen',
+                          },
+                          lang
+                        )}
+                      </button>
+                    )}
+
+                    {(extrasOpen || isMarsaAlamTrip) && (
+                      <div className="space-y-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-end">
+                          <label className="flex flex-col justify-end gap-1.5 h-full">
+                            <span className="text-xs font-semibold text-[#0F2233] leading-snug">
+                              {tText(
+                                {
+                                  en: isMarsaAlamTrip
+                                    ? 'Hotel Room No. * (Required for Marsa Alam)'
+                                    : 'Hotel Room No. (Optional)',
+                                  ar: isMarsaAlamTrip
+                                    ? 'رقم الغرفة * (إلزامي لرحلات مرسى علم)'
+                                    : 'رقم الغرفة (اختياري)',
+                                  de: isMarsaAlamTrip
+                                    ? 'Zimmernummer * (Pflicht für Marsa Alam)'
+                                    : 'Zimmernummer (Optional)',
+                                },
+                                lang
+                              )}
+                            </span>
+                            <input
+                              type="text"
+                              required={isMarsaAlamTrip}
+                              value={roomNumber}
+                              onChange={(e) => setRoomNumber(e.target.value)}
+                              placeholder={tText(
+                                {
+                                  en: isMarsaAlamTrip ? 'e.g. 214 (Required)' : 'e.g. 214 or TBD',
+                                  ar: isMarsaAlamTrip ? 'مثال: 214 (أساسي للتصريح)' : 'مثال: 214 أو عند الوصول',
+                                  de: 'z. B. 214',
+                                },
+                                lang
+                              )}
+                              className="min-h-[48px] w-full rounded-lg border border-[#C8C2B8] bg-white px-3.5 text-sm text-[#0F2233] placeholder:text-[#7B8E95] focus:border-[#EE5426] focus:outline-none tabular-nums"
+                            />
+                          </label>
+                          <label className="flex flex-col justify-end gap-1.5 h-full">
+                            <span className="text-xs font-semibold text-[#0F2233] leading-snug inline-flex items-center gap-1">
+                              <Tag className="h-3 w-3 text-[#EE5426]" aria-hidden="true" />
+                              {tText(
+                                {
+                                  en: 'Promo / Partner Code (Optional)',
+                                  ar: 'كود خصم / إحالة (اختياري)',
+                                  de: 'Aktionscode (Optional)',
+                                },
+                                lang
+                              )}
+                            </span>
+                            <input
+                              type="text"
+                              value={promoCode}
+                              onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
+                              placeholder={tText({ en: 'Verified by Operations', ar: 'يُراجع مع العمليات', de: 'Wird geprüft' }, lang)}
+                              className="min-h-[48px] w-full rounded-lg border border-[#C8C2B8] bg-white px-3.5 text-sm font-mono uppercase text-[#0F2233] placeholder:font-sans placeholder:normal-case placeholder:text-[#7B8E95] focus:border-[#EE5426] focus:outline-none"
+                            />
+                          </label>
+                        </div>
+
+                        {requiresPassportNotice && (
+                          <div className="rounded-xl border-[1.5px] border-[#EE5426] bg-[#FFF7ED] p-3.5 space-y-2.5 text-xs text-[#0F2233]">
+                            <div className="flex items-start justify-between gap-2">
+                              <div>
+                                <strong className="font-bold text-[#9A3412] block">
+                                  {tText(
+                                    {
+                                      en: 'Passport Photo Upload * (Required for Marsa Alam Permits)',
+                                      ar: 'رفع صورة جواز السفر * (أساسي لتصاريح رحلات مرسى علم)',
+                                      de: 'Passfoto hochladen * (Pflicht für Marsa Alam Genehmigung)',
+                                    },
+                                    lang
+                                  )}
+                                </strong>
+                                <p className="text-[11px] text-[#475569] mt-0.5">
+                                  {tText(
+                                    {
+                                      en: 'Coast Guard & Marina permits in Marsa Alam require a clear photo of your passport data page along with your room number.',
+                                      ar: 'تتطلب تصاريح حرس الحدود والمارينا في مرسى علم رفع صورة واضحة لصفحة جواز السفر مع رقم الغرفة على التطبيق.',
+                                      de: 'Für die Küstenwache in Marsa Alam ist ein Foto der Passdatenseite sowie Ihre Zimmernummer erforderlich.',
+                                    },
+                                    lang
+                                  )}
+                                </p>
+                              </div>
+                              <Camera className="h-4 w-4 text-[#EE5426] shrink-0 mt-0.5" aria-hidden="true" />
+                            </div>
+
+                            <div className="flex flex-wrap items-center gap-2.5">
+                              <label className="btn-wasla-primary inline-flex min-h-[38px] items-center gap-2 rounded-lg px-3.5 py-1.5 text-xs font-bold cursor-pointer">
+                                <Camera className="h-3.5 w-3.5" aria-hidden="true" />
+                                <span>
+                                  {passportUploading
+                                    ? tText({ en: 'Processing...', ar: 'جاري المعالجة...', de: 'Lädt...' }, lang)
+                                    : passportPhotoDataUrl
+                                    ? tText({ en: 'Change Passport Photo', ar: 'تغيير صورة جواز السفر', de: 'Passfoto ändern' }, lang)
+                                    : tText({ en: 'Upload Passport Photo', ar: 'ارفع صورة جواز السفر', de: 'Passfoto auswählen' }, lang)}
+                                </span>
+                                <input
+                                  type="file"
+                                  accept="image/*"
+                                  onChange={(e) => void handlePassportFileChange(e)}
+                                  className="hidden"
+                                />
+                              </label>
+                              {passportPhotoDataUrl && (
+                                <div className="inline-flex items-center gap-2 rounded-lg border border-[#16A34A]/40 bg-[#F0FDF4] px-2.5 py-1 text-[11px] font-semibold text-[#15803D]">
+                                  <Check className="h-3.5 w-3.5 shrink-0" />
+                                  <span className="truncate max-w-[160px]">
+                                    {passportPhotoName ||
+                                      tText({ en: 'Passport attached', ar: 'تم إرفاق الجواز', de: 'Pass beigefügt' }, lang)}
+                                  </span>
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setPassportPhotoDataUrl('');
+                                      setPassportPhotoName('');
+                                    }}
+                                    className="text-[#DC2626] hover:underline ms-1 cursor-pointer"
+                                  >
+                                    ×
+                                  </button>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        )}
+
+                        <label className="block space-y-1.5">
+                          <span className="text-xs font-semibold text-[#0F2233]">{t.modalNotesLabel}</span>
+                          <textarea
+                            rows={2}
+                            placeholder={t.modalNotesPlaceholder}
+                            value={notes}
+                            onChange={(e) => setNotes(e.target.value)}
+                            className="w-full rounded-lg border border-[#C8C2B8] bg-white p-3 text-sm text-[#0F2233] placeholder:text-[#7B8E95] focus:border-[#EE5426] focus:outline-none"
+                          />
+                        </label>
+                      </div>
+                    )}
+                  </>
                 )}
 
-                <label className="block space-y-1.5">
-                  <span className="text-xs font-semibold text-[#0F2233]">{t.modalNotesLabel}</span>
-                  <textarea
-                    rows={2}
-                    placeholder={t.modalNotesPlaceholder}
-                    value={notes}
-                    onChange={(e) => setNotes(e.target.value)}
-                    className="w-full rounded-lg border-[1.5px] border-[#94A3B8] bg-white p-3 text-sm text-[#0F2233] placeholder:text-[#7B8E95] focus:border-[#EE5426] focus:outline-none"
-                  />
-                </label>
-
                 {error && (
-                  <p className="rounded-lg bg-[#FDF2F2] border border-[#EBC6C6] px-3.5 py-2.5 text-xs font-medium text-[#8A2424]">
+                  <p role="alert" className="rounded-lg bg-[#FDF2F2] border border-[#EBC6C6] px-3.5 py-2.5 text-xs font-medium text-[#8A2424]">
                     {error}
                   </p>
                 )}
 
-                <div className="border-t-[1.5px] border-[#94A3B8] pt-4 space-y-3">
-                  {/* Live Itemized Booking Receipt */}
-                  <div className="rounded-2xl border-[1.5px] border-[#94A3B8] bg-[#F8FAFC] overflow-hidden">
-                    <div className="px-4 py-3 bg-white border-b-[1.5px] border-[#94A3B8] flex items-center justify-between gap-2">
-                      <span className="text-xs font-semibold text-[#0F2233]">
-                        {receiptLabels.summaryHeader}
-                      </span>
-                      <span className="text-[11px] font-medium text-[#64748B] tabular-nums">
-                        {totalHeadcount} {receiptLabels.paxWord} · {safeAdults}A
-                        {safeChildren > 0 ? ` + ${safeChildren}C` : ''}
-                        {safeInfants > 0 ? ` + ${safeInfants} INF` : ''}
-                      </span>
-                    </div>
-
-                    <div className="px-4 py-3.5 space-y-2 text-xs tabular-nums">
-                      {selectedOption && (
-                        <div className="flex items-center justify-between gap-3 pb-1.5 border-b border-[#94A3B8]/60">
-                          <span className="text-[#64748B] shrink-0">{receiptLabels.selectedPkg}</span>
-                          <span className="font-semibold text-[#0F2233] text-end truncate">
-                            {tText(selectedOption.title, lang)}
-                          </span>
-                        </div>
-                      )}
-
-                      <div className="flex items-center justify-between gap-3">
-                        <span className="text-[#64748B] shrink-0">
-                          {isTransferTrip
-                            ? tText(
-                                {
-                                  en: 'Flight Time',
-                                  ar: 'ميعاد الطيارة / التحرك',
-                                  de: 'Flugzeit',
-                                },
-                                lang
-                              )
-                            : tText(
-                                {
-                                  en: 'Trip Start',
-                                  ar: 'بداية الرحلة',
-                                  de: 'Startzeit',
-                                },
-                                lang
-                              )}
-                        </span>
-                        <span className="font-semibold text-[#EE5426] text-end truncate">
-                          {resolvedTripStartTime}
-                        </span>
-                      </div>
-
-                      <div className="flex items-center justify-between gap-3">
-                        <span className="text-[#475569]">
-                          {receiptLabels.adultsUnit} ({safeAdults} × {formatLinePrice(activeUnitPrice)})
-                        </span>
-                        <span className="font-semibold text-[#0F2233]">
-                          {formatLinePrice(adultsSubtotalEur)}
-                        </span>
-                      </div>
-
-                      {safeChildren > 0 ? (
-                        <div className="flex items-center justify-between gap-3">
-                          <span className="text-[#475569]">
-                            {receiptLabels.childrenUnit} ({safeChildren} × {formatLinePrice(childPrice)})
-                          </span>
-                          <span className="font-semibold text-[#0F2233]">
-                            {formatLinePrice(childrenSubtotalEur)}
-                          </span>
-                        </div>
-                      ) : (
-                        <div className="flex items-center justify-between gap-3 text-[11px] text-[#64748B]">
-                          <span>{receiptLabels.childrenUnit}</span>
-                          <span>
-                            {formatLinePrice(childPrice)} / {tText({ en: 'child', ar: 'طفل', de: 'Kind' }, lang)}
-                          </span>
-                        </div>
-                      )}
-
-                      {safeInfants > 0 && (
-                        <div className="flex items-center justify-between gap-3">
-                          <span className="text-[#475569]">
-                            {receiptLabels.infantsUnit} ({safeInfants} × {receiptLabels.freeLabel})
-                          </span>
-                          <span className="font-semibold text-[#15803D]">
-                            {receiptLabels.freeLabel} ({formatLinePrice(0)})
-                          </span>
-                        </div>
-                      )}
-
-                      {hasOuterZoneTransfer && (
-                        <div className="flex items-center justify-between gap-3">
-                          <span className="text-[#475569] truncate">
-                            {receiptLabels.transferLine}
-                            {zoneFeePerPerson > 0
-                              ? ` (${payingGuestsCount} × ${formatLinePrice(zoneFeePerPerson)})`
-                              : ''}
-                          </span>
-                          <span className="font-semibold text-[#0F2233] shrink-0">
-                            {transferSurchargeTotal > 0
-                              ? `+${formatLinePrice(transferSurchargeTotal)}`
-                              : receiptLabels.includedLabel}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="px-4 py-3.5 bg-[#FFF7ED] border-t border-dashed border-[#EE5426]/45 flex items-center justify-between gap-3">
-                      <div>
-                        <span className="block text-xs font-semibold text-[#0F2233]">
-                          {receiptLabels.totalLabel}
-                        </span>
-                        <span className="block text-[11px] text-[#64748B]">{t.modalPayAfter}</span>
-                      </div>
-                      <span className="text-xl sm:text-2xl font-bold text-[#EE5426] tabular-nums shrink-0">
+                {/* Card footer: total + receipt details toggle + main action */}
+                <div className="border-t border-[#C8C2B8]/60 pt-3.5 space-y-3">
+                  <button
+                    type="button"
+                    onClick={() => setReceiptOpen((o) => !o)}
+                    aria-expanded={receiptOpen}
+                    className="flex w-full items-center justify-between gap-3 cursor-pointer"
+                  >
+                    <span className="text-sm font-semibold text-[#0F2233]">
+                      {receiptLabels.totalLabel}
+                    </span>
+                    <span className="flex items-center gap-2">
+                      <span className="font-display text-xl font-bold text-[#0F2233] tabular-nums">
                         {formatPrice(totalEur)}
                       </span>
-                    </div>
-                  </div>
-                  <button
-                    type="submit"
-                    className="btn-wasla-primary min-h-[46px] w-full rounded-full px-6 py-3 text-sm cursor-pointer"
-                  >
-                    {previewMode
-                      ? 'Preview Booking Ticket'
-                      : lang === 'ar'
-                      ? 'عرض تيكت الحجز ومراجعة المواصفات'
-                      : `${t.modalSubmitBooking} · ${tText(
-                          { en: 'Review Ticket', ar: 'مراجعة التيكت', de: 'Ticket prüfen' },
-                          lang
-                        )}`}
+                      <span className="text-[11px] font-semibold text-[#EE5426]">
+                        {tText({ en: 'details', ar: 'التفاصيل', de: 'Details' }, lang)}{' '}
+                        {receiptOpen ? '▴' : '▾'}
+                      </span>
+                    </span>
                   </button>
+
+                  {receiptOpen && (
+                    <div className="rounded-xl border border-[#C8C2B8]/60 bg-[#F8FAFC] overflow-hidden">
+                      <div className="px-4 py-3 bg-white border-b border-[#C8C2B8]/60 flex items-center justify-between gap-2">
+                        <span className="text-xs font-semibold text-[#0F2233]">
+                          {receiptLabels.summaryHeader}
+                        </span>
+                        <span className="text-[11px] font-medium text-[#64748B] tabular-nums">
+                          {totalHeadcount} {receiptLabels.paxWord} · {safeAdults}A
+                          {safeChildren > 0 ? ` + ${safeChildren}C` : ''}
+                          {safeInfants > 0 ? ` + ${safeInfants} ${receiptLabels.infantsUnit}` : ''}
+                        </span>
+                      </div>
+
+                      <div className="px-4 py-3.5 space-y-2 text-xs tabular-nums">
+                        {selectedOption && (
+                          <div className="flex items-center justify-between gap-3 pb-1.5 border-b border-[#C8C2B8]/50">
+                            <span className="text-[#64748B] shrink-0">{receiptLabels.selectedPkg}</span>
+                            <span className="font-semibold text-[#0F2233] text-end truncate">
+                              {tText(selectedOption.title, lang)}
+                            </span>
+                          </div>
+                        )}
+
+                        <div className="flex items-center justify-between gap-3">
+                          <span className="text-[#64748B] shrink-0">
+                            {isTransferTrip
+                              ? tText(
+                                  {
+                                    en: 'Flight Time',
+                                    ar: 'ميعاد الطيارة / التحرك',
+                                    de: 'Flugzeit',
+                                  },
+                                  lang
+                                )
+                              : tText(
+                                  {
+                                    en: 'Trip Start',
+                                    ar: 'بداية الرحلة',
+                                    de: 'Startzeit',
+                                  },
+                                  lang
+                                )}
+                          </span>
+                          <span className="font-semibold text-[#0F2233] text-end truncate">
+                            {resolvedTripStartTime}
+                          </span>
+                        </div>
+
+                        <div className="flex items-center justify-between gap-3">
+                          <span className="text-[#475569]">
+                            {receiptLabels.adultsUnit} ({safeAdults} × {formatLinePrice(activeUnitPrice)})
+                          </span>
+                          <span className="font-semibold text-[#0F2233]">
+                            {formatLinePrice(adultsSubtotalEur)}
+                          </span>
+                        </div>
+
+                        {safeChildren > 0 ? (
+                          <div className="flex items-center justify-between gap-3">
+                            <span className="text-[#475569]">
+                              {receiptLabels.childrenUnit} ({safeChildren} × {formatLinePrice(childPrice)})
+                            </span>
+                            <span className="font-semibold text-[#0F2233]">
+                              {formatLinePrice(childrenSubtotalEur)}
+                            </span>
+                          </div>
+                        ) : (
+                          <div className="flex items-center justify-between gap-3 text-[11px] text-[#64748B]">
+                            <span>{receiptLabels.childrenUnit}</span>
+                            <span>
+                              {formatLinePrice(childPrice)} / {tText({ en: 'child', ar: 'طفل', de: 'Kind' }, lang)}
+                            </span>
+                          </div>
+                        )}
+
+                        {safeInfants > 0 && (
+                          <div className="flex items-center justify-between gap-3">
+                            <span className="text-[#475569]">
+                              {receiptLabels.infantsUnit} ({safeInfants} × {receiptLabels.freeLabel})
+                            </span>
+                            <span className="font-semibold text-[#15803D]">
+                              {receiptLabels.freeLabel} ({formatLinePrice(0)})
+                            </span>
+                          </div>
+                        )}
+
+                        {hasOuterZoneTransfer && (
+                          <div className="flex items-center justify-between gap-3">
+                            <span className="text-[#475569] truncate">
+                              {receiptLabels.transferLine}
+                              {zoneFeePerPerson > 0
+                                ? ` (${payingGuestsCount} × ${formatLinePrice(zoneFeePerPerson)})`
+                                : ''}
+                            </span>
+                            <span className="font-semibold text-[#0F2233] shrink-0">
+                              {transferSurchargeTotal > 0
+                                ? `+${formatLinePrice(transferSurchargeTotal)}`
+                                : receiptLabels.includedLabel}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="px-4 py-3 bg-white border-t border-dashed border-[#C8C2B8] flex items-center justify-between gap-3">
+                        <div>
+                          <span className="block text-xs font-semibold text-[#0F2233]">
+                            {receiptLabels.totalLabel}
+                          </span>
+                          <span className="block text-[11px] text-[#64748B]">{t.modalPayAfter}</span>
+                        </div>
+                        <span className="text-xl font-bold text-[#0F2233] tabular-nums shrink-0">
+                          {formatPrice(totalEur)}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+
+                  {bookingStep === 1 ? (
+                    <button
+                      type="button"
+                      onClick={handleAdvanceToDetails}
+                      className="min-h-[52px] w-full rounded-xl bg-[#EE5426] hover:bg-[#D9461B] px-6 text-sm font-bold text-white transition-colors cursor-pointer"
+                    >
+                      {tText(
+                        { en: 'Check availability', ar: 'التحقق من التوفر', de: 'Verfügbarkeit prüfen' },
+                        lang
+                      )}
+                    </button>
+                  ) : (
+                    <>
+                      <button
+                        type="submit"
+                        className="min-h-[52px] w-full rounded-xl bg-[#EE5426] hover:bg-[#D9461B] px-6 text-sm font-bold text-white transition-colors cursor-pointer"
+                      >
+                        {previewMode ? 'Preview Booking Ticket' : t.modalSubmitBooking}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setBookingStep(1)}
+                        className="w-full text-center text-xs font-semibold text-[#475569] hover:text-[#EE5426] transition-colors cursor-pointer"
+                      >
+                        ←{' '}
+                        {tText(
+                          { en: 'Back to date & travelers', ar: 'العودة للتاريخ والمسافرين', de: 'Zurück zu Datum & Reisenden' },
+                          lang
+                        )}
+                      </button>
+                    </>
+                  )}
+
                   <div className="space-y-1">
-                    <p className="text-xs font-medium text-[#EE5426]">{t.modalPickupDispatchNote}</p>
-                    <p className="text-xs text-[#64748B]">{t.modalNoBotNote}</p>
+                    <p className="text-xs font-medium text-[#475569]">{t.modalPickupDispatchNote}</p>
+                    <p className="text-xs text-[#64748B]">
+                      {tText(
+                        {
+                          en: 'Free cancellation up to 24h before',
+                          ar: 'إلغاء مجاني قبل ٢٤ ساعة',
+                          de: 'Kostenlos stornierbar bis 24h vorher',
+                        },
+                        lang
+                      )}
+                      {' · '}
+                      {t.modalPayAfter}
+                    </p>
                   </div>
                 </div>
               </form>
@@ -2960,6 +3005,7 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
                   ]
                 : storefrontBookingRefs
             }
+            hideReviewPrompt
             onOpenReviewModal={
               onOpenPostTripReview
                 ? (bookingId) => onOpenPostTripReview(trip, bookingId)
@@ -3014,7 +3060,7 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
                     </div>
                   </div>
                   <div className="border-t border-[#C8C2B8]/40 px-3.5 py-2.5 flex items-center justify-between text-xs tabular-nums">
-                    <span className="font-bold text-[#EE5426]">
+                    <span className="font-bold text-[#0F2233]">
                       {formatCurrencyPrice(rel.price, currency)}
                     </span>
                     <span className="font-semibold text-[#0F2233] group-hover:text-[#EE5426]">
@@ -3036,14 +3082,14 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
               <span className="block text-[10.5px] font-medium text-[#64748B]">
                 {tText({ en: 'Estimated total', ar: 'الإجمالي التقديري', de: 'Gesamtpreis' }, lang)}
               </span>
-              <span className="block text-lg font-bold text-[#EE5426] leading-tight">
+              <span className="block text-lg font-bold text-[#0F2233] leading-tight">
                 {formatLinePrice(totalEur)}
               </span>
             </div>
             <button
               type="button"
-              onClick={handleMobileStickyBookClick}
-              className="btn-wasla-primary min-h-[42px] rounded-full px-6 py-2 text-xs sm:text-sm font-bold cursor-pointer whitespace-nowrap"
+              onClick={() => jumpToSection('trip-booking-form')}
+              className="btn-wasla-primary min-h-[44px] rounded-full px-6 py-2 text-xs sm:text-sm font-bold cursor-pointer whitespace-nowrap"
             >
               {t.bookNow}
             </button>
