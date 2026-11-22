@@ -5,6 +5,7 @@ import {
   Briefcase,
   CalendarDays,
   Car,
+  Check,
   ChevronDown,
   Compass,
   Eye,
@@ -278,13 +279,12 @@ export default function App() {
 
   const todayIso = useMemo(() => new Date().toISOString().slice(0, 10), []);
   const tomorrowIso = useMemo(() => new Date(Date.now() + 86400000).toISOString().slice(0, 10), []);
-  const weekEndIso = useMemo(() => new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 10), []);
 
   // Storefront UI state
   const [searchDestination, setSearchDestination] = useState<DestinationRegion | 'all'>('all');
   const [searchActivity, setSearchActivity] = useState<ActivityCategoryId | 'all'>('all');
-  const [searchStartDate, setSearchStartDate] = useState(tomorrowIso);
-  const [searchEndDate, setSearchEndDate] = useState(weekEndIso);
+  // Single optional trip date ('' = "Any date", no date filtering)
+  const [searchTripDate, setSearchTripDate] = useState('');
   const [selectedExplorerTripId, setSelectedExplorerTripId] = useState<string>(TRIPS[0].id);
   const [activeDetailTrip, setActiveDetailTrip] = useState<Trip | null>(null);
   const [favoriteTripIds, setFavoriteTripIds] = useState<string[]>(() => {
@@ -536,31 +536,23 @@ export default function App() {
     ) {
       setSearchActivity(act);
     }
-    let resolvedStart = '';
-    let resolvedEnd = '';
-    if (startParam || endParam) {
-      const norm = normalizeSearchDateRange(startParam || endParam || '', endParam || startParam || '');
+    // Single trip date: prefer the `date` param; legacy `startDate`/`endDate`
+    // params collapse to their first valid day so old shared links still work.
+    let resolvedDate = '';
+    const singleDateParam = dateParam || startParam || endParam;
+    if (singleDateParam) {
+      const norm = normalizeSearchDateRange(singleDateParam, singleDateParam);
       if (norm.startDate) {
-        resolvedStart = norm.startDate;
-        resolvedEnd = norm.endDate;
-        setSearchStartDate(norm.startDate);
-        setSearchEndDate(norm.endDate);
-      }
-    } else if (dateParam) {
-      const norm = normalizeSearchDateRange(dateParam, dateParam);
-      if (norm.startDate) {
-        resolvedStart = norm.startDate;
-        resolvedEnd = norm.endDate;
-        setSearchStartDate(norm.startDate);
-        setSearchEndDate(norm.endDate);
+        resolvedDate = norm.startDate;
+        setSearchTripDate(norm.startDate);
       }
     }
-    if (dest || act || resolvedStart) {
+    if (dest || act || resolvedDate) {
       const match = TRIPS.find(
         (tr) =>
           (!dest || tr.destination === dest) &&
           (!act || tr.category === act) &&
-          (!resolvedStart || doesTripRunInDateRange(tr, resolvedStart, resolvedEnd))
+          (!resolvedDate || doesTripRunInDateRange(tr, resolvedDate, resolvedDate))
       );
       if (match) setSelectedExplorerTripId(match.id);
     }
@@ -783,10 +775,26 @@ export default function App() {
     if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
+  // The single trip date is fed to the existing range helpers as a one-day
+  // range: '' yields an empty range (no date filtering), a set date yields
+  // start === end === that date (trips running on that exact day only).
   const normalizedDateRange = useMemo(
-    () => normalizeSearchDateRange(searchStartDate, searchEndDate),
-    [searchStartDate, searchEndDate]
+    () => normalizeSearchDateRange(searchTripDate, searchTripDate),
+    [searchTripDate]
   );
+
+  // Weekday caption for the chosen trip date, e.g. "Sat, 29 Nov"
+  const tripDateCaption = useMemo(() => {
+    if (!searchTripDate) return '';
+    const d = new Date(`${searchTripDate}T00:00:00`);
+    if (Number.isNaN(d.getTime())) return '';
+    const locale = lang === 'ar' ? 'ar-EG' : lang === 'de' ? 'de-DE' : 'en-GB';
+    return new Intl.DateTimeFormat(locale, {
+      weekday: 'short',
+      day: 'numeric',
+      month: 'short',
+    }).format(d);
+  }, [searchTripDate, lang]);
 
   const heroFilteredTrips = useMemo(
     () =>
@@ -806,8 +814,7 @@ export default function App() {
   const hasCustomSearchFilters =
     searchDestination !== 'all' ||
     searchActivity !== 'all' ||
-    (normalizedDateRange.startDate !== '' &&
-      (normalizedDateRange.startDate !== tomorrowIso || normalizedDateRange.endDate !== weekEndIso)) ||
+    normalizedDateRange.startDate !== '' ||
     heroFilteredTrips.length !== liveTrips.length;
 
   useEffect(() => {
@@ -819,25 +826,10 @@ export default function App() {
     }
   }, [heroFilteredTrips, selectedExplorerTripId]);
 
-  const handleStartDateChange = (nextStart: string) => {
-    setSearchStartDate(nextStart);
-    if (nextStart && searchEndDate && nextStart > searchEndDate) {
-      setSearchEndDate(nextStart);
-    }
-  };
-
-  const handleEndDateChange = (nextEnd: string) => {
-    setSearchEndDate(nextEnd);
-    if (nextEnd && searchStartDate && nextEnd < searchStartDate) {
-      setSearchStartDate(nextEnd);
-    }
-  };
-
   const resetHeroFilters = useCallback(() => {
     setSearchDestination('all');
     setSearchActivity('all');
-    setSearchStartDate(tomorrowIso);
-    setSearchEndDate(weekEndIso);
+    setSearchTripDate('');
     if (typeof window !== 'undefined') {
       const url = new URL(window.location.href);
       url.searchParams.delete('destination');
@@ -848,7 +840,7 @@ export default function App() {
       const qs = url.searchParams.toString();
       window.history.replaceState(null, '', `${url.pathname}${qs ? `?${qs}` : ''}${url.hash}`);
     }
-  }, [tomorrowIso, weekEndIso]);
+  }, []);
 
   const handleHeroSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -857,11 +849,10 @@ export default function App() {
     else params.delete('destination');
     if (searchActivity !== 'all') params.set('activity', searchActivity);
     else params.delete('activity');
-    params.delete('date');
-    if (normalizedDateRange.startDate) params.set('startDate', normalizedDateRange.startDate);
-    else params.delete('startDate');
-    if (normalizedDateRange.endDate) params.set('endDate', normalizedDateRange.endDate);
-    else params.delete('endDate');
+    params.delete('startDate');
+    params.delete('endDate');
+    if (searchTripDate) params.set('date', searchTripDate);
+    else params.delete('date');
     const qs = params.toString();
     window.history.replaceState(null, '', qs ? `?${qs}#all-trips` : '#all-trips');
 
@@ -1663,7 +1654,7 @@ export default function App() {
 
           <main id="top" className="overflow-x-clip">
             {/* 1. HERO */}
-            <section className="wasla-hero-glare relative overflow-hidden bg-[#F8FAFC] lg:bg-[#0F2233]" aria-labelledby="hero-title">
+            <section className="wasla-hero-glare relative overflow-hidden bg-[#F8FAFC]" aria-labelledby="hero-title">
               {/* Image zone: photo + neutral scrim + eyebrow/headline only */}
               <div className="relative overflow-hidden text-white">
                 <div
@@ -1708,7 +1699,7 @@ export default function App() {
                         </>
                       )}
                     </h1>
-                    <p className="text-[15px] sm:text-base leading-relaxed text-white/90">
+                    <p className="font-hero-standard text-[15px] sm:text-base leading-relaxed text-white/90">
                       {customHeroSubtitle || t.heroLede}
                     </p>
                   </div>
@@ -1716,22 +1707,22 @@ export default function App() {
               </div>
 
               {/* Form zone: below the image on mobile, overlapping it on desktop */}
-              <div className="relative z-20 mx-auto max-w-[1200px] px-4 sm:px-6 pt-4 lg:pt-0 pb-10 lg:-mt-16 space-y-8">
+              <div className="relative z-20 mx-auto max-w-[1200px] px-4 sm:px-6 pt-4 lg:pt-0 pb-0 lg:-mt-16">
                 <form
                   onSubmit={handleHeroSearch}
                   role="search"
-                  className="wasla-led-ring hero-enter-delayed max-w-5xl rounded-xl bg-white p-2.5 sm:p-3 lg:px-4 lg:py-2.5 text-[#0F2233]"
+                  className="wasla-led-ring hero-enter-delayed max-w-5xl rounded-2xl bg-white p-2.5 text-[#0F2233]"
                 >
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[1.05fr_1.3fr_1fr_1fr_auto] gap-2.5 items-center">
-                    <label className="block px-2 py-1">
-                      <span className="block text-[11px] font-semibold text-[#475569]">
+                  <div className="grid grid-cols-[minmax(0,1fr)_112px] lg:grid-cols-[1.05fr_1.25fr_1fr_168px] gap-2.5 items-center">
+                    <label className="block px-2 py-2 col-span-2 lg:col-span-1">
+                      <span className="block text-[11px] font-semibold text-[#64748B]">
                         {t.searchDestinationLabel}
                       </span>
                       <div className="relative mt-0.5">
                         <select
                           value={searchDestination}
                           onChange={(e) => setSearchDestination(e.target.value as DestinationRegion | 'all')}
-                          className="w-full appearance-none bg-transparent pe-6 text-sm font-medium text-[#0F2233] focus:outline-none cursor-pointer"
+                          className="w-full appearance-none bg-transparent pe-6 text-[15px] font-semibold text-[#0F2233] focus:outline-none cursor-pointer"
                         >
                           <option value="all">{t.searchAllDestinations}</option>
                           <option value="Hurghada">Hurghada</option>
@@ -1746,7 +1737,7 @@ export default function App() {
                       </div>
                     </label>
 
-                    <label className="block px-2 py-1 sm:border-s sm:border-[#C8C2B8]/60">
+                    <label className="block px-2 py-2 col-span-2 lg:col-span-1 border-t border-[#E7E0D2] lg:border-t-0 lg:border-s">
                       <span className="block text-[11px] font-semibold text-[#64748B]">
                         {t.searchActivityLabel}
                       </span>
@@ -1754,7 +1745,7 @@ export default function App() {
                         <select
                           value={searchActivity}
                           onChange={(e) => setSearchActivity(e.target.value as ActivityCategoryId | 'all')}
-                          className="w-full appearance-none bg-transparent pe-6 text-sm font-medium text-[#0F2233] focus:outline-none cursor-pointer"
+                          className="w-full appearance-none bg-transparent pe-6 text-[15px] font-semibold text-[#0F2233] focus:outline-none cursor-pointer"
                         >
                           <option value="all">{t.searchAllActivities}</option>
                           {CATEGORIES.map((cat) => (
@@ -1770,127 +1761,123 @@ export default function App() {
                       </div>
                     </label>
 
-                    <label className="block px-2 py-1 lg:border-s lg:border-[#C8C2B8]/60">
+                    <label className="block px-2 py-2 border-t border-[#E7E0D2] lg:border-t-0 lg:border-s">
                       <span className="block text-[11px] font-semibold text-[#64748B]">
-                        {tText({ en: 'Start date', ar: 'من تاريخ', de: 'Startdatum' }, lang)}
+                        {tText({ en: 'Trip date', ar: 'تاريخ الرحلة', de: 'Reisedatum' }, lang)}
                       </span>
                       <div className="relative mt-0.5">
                         <input
                           type="date"
-                          value={searchStartDate}
+                          value={searchTripDate}
                           min={todayIso}
-                          aria-label={tText({ en: 'Start date', ar: 'من تاريخ', de: 'Startdatum' }, lang)}
-                          onChange={(e) => handleStartDateChange(e.target.value)}
-                          className="w-full bg-transparent pe-6 text-sm font-medium text-[#0F2233] focus:outline-none tabular-nums [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:inset-0 [&::-webkit-calendar-picker-indicator]:h-full [&::-webkit-calendar-picker-indicator]:w-full [&::-webkit-calendar-picker-indicator]:cursor-pointer [&::-webkit-calendar-picker-indicator]:opacity-0"
+                          aria-label={tText({ en: 'Trip date', ar: 'تاريخ الرحلة', de: 'Reisedatum' }, lang)}
+                          onChange={(e) => setSearchTripDate(e.target.value)}
+                          className={`w-full bg-transparent pe-6 text-[15px] font-semibold focus:outline-none tabular-nums [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:inset-0 [&::-webkit-calendar-picker-indicator]:h-full [&::-webkit-calendar-picker-indicator]:w-full [&::-webkit-calendar-picker-indicator]:cursor-pointer [&::-webkit-calendar-picker-indicator]:opacity-0 ${
+                            searchTripDate ? 'text-[#0F2233]' : 'text-transparent'
+                          }`}
                         />
-                        <CalendarDays
-                          className="pointer-events-none absolute end-0 top-1/2 h-4 w-4 -translate-y-1/2 text-[#64748B] stroke-[1.75]"
-                          aria-hidden="true"
-                        />
+                        {!searchTripDate && (
+                          <span className="pointer-events-none absolute start-0 top-1/2 -translate-y-1/2 text-[15px] font-semibold text-[#64748B]">
+                            {tText({ en: 'Any date', ar: 'أي تاريخ', de: 'Beliebiges Datum' }, lang)}
+                          </span>
+                        )}
+                        {searchTripDate ? (
+                          <button
+                            type="button"
+                            aria-label={tText(
+                              { en: 'Clear date', ar: 'مسح التاريخ', de: 'Datum löschen' },
+                              lang
+                            )}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              setSearchTripDate('');
+                            }}
+                            className="absolute end-0 top-1/2 z-10 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-full text-[#64748B] hover:bg-[#F1F5F9] hover:text-[#0F2233] cursor-pointer"
+                          >
+                            <X className="h-4 w-4" aria-hidden="true" />
+                          </button>
+                        ) : (
+                          <CalendarDays
+                            className="pointer-events-none absolute end-0 top-1/2 h-4 w-4 -translate-y-1/2 text-[#64748B] stroke-[1.75]"
+                            aria-hidden="true"
+                          />
+                        )}
                       </div>
+                      {searchTripDate && tripDateCaption && (
+                        <span className="mt-0.5 block text-[11px] font-semibold text-[#EE5426]">
+                          {tripDateCaption}
+                        </span>
+                      )}
                     </label>
 
-                    <label className="block px-2 py-1 sm:border-s sm:border-[#C8C2B8]/60">
-                      <span className="block text-[11px] font-semibold text-[#64748B]">
-                        {tText({ en: 'End date', ar: 'إلى تاريخ', de: 'Enddatum' }, lang)}
-                      </span>
-                      <div className="relative mt-0.5">
-                        <input
-                          type="date"
-                          value={searchEndDate}
-                          min={searchStartDate || todayIso}
-                          aria-label={tText({ en: 'End date', ar: 'إلى تاريخ', de: 'Enddatum' }, lang)}
-                          onChange={(e) => handleEndDateChange(e.target.value)}
-                          className="w-full bg-transparent pe-6 text-sm font-medium text-[#0F2233] focus:outline-none tabular-nums [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:inset-0 [&::-webkit-calendar-picker-indicator]:h-full [&::-webkit-calendar-picker-indicator]:w-full [&::-webkit-calendar-picker-indicator]:cursor-pointer [&::-webkit-calendar-picker-indicator]:opacity-0"
-                        />
-                        <CalendarDays
-                          className="pointer-events-none absolute end-0 top-1/2 h-4 w-4 -translate-y-1/2 text-[#64748B] stroke-[1.75]"
-                          aria-hidden="true"
-                        />
-                      </div>
-                    </label>
-
-                    <div className="sm:col-span-2 lg:col-span-1">
+                    <div>
                       <button
                         type="submit"
-                        className="btn-wasla-primary min-h-[46px] w-full rounded-lg px-6 text-sm font-bold whitespace-nowrap cursor-pointer"
+                        className="btn-wasla-primary min-h-[50px] lg:min-h-[52px] w-full rounded-xl px-2 lg:px-4 text-[15px] font-bold whitespace-nowrap cursor-pointer"
                       >
-                        <Search className="h-4 w-4" aria-hidden="true" />
-                        <span>{t.searchButton}</span>
+                        <Search className="hidden h-4 w-4 lg:block" aria-hidden="true" />
+                        <span>
+                          {tText(
+                            { en: 'Search trips', ar: 'بحث الرحلات', de: 'Trips suchen' },
+                            lang
+                          )}
+                        </span>
                       </button>
                     </div>
                   </div>
                 </form>
 
                 {/* Unboxed Hero Trust & Payment Transparency Strip */}
-                <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs font-medium text-[#334155] lg:text-white/90">
-                  <span>
-                    ✓{' '}
-                    {tText(
-                      {
-                        en: 'Vetted local operators',
-                        ar: 'مشغّلون محليون معتمدون',
-                        de: 'Geprüfte lokale Anbieter',
-                      },
-                      lang
-                    )}
-                  </span>
-                  <span aria-hidden="true" className="text-[#CBD5E1] lg:text-white/40">·</span>
-                  <span>
-                    ✓{' '}
-                    {tText(
-                      {
-                        en: 'No hidden markups',
-                        ar: 'أسعار شفافة بدون عمولات خفية',
-                        de: 'Keine versteckten Aufschläge',
-                      },
-                      lang
-                    )}
-                  </span>
-                  <span aria-hidden="true" className="text-[#CBD5E1] lg:text-white/40">·</span>
-                  <span>
-                    ✓{' '}
-                    {tText(
-                      {
-                        en: 'Free 24h cancellation',
-                        ar: 'إلغاء مجاني قبل 24 ساعة',
-                        de: '24 Std. kostenlos stornierbar',
-                      },
-                      lang
-                    )}
-                  </span>
-                  <span aria-hidden="true" className="text-[#CBD5E1] lg:text-white/40">·</span>
-                  <span>
-                    ✓{' '}
-                    {tText(
-                      {
-                        en: 'Pay cash on pickup or via official link',
-                        ar: 'كاش عند الاستلام أو عبر رابط دفع رسمي',
-                        de: 'Bar vor Ort oder offizieller Zahlungslink',
-                      },
-                      lang
-                    )}
-                  </span>
+                <div className="flex flex-wrap items-center gap-x-7 gap-y-2 pt-4 pb-5 lg:pt-5 lg:pb-6 text-[12.5px] lg:text-[13.5px] font-medium leading-[1.4] tracking-[0.01em] text-[#334155]">
+                  {[
+                    {
+                      en: 'Vetted local operators',
+                      ar: 'مشغّلون محليون معتمدون',
+                      de: 'Geprüfte lokale Anbieter',
+                    },
+                    {
+                      en: 'No hidden markups',
+                      ar: 'أسعار شفافة بدون عمولات خفية',
+                      de: 'Keine versteckten Aufschläge',
+                    },
+                    {
+                      en: 'Free 24h cancellation',
+                      ar: 'إلغاء مجاني قبل 24 ساعة',
+                      de: '24 Std. kostenlos stornierbar',
+                    },
+                    {
+                      en: 'Pay cash on pickup',
+                      ar: 'كاش عند الاستلام',
+                      de: 'Bar vor Ort',
+                    },
+                  ].map((item) => (
+                    <span key={item.en} className="inline-flex items-center gap-1.5">
+                      <Check
+                        className="h-[13px] w-[13px] lg:h-3.5 lg:w-3.5 shrink-0 text-[#EE5426]"
+                        strokeWidth={2.5}
+                        aria-hidden="true"
+                      />
+                      {tText(item, lang)}
+                    </span>
+                  ))}
                   {currency !== 'EUR' && (
-                    <>
-                      <span aria-hidden="true" className="text-[#CBD5E1] lg:text-white/40">·</span>
-                      <span className="text-[#B45309] lg:text-[#FED7AA]">
-                        {tText(
-                          {
-                            en: 'EUR (€) base currency · converted amounts are approximate',
-                            ar: 'اليورو (€) عملة أساسية والأسعار المحوّلة تقديرية',
-                            de: 'Basiswährung EUR (€) · Richtwerte',
-                          },
-                          lang
-                        )}
-                      </span>
-                    </>
+                    <span className="text-[#B45309]">
+                      {tText(
+                        {
+                          en: 'EUR (€) base currency · converted amounts are approximate',
+                          ar: 'اليورو (€) عملة أساسية والأسعار المحوّلة تقديرية',
+                          de: 'Basiswährung EUR (€) · Richtwerte',
+                        },
+                        lang
+                      )}
+                    </span>
                   )}
                 </div>
 
                 {publicSettings.airTicketsEnabled && (
-                  <div className="inline-flex items-center gap-2 rounded-lg border border-[#CBD5E1] bg-white px-4 py-2 text-xs font-medium text-[#334155] lg:border-white/25 lg:bg-white/10 lg:text-[#FFF7ED]">
-                    <Plane className="h-4 w-4 text-[#EE5426] lg:text-[#FDBA74]" aria-hidden="true" />
+                  <div className="mb-5 lg:mb-6 inline-flex items-center gap-2 rounded-lg border border-[#CBD5E1] bg-white px-4 py-2 text-xs font-medium text-[#334155]">
+                    <Plane className="h-4 w-4 text-[#EE5426]" aria-hidden="true" />
                     <span>
                       {tText(
                         {
@@ -1909,7 +1896,7 @@ export default function App() {
             {/* Quick Destination & Service Filter Strip (Visually separated Destinations vs Trip Types) */}
             <nav
               aria-label="Quick destinations and services"
-              className="border-b border-[#C8C2B8]/60 bg-[#FAF4ED]"
+              className="border-b border-[#C8C2B8]/60 bg-[#FAF4ED] [border-top:1px_solid_#EDE8DD]"
             >
               <div className="mx-auto max-w-[1200px] px-4 sm:px-6 py-3">
                 <div className="no-scrollbar carousel-track flex items-center gap-2 overflow-x-auto snap-x snap-proximity py-0.5">

@@ -377,9 +377,9 @@ select:not(.bg-transparent):not(.no-led):focus {
   font-family: "Plus Jakarta Sans", "IBM Plex Sans Arabic", ui-sans-serif, system-ui, sans-serif;
 }
 
-/* Locked hero design system (world-class standard): Inter type, one neutral scrim, focal-point image */
+/* Locked hero design system (world-class standard): Outfit type (owner choice 2026-11-22), one neutral scrim, focal-point image */
 .font-hero-standard {
-  font-family: "Inter", "IBM Plex Sans Arabic", "Cairo", ui-sans-serif, system-ui, sans-serif;
+  font-family: "Outfit", "Inter", "IBM Plex Sans Arabic", "Cairo", ui-sans-serif, system-ui, sans-serif;
 }
 
 .wasla-hero-scrim {

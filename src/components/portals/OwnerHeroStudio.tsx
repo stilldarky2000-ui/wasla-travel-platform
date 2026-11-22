@@ -254,9 +254,24 @@ export const OwnerHeroStudio: React.FC<OwnerHeroStudioProps> = ({
 
         {/* Right: Photo Focal Point Picker */}
         <div className="lg:col-span-6 card-wasla rounded-xl p-5 space-y-5">
-          <div className="flex items-center gap-2 text-sm font-semibold text-[#0F2233]">
-            <Crosshair className="h-4 w-4 text-[#EE5426]" aria-hidden="true" />
-            <span>2. Photo Focal Point (what stays visible)</span>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2 text-sm font-semibold text-[#0F2233]">
+              <Crosshair className="h-4 w-4 text-[#EE5426]" aria-hidden="true" />
+              <span>2. Photo Focal Point (what stays visible)</span>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                setFxD(50);
+                setFyD(50);
+                setFxM(50);
+                setFyM(50);
+              }}
+              className="inline-flex items-center gap-1 text-xs font-medium text-[#475569] hover:text-[#0F2233] cursor-pointer"
+            >
+              <RotateCcw className="h-3.5 w-3.5" aria-hidden="true" />
+              <span>Reset focal point</span>
+            </button>
           </div>
 
           {/* Desktop / Mobile mode toggle */}
