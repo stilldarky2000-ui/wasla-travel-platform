@@ -101,14 +101,37 @@ select:not(.bg-transparent):not(.no-led):focus {
 
 /* Architectural Hero Search Bar Frame */
 .wasla-led-ring {
-  border: 1px solid rgba(15, 34, 51, 0.12);
-  box-shadow: 0 20px 44px -16px rgba(15, 34, 51, 0.38);
-  transition: border-color 180ms ease, box-shadow 180ms ease;
+  background-color: rgba(255, 255, 255, 0.98);
+  border: 1px solid rgba(15, 34, 51, 0.1);
+  box-shadow:
+    0 20px 44px -16px rgba(15, 34, 51, 0.28),
+    0 4px 14px -4px rgba(15, 34, 51, 0.08);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  transition: border-color 180ms ease, box-shadow 180ms ease, background-color 180ms ease;
 }
 
 .wasla-led-ring:focus-within {
-  border-color: rgba(238, 84, 38, 0.55);
-  box-shadow: 0 0 0 3px rgba(238, 84, 38, 0.18), 0 22px 48px -16px rgba(15, 34, 51, 0.42);
+  border-color: rgba(238, 84, 38, 0.5);
+  box-shadow:
+    0 0 0 3px rgba(238, 84, 38, 0.14),
+    0 22px 48px -16px rgba(15, 34, 51, 0.34);
+}
+
+.wasla-search-field {
+  transition: background-color 160ms ease;
+}
+
+.wasla-search-field:hover {
+  background-color: rgba(250, 244, 237, 0.85);
+}
+
+.wasla-search-field:focus-within {
+  background-color: #FAF4ED;
+}
+
+.wasla-search-divider {
+  background-color: rgba(15, 34, 51, 0.11);
 }
 
 .tabular-nums {
@@ -732,14 +755,31 @@ select:not(.bg-transparent):not(.no-led):focus {
 }
 
 [data-wasla-theme="dark"] .wasla-led-ring {
-  background-color: #19354F !important;
-  border-color: #334155 !important;
-  box-shadow: 0 20px 44px -16px rgba(0, 0, 0, 0.65);
+  background-color: rgba(21, 44, 67, 0.94) !important;
+  border-color: rgba(255, 255, 255, 0.14) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 24px 52px -18px rgba(0, 0, 0, 0.72);
 }
 
 [data-wasla-theme="dark"] .wasla-led-ring:focus-within {
-  border-color: rgba(238, 84, 38, 0.65) !important;
-  box-shadow: 0 0 0 3px rgba(238, 84, 38, 0.22), 0 22px 48px -16px rgba(0, 0, 0, 0.7);
+  border-color: rgba(238, 84, 38, 0.6) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 0 0 3px rgba(238, 84, 38, 0.2),
+    0 24px 52px -18px rgba(0, 0, 0, 0.76);
+}
+
+[data-wasla-theme="dark"] .wasla-search-field:hover {
+  background-color: rgba(255, 255, 255, 0.055) !important;
+}
+
+[data-wasla-theme="dark"] .wasla-search-field:focus-within {
+  background-color: rgba(255, 255, 255, 0.085) !important;
+}
+
+[data-wasla-theme="dark"] .wasla-search-divider {
+  background-color: rgba(255, 255, 255, 0.12) !important;
 }
 
 [data-wasla-theme="dark"] input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not(.bg-transparent):not(.no-led):hover,

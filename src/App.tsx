@@ -1042,7 +1042,7 @@ export default function App() {
         <WaslaLogo
           variant="full"
           theme={darkMode ? 'dark' : 'light'}
-          className="h-6 min-[400px]:h-8 sm:h-11 w-auto"
+          className="h-[34px] min-[375px]:h-9 min-[420px]:h-10 sm:h-11 w-auto"
         />
       </span>
     );
@@ -1711,112 +1711,135 @@ export default function App() {
                 <form
                   onSubmit={handleHeroSearch}
                   role="search"
-                  className="wasla-led-ring hero-enter-delayed max-w-5xl rounded-2xl bg-white p-2.5 text-[#0F2233]"
+                  className="wasla-led-ring hero-enter-delayed max-w-5xl rounded-2xl bg-white p-2 text-[#0F2233]"
                 >
-                  <div className="grid grid-cols-[minmax(0,1fr)_112px] lg:grid-cols-[1.05fr_1.25fr_1fr_168px] gap-2.5 items-center">
-                    <label className="block px-2 py-2 col-span-2 lg:col-span-1">
-                      <span className="block text-[11px] font-semibold text-[#64748B]">
-                        {t.searchDestinationLabel}
-                      </span>
-                      <div className="relative mt-0.5">
-                        <select
-                          value={searchDestination}
-                          onChange={(e) => setSearchDestination(e.target.value as DestinationRegion | 'all')}
-                          className="w-full appearance-none bg-transparent pe-6 text-[15px] font-semibold text-[#0F2233] focus:outline-none cursor-pointer"
-                        >
-                          <option value="all">{t.searchAllDestinations}</option>
-                          <option value="Hurghada">Hurghada</option>
-                          <option value="Marsa Alam">Marsa Alam</option>
-                          <option value="Luxor">Luxor</option>
-                          <option value="Cairo">Cairo</option>
-                        </select>
-                        <ChevronDown
-                          className="pointer-events-none absolute end-0 top-1/2 h-4 w-4 -translate-y-1/2 text-[#64748B] stroke-[1.75]"
-                          aria-hidden="true"
-                        />
-                      </div>
-                    </label>
-
-                    <label className="block px-2 py-2 col-span-2 lg:col-span-1 border-t border-[#E7E0D2] lg:border-t-0 lg:border-s">
-                      <span className="block text-[11px] font-semibold text-[#64748B]">
-                        {t.searchActivityLabel}
-                      </span>
-                      <div className="relative mt-0.5">
-                        <select
-                          value={searchActivity}
-                          onChange={(e) => setSearchActivity(e.target.value as ActivityCategoryId | 'all')}
-                          className="w-full appearance-none bg-transparent pe-6 text-[15px] font-semibold text-[#0F2233] focus:outline-none cursor-pointer"
-                        >
-                          <option value="all">{t.searchAllActivities}</option>
-                          {CATEGORIES.map((cat) => (
-                            <option key={cat.id} value={cat.id}>
-                              {tText(cat.name, lang)}
-                            </option>
-                          ))}
-                        </select>
-                        <ChevronDown
-                          className="pointer-events-none absolute end-0 top-1/2 h-4 w-4 -translate-y-1/2 text-[#64748B] stroke-[1.75]"
-                          aria-hidden="true"
-                        />
-                      </div>
-                    </label>
-
-                    <label className="block px-2 py-2 border-t border-[#E7E0D2] lg:border-t-0 lg:border-s">
-                      <span className="block text-[11px] font-semibold text-[#64748B]">
-                        {tText({ en: 'Trip date', ar: 'تاريخ الرحلة', de: 'Reisedatum' }, lang)}
-                      </span>
-                      <div className="relative mt-0.5">
-                        <input
-                          type="date"
-                          value={searchTripDate}
-                          min={todayIso}
-                          aria-label={tText({ en: 'Trip date', ar: 'تاريخ الرحلة', de: 'Reisedatum' }, lang)}
-                          onChange={(e) => setSearchTripDate(e.target.value)}
-                          className={`w-full bg-transparent pe-6 text-[15px] font-semibold focus:outline-none tabular-nums [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:inset-0 [&::-webkit-calendar-picker-indicator]:h-full [&::-webkit-calendar-picker-indicator]:w-full [&::-webkit-calendar-picker-indicator]:cursor-pointer [&::-webkit-calendar-picker-indicator]:opacity-0 ${
-                            searchTripDate ? 'text-[#0F2233]' : 'text-transparent'
-                          }`}
-                        />
-                        {!searchTripDate && (
-                          <span className="pointer-events-none absolute start-0 top-1/2 -translate-y-1/2 text-[15px] font-semibold text-[#64748B]">
-                            {tText({ en: 'Any date', ar: 'أي تاريخ', de: 'Beliebiges Datum' }, lang)}
-                          </span>
-                        )}
-                        {searchTripDate ? (
-                          <button
-                            type="button"
-                            aria-label={tText(
-                              { en: 'Clear date', ar: 'مسح التاريخ', de: 'Datum löschen' },
-                              lang
-                            )}
-                            onClick={(e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              setSearchTripDate('');
-                            }}
-                            className="absolute end-0 top-1/2 z-10 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-full text-[#64748B] hover:bg-[#F1F5F9] hover:text-[#0F2233] cursor-pointer"
+                  <div className="flex flex-col gap-1.5 lg:flex-row lg:items-stretch lg:gap-2">
+                    <div className="grid flex-1 grid-cols-1 lg:grid-cols-[1.05fr_auto_1.22fr_auto_1fr] items-stretch">
+                      {/* Destination */}
+                      <label className="wasla-search-field group relative flex flex-col justify-center rounded-xl px-3.5 py-2.5 lg:px-4 cursor-pointer">
+                        <span className="flex items-center gap-1.5 text-[11px] font-medium tracking-[0.02em] text-[#64748B]">
+                          <MapPin className="h-3.5 w-3.5 shrink-0 text-[#EE5426]" aria-hidden="true" />
+                          <span>{t.searchDestinationLabel}</span>
+                        </span>
+                        <div className="relative mt-1">
+                          <select
+                            value={searchDestination}
+                            onChange={(e) => setSearchDestination(e.target.value as DestinationRegion | 'all')}
+                            className="w-full appearance-none bg-transparent pe-6 text-[14.5px] sm:text-[15px] font-semibold leading-snug text-[#0F2233] focus:outline-none cursor-pointer"
                           >
-                            <X className="h-4 w-4" aria-hidden="true" />
-                          </button>
-                        ) : (
-                          <CalendarDays
-                            className="pointer-events-none absolute end-0 top-1/2 h-4 w-4 -translate-y-1/2 text-[#64748B] stroke-[1.75]"
+                            <option value="all">{t.searchAllDestinations}</option>
+                            <option value="Hurghada">Hurghada</option>
+                            <option value="Marsa Alam">Marsa Alam</option>
+                            <option value="Luxor">Luxor</option>
+                            <option value="Cairo">Cairo</option>
+                          </select>
+                          <ChevronDown
+                            className="pointer-events-none absolute end-0 top-1/2 h-4 w-4 -translate-y-1/2 text-[#64748B] stroke-[1.75] transition-transform duration-150 group-focus-within:rotate-180"
                             aria-hidden="true"
                           />
-                        )}
-                      </div>
-                      {searchTripDate && tripDateCaption && (
-                        <span className="mt-0.5 block text-[11px] font-semibold text-[#EE5426]">
-                          {tripDateCaption}
-                        </span>
-                      )}
-                    </label>
+                        </div>
+                      </label>
 
-                    <div>
+                      <div
+                        aria-hidden="true"
+                        className="wasla-search-divider mx-3.5 h-px lg:mx-1 lg:my-auto lg:h-8 lg:w-px shrink-0"
+                      />
+
+                      {/* Activity */}
+                      <label className="wasla-search-field group relative flex flex-col justify-center rounded-xl px-3.5 py-2.5 lg:px-4 cursor-pointer">
+                        <span className="flex items-center gap-1.5 text-[11px] font-medium tracking-[0.02em] text-[#64748B]">
+                          <Compass className="h-3.5 w-3.5 shrink-0 text-[#EE5426]" aria-hidden="true" />
+                          <span>{t.searchActivityLabel}</span>
+                        </span>
+                        <div className="relative mt-1">
+                          <select
+                            value={searchActivity}
+                            onChange={(e) => setSearchActivity(e.target.value as ActivityCategoryId | 'all')}
+                            className="w-full appearance-none bg-transparent pe-6 text-[14.5px] sm:text-[15px] font-semibold leading-snug text-[#0F2233] focus:outline-none cursor-pointer"
+                          >
+                            <option value="all">{t.searchAllActivities}</option>
+                            {CATEGORIES.map((cat) => (
+                              <option key={cat.id} value={cat.id}>
+                                {tText(cat.name, lang)}
+                              </option>
+                            ))}
+                          </select>
+                          <ChevronDown
+                            className="pointer-events-none absolute end-0 top-1/2 h-4 w-4 -translate-y-1/2 text-[#64748B] stroke-[1.75] transition-transform duration-150 group-focus-within:rotate-180"
+                            aria-hidden="true"
+                          />
+                        </div>
+                      </label>
+
+                      <div
+                        aria-hidden="true"
+                        className="wasla-search-divider mx-3.5 h-px lg:mx-1 lg:my-auto lg:h-8 lg:w-px shrink-0"
+                      />
+
+                      {/* Trip date */}
+                      <label className="wasla-search-field group relative flex flex-col justify-center rounded-xl px-3.5 py-2.5 lg:px-4 cursor-pointer">
+                        <span className="flex items-center justify-between gap-2 text-[11px] font-medium tracking-[0.02em] text-[#64748B]">
+                          <span className="flex items-center gap-1.5">
+                            <CalendarDays className="h-3.5 w-3.5 shrink-0 text-[#EE5426]" aria-hidden="true" />
+                            <span>
+                              {tText({ en: 'Trip date', ar: 'تاريخ الرحلة', de: 'Reisedatum' }, lang)}
+                            </span>
+                          </span>
+                          {searchTripDate && tripDateCaption && (
+                            <span className="truncate text-[10.5px] font-semibold text-[#EE5426]">
+                              {tripDateCaption}
+                            </span>
+                          )}
+                        </span>
+                        <div className="relative mt-1">
+                          <input
+                            type="date"
+                            value={searchTripDate}
+                            min={todayIso}
+                            aria-label={tText({ en: 'Trip date', ar: 'تاريخ الرحلة', de: 'Reisedatum' }, lang)}
+                            onChange={(e) => setSearchTripDate(e.target.value)}
+                            className={`w-full bg-transparent pe-7 text-[14.5px] sm:text-[15px] font-semibold leading-snug focus:outline-none tabular-nums [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:inset-0 [&::-webkit-calendar-picker-indicator]:h-full [&::-webkit-calendar-picker-indicator]:w-full [&::-webkit-calendar-picker-indicator]:cursor-pointer [&::-webkit-calendar-picker-indicator]:opacity-0 ${
+                              searchTripDate ? 'text-[#0F2233]' : 'text-transparent'
+                            }`}
+                          />
+                          {!searchTripDate && (
+                            <span className="pointer-events-none absolute start-0 top-1/2 -translate-y-1/2 text-[14.5px] sm:text-[15px] font-semibold leading-snug text-[#0F2233]/85 dark:text-white/90">
+                              {tText({ en: 'Any date', ar: 'أي تاريخ', de: 'Beliebiges Datum' }, lang)}
+                            </span>
+                          )}
+                          {searchTripDate ? (
+                            <button
+                              type="button"
+                              aria-label={tText(
+                                { en: 'Clear date', ar: 'مسح التاريخ', de: 'Datum löschen' },
+                                lang
+                              )}
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                setSearchTripDate('');
+                              }}
+                              className="absolute end-0 top-1/2 z-10 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-full text-[#64748B] hover:bg-[#F1F5F9] hover:text-[#0F2233] transition-colors cursor-pointer"
+                            >
+                              <X className="h-3.5 w-3.5" aria-hidden="true" />
+                            </button>
+                          ) : (
+                            <ChevronDown
+                              className="pointer-events-none absolute end-0 top-1/2 h-4 w-4 -translate-y-1/2 text-[#64748B] stroke-[1.75]"
+                              aria-hidden="true"
+                            />
+                          )}
+                        </div>
+                      </label>
+                    </div>
+
+                    {/* Primary Search CTA */}
+                    <div className="lg:w-[176px] lg:shrink-0">
                       <button
                         type="submit"
-                        className="btn-wasla-primary min-h-[50px] lg:min-h-[52px] w-full rounded-xl px-2 lg:px-4 text-[15px] font-bold whitespace-nowrap cursor-pointer"
+                        className="btn-wasla-primary h-full min-h-[50px] lg:min-h-[56px] w-full rounded-xl px-5 text-[14.5px] font-semibold tracking-[0.01em] whitespace-nowrap cursor-pointer"
                       >
-                        <Search className="hidden h-4 w-4 lg:block" aria-hidden="true" />
+                        <Search className="h-4 w-4 shrink-0" aria-hidden="true" />
                         <span>
                           {tText(
                             { en: 'Search trips', ar: 'بحث الرحلات', de: 'Trips suchen' },
