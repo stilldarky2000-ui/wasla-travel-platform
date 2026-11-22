@@ -2252,11 +2252,7 @@ export default function App() {
               </section>
 
               {/* 7. FREQUENTLY ASKED QUESTIONS */}
-              <StorefrontFaq
-                lang={lang}
-                onAskWhatsapp={() => setWhatsappOpen(true)}
-                onOpenPolicies={() => openPolicies('terms')}
-              />
+              <StorefrontFaq lang={lang} />
 
               {/* 8. DIRECT CONTACT & LOCAL HURGHADA SUPPORT DESK */}
               <ContactSupportSection
@@ -2264,11 +2260,6 @@ export default function App() {
                 isRtl={isRtl}
                 whatsappNumber={publicSettings.whatsappNumber}
                 contactEmail={publicSettings.email}
-                onOpenTrackBooking={() => setTrackBookingOpen(true)}
-                onOpenCustomTrip={() => {
-                  setCustomInitialServices(undefined);
-                  setCustomTripOpen(true);
-                }}
               />
 
               {/* 9. QUIET PRE-FOOTER: NEWSLETTER & QUICK EXPLORE DIRECTORY */}

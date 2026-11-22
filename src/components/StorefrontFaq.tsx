@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { ChevronDown, HelpCircle, MessageCircle, ShieldCheck } from 'lucide-react';
+import { ChevronDown, HelpCircle } from 'lucide-react';
 import { Lang } from '../data/i18n';
 import { LocalizedText, tText } from '../data/marketplaceData';
 
@@ -183,15 +183,9 @@ const FAQ_ITEMS: FaqItem[] = [
 
 interface StorefrontFaqProps {
   lang: Lang;
-  onAskWhatsapp: () => void;
-  onOpenPolicies: () => void;
 }
 
-export const StorefrontFaq: React.FC<StorefrontFaqProps> = ({
-  lang,
-  onAskWhatsapp,
-  onOpenPolicies,
-}) => {
+export const StorefrontFaq: React.FC<StorefrontFaqProps> = ({ lang }) => {
   const [selectedCategory, setSelectedCategory] = useState<FaqCategoryId>('all');
   const [openId, setOpenId] = useState<string>('pickup-confirmation');
 
@@ -304,33 +298,6 @@ export const StorefrontFaq: React.FC<StorefrontFaqProps> = ({
           })}
         </div>
 
-        {/* Direct Human Support Footer Strip */}
-        <div className="border-t border-[#C8C2B8]/50 dark:border-[#334155] pt-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="space-y-0.5">
-            <h3 className="text-sm font-semibold text-[#0F2233]">
-              {tText(FAQ_COPY.stillHaveTitle, lang)}
-            </h3>
-            <p className="text-xs text-[#64748B]">{tText(FAQ_COPY.stillHaveSub, lang)}</p>
-          </div>
-          <div className="flex flex-wrap items-center gap-2.5 shrink-0">
-            <button
-              type="button"
-              onClick={onOpenPolicies}
-              className="btn-wasla-outline min-h-[40px] gap-1.5 rounded-full bg-white dark:bg-[#0F2233] px-4 py-1.5 text-xs whitespace-nowrap cursor-pointer"
-            >
-              <ShieldCheck className="h-3.5 w-3.5 text-[#EE5426]" aria-hidden="true" />
-              <span>{tText(FAQ_COPY.viewPolicies, lang)}</span>
-            </button>
-            <button
-              type="button"
-              onClick={onAskWhatsapp}
-              className="wasla-wa-glare inline-flex min-h-[40px] items-center gap-1.5 rounded-full px-4 text-xs font-semibold text-white whitespace-nowrap cursor-pointer"
-            >
-              <MessageCircle className="h-3.5 w-3.5" aria-hidden="true" />
-              <span>{tText(FAQ_COPY.askWhatsapp, lang)}</span>
-            </button>
-          </div>
-        </div>
       </div>
     </section>
   );
