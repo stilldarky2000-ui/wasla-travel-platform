@@ -12,16 +12,7 @@ import {
   Trash2,
   X,
 } from 'lucide-react';
-import {
-  collection,
-  doc,
-  getDoc,
-  onSnapshot,
-  query,
-  serverTimestamp,
-  setDoc,
-  where,
-} from 'firebase/firestore';
+import { doc, getDoc, serverTimestamp, setDoc } from 'firebase/firestore';
 import { Lang } from '../data/i18n';
 import { Trip, tText } from '../data/marketplaceData';
 import { INITIAL_BOOKINGS, INITIAL_TRIP_REVIEWS, TripReviewRecord } from '../data/platformData';
@@ -864,42 +855,15 @@ export const TripReview: React.FC<TripReviewProps> = ({
     setLoadError('');
     setLightboxPhoto(null);
 
-    const reviewsQuery = query(
-      collection(db, 'trip_reviews'),
-      where('approvalStatus', '==', 'Approved')
-    );
-
-    const unsub = onSnapshot(
-      reviewsQuery,
-      (snap) => {
-        if (snap.empty) {
-          const fallback = INITIAL_TRIP_REVIEWS.filter(
-            (r) => r.tripId === trip.id && r.approvalStatus === 'Approved'
-          );
-          setReviews(fallback);
-        } else {
-          const matched = snap.docs
-            .map((d) => d.data() as TripReviewRecord)
-            .filter((r) => r.tripId === trip.id)
-            .sort((a, b) => (b.visitDate || '').localeCompare(a.visitDate || ''));
-          setReviews(matched);
-        }
-        setLoading(false);
-      },
-      (err) => {
-        const fallback = INITIAL_TRIP_REVIEWS.filter(
-          (r) => r.tripId === trip.id && r.approvalStatus === 'Approved'
-        );
-        setReviews(fallback);
-        setLoading(false);
-        if (err && typeof err === 'object' && 'code' in err && err.code !== 'permission-denied') {
-          setLoadError(copy.loadError);
-        }
-      }
-    );
-
-    return () => unsub();
-  }, [trip.id, copy.loadError]);
+    // Public reviews are curated locally and updated manually by the owner
+    // (INITIAL_TRIP_REVIEWS in src/data/platformData.ts), so this section
+    // makes no Firestore reads. Display, order, and layout are unchanged.
+    const matched = INITIAL_TRIP_REVIEWS.filter(
+      (r) => r.tripId === trip.id && r.approvalStatus === 'Approved'
+    ).sort((a, b) => (b.visitDate || '').localeCompare(a.visitDate || ''));
+    setReviews(matched);
+    setLoading(false);
+  }, [trip.id]);
 
   useEffect(() => {
     const bookingIds = Array.from(
