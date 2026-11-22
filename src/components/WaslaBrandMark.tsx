@@ -24,7 +24,7 @@ export const WaslaBrandMark: React.FC<WaslaBrandMarkProps> = ({
       className={`inline-flex shrink-0 items-center justify-center ${SIZE_CLASSES[size]} ${className}`}
       aria-hidden="true"
     >
-      <WaslaLogo variant="icon" iconStyle={iconStyle} className="h-full w-full" />
+      <WaslaLogo variant="avatar" iconStyle={iconStyle} className="h-full w-full" />
     </span>
   );
 };

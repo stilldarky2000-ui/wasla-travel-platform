@@ -189,7 +189,7 @@ export const PrivateMaintenanceGate: React.FC<PrivateMaintenanceGateProps> = ({ 
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md animate-fadeIn"
         >
           <div className="w-full max-w-sm rounded-2xl bg-[#19354F] border border-[#334155] p-6 shadow-2xl space-y-5 text-center">
-            <WaslaLogo variant="icon" iconStyle="orange" className="h-12 w-12 mx-auto" />
+            <WaslaLogo variant="avatar" iconStyle="orange" className="h-12 w-12 mx-auto" />
 
             <div className="space-y-1">
               <h2 className="text-lg font-bold text-white font-arabic">فتح المعاينة الخاصة بالإدارة</h2>
