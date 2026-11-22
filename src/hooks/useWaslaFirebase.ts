@@ -849,11 +849,15 @@ export function useWaslaFirebase() {
     return () => unsub();
   }, []);
 
-  // 2. Live Public Settings listener (always safe for Storefront)
+  // 2. Public Settings, fetched once per role change (always safe for
+  // Storefront). One-time read instead of a live listener, to conserve the
+  // free Firestore read quota: settings edits apply on the next page load.
   useEffect(() => {
-    const unsub = onSnapshot(
-      doc(db, 'public_settings', 'storefront'),
-      (snap) => {
+    let active = true;
+    void (async () => {
+      try {
+        const snap = await getDoc(doc(db, 'public_settings', 'storefront'));
+        if (!active) return;
         if (snap.exists()) {
           const data = snap.data() as PublicStorefrontSettings;
           setPublicSettings({
@@ -875,12 +879,13 @@ export function useWaslaFirebase() {
             heroTheme: data.heroTheme || 'red-sea',
           });
         }
-      },
-      () => {
+      } catch {
         // Fallback defaults remain active until seeded
       }
-    );
-    return () => unsub();
+    })();
+    return () => {
+      active = false;
+    };
   }, [effectiveRole]);
 
   // 3. Auto-seed Firestore once when Owner signs in on an empty database
@@ -1492,11 +1497,18 @@ export function useWaslaFirebase() {
       // One-time fetch (not a live listener): public visitors load the
       // approved catalog once per visit to conserve the free Firestore
       // read quota. The displayed catalog and layout are unchanged.
+      // The active guard stops a late public result from overwriting the
+      // staff catalog if the visitor signs in while the fetch is in flight.
+      let publicFetchActive = true;
+      unsubscribers.push(() => {
+        publicFetchActive = false;
+      });
       void (async () => {
         try {
           const snap = await getDocs(
             query(collection(db, 'trips'), where('approvalStatus', '==', 'Approved'))
           );
+          if (!publicFetchActive) return;
           if (!snap.empty) {
             setFirestoreSeeded(true);
             setTrips(mergeTripsWithStarterCatalog(snap.docs.map((d) => d.data() as Trip)));
@@ -1504,7 +1516,7 @@ export function useWaslaFirebase() {
         } catch {
           // Keep default starter catalog visible if database isn't initialized yet
         } finally {
-          setTripsLoading(false);
+          if (publicFetchActive) setTripsLoading(false);
         }
       })();
 

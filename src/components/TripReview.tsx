@@ -12,7 +12,7 @@ import {
   Trash2,
   X,
 } from 'lucide-react';
-import { doc, getDoc, serverTimestamp, setDoc } from 'firebase/firestore';
+import { doc, serverTimestamp, setDoc } from 'firebase/firestore';
 import { Lang } from '../data/i18n';
 import { Trip, tText } from '../data/marketplaceData';
 import { INITIAL_BOOKINGS, INITIAL_TRIP_REVIEWS, TripReviewRecord } from '../data/platformData';
@@ -875,39 +875,23 @@ export const TripReview: React.FC<TripReviewProps> = ({
     );
     if (bookingIds.length === 0) return;
 
-    let cancelled = false;
-    void (async () => {
-      const entries = await Promise.all(
-        bookingIds.map(async (bId) => {
-          if (bookingStatusById?.[bId]) {
-            return [bId, bookingStatusById[bId]] as const;
-          }
-          try {
-            const snap = await getDoc(doc(db, 'booking_receipts', bId));
-            if (snap.exists()) {
-              const st = snap.data()?.status;
-              if (typeof st === 'string') return [bId, st] as const;
-            }
-          } catch {
-            // Fall back to starter booking state if receipt isn't reachable yet
-          }
-          const starter = INITIAL_BOOKINGS.find((b) => b.id === bId);
-          return starter ? ([bId, starter.status] as const) : null;
-        })
-      );
-      if (cancelled) return;
-      const next: Record<string, string> = {};
-      for (const entry of entries) {
-        if (entry) next[entry[0]] = entry[1];
+    // Public reviews are curated locally, so their booking statuses are
+    // resolved locally too (prop state, then the starter catalog, then the
+    // review's own verifiedBooking flag). No Firestore reads here.
+    const entries = bookingIds.map((bId) => {
+      if (bookingStatusById?.[bId]) {
+        return [bId, bookingStatusById[bId]] as const;
       }
-      if (Object.keys(next).length > 0) {
-        setLiveReceiptStatuses((prev) => ({ ...prev, ...next }));
-      }
-    })();
-
-    return () => {
-      cancelled = true;
-    };
+      const starter = INITIAL_BOOKINGS.find((b) => b.id === bId);
+      return starter ? ([bId, starter.status] as const) : null;
+    });
+    const next: Record<string, string> = {};
+    for (const entry of entries) {
+      if (entry) next[entry[0]] = entry[1];
+    }
+    if (Object.keys(next).length > 0) {
+      setLiveReceiptStatuses((prev) => ({ ...prev, ...next }));
+    }
   }, [reviews, bookingStatusById]);
 
   const isReviewVerifiedBooking = (rev: TripReviewRecord): boolean => {
