@@ -89,7 +89,7 @@ import {
   sanitizeBookingId,
 } from './hooks/useBookingReviewVerification';
 import { useScrollReveal } from './hooks/useScrollReveal';
-import { EffectiveRole, HeroThemeStyle, useWaslaFirebase } from './hooks/useWaslaFirebase';
+import { EffectiveRole, useWaslaFirebase } from './hooks/useWaslaFirebase';
 import {
   getNotificationSupportStatus,
   requestDesktopAlertPermission,
@@ -97,52 +97,6 @@ import {
 } from './lib/alerts';
 
 type WorkspaceRole = 'storefront' | 'operations' | 'supplier' | 'owner';
-
-const HERO_THEME_CLASSES: Record<
-  HeroThemeStyle,
-  { bg: string; overlay: string; accent: string }
-> = {
-  'red-sea': {
-    bg: 'bg-[#0F2233]',
-    overlay: 'from-[#0F2233]/78 via-[#0F2233]/42 to-[#0F2233]/78',
-    accent: 'text-[#FDBA74]',
-  },
-  midnight: {
-    bg: 'bg-[#1C1008]',
-    overlay: 'from-[#120A05]/80 via-[#29170C]/55 to-[#1C1008]/85',
-    accent: 'text-[#FDBA74]',
-  },
-  'golden-dusk': {
-    bg: 'bg-[#452711]',
-    overlay: 'from-[#2A1608]/75 via-[#683C19]/45 to-[#2A1608]/80',
-    accent: 'text-[#FDE68A]',
-  },
-  minimal: {
-    bg: 'bg-[#1C1917]',
-    overlay: 'from-[#1C1917]/60 via-[#1C1917]/30 to-[#1C1917]/65',
-    accent: 'text-[#FED7AA]',
-  },
-  'deep-turquoise': {
-    bg: 'bg-[#042F2E]',
-    overlay: 'from-[#022C22]/80 via-[#0F766E]/45 to-[#042F2E]/85',
-    accent: 'text-[#5EEAD4]',
-  },
-  'coral-horizon': {
-    bg: 'bg-[#4C0519]',
-    overlay: 'from-[#3B0714]/78 via-[#9F1239]/42 to-[#7C2D12]/82',
-    accent: 'text-[#FDA4AF]',
-  },
-  'desert-amber': {
-    bg: 'bg-[#29160B]',
-    overlay: 'from-[#1C0F06]/78 via-[#78350F]/45 to-[#451A03]/84',
-    accent: 'text-[#FCD34D]',
-  },
-  'obsidian-gold': {
-    bg: 'bg-[#0F2233]',
-    overlay: 'from-[#0F2233]/88 via-[#19354F]/62 to-[#0F2233]/92',
-    accent: 'text-[#FDE047]',
-  },
-};
 
 export default function App() {
   const [isSiteUnlocked, setIsSiteUnlocked] = useState<boolean>(() => isPrivateGateUnlocked());
@@ -1103,20 +1057,12 @@ export default function App() {
     );
   };
 
-  const activeHeroTheme =
-    HERO_THEME_CLASSES[publicSettings.heroTheme || 'red-sea'] || HERO_THEME_CLASSES['red-sea'];
-  const activeHeroFontClass =
-    publicSettings.heroFontStyle === 'modern'
-      ? 'font-hero-modern'
-      : publicSettings.heroFontStyle === 'clean'
-      ? 'font-hero-clean'
-      : publicSettings.heroFontStyle === 'luxury'
-      ? 'font-hero-luxury'
-      : publicSettings.heroFontStyle === 'bold'
-      ? 'font-hero-bold'
-      : publicSettings.heroFontStyle === 'architectural'
-      ? 'font-hero-architectural'
-      : 'font-hero-editorial';
+  const heroFocalStyle = {
+    '--hfx': `${publicSettings.heroFocalXDesktop ?? 50}%`,
+    '--hfy': `${publicSettings.heroFocalYDesktop ?? 50}%`,
+    '--hfxm': `${publicSettings.heroFocalXMobile ?? 50}%`,
+    '--hfym': `${publicSettings.heroFocalYMobile ?? 50}%`,
+  } as React.CSSProperties;
   const customHeroCaption =
     lang === 'ar'
       ? publicSettings.heroCaptionAr
@@ -1717,53 +1663,60 @@ export default function App() {
 
           <main id="top" className="overflow-x-clip">
             {/* 1. HERO */}
-            <section className={`wasla-hero-glare relative overflow-hidden ${activeHeroTheme.bg} text-white`} aria-labelledby="hero-title">
-              <div
-                className="absolute inset-0 will-change-transform"
-                style={{ transform: `translate3d(0, ${heroScrollY * 0.16}px, 0) scale(1.06)` }}
-              >
-                <img
-                  src={
-                    publicSettings.heroImageUrl
-                      ? resolveBundledMediaUrl(publicSettings.heroImageUrl)
-                      : SITE_CONFIG.heroBackground
-                  }
-                  alt="Red Sea coastline in Hurghada"
-                  onError={(e) => {
-                    if (e.currentTarget.src !== SITE_CONFIG.heroBackground) {
-                      e.currentTarget.src = SITE_CONFIG.heroBackground;
+            <section className="wasla-hero-glare relative overflow-hidden bg-[#F8FAFC] lg:bg-[#0F2233]" aria-labelledby="hero-title">
+              {/* Image zone: photo + neutral scrim + eyebrow/headline only */}
+              <div className="relative overflow-hidden text-white">
+                <div
+                  className="absolute inset-0 will-change-transform"
+                  style={{ transform: `translate3d(0, ${heroScrollY * 0.16}px, 0) scale(1.06)` }}
+                >
+                  <img
+                    src={
+                      publicSettings.heroImageUrl
+                        ? resolveBundledMediaUrl(publicSettings.heroImageUrl)
+                        : SITE_CONFIG.heroBackground
                     }
-                  }}
-                  className="h-full w-full object-cover opacity-75"
-                />
+                    alt="Red Sea coastline in Hurghada"
+                    onError={(e) => {
+                      if (e.currentTarget.src !== SITE_CONFIG.heroBackground) {
+                        e.currentTarget.src = SITE_CONFIG.heroBackground;
+                      }
+                    }}
+                    className="wasla-hero-img h-full w-full object-cover"
+                    style={heroFocalStyle}
+                  />
+                </div>
+                <div className="absolute inset-0 wasla-hero-scrim" />
+
+                <div className="relative z-10 mx-auto max-w-[1200px] px-4 sm:px-6 pt-12 sm:pt-16 lg:pt-20 pb-10 lg:pb-28 space-y-8">
+                  <div className="hero-enter">
+                    <p className="text-xs font-semibold uppercase tracking-[0.12em] text-white/85">{t.heroEyebrow}</p>
+                  </div>
+
+                  <div className="max-w-[640px] space-y-4 hero-enter">
+                    <h1
+                      id="hero-title"
+                      className="font-hero-standard text-[clamp(2rem,4.4vw,3.5rem)] leading-[1.05] font-bold tracking-[-0.02em] text-white text-balance"
+                    >
+                      {customHeroCaption ? (
+                        customHeroCaption
+                      ) : (
+                        <>
+                          {t.heroTitleLine1}
+                          <br />
+                          <span className="text-[#F97316]">{t.heroTitleLine2}</span>
+                        </>
+                      )}
+                    </h1>
+                    <p className="text-[15px] sm:text-base leading-relaxed text-white/90">
+                      {customHeroSubtitle || t.heroLede}
+                    </p>
+                  </div>
+                </div>
               </div>
-              <div className={`absolute inset-0 bg-gradient-to-b ${activeHeroTheme.overlay}`} />
 
-              <div className="relative z-10 mx-auto max-w-[1200px] px-4 sm:px-6 py-12 sm:py-16 lg:py-20 space-y-8">
-                <div className="hero-enter">
-                  <p className="text-xs font-semibold tracking-wide text-[#FED7AA]">{t.heroEyebrow}</p>
-                </div>
-
-                <div className="max-w-3xl space-y-4 hero-enter">
-                  <h1
-                    id="hero-title"
-                    className={`${activeHeroFontClass} text-[clamp(2.25rem,4.4vw,3.75rem)] leading-[1.08] font-semibold tracking-tight text-white text-balance`}
-                  >
-                    {customHeroCaption ? (
-                      customHeroCaption
-                    ) : (
-                      <>
-                        {t.heroTitleLine1}
-                        <br />
-                        <em className={`font-normal italic ${activeHeroTheme.accent}`}>{t.heroTitleLine2}</em>
-                      </>
-                    )}
-                  </h1>
-                  <p className="max-w-[62ch] text-[15px] sm:text-base leading-relaxed text-[#FFF7ED]/95">
-                    {customHeroSubtitle || t.heroLede}
-                  </p>
-                </div>
-
+              {/* Form zone: below the image on mobile, overlapping it on desktop */}
+              <div className="relative z-20 mx-auto max-w-[1200px] px-4 sm:px-6 pt-4 lg:pt-0 pb-10 lg:-mt-16 space-y-8">
                 <form
                   onSubmit={handleHeroSearch}
                   role="search"
@@ -1870,7 +1823,7 @@ export default function App() {
                 </form>
 
                 {/* Unboxed Hero Trust & Payment Transparency Strip */}
-                <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs font-medium text-[#FFF7ED]/95">
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs font-medium text-[#334155] lg:text-white/90">
                   <span>
                     ✓{' '}
                     {tText(
@@ -1882,7 +1835,7 @@ export default function App() {
                       lang
                     )}
                   </span>
-                  <span aria-hidden="true" className="text-white/40">·</span>
+                  <span aria-hidden="true" className="text-[#CBD5E1] lg:text-white/40">·</span>
                   <span>
                     ✓{' '}
                     {tText(
@@ -1894,7 +1847,7 @@ export default function App() {
                       lang
                     )}
                   </span>
-                  <span aria-hidden="true" className="text-white/40">·</span>
+                  <span aria-hidden="true" className="text-[#CBD5E1] lg:text-white/40">·</span>
                   <span>
                     ✓{' '}
                     {tText(
@@ -1906,7 +1859,7 @@ export default function App() {
                       lang
                     )}
                   </span>
-                  <span aria-hidden="true" className="text-white/40">·</span>
+                  <span aria-hidden="true" className="text-[#CBD5E1] lg:text-white/40">·</span>
                   <span>
                     ✓{' '}
                     {tText(
@@ -1920,8 +1873,8 @@ export default function App() {
                   </span>
                   {currency !== 'EUR' && (
                     <>
-                      <span aria-hidden="true" className="text-white/40">·</span>
-                      <span className="text-[#FED7AA]">
+                      <span aria-hidden="true" className="text-[#CBD5E1] lg:text-white/40">·</span>
+                      <span className="text-[#B45309] lg:text-[#FED7AA]">
                         {tText(
                           {
                             en: 'EUR (€) base currency · converted amounts are approximate',
@@ -1936,8 +1889,8 @@ export default function App() {
                 </div>
 
                 {publicSettings.airTicketsEnabled && (
-                  <div className="inline-flex items-center gap-2 rounded-lg border border-white/25 bg-white/10 px-4 py-2 text-xs font-medium text-[#FFF7ED]">
-                    <Plane className="h-4 w-4 text-[#FDBA74]" aria-hidden="true" />
+                  <div className="inline-flex items-center gap-2 rounded-lg border border-[#CBD5E1] bg-white px-4 py-2 text-xs font-medium text-[#334155] lg:border-white/25 lg:bg-white/10 lg:text-[#FFF7ED]">
+                    <Plane className="h-4 w-4 text-[#EE5426] lg:text-[#FDBA74]" aria-hidden="true" />
                     <span>
                       {tText(
                         {

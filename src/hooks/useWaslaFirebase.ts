@@ -98,6 +98,10 @@ export interface PublicStorefrontSettings {
   heroSubEn?: string;
   heroSubAr?: string;
   heroSubDe?: string;
+  heroFocalXDesktop?: number;
+  heroFocalYDesktop?: number;
+  heroFocalXMobile?: number;
+  heroFocalYMobile?: number;
   heroFontStyle?: HeroFontStyle;
   heroTheme?: HeroThemeStyle;
 }
@@ -746,6 +750,10 @@ export function useWaslaFirebase() {
     heroSubEn: '',
     heroSubAr: '',
     heroSubDe: '',
+    heroFocalXDesktop: 50,
+    heroFocalYDesktop: 50,
+    heroFocalXMobile: 50,
+    heroFocalYMobile: 50,
     heroFontStyle: 'editorial',
     heroTheme: 'red-sea',
   });
@@ -875,6 +883,10 @@ export function useWaslaFirebase() {
             heroSubEn: data.heroSubEn || '',
             heroSubAr: data.heroSubAr || '',
             heroSubDe: data.heroSubDe || '',
+            heroFocalXDesktop: clampNumber(data.heroFocalXDesktop, 0, 100, 50),
+            heroFocalYDesktop: clampNumber(data.heroFocalYDesktop, 0, 100, 50),
+            heroFocalXMobile: clampNumber(data.heroFocalXMobile, 0, 100, 50),
+            heroFocalYMobile: clampNumber(data.heroFocalYMobile, 0, 100, 50),
             heroFontStyle: data.heroFontStyle || 'editorial',
             heroTheme: data.heroTheme || 'red-sea',
           });
@@ -2446,6 +2458,10 @@ export function useWaslaFirebase() {
         heroSubEn: truncateText(merged.heroSubEn, 600, ''),
         heroSubAr: truncateText(merged.heroSubAr, 600, ''),
         heroSubDe: truncateText(merged.heroSubDe, 600, ''),
+        heroFocalXDesktop: clampNumber(merged.heroFocalXDesktop, 0, 100, 50),
+        heroFocalYDesktop: clampNumber(merged.heroFocalYDesktop, 0, 100, 50),
+        heroFocalXMobile: clampNumber(merged.heroFocalXMobile, 0, 100, 50),
+        heroFocalYMobile: clampNumber(merged.heroFocalYMobile, 0, 100, 50),
         heroFontStyle: safeHeroFont,
         heroTheme: safeHeroTheme,
       };

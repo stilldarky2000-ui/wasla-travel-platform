@@ -377,6 +377,33 @@ select:not(.bg-transparent):not(.no-led):focus {
   font-family: "Plus Jakarta Sans", "IBM Plex Sans Arabic", ui-sans-serif, system-ui, sans-serif;
 }
 
+/* Locked hero design system (world-class standard): Inter type, one neutral scrim, focal-point image */
+.font-hero-standard {
+  font-family: "Inter", "IBM Plex Sans Arabic", "Cairo", ui-sans-serif, system-ui, sans-serif;
+}
+
+.wasla-hero-scrim {
+  background:
+    linear-gradient(to right, rgba(0, 0, 0, 0.55) 0%, rgba(0, 0, 0, 0.28) 45%, rgba(0, 0, 0, 0) 72%),
+    linear-gradient(to top, rgba(0, 0, 0, 0.40) 0%, rgba(0, 0, 0, 0) 48%);
+}
+
+[dir="rtl"] .wasla-hero-scrim {
+  background:
+    linear-gradient(to left, rgba(0, 0, 0, 0.55) 0%, rgba(0, 0, 0, 0.28) 45%, rgba(0, 0, 0, 0) 72%),
+    linear-gradient(to top, rgba(0, 0, 0, 0.40) 0%, rgba(0, 0, 0, 0) 48%);
+}
+
+.wasla-hero-img {
+  object-position: var(--hfx, 50%) var(--hfy, 50%);
+}
+
+@media (max-width: 767.98px) {
+  .wasla-hero-img {
+    object-position: var(--hfxm, 50%) var(--hfym, 50%);
+  }
+}
+
 /* System-Wide Dark Mode Theme ([data-wasla-theme="dark"]) for Storefront, Operations Desk, Supplier Portal, and Owner Control */
 [data-wasla-theme="dark"] {
   color-scheme: dark;

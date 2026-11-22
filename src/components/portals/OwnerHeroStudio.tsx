@@ -1,11 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Check, Image as ImageIcon, Palette, RotateCcw, Save, Sparkles, Type, Upload } from 'lucide-react';
+import { Crosshair, Image as ImageIcon, RotateCcw, Save, Upload } from 'lucide-react';
 import { SITE_CONFIG, Trip } from '../../data/marketplaceData';
-import {
-  HeroFontStyle,
-  HeroThemeStyle,
-  PublicStorefrontSettings,
-} from '../../hooks/useWaslaFirebase';
+import { PublicStorefrontSettings } from '../../hooks/useWaslaFirebase';
 
 interface OwnerHeroStudioProps {
   trips: Trip[];
@@ -13,140 +9,7 @@ interface OwnerHeroStudioProps {
   onSavePublicSettings?: (patch: Partial<PublicStorefrontSettings>) => Promise<void> | void;
 }
 
-const FONT_OPTIONS: Array<{
-  id: HeroFontStyle;
-  label: string;
-  vibe: string;
-  fontClass: string;
-}> = [
-  { id: 'editorial', label: 'Editorial (Fraunces)', vibe: 'Magazine Serif', fontClass: 'font-hero-editorial' },
-  { id: 'luxury', label: 'Royal Serif (Playfair)', vibe: 'Boutique Heritage', fontClass: 'font-hero-luxury' },
-  { id: 'modern', label: 'Modern (Jakarta + Cairo)', vibe: 'Contemporary Sans', fontClass: 'font-hero-modern' },
-  { id: 'bold', label: 'Coastal Bold (Outfit)', vibe: 'Resort Display', fontClass: 'font-hero-bold' },
-  { id: 'architectural', label: 'Executive (Manrope)', vibe: 'Balanced Crisp', fontClass: 'font-hero-architectural' },
-  { id: 'clean', label: 'Minimal (DM Sans)', vibe: 'Clean Geometric', fontClass: 'font-hero-clean' },
-];
-
-const THEME_PREVIEWS: Record<
-  HeroThemeStyle,
-  { label: string; bg: string; overlay: string; accent: string; swatch: string; accentHex: string }
-> = {
-  'red-sea': {
-    label: 'Red Sea Sunset Orange',
-    bg: 'bg-[#431407]',
-    overlay: 'from-[#2A0E05]/75 via-[#7C2D12]/42 to-[#2A0E05]/82',
-    accent: 'text-[#FDBA74]',
-    swatch: '#7C2D12',
-    accentHex: '#FDBA74',
-  },
-  midnight: {
-    label: 'Warm Amber Night',
-    bg: 'bg-[#1C1008]',
-    overlay: 'from-[#120A05]/80 via-[#29170C]/55 to-[#1C1008]/85',
-    accent: 'text-[#FDBA74]',
-    swatch: '#1C1008',
-    accentHex: '#FDBA74',
-  },
-  'golden-dusk': {
-    label: 'Golden Red Sea Dusk',
-    bg: 'bg-[#452711]',
-    overlay: 'from-[#2A1608]/75 via-[#683C19]/45 to-[#2A1608]/80',
-    accent: 'text-[#FDE68A]',
-    swatch: '#683C19',
-    accentHex: '#FDE68A',
-  },
-  minimal: {
-    label: 'Minimal Crisp Daylight',
-    bg: 'bg-[#1C1917]',
-    overlay: 'from-[#1C1917]/60 via-[#1C1917]/30 to-[#1C1917]/65',
-    accent: 'text-[#FED7AA]',
-    swatch: '#334155',
-    accentHex: '#FED7AA',
-  },
-  'deep-turquoise': {
-    label: 'Hurghada Deep Lagoon',
-    bg: 'bg-[#042F2E]',
-    overlay: 'from-[#022C22]/80 via-[#0F766E]/45 to-[#042F2E]/85',
-    accent: 'text-[#5EEAD4]',
-    swatch: '#0F766E',
-    accentHex: '#5EEAD4',
-  },
-  'coral-horizon': {
-    label: 'Coral Reef Horizon',
-    bg: 'bg-[#4C0519]',
-    overlay: 'from-[#3B0714]/78 via-[#9F1239]/42 to-[#7C2D12]/82',
-    accent: 'text-[#FDA4AF]',
-    swatch: '#9F1239',
-    accentHex: '#FDA4AF',
-  },
-  'desert-amber': {
-    label: 'Sahara Desert Bronze',
-    bg: 'bg-[#29160B]',
-    overlay: 'from-[#1C0F06]/78 via-[#78350F]/45 to-[#451A03]/84',
-    accent: 'text-[#FCD34D]',
-    swatch: '#78350F',
-    accentHex: '#FCD34D',
-  },
-  'obsidian-gold': {
-    label: 'Obsidian & Gold Luxury',
-    bg: 'bg-[#0F2233]',
-    overlay: 'from-[#0F2233]/86 via-[#19354F]/58 to-[#0F2233]/90',
-    accent: 'text-[#FDE047]',
-    swatch: '#0F2233',
-    accentHex: '#FDE047',
-  },
-};
-
-const HERO_STYLE_PROFILES: Array<{
-  id: string;
-  name: string;
-  desc: string;
-  font: HeroFontStyle;
-  theme: HeroThemeStyle;
-}> = [
-  {
-    id: 'wasla-classic',
-    name: 'Wasla Red Sea Classic',
-    desc: 'Warm sunset gradient + editorial serif',
-    font: 'editorial',
-    theme: 'red-sea',
-  },
-  {
-    id: 'el-gouna-lagoon',
-    name: 'El Gouna Lagoon',
-    desc: 'Turquoise Red Sea veil + bold display',
-    font: 'bold',
-    theme: 'deep-turquoise',
-  },
-  {
-    id: 'luxor-royal',
-    name: 'Luxor Royal Heritage',
-    desc: 'Obsidian & gold + classic luxury serif',
-    font: 'luxury',
-    theme: 'obsidian-gold',
-  },
-  {
-    id: 'sahara-safari',
-    name: 'Sahara Safari Dusk',
-    desc: 'Desert bronze + modern bilingual sans',
-    font: 'modern',
-    theme: 'desert-amber',
-  },
-  {
-    id: 'coral-sunset',
-    name: 'Coral Reef Sunset',
-    desc: 'Coral horizon tint + executive sans',
-    font: 'architectural',
-    theme: 'coral-horizon',
-  },
-  {
-    id: 'swiss-minimal',
-    name: 'Crystal Daylight',
-    desc: 'Clean light veil + geometric sans',
-    font: 'clean',
-    theme: 'minimal',
-  },
-];
+type FocalPickerMode = 'desktop' | 'mobile';
 
 export const OwnerHeroStudio: React.FC<OwnerHeroStudioProps> = ({
   trips,
@@ -160,12 +23,11 @@ export const OwnerHeroStudio: React.FC<OwnerHeroStudioProps> = ({
   const [heroSubEn, setHeroSubEn] = useState(publicSettings?.heroSubEn || '');
   const [heroSubAr, setHeroSubAr] = useState(publicSettings?.heroSubAr || '');
   const [heroSubDe, setHeroSubDe] = useState(publicSettings?.heroSubDe || '');
-  const [heroFontStyle, setHeroFontStyle] = useState<HeroFontStyle>(
-    publicSettings?.heroFontStyle || 'editorial'
-  );
-  const [heroTheme, setHeroTheme] = useState<HeroThemeStyle>(
-    publicSettings?.heroTheme || 'red-sea'
-  );
+  const [fxD, setFxD] = useState(publicSettings?.heroFocalXDesktop ?? 50);
+  const [fyD, setFyD] = useState(publicSettings?.heroFocalYDesktop ?? 50);
+  const [fxM, setFxM] = useState(publicSettings?.heroFocalXMobile ?? 50);
+  const [fyM, setFyM] = useState(publicSettings?.heroFocalYMobile ?? 50);
+  const [pickerMode, setPickerMode] = useState<FocalPickerMode>('desktop');
   const [saving, setSaving] = useState(false);
   const [savedBanner, setSavedBanner] = useState('');
   const [uploadNote, setUploadNote] = useState('');
@@ -180,8 +42,10 @@ export const OwnerHeroStudio: React.FC<OwnerHeroStudioProps> = ({
     setHeroSubEn(publicSettings.heroSubEn || '');
     setHeroSubAr(publicSettings.heroSubAr || '');
     setHeroSubDe(publicSettings.heroSubDe || '');
-    setHeroFontStyle(publicSettings.heroFontStyle || 'editorial');
-    setHeroTheme(publicSettings.heroTheme || 'red-sea');
+    setFxD(publicSettings.heroFocalXDesktop ?? 50);
+    setFyD(publicSettings.heroFocalYDesktop ?? 50);
+    setFxM(publicSettings.heroFocalXMobile ?? 50);
+    setFyM(publicSettings.heroFocalYMobile ?? 50);
   }, [publicSettings]);
 
   const galleryPresets = useMemo(() => {
@@ -246,41 +110,70 @@ export const OwnerHeroStudio: React.FC<OwnerHeroStudioProps> = ({
         heroSubEn: heroSubEn.trim(),
         heroSubAr: heroSubAr.trim(),
         heroSubDe: heroSubDe.trim(),
-        heroFontStyle,
-        heroTheme,
+        heroFocalXDesktop: fxD,
+        heroFocalYDesktop: fyD,
+        heroFocalXMobile: fxM,
+        heroFocalYMobile: fyM,
       });
-      setSavedBanner('Hero panorama, caption, font & theme published live to customer storefront!');
+      setSavedBanner('Hero photo, focal point & captions published live to customer storefront!');
     } finally {
       setSaving(false);
     }
   };
 
-  const activeThemeCfg = THEME_PREVIEWS[heroTheme] || THEME_PREVIEWS['red-sea'];
-  const fontClass =
-    FONT_OPTIONS.find((opt) => opt.id === heroFontStyle)?.fontClass || 'font-hero-editorial';
+  const activeFx = pickerMode === 'desktop' ? fxD : fxM;
+  const activeFy = pickerMode === 'desktop' ? fyD : fyM;
+
+  const setActiveFx = (value: number) => {
+    if (pickerMode === 'desktop') setFxD(value);
+    else setFxM(value);
+  };
+  const setActiveFy = (value: number) => {
+    if (pickerMode === 'desktop') setFyD(value);
+    else setFyM(value);
+  };
+
+  const handlePreviewClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    if (rect.width === 0 || rect.height === 0) return;
+    const x = Math.min(100, Math.max(0, Math.round(((e.clientX - rect.left) / rect.width) * 100)));
+    const y = Math.min(100, Math.max(0, Math.round(((e.clientY - rect.top) / rect.height) * 100)));
+    setActiveFx(x);
+    setActiveFy(y);
+  };
 
   return (
     <form onSubmit={handleSave} className="space-y-6">
-      {/* Live Visual Mini-Preview */}
-      <div className={`wasla-hero-glare relative overflow-hidden rounded-2xl ${activeThemeCfg.bg} text-white border border-[#E2E8F0]`}>
+      {/* Live Visual Mini-Preview — locked design; click to place the focal point */}
+      <div
+        className="relative overflow-hidden rounded-2xl bg-[#0F2233] text-white border border-[#E2E8F0] cursor-crosshair"
+        onClick={handlePreviewClick}
+        title="Click to set the focal point"
+      >
         <img
           src={heroImageUrl.trim() || SITE_CONFIG.heroBackground}
           alt="Hero Panorama Preview"
-          className="absolute inset-0 h-full w-full object-cover opacity-75"
+          className="absolute inset-0 h-full w-full object-cover"
+          style={{ objectPosition: `${activeFx}% ${activeFy}%` }}
         />
-        <div className={`absolute inset-0 bg-gradient-to-b ${activeThemeCfg.overlay}`} />
+        <div className="absolute inset-0 wasla-hero-scrim" />
+        <div
+          className="pointer-events-none absolute z-20 h-5 w-5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white bg-[#F97316]/70 shadow"
+          style={{ left: `${activeFx}%`, top: `${activeFy}%` }}
+          aria-hidden="true"
+        />
         <div className="relative z-10 p-6 sm:p-8 space-y-3">
           <div className="text-[11px] font-semibold uppercase tracking-wide text-white/80">
-            Live Customer Storefront Preview ({heroFontStyle} · {activeThemeCfg.label})
+            Live Customer Storefront Preview
           </div>
-          <h2 className={`${fontClass} text-2xl sm:text-3xl font-semibold text-white`}>
+          <h2 className="font-hero-standard text-2xl sm:text-3xl font-bold text-white">
             {heroCaptionEn.trim() || (
               <>
-                Small-group days, <em className={`font-normal italic ${activeThemeCfg.accent}`}>booked without the guesswork.</em>
+                Small-group days, <span className="text-[#F97316]">booked without the guesswork.</span>
               </>
             )}
           </h2>
-          <p className="max-w-2xl text-xs sm:text-sm text-[#FAF4ED]/90">
+          <p className="max-w-2xl text-xs sm:text-sm text-white/90">
             {heroSubEn.trim() ||
               'Wasla Travel connects you directly with vetted local tourism providers across the Red Sea and Nile.'}
           </p>
@@ -359,133 +252,74 @@ export const OwnerHeroStudio: React.FC<OwnerHeroStudioProps> = ({
           </div>
         </div>
 
-        {/* Right: Profiles, Font + Overlay Theme */}
+        {/* Right: Photo Focal Point Picker */}
         <div className="lg:col-span-6 card-wasla rounded-xl p-5 space-y-5">
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <div className="flex items-center gap-2 text-sm font-semibold text-[#0F2233]">
-              <Type className="h-4 w-4 text-[#EE5426]" aria-hidden="true" />
-              <span>2. Hero Typography &amp; Background Overlay</span>
-            </div>
-            <span className="text-[11px] font-medium text-[#64748B]">
-              Pick a quick profile or customize font &amp; color below
-            </span>
+          <div className="flex items-center gap-2 text-sm font-semibold text-[#0F2233]">
+            <Crosshair className="h-4 w-4 text-[#EE5426]" aria-hidden="true" />
+            <span>2. Photo Focal Point (what stays visible)</span>
           </div>
 
-          {/* Ready-made 1-Click Style Profiles */}
-          <div className="space-y-2">
-            <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#0F2233]">
-              <Sparkles className="h-3.5 w-3.5 text-[#EE5426]" aria-hidden="true" />
-              <span>Ready Style Profiles (1-Click Font + Theme)</span>
-            </span>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-              {HERO_STYLE_PROFILES.map((profile) => {
-                const isProfileActive =
-                  heroFontStyle === profile.font && heroTheme === profile.theme;
-                const themeCfg = THEME_PREVIEWS[profile.theme];
-                return (
-                  <button
-                    key={profile.id}
-                    type="button"
-                    onClick={() => {
-                      setHeroFontStyle(profile.font);
-                      setHeroTheme(profile.theme);
-                    }}
-                    className={`flex items-start justify-between gap-2 rounded-lg border px-3 py-2 text-start transition-all cursor-pointer ${
-                      isProfileActive
-                        ? 'border-[#EE5426] bg-[#FFF7ED] ring-1 ring-[#EE5426]/30'
-                        : 'border-[#E2E8F0] bg-white hover:border-[#FDBA74]'
-                    }`}
-                  >
-                    <div className="min-w-0 space-y-0.5">
-                      <div className="flex items-center gap-1.5">
-                        <span
-                          className="h-3 w-3 rounded-full shrink-0 border border-white/40 shadow-xs"
-                          style={{
-                            background: `linear-gradient(135deg, ${themeCfg.swatch} 55%, ${themeCfg.accentHex} 100%)`,
-                          }}
-                        />
-                        <span
-                          className={`text-xs font-semibold truncate ${
-                            isProfileActive ? 'text-[#EE5426]' : 'text-[#0F2233]'
-                          }`}
-                        >
-                          {profile.name}
-                        </span>
-                      </div>
-                      <p className="text-[10.5px] text-[#64748B] truncate">{profile.desc}</p>
-                    </div>
-                    {isProfileActive && (
-                      <Check className="h-3.5 w-3.5 shrink-0 text-[#EE5426] mt-0.5" aria-hidden="true" />
-                    )}
-                  </button>
-                );
-              })}
-            </div>
+          {/* Desktop / Mobile mode toggle */}
+          <div className="flex gap-2">
+            {(
+              [
+                { id: 'desktop', label: 'Desktop' },
+                { id: 'mobile', label: 'Mobile' },
+              ] as Array<{ id: FocalPickerMode; label: string }>
+            ).map((mode) => (
+              <button
+                key={mode.id}
+                type="button"
+                onClick={() => setPickerMode(mode.id)}
+                className={`rounded-lg border px-4 py-2 text-xs font-semibold transition-colors cursor-pointer ${
+                  pickerMode === mode.id
+                    ? 'border-[#EE5426] bg-[#FFF7ED] text-[#EE5426]'
+                    : 'border-[#E2E8F0] bg-white text-[#475569] hover:border-[#CBD5E1]'
+                }`}
+              >
+                {mode.label}
+              </button>
+            ))}
           </div>
 
-          {/* 6 Headline Font Families */}
-          <div className="space-y-2">
-            <span className="block text-xs font-semibold text-[#0F2233]">
-              Headline Font Family ({FONT_OPTIONS.length} styles)
-            </span>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-              {FONT_OPTIONS.map((opt) => (
-                <button
-                  key={opt.id}
-                  type="button"
-                  onClick={() => setHeroFontStyle(opt.id)}
-                  className={`rounded-lg border px-3 py-2 text-start transition-colors cursor-pointer ${
-                    heroFontStyle === opt.id
-                      ? 'border-[#EE5426] bg-[#FFF7ED] text-[#EE5426]'
-                      : 'border-[#E2E8F0] bg-white text-[#475569] hover:border-[#CBD5E1]'
-                  }`}
-                >
-                  <div className={`${opt.fontClass} text-xs font-semibold truncate`}>
-                    {opt.label}
-                  </div>
-                  <div className="text-[10.5px] opacity-75 truncate">{opt.vibe}</div>
-                </button>
-              ))}
-            </div>
+          {/* Horizontal / Vertical sliders for the active mode */}
+          <div className="space-y-4">
+            <label className="block space-y-1.5">
+              <span className="flex items-center justify-between text-xs font-semibold text-[#0F2233]">
+                <span>Horizontal (X)</span>
+                <span className="tabular-nums text-[#64748B]">{activeFx}%</span>
+              </span>
+              <input
+                type="range"
+                min={0}
+                max={100}
+                step={1}
+                value={activeFx}
+                onChange={(e) => setActiveFx(Number(e.target.value))}
+                className="w-full accent-[#EE5426] cursor-pointer"
+              />
+            </label>
+            <label className="block space-y-1.5">
+              <span className="flex items-center justify-between text-xs font-semibold text-[#0F2233]">
+                <span>Vertical (Y)</span>
+                <span className="tabular-nums text-[#64748B]">{activeFy}%</span>
+              </span>
+              <input
+                type="range"
+                min={0}
+                max={100}
+                step={1}
+                value={activeFy}
+                onChange={(e) => setActiveFy(Number(e.target.value))}
+                className="w-full accent-[#EE5426] cursor-pointer"
+              />
+            </label>
           </div>
 
-          {/* 8 Backdrop Color & Overlay Tints */}
-          <div className="space-y-2">
-            <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#0F2233]">
-              <Palette className="h-3.5 w-3.5 text-[#EE5426]" aria-hidden="true" />
-              <span>Backdrop Color &amp; Overlay Tint ({Object.keys(THEME_PREVIEWS).length} themes)</span>
-            </span>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              {(Object.keys(THEME_PREVIEWS) as HeroThemeStyle[]).map((key) => {
-                const cfg = THEME_PREVIEWS[key];
-                return (
-                  <button
-                    key={key}
-                    type="button"
-                    onClick={() => setHeroTheme(key)}
-                    className={`flex items-center justify-between gap-2 rounded-lg border px-3 py-2 text-xs font-semibold transition-colors cursor-pointer ${
-                      heroTheme === key
-                        ? 'border-[#EE5426] bg-[#FFF7ED] text-[#EE5426]'
-                        : 'border-[#E2E8F0] bg-white text-[#475569] hover:border-[#CBD5E1]'
-                    }`}
-                  >
-                    <span className="flex items-center gap-2 min-w-0">
-                      <span
-                        className="h-4 w-4 shrink-0 rounded-full border border-black/10"
-                        style={{
-                          background: `linear-gradient(135deg, ${cfg.swatch} 55%, ${cfg.accentHex} 100%)`,
-                        }}
-                      />
-                      <span className="truncate">{cfg.label}</span>
-                    </span>
-                    {heroTheme === key && (
-                      <Check className="h-3.5 w-3.5 shrink-0 text-[#EE5426]" aria-hidden="true" />
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
+          <p className="text-xs leading-relaxed text-[#64748B]">
+            Click the preview photo above to place the focal point. Desktop and mobile crop
+            differently — set each one.
+          </p>
         </div>
       </div>
 
