@@ -2351,7 +2351,7 @@ export default function App() {
           </main>
 
           {/* 10B. DEEP RED SEA NAVY FOOTER */}
-          <footer className="wasla-footer-glare border-t border-white/10 text-white pb-20 md:pb-0">
+          <footer className="wasla-footer-glare border-t border-white/10 text-white">
             <div className="relative z-10 mx-auto max-w-[1200px] px-4 sm:px-6 pt-12 pb-8">
               <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
                 {/* Brand & Direct Contact */}
@@ -2521,42 +2521,6 @@ export default function App() {
               </div>
             </div>
           </footer>
-
-          {/* Mobile Sticky Bottom Action Bar (Single Compact Bar <= 15% viewport height) */}
-          <div
-            className={`md:hidden fixed inset-x-0 bottom-0 z-40 border-t backdrop-blur-sm px-3 py-2 flex items-center gap-2 shadow-lg transition-colors ${
-              darkMode
-                ? 'border-[#334155] bg-[#0F2233]/95'
-                : 'border-[#C8C2B8]/50 bg-white/95'
-            }`}
-          >
-            <button
-              type="button"
-              onClick={() => smoothScrollTo('all-trips')}
-              className="btn-wasla-primary flex-1 min-h-[40px] rounded-lg px-3 py-2 text-xs font-bold cursor-pointer"
-            >
-              {t.mobileBarExplore}
-            </button>
-            {favoriteTrips.length > 0 && (
-              <button
-                type="button"
-                onClick={() => setFavoritesModalOpen(true)}
-                aria-label={tText({ en: 'Saved Favorites', ar: 'المفضلة', de: 'Favoriten' }, lang)}
-                className="inline-flex min-h-[40px] items-center justify-center gap-1 rounded-lg border border-[#E11D48] bg-[#E11D48] px-3 text-xs font-bold text-white cursor-pointer tabular-nums shrink-0"
-              >
-                <Heart className="h-3.5 w-3.5 fill-white text-white" />
-                <span>{favoriteTrips.length}</span>
-              </button>
-            )}
-            <button
-              type="button"
-              onClick={() => setWhatsappOpen(true)}
-              className="wasla-wa-glare flex-1 inline-flex min-h-[40px] items-center justify-center gap-1.5 rounded-lg px-3.5 text-xs font-semibold text-white active:scale-[0.98] cursor-pointer"
-            >
-              <MessageCircle className="h-4 w-4" aria-hidden="true" />
-              <span>{t.mobileBarWhatsapp}</span>
-            </button>
-          </div>
 
           {/* Desktop Floating WhatsApp FAB */}
           <button

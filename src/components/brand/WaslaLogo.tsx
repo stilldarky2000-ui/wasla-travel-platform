@@ -153,12 +153,13 @@ export const WaslaLogo: React.FC<WaslaLogoProps> = ({
               Wasla
             </text>
             <text
-              x="146"
+              x="144"
               y="96"
               fontFamily="'Plus Jakarta Sans', 'Inter', sans-serif"
               fontSize="16"
               fontWeight="700"
-              letterSpacing="8.5"
+              textLength="127.05"
+              lengthAdjust="spacing"
               fill="#EE5426"
             >
               TRAVEL
@@ -184,8 +185,10 @@ export const WaslaLogo: React.FC<WaslaLogoProps> = ({
               textAnchor="middle"
               direction="rtl"
               fontFamily="'Cairo', sans-serif"
-              fontSize="24"
+              fontSize="33"
               fontWeight="700"
+              textLength="100.8"
+              lengthAdjust="spacingAndGlyphs"
               fill="#EE5426"
             >
               ترافيل
@@ -231,12 +234,13 @@ export const WaslaLogo: React.FC<WaslaLogoProps> = ({
         Wasla
       </text>
       <text
-        x="150"
+        x="148"
         y="96"
         fontFamily="'Plus Jakarta Sans', 'Inter', sans-serif"
         fontSize="16"
         fontWeight="700"
-        letterSpacing="8.5"
+        textLength="127.05"
+        lengthAdjust="spacing"
         fill="#EE5426"
       >
         TRAVEL
@@ -268,8 +272,10 @@ export const WaslaLogo: React.FC<WaslaLogoProps> = ({
         textAnchor="middle"
         direction="rtl"
         fontFamily="'Cairo', sans-serif"
-        fontSize="24"
+        fontSize="33"
         fontWeight="700"
+        textLength="100.8"
+        lengthAdjust="spacingAndGlyphs"
         fill="#EE5426"
       >
         ترافيل
