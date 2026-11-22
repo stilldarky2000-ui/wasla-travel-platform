@@ -63,6 +63,10 @@
         "heroSubEn": { "type": "string", "maxLength": 600 },
         "heroSubAr": { "type": "string", "maxLength": 600 },
         "heroSubDe": { "type": "string", "maxLength": 600 },
+        "heroFocalXDesktop": { "type": "number" },
+        "heroFocalYDesktop": { "type": "number" },
+        "heroFocalXMobile": { "type": "number" },
+        "heroFocalYMobile": { "type": "number" },
         "heroFontStyle": { "type": "string", "enum": ["editorial", "modern", "clean", "luxury", "bold", "architectural"] },
         "heroTheme": { "type": "string", "enum": ["red-sea", "midnight", "golden-dusk", "minimal", "deep-turquoise", "coral-horizon", "desert-amber", "obsidian-gold"] },
         "updatedAt": { "type": "string", "format": "date-time" }

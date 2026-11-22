@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Check, Copy } from 'lucide-react';
+import { Check, Copy, Mail, MessageCircle } from 'lucide-react';
 import { Lang } from '../data/i18n';
 import { tText } from '../data/marketplaceData';
 import { normalizeWhatsAppDigits } from '../lib/whatsapp';
@@ -12,29 +12,6 @@ interface ContactSupportSectionProps {
 }
 
 type TopicId = 'trip' | 'pickup' | 'group' | 'booking';
-
-/**
- * WhatsApp glyph (speech bubble + handset), drawn in the brand's two-tone
- * style: `bubble` is the bubble fill, `phone` the handset fill.
- */
-const WhatsAppGlyph: React.FC<{ bubble: string; phone: string; className?: string }> = ({
-  bubble,
-  phone,
-  className,
-}) => (
-  <svg viewBox="0 0 24 24" className={className} aria-hidden="true" fill="none">
-    <path
-      d="M12 2C6.48 2 2 6.48 2 12c0 1.89.53 3.65 1.44 5.16L2 22l4.99-1.4A9.96 9.96 0 0 0 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2z"
-      fill={bubble}
-    />
-    <g transform="translate(4.6 4.6) scale(0.62)">
-      <path
-        d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"
-        fill={phone}
-      />
-    </g>
-  </svg>
-);
 
 export const ContactSupportSection: React.FC<ContactSupportSectionProps> = ({
   lang,
@@ -125,13 +102,26 @@ export const ContactSupportSection: React.FC<ContactSupportSectionProps> = ({
       aria-labelledby="contact-desk-heading"
     >
       <div className="card-wasla p-0 overflow-hidden">
-        <div className="bg-[#FAF4ED]/80 dark:bg-[#0F2233]/60 p-6 sm:p-8">
-          <div className="max-w-2xl space-y-5">
-            {/* Heading — one line of job: start a conversation */}
-            <div className="space-y-2.5">
+        <div className="grid grid-cols-1 lg:grid-cols-12 items-stretch">
+          {/* Narrative & Direct Email Column */}
+          <div className="lg:col-span-6 bg-[#FAF4ED]/80 dark:bg-[#0F2233]/60 border-b lg:border-b-0 lg:border-e border-[#C8C2B8]/50 dark:border-[#334155] p-6 sm:p-8 flex flex-col justify-between gap-6">
+            <div className="space-y-2">
+              <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#EE5426]">
+                <MessageCircle className="h-3.5 w-3.5" aria-hidden="true" />
+                <span>
+                  {tText(
+                    {
+                      en: 'Direct Local Support',
+                      ar: 'تواصل مباشر مع فريقنا في الغردقة',
+                      de: 'Direkter persönlicher Kontakt',
+                    },
+                    lang
+                  )}
+                </span>
+              </div>
               <h2
                 id="contact-desk-heading"
-                className="font-display text-2xl sm:text-[26px] font-semibold tracking-[-0.02em] text-[#0F2233] leading-tight"
+                className="font-display text-2xl sm:text-[28px] font-semibold tracking-[-0.02em] leading-tight text-[#0F2233]"
               >
                 {tText(
                   {
@@ -142,7 +132,7 @@ export const ContactSupportSection: React.FC<ContactSupportSectionProps> = ({
                   lang
                 )}
               </h2>
-              <p className="text-sm leading-relaxed text-[#52525B]">
+              <p className="text-sm leading-relaxed text-[#64748B]">
                 {tText(
                   {
                     en: 'Ask about child ages, sea conditions, hotel pickup zones, or group pricing. You message the owner directly — the person who runs your trip. No call centre, no bots.',
@@ -154,20 +144,68 @@ export const ContactSupportSection: React.FC<ContactSupportSectionProps> = ({
               </p>
             </div>
 
-            {/* The one card: WhatsApp with topic chips */}
-            <div className="rounded-2xl border border-[#E7DFD2] bg-white p-5 space-y-4">
-              <div className="flex items-center gap-2.5">
-                <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-[#E4F6EA]">
-                  <WhatsAppGlyph bubble="#1FA855" phone="#FFFFFF" className="h-6 w-6" />
+            <div className="space-y-3 border-t border-[#C8C2B8]/50 dark:border-[#334155] pt-4">
+              <div className="flex items-center justify-between gap-3 flex-wrap">
+                <div className="inline-flex items-center gap-2 min-w-0">
+                  <Mail className="h-4 w-4 text-[#EE5426] shrink-0" aria-hidden="true" />
+                  <span className="text-sm text-[#64748B]">
+                    {tText({ en: 'Email us:', ar: 'راسلنا بالإيميل:', de: 'E-Mail:' }, lang)}
+                  </span>
+                  <a
+                    href={`mailto:${contactEmail}`}
+                    className="text-sm font-semibold text-[#EE5426] hover:underline underline-offset-4 truncate"
+                  >
+                    {contactEmail}
+                  </a>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => void handleCopyEmail()}
+                  aria-label="Copy email address"
+                  className="inline-flex min-h-[34px] items-center gap-1.5 rounded-lg border border-[#C8C2B8]/60 bg-white px-2.5 py-1 text-xs font-semibold text-[#475569] hover:border-[#EE5426] hover:text-[#EE5426] transition-colors cursor-pointer shrink-0"
+                >
+                  {copied ? (
+                    <>
+                      <Check className="h-3.5 w-3.5 text-[#15803D]" aria-hidden="true" />
+                      <span>{tText({ en: 'Copied', ar: 'نُسخ', de: 'Kopiert' }, lang)}</span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="h-3.5 w-3.5" aria-hidden="true" />
+                      <span>{tText({ en: 'Copy', ar: 'نسخ', de: 'Kopieren' }, lang)}</span>
+                    </>
+                  )}
+                </button>
+              </div>
+
+              <p className="text-xs leading-relaxed text-[#64748B]">
+                {tText(
+                  {
+                    en: 'On hand throughout the day, every day — including follow-up while Cairo and Luxor trips are on the road · The owner replies personally as soon as your message arrives.',
+                    ar: 'متابعة مباشرة طوال اليوم، كل يوم — بما فيها متابعة رحلات القاهرة والأقصر أثناء تنفيذها · صاحب العمل يرد عليك بنفسه فور وصول رسالتك.',
+                    de: 'Den ganzen Tag über für Sie da, jeden Tag — inklusive Begleitung während der Kairo- und Luxor-Ausflüge unterwegs · Der Inhaber antwortet persönlich, sobald Ihre Nachricht eintrifft.',
+                  },
+                  lang
+                )}
+              </p>
+            </div>
+          </div>
+
+          {/* WhatsApp Direct Topic Selector & CTA Column */}
+          <div className="lg:col-span-6 p-6 sm:p-8 flex flex-col justify-between gap-5">
+            <div className="space-y-4">
+              <div className="flex items-center gap-3">
+                <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#DCFCE7] text-[#15803D]">
+                  <MessageCircle className="h-5 w-5" aria-hidden="true" />
                 </span>
-                <div className="min-w-0">
-                  <div className="text-[15px] font-semibold text-[#0F2233]">
+                <div className="min-w-0 space-y-0.5">
+                  <h3 className="text-sm sm:text-[15px] font-semibold text-[#0F2233] leading-snug">
                     {tText(
                       { en: 'Message us on WhatsApp', ar: 'راسلنا على واتساب', de: 'Schreiben Sie uns auf WhatsApp' },
                       lang
                     )}
-                  </div>
-                  <div className="text-xs text-[#64748B]">
+                  </h3>
+                  <p className="text-xs leading-relaxed text-[#64748B]">
                     {tText(
                       {
                         en: 'Pick a topic and your message is written for you.',
@@ -176,14 +214,14 @@ export const ContactSupportSection: React.FC<ContactSupportSectionProps> = ({
                       },
                       lang
                     )}
-                  </div>
+                  </p>
                 </div>
               </div>
 
-              <div>
-                <div className="text-[11px] font-medium text-[#94A3B8] mb-2">
+              <div className="space-y-2">
+                <p className="text-xs font-semibold text-[#64748B]">
                   {tText({ en: "What's it about?", ar: 'الموضوع عن إيه؟', de: 'Worum geht es?' }, lang)}
-                </div>
+                </p>
                 <div className="flex flex-wrap gap-2">
                   {topics.map((topic) => {
                     const active = selectedTopic === topic.id;
@@ -193,10 +231,10 @@ export const ContactSupportSection: React.FC<ContactSupportSectionProps> = ({
                         type="button"
                         aria-pressed={active}
                         onClick={() => setSelectedTopic((prev) => (prev === topic.id ? null : topic.id))}
-                        className={`min-h-[38px] rounded-full px-3.5 py-2 text-[13px] font-medium border transition-colors cursor-pointer ${
+                        className={`min-h-[38px] rounded-lg px-3.5 py-2 text-xs font-semibold border transition-colors cursor-pointer ${
                           active
-                            ? 'border-[#1FA855] bg-[#E4F6EA] text-[#0F2233]'
-                            : 'border-[#D8D2C4] bg-white text-[#0F2233] hover:border-[#1FA855]'
+                            ? 'border-[#15803D] bg-[#DCFCE7] text-[#15803D]'
+                            : 'border-[#C8C2B8]/60 bg-[#FAF4ED]/60 text-[#0F2233] hover:border-[#15803D] hover:text-[#15803D]'
                         }`}
                       >
                         {topic.label}
@@ -205,65 +243,22 @@ export const ContactSupportSection: React.FC<ContactSupportSectionProps> = ({
                   })}
                 </div>
               </div>
-
-              <a
-                href={whatsappUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="wasla-wa-glare w-full min-h-[52px] inline-flex items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold text-white"
-              >
-                <WhatsAppGlyph bubble="#FFFFFF" phone="#1FA855" className="h-5 w-5" />
-                <span>
-                  {tText(
-                    { en: 'Start WhatsApp Chat', ar: 'ابدأ محادثة واتساب الآن', de: 'WhatsApp-Chat starten' },
-                    lang
-                  )}
-                </span>
-              </a>
             </div>
 
-            {/* Email — a quiet row, not a card */}
-            <div className="flex items-center gap-2 flex-wrap border-t border-[#C8C2B8]/50 dark:border-[#334155] pt-4">
-              <span className="text-[13px] text-[#64748B]">
-                {tText({ en: 'Email us:', ar: 'راسلنا بالإيميل:', de: 'E-Mail:' }, lang)}
-              </span>
-              <a
-                href={`mailto:${contactEmail}`}
-                className="text-[13px] font-semibold text-[#EE5426] hover:underline underline-offset-4"
-              >
-                {contactEmail}
-              </a>
-              <button
-                type="button"
-                onClick={() => void handleCopyEmail()}
-                aria-label="Copy email address"
-                className="ms-auto inline-flex h-8 items-center gap-1 rounded-lg border border-[#E2E8F0] bg-white px-2 text-[11px] font-semibold text-[#475569] hover:border-[#EE5426] hover:text-[#EE5426] cursor-pointer shrink-0"
-              >
-                {copied ? (
-                  <>
-                    <Check className="h-3 w-3 text-[#15803D]" aria-hidden="true" />
-                    <span>{tText({ en: 'Copied', ar: 'نُسخ', de: 'Kopiert' }, lang)}</span>
-                  </>
-                ) : (
-                  <>
-                    <Copy className="h-3 w-3" aria-hidden="true" />
-                    <span>{tText({ en: 'Copy', ar: 'نسخ', de: 'Kopieren' }, lang)}</span>
-                  </>
+            <a
+              href={whatsappUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="wasla-wa-glare w-full min-h-[44px] inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white"
+            >
+              <MessageCircle className="h-4 w-4" aria-hidden="true" />
+              <span>
+                {tText(
+                  { en: 'Start WhatsApp Chat', ar: 'ابدأ محادثة واتساب الآن', de: 'WhatsApp-Chat starten' },
+                  lang
                 )}
-              </button>
-            </div>
-
-            {/* One honest trust line */}
-            <p className="text-xs leading-relaxed text-[#94A3B8]">
-              {tText(
-                {
-                  en: 'Open daily 08:00–23:00 (Egypt time) · Replies in English, German & Arabic · Owner-run in Hurghada',
-                  ar: 'متاحين يوميًا 08:00–23:00 بتوقيت مصر · الرد بالإنجليزية والألمانية والعربية · يديره المالك بنفسه في الغردقة',
-                  de: 'Täglich 08:00–23:00 Uhr (Ägypten-Zeit) · Antworten auf Deutsch, Englisch & Arabisch · Inhabergeführt in Hurghada',
-                },
-                lang
-              )}
-            </p>
+              </span>
+            </a>
           </div>
         </div>
       </div>

@@ -101,7 +101,9 @@ service cloud.firestore {
         && data.keys().hasOnly([
           'whatsappNumber', 'whatsappDisplay', 'email', 'domain', 'airTicketsEnabled', 'metaPixelId', 'ga4Id',
           'heroImageUrl', 'heroCaptionEn', 'heroCaptionAr', 'heroCaptionDe',
-          'heroSubEn', 'heroSubAr', 'heroSubDe', 'heroFontStyle', 'heroTheme',
+          'heroSubEn', 'heroSubAr', 'heroSubDe',
+          'heroFocalXDesktop', 'heroFocalYDesktop', 'heroFocalXMobile', 'heroFocalYMobile',
+          'heroFontStyle', 'heroTheme',
           'updatedAt'
         ])
         && data.whatsappNumber is string && data.whatsappNumber.size() >= 6 && data.whatsappNumber.size() <= 24
@@ -118,6 +120,26 @@ service cloud.firestore {
         && (!('heroSubEn' in data) || (data.heroSubEn is string && data.heroSubEn.size() <= 600))
         && (!('heroSubAr' in data) || (data.heroSubAr is string && data.heroSubAr.size() <= 600))
         && (!('heroSubDe' in data) || (data.heroSubDe is string && data.heroSubDe.size() <= 600))
+        && (
+          !('heroFocalXDesktop' in data)
+          || (data.heroFocalXDesktop is int && data.heroFocalXDesktop >= 0 && data.heroFocalXDesktop <= 100)
+          || (data.heroFocalXDesktop is float && data.heroFocalXDesktop >= 0.0 && data.heroFocalXDesktop <= 100.0)
+        )
+        && (
+          !('heroFocalYDesktop' in data)
+          || (data.heroFocalYDesktop is int && data.heroFocalYDesktop >= 0 && data.heroFocalYDesktop <= 100)
+          || (data.heroFocalYDesktop is float && data.heroFocalYDesktop >= 0.0 && data.heroFocalYDesktop <= 100.0)
+        )
+        && (
+          !('heroFocalXMobile' in data)
+          || (data.heroFocalXMobile is int && data.heroFocalXMobile >= 0 && data.heroFocalXMobile <= 100)
+          || (data.heroFocalXMobile is float && data.heroFocalXMobile >= 0.0 && data.heroFocalXMobile <= 100.0)
+        )
+        && (
+          !('heroFocalYMobile' in data)
+          || (data.heroFocalYMobile is int && data.heroFocalYMobile >= 0 && data.heroFocalYMobile <= 100)
+          || (data.heroFocalYMobile is float && data.heroFocalYMobile >= 0.0 && data.heroFocalYMobile <= 100.0)
+        )
         && (!('heroFontStyle' in data) || data.heroFontStyle in ['editorial', 'modern', 'clean', 'luxury', 'bold', 'architectural'])
         && (!('heroTheme' in data) || data.heroTheme in ['red-sea', 'midnight', 'golden-dusk', 'minimal', 'deep-turquoise', 'coral-horizon', 'desert-amber', 'obsidian-gold'])
         && data.updatedAt is timestamp;

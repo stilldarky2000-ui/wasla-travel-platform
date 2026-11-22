@@ -2262,95 +2262,102 @@ export default function App() {
                 contactEmail={publicSettings.email}
               />
 
-              {/* 9. QUIET PRE-FOOTER: NEWSLETTER & QUICK EXPLORE DIRECTORY */}
-              <div className="space-y-10 border-t border-[#C8C2B8]/50 pt-10">
-                <section className="reveal-item">
-                  <div className="card-wasla bg-[#FAF4ED] p-6 sm:p-8 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-                    <div className="space-y-1.5 max-w-xl">
-                      <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#EE5426]">
-                        <Mail className="h-3.5 w-3.5" aria-hidden="true" />
-                        <span>{t.newsletterEyebrow}</span>
-                      </div>
-                      <h2 className="font-display text-2xl font-semibold text-[#0F2233]">{t.newsletterTitle}</h2>
-                      <p className="text-sm text-[#64748B]">{t.newsletterSub}</p>
+              {/* 9. NEWSLETTER */}
+              <section className="reveal-item">
+                <div className="card-wasla bg-[#FAF4ED]/80 dark:bg-[#19354F]/60 p-6 sm:p-8 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+                  <div className="space-y-2 max-w-xl">
+                    <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#EE5426]">
+                      <Mail className="h-3.5 w-3.5" aria-hidden="true" />
+                      <span>{t.newsletterEyebrow}</span>
                     </div>
-
-                    {newsletterConfirmed ? (
-                      <div className="rounded-xl border border-[#EE5426]/25 bg-white px-4 py-3 text-sm font-medium text-[#0F2233]">
-                        {t.newsletterSuccess}{' '}
-                        <span className="tabular-nums text-[#64748B]">
-                          ({lastSubscribedEmail || subscribedEmails[subscribedEmails.length - 1]})
-                        </span>
-                      </div>
-                    ) : (
-                      <form onSubmit={handleNewsletterSubmit} className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
-                        <input
-                          type="email"
-                          required
-                          value={newsletterEmail}
-                          onChange={(e) => setNewsletterEmail(e.target.value)}
-                          placeholder={t.newsletterPlaceholder}
-                          className="input-wasla min-h-[44px] w-full sm:w-64 text-sm"
-                          aria-label={t.newsletterTitle}
-                        />
-                        <button
-                          type="submit"
-                          className="btn-wasla-primary min-h-[44px] px-6 py-2.5 text-sm whitespace-nowrap cursor-pointer"
-                        >
-                          {t.newsletterButton}
-                        </button>
-                      </form>
-                    )}
+                    <h2 className="font-display text-2xl sm:text-[28px] font-semibold tracking-[-0.02em] leading-tight text-[#0F2233]">
+                      {t.newsletterTitle}
+                    </h2>
+                    <p className="text-sm leading-relaxed text-[#64748B]">{t.newsletterSub}</p>
                   </div>
-                </section>
 
-                <section aria-label="Quick destination links">
-                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
-                    {TOP_LINK_COLUMNS.map((col, idx) => (
-                      <div
-                        key={col.key}
-                        style={{ '--reveal-delay': `${idx * 60}ms` } as React.CSSProperties}
-                        className="reveal-item space-y-3"
+                  {newsletterConfirmed ? (
+                    <div className="rounded-xl border border-[#EE5426]/25 bg-white px-4 py-3 text-sm font-medium text-[#0F2233]">
+                      {t.newsletterSuccess}{' '}
+                      <span className="tabular-nums text-[#64748B]">
+                        ({lastSubscribedEmail || subscribedEmails[subscribedEmails.length - 1]})
+                      </span>
+                    </div>
+                  ) : (
+                    <form onSubmit={handleNewsletterSubmit} className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
+                      <input
+                        type="email"
+                        required
+                        value={newsletterEmail}
+                        onChange={(e) => setNewsletterEmail(e.target.value)}
+                        placeholder={t.newsletterPlaceholder}
+                        className="input-wasla min-h-[44px] w-full sm:w-64 text-sm"
+                        aria-label={t.newsletterTitle}
+                      />
+                      <button
+                        type="submit"
+                        className="btn-wasla-primary min-h-[44px] px-6 py-2.5 text-sm whitespace-nowrap cursor-pointer"
                       >
-                        <h3 className="text-sm font-bold text-[#0F2233]">{t.topLinksColumns[col.key]}</h3>
-                        <ul className="space-y-2">
-                          {col.links.map((entry, lIdx) => (
-                            <li key={lIdx}>
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  if (entry.tripId) {
-                                    setSelectedExplorerTripId(entry.tripId);
-                                    smoothScrollTo('all-trips');
-                                  } else if (entry.sectionId) {
-                                    smoothScrollTo(entry.sectionId);
-                                  }
-                                }}
-                                className="text-start text-sm text-[#475569] hover:text-[#EE5426] hover:underline underline-offset-4 transition-colors cursor-pointer"
-                              >
-                                {tText(entry.label, lang)}
-                              </button>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    ))}
-                  </div>
-                </section>
-              </div>
+                        {t.newsletterButton}
+                      </button>
+                    </form>
+                  )}
+                </div>
+              </section>
+
+              {/* 10A. QUIET PRE-FOOTER QUICK EXPLORE DIRECTORY */}
+              <section
+                aria-label="Quick destination links"
+                className="border-t border-[#C8C2B8]/50 dark:border-[#334155] pt-10"
+              >
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
+                  {TOP_LINK_COLUMNS.map((col, idx) => (
+                    <div
+                      key={col.key}
+                      style={{ '--reveal-delay': `${idx * 60}ms` } as React.CSSProperties}
+                      className="reveal-item space-y-3"
+                    >
+                      <h3 className="text-sm font-semibold text-[#0F2233]">{t.topLinksColumns[col.key]}</h3>
+                      <ul className="space-y-2">
+                        {col.links.map((entry, lIdx) => (
+                          <li key={lIdx}>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                if (entry.tripId) {
+                                  setSelectedExplorerTripId(entry.tripId);
+                                  smoothScrollTo('all-trips');
+                                } else if (entry.sectionId) {
+                                  smoothScrollTo(entry.sectionId);
+                                }
+                              }}
+                              className="text-start text-sm leading-relaxed text-[#64748B] hover:text-[#EE5426] hover:underline underline-offset-4 transition-colors cursor-pointer"
+                            >
+                              {tText(entry.label, lang)}
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
+              </section>
             </div>
           </main>
 
           {/* 10B. DEEP RED SEA NAVY FOOTER */}
-          <footer className="wasla-footer-glare border-t border-white/10 text-white">
-            <div className="relative z-10 mx-auto max-w-[1200px] px-4 sm:px-6 pt-12 pb-8">
-              <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
-                {/* Brand & Direct Contact */}
-                <div className="md:col-span-5 space-y-3.5">
-                  <div className="inline-block font-display text-2xl font-bold text-white">
+          <footer
+            dir={isRtl ? 'rtl' : 'ltr'}
+            className="wasla-footer-glare border-t border-white/10 text-white"
+          >
+            <div className="relative z-10 mx-auto max-w-[1200px] px-4 sm:px-6 pt-12 pb-10">
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-10 items-start">
+                {/* Column 1: Brand & Direct Contact */}
+                <div className="md:col-span-5 lg:col-span-4 space-y-4">
+                  <div className="inline-block font-display text-2xl font-semibold text-white">
                     {renderAnimatedBrand('footer')}
                   </div>
-                  <p className="text-xs leading-relaxed text-slate-300 max-w-sm">
+                  <p className="text-sm leading-relaxed text-white/80 max-w-sm">
                     {t.heroEyebrow} ·{' '}
                     <a
                       href={`mailto:${publicSettings.email}`}
@@ -2359,11 +2366,11 @@ export default function App() {
                       {publicSettings.email}
                     </a>
                   </p>
-                  <div className="flex flex-wrap items-center gap-2.5 pt-1">
+                  <div className="flex flex-wrap items-center gap-2.5 pt-0.5">
                     <button
                       type="button"
                       onClick={() => setWhatsappOpen(true)}
-                      className="wasla-wa-glare inline-flex min-h-[40px] items-center gap-2 rounded-lg px-4 py-2 text-xs font-bold text-white cursor-pointer"
+                      className="wasla-wa-glare inline-flex min-h-[40px] items-center gap-2 rounded-lg px-4 py-2 text-xs font-semibold text-white cursor-pointer"
                     >
                       <MessageCircle className="h-4 w-4" aria-hidden="true" />
                       <span>{t.askWhatsapp}</span>
@@ -2389,48 +2396,66 @@ export default function App() {
                   </div>
                 </div>
 
-                {/* Navigation & Support Links */}
-                <div className="md:col-span-4 grid grid-cols-2 gap-6 text-xs">
-                  <div className="space-y-2.5">
-                    <p className="text-[11px] font-bold uppercase tracking-wider text-white/70">
+                {/* Columns 2 & 3: Navigation & Support Links */}
+                <div className="md:col-span-4 lg:col-span-5 grid grid-cols-2 gap-6 sm:gap-8">
+                  <div className="space-y-3">
+                    <h3 className="text-sm font-semibold text-white">
                       {t.navAllTrips}
-                    </p>
-                    <ul className="space-y-2 font-semibold">
+                    </h3>
+                    <ul className="space-y-2.5 text-sm">
                       <li>
-                        <a href="#hurghada-marsa-alam" className="text-white/90 hover:text-white hover:underline underline-offset-4 transition-colors">
+                        <a
+                          href="#hurghada-marsa-alam"
+                          className="inline-block text-white/80 hover:text-[#FDBA74] hover:underline underline-offset-4 transition-colors"
+                        >
                           {t.navHurghada}
                         </a>
                       </li>
                       <li>
-                        <a href="#cairo-luxor" className="text-white/90 hover:text-white hover:underline underline-offset-4 transition-colors">
+                        <a
+                          href="#cairo-luxor"
+                          className="inline-block text-white/80 hover:text-[#FDBA74] hover:underline underline-offset-4 transition-colors"
+                        >
                           {t.navCairoLuxor}
                         </a>
                       </li>
                       <li>
-                        <a href="#activities" className="text-white/90 hover:text-white hover:underline underline-offset-4 transition-colors">
+                        <a
+                          href="#activities"
+                          className="inline-block text-white/80 hover:text-[#FDBA74] hover:underline underline-offset-4 transition-colors"
+                        >
                           {tText({ en: 'Browse by Activity', ar: 'الأنشطة والرحلات', de: 'Aktivitäten' }, lang)}
                         </a>
                       </li>
                       <li>
-                        <a href="#all-trips" className="text-white/90 hover:text-white hover:underline underline-offset-4 transition-colors">
+                        <a
+                          href="#all-trips"
+                          className="inline-block text-white/80 hover:text-[#FDBA74] hover:underline underline-offset-4 transition-colors"
+                        >
                           {t.navAllTrips}
                         </a>
                       </li>
                       <li>
-                        <a href="#how-it-works" className="text-white/90 hover:text-white hover:underline underline-offset-4 transition-colors">
+                        <a
+                          href="#how-it-works"
+                          className="inline-block text-white/80 hover:text-[#FDBA74] hover:underline underline-offset-4 transition-colors"
+                        >
                           {tText({ en: 'How Booking Works', ar: 'كيف تعمل الحجوزات', de: 'So funktioniert’s' }, lang)}
                         </a>
                       </li>
                     </ul>
                   </div>
 
-                  <div className="space-y-2.5">
-                    <p className="text-[11px] font-bold uppercase tracking-wider text-white/70">
+                  <div className="space-y-3">
+                    <h3 className="text-sm font-semibold text-white">
                       {t.footerWhatsapp}
-                    </p>
-                    <ul className="space-y-2 font-semibold">
+                    </h3>
+                    <ul className="space-y-2.5 text-sm">
                       <li>
-                        <a href="#contact" className="text-white/90 hover:text-white hover:underline underline-offset-4 transition-colors">
+                        <a
+                          href="#contact"
+                          className="inline-block text-white/80 hover:text-[#FDBA74] hover:underline underline-offset-4 transition-colors"
+                        >
                           {tText({ en: 'Contact & Support Desk', ar: 'تواصل معنا والدعم', de: 'Kontakt & Support' }, lang)}
                         </a>
                       </li>
@@ -2438,13 +2463,16 @@ export default function App() {
                         <button
                           type="button"
                           onClick={() => setTrackBookingOpen(true)}
-                          className="text-start text-white/90 hover:text-white hover:underline underline-offset-4 cursor-pointer transition-colors"
+                          className="text-start text-white/80 hover:text-[#FDBA74] hover:underline underline-offset-4 cursor-pointer transition-colors"
                         >
                           {tText({ en: 'Track My Booking', ar: 'تتبّع حالة حجزك', de: 'Buchung verfolgen' }, lang)}
                         </button>
                       </li>
                       <li>
-                        <a href="#faq" className="text-white/90 hover:text-white hover:underline underline-offset-4 transition-colors">
+                        <a
+                          href="#faq"
+                          className="inline-block text-white/80 hover:text-[#FDBA74] hover:underline underline-offset-4 transition-colors"
+                        >
                           {tText({ en: 'FAQ', ar: 'الأسئلة الشائعة', de: 'FAQ' }, lang)}
                         </a>
                       </li>
@@ -2452,7 +2480,7 @@ export default function App() {
                         <button
                           type="button"
                           onClick={() => openPolicies('terms')}
-                          className="text-start text-white/90 hover:text-white hover:underline underline-offset-4 cursor-pointer transition-colors"
+                          className="text-start text-white/80 hover:text-[#FDBA74] hover:underline underline-offset-4 cursor-pointer transition-colors"
                         >
                           {t.footerPolicies}
                         </button>
@@ -2461,7 +2489,7 @@ export default function App() {
                         <button
                           type="button"
                           onClick={() => openPolicies('payment')}
-                          className="text-start text-white/90 hover:text-white hover:underline underline-offset-4 cursor-pointer transition-colors"
+                          className="text-start text-white/80 hover:text-[#FDBA74] hover:underline underline-offset-4 cursor-pointer transition-colors"
                         >
                           {tText({ en: 'Payment & Transfers', ar: 'الدفع والتوصيل', de: 'Zahlung & Transfer' }, lang)}
                         </button>
@@ -2470,45 +2498,57 @@ export default function App() {
                         <button
                           type="button"
                           onClick={() => openPolicies('privacy')}
-                          className="text-start text-white/90 hover:text-white hover:underline underline-offset-4 cursor-pointer transition-colors"
+                          className="text-start text-white/80 hover:text-[#FDBA74] hover:underline underline-offset-4 cursor-pointer transition-colors"
                         >
                           {tText({ en: 'Privacy & GDPR', ar: 'سياسة الخصوصية (GDPR)', de: 'Datenschutz (DSGVO)' }, lang)}
                         </button>
-                      </li>
-                      <li className="pt-1">
-                        {effectiveRole !== 'none' && touristPreviewOnly ? (
-                          <button
-                            type="button"
-                            onClick={() => setTouristPreviewOnly(false)}
-                            className="inline-flex min-h-[36px] items-center rounded-lg border border-white bg-white px-3 py-1.5 text-[11px] font-bold text-[#0F2233] hover:bg-[#FAF4ED] cursor-pointer shadow-xs transition-colors"
-                          >
-                            Team Portals
-                          </button>
-                        ) : (
-                          <button
-                            type="button"
-                            onClick={() => setPortalAuthOpen(true)}
-                            className="inline-flex min-h-[36px] items-center gap-1.5 rounded-lg border border-white/20 bg-white/8 px-3 py-1.5 text-[11px] font-semibold text-white hover:bg-white/15 hover:border-white/35 cursor-pointer transition-colors"
-                          >
-                            <Lock className="h-3 w-3 shrink-0" aria-hidden="true" />
-                            <span>{t.staffPortalLogin}</span>
-                          </button>
-                        )}
                       </li>
                     </ul>
                   </div>
                 </div>
 
-                {/* Modern Global Language Switcher */}
-                <div className="md:col-span-3 space-y-2.5">
-                  <LanguageSelector lang={lang} onChange={setLang} variant="footer" />
+                {/* Column 4: Global Language Switcher & Team Portal Access */}
+                <div className="md:col-span-3 space-y-3">
+                  <h3 className="text-sm font-semibold text-white">
+                    {tText(
+                      { en: 'Language & Region', ar: 'اللغة والمنطقة', de: 'Sprache & Region' },
+                      lang
+                    )}
+                  </h3>
+                  <div className="space-y-2.5">
+                    <LanguageSelector
+                      lang={lang}
+                      onChange={setLang}
+                      variant="footer"
+                      currency={currency}
+                      onChangeCurrency={setCurrency}
+                    />
+                    {effectiveRole !== 'none' && touristPreviewOnly ? (
+                      <button
+                        type="button"
+                        onClick={() => setTouristPreviewOnly(false)}
+                        className="inline-flex min-h-[40px] w-full items-center justify-center rounded-xl border border-white bg-white px-3.5 py-2 text-xs font-semibold text-[#0F2233] hover:bg-[#FAF4ED] cursor-pointer shadow-xs transition-colors"
+                      >
+                        Team Portals
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => setPortalAuthOpen(true)}
+                        className="inline-flex min-h-[40px] w-full items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/8 px-3.5 py-2 text-xs font-semibold text-white hover:bg-white/15 hover:border-white/35 cursor-pointer transition-colors"
+                      >
+                        <Lock className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+                        <span>{t.staffPortalLogin}</span>
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
 
               {/* Bottom Hairline Bar */}
-              <div className="mt-8 pt-5 border-t border-white/12 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-[11px] font-medium text-slate-300">
+              <div className="mt-10 pt-6 border-t border-white/12 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs text-white/70">
                 <span>{t.footerRights}</span>
-                <span className="font-mono text-slate-400">{publicSettings.domain}</span>
+                <span className="font-mono text-white/70">{publicSettings.domain}</span>
               </div>
             </div>
           </footer>

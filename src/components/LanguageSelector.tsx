@@ -261,26 +261,17 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
         aria-haspopup="listbox"
         aria-expanded={open}
         aria-label={copy.footerLabel}
-        className="inline-flex min-h-[46px] w-full items-center justify-between gap-3 rounded-xl border border-white/25 bg-white/12 px-3.5 py-2 text-start text-white backdrop-blur-sm hover:bg-white/20 hover:border-white/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 transition-all cursor-pointer"
+        className="inline-flex min-h-[40px] w-full items-center justify-between gap-2.5 rounded-xl border border-white/20 bg-white/8 px-3.5 py-2 text-start text-xs font-semibold text-white hover:bg-white/15 hover:border-white/35 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 transition-colors cursor-pointer"
       >
-        <span className="flex items-center gap-2.5 min-w-0">
-          <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white/15 text-white">
-            <Globe className="h-4 w-4" aria-hidden="true" />
-          </span>
-          <span className="min-w-0">
-            <span className="block text-[10px] font-semibold uppercase tracking-wider text-white/75 leading-tight">
-              {copy.footerLabel}
-            </span>
-            <span className="mt-0.5 flex items-center gap-1.5 truncate text-xs font-bold text-white leading-tight">
-              <span>{current.nativeName}</span>
-              <span className="font-mono text-[10px] font-semibold text-white/80">
-                ({current.short} · {LANGUAGE_OPTIONS.length})
-              </span>
-            </span>
+        <span className="flex items-center gap-2 min-w-0">
+          <Globe className="h-4 w-4 shrink-0 text-[#FDBA74]" aria-hidden="true" />
+          <span className="truncate text-white">{current.nativeName}</span>
+          <span className="font-mono text-[11px] text-white/75 shrink-0">
+            ({current.short}{currency ? ` · ${currency}` : ''})
           </span>
         </span>
         <ChevronDown
-          className={`h-4 w-4 shrink-0 text-white/85 transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
+          className={`h-4 w-4 shrink-0 text-white/80 transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
           aria-hidden="true"
         />
       </button>
