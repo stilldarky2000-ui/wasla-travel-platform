@@ -1042,7 +1042,7 @@ export default function App() {
         <WaslaLogo
           variant="full"
           theme={darkMode ? 'dark' : 'light'}
-          className="h-8 sm:h-11 w-auto"
+          className="h-6 min-[400px]:h-8 sm:h-11 w-auto"
         />
       </span>
     );
@@ -1463,7 +1463,7 @@ export default function App() {
                 : 'border-[#C8C2B8]/50 bg-[#FFFFFF]/95 shadow-[0_1px_12px_-4px_rgba(15,34,51,0.06)]'
             }`}
           >
-            <div className="mx-auto flex h-16 sm:h-[70px] max-w-[1200px] items-center justify-between gap-2 sm:gap-6 px-3 sm:px-6">
+            <div className="mx-auto flex h-16 sm:h-[70px] max-w-[1200px] items-center justify-between gap-1.5 sm:gap-6 px-2.5 sm:px-6">
               <a
                 href="#top"
                 aria-label="Wasla Travel — وصلة ترافيل"
@@ -1498,7 +1498,7 @@ export default function App() {
                 ))}
               </nav>
 
-              <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
+              <div className="flex items-center gap-1 sm:gap-2.5 shrink-0">
                 {/* Consolidated Language + Currency Selector (e.g. EN · EUR) */}
                 <LanguageSelector
                   lang={lang}
@@ -1524,30 +1524,18 @@ export default function App() {
                   </span>
                 </button>
 
-                {/* Storefront Light-Dark Switch */}
-                <ThemeSwitch
-                  darkMode={darkMode}
-                  onToggle={toggleAllWorkspacesTheme}
-                  lang={lang}
-                  size="sm"
-                />
+                {/* Storefront Light-Dark Switch (in the mobile drawer below sm, to keep the hamburger reachable) */}
+                <span className="hidden sm:inline-flex">
+                  <ThemeSwitch
+                    darkMode={darkMode}
+                    onToggle={toggleAllWorkspacesTheme}
+                    lang={lang}
+                    size="sm"
+                  />
+                </span>
 
                 {/* Subtle Icon-Only PWA Install Trigger */}
                 <PWAInstallButton lang={lang} darkMode={darkMode} iconOnly />
-
-                {/* Brand-consistent Primary Header CTA */}
-                <button
-                  type="button"
-                  onClick={() => setWhatsappOpen(true)}
-                  className="btn-wasla-primary min-h-[36px] sm:min-h-[40px] gap-1.5 sm:gap-2 rounded-lg px-3 sm:px-4 py-1.5 text-[13px] tracking-[-0.01em] whitespace-nowrap shrink-0 cursor-pointer tabular-nums"
-                >
-                  <MessageCircle className="h-4 w-4" aria-hidden="true" />
-                  <span className="hidden sm:inline">
-                    {customerRequests.length > 0
-                      ? `${t.deskCount} (${customerRequests.length})`
-                      : tText({ en: 'Contact Desk', ar: 'تواصل معنا', de: 'Kontakt' }, lang)}
-                  </span>
-                </button>
 
                 {/* Mobile Navigation Drawer Trigger */}
                 <button
@@ -1610,6 +1598,18 @@ export default function App() {
                       {tText({ en: 'Track Booking', ar: 'تتبّع حجزك', de: 'Buchung prüfen' }, lang)}
                     </span>
                   </button>
+                </div>
+
+                <div className="flex items-center justify-between gap-2 sm:hidden">
+                  <span className="text-xs font-semibold">
+                    {tText({ en: 'Dark mode', ar: 'الوضع الليلي', de: 'Dunkelmodus' }, lang)}
+                  </span>
+                  <ThemeSwitch
+                    darkMode={darkMode}
+                    onToggle={toggleAllWorkspacesTheme}
+                    lang={lang}
+                    size="sm"
+                  />
                 </div>
 
                 <div className="flex flex-wrap items-center justify-between gap-2 border-t border-[#E2E8F0]/40 pt-3">
