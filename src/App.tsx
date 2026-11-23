@@ -1033,6 +1033,11 @@ export default function App() {
       return (
         <span dir="ltr" className="inline-flex items-center select-none">
           <WaslaLogo variant="full" theme="dark" className="h-10 sm:h-12 w-auto" />
+          <WaslaLogo
+            variant="icon"
+            iconStyle="orange"
+            className="h-8 w-8 sm:h-9 sm:w-9 shrink-0 -ms-2 sm:-ms-2.5 drop-shadow-xs"
+          />
         </span>
       );
     }

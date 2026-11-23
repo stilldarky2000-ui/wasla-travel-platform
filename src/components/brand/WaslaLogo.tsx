@@ -169,25 +169,25 @@ export const WaslaLogo: React.FC<WaslaLogoProps> = ({
           <>
             <text
               x="225"
-              y="66"
+              y="64"
               textAnchor="middle"
               direction="rtl"
               fontFamily="'Cairo', sans-serif"
-              fontSize="42"
-              fontWeight="700"
+              fontSize="45"
+              fontWeight="800"
               className={primaryFill}
             >
               وصلة
             </text>
             <text
               x="225"
-              y="96"
+              y="97"
               textAnchor="middle"
               direction="rtl"
               fontFamily="'Cairo', sans-serif"
-              fontSize="32"
-              fontWeight="700"
-              textLength="100.8"
+              fontSize="24"
+              fontWeight="600"
+              textLength="106"
               lengthAdjust="spacingAndGlyphs"
               fill="#EE5426"
             >
@@ -256,25 +256,25 @@ export const WaslaLogo: React.FC<WaslaLogoProps> = ({
       />
       <text
         x="424"
-        y="66"
+        y="64"
         textAnchor="middle"
         direction="rtl"
         fontFamily="'Cairo', sans-serif"
-        fontSize="42"
-        fontWeight="700"
+        fontSize="45"
+        fontWeight="800"
         className={primaryFill}
       >
         وصلة
       </text>
       <text
         x="424"
-        y="96"
+        y="97"
         textAnchor="middle"
         direction="rtl"
         fontFamily="'Cairo', sans-serif"
-        fontSize="32"
-        fontWeight="700"
-        textLength="100.8"
+        fontSize="24"
+        fontWeight="600"
+        textLength="106"
         lengthAdjust="spacingAndGlyphs"
         fill="#EE5426"
       >
