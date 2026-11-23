@@ -948,7 +948,7 @@ export function printWaslaBoardingVoucher(
         <!-- Top Brand Banner with Reference & Verification QR Code -->
         <div class="wasla-voucher-header" style="background:#0F2233;color:#FFFFFF;padding:16px 20px;border-bottom:4px solid #EE5426;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;">
           <div class="wasla-voucher-brand-row" style="display:flex;align-items:center;gap:12px;">
-            <div class="wasla-voucher-logo-badge" style="width:44px;height:44px;border-radius:10px;background:#EE5426;color:#FFFFFF;font-weight:800;font-size:22px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">W</div>
+            <div class="wasla-voucher-logo-badge" style="width:44px;height:44px;flex-shrink:0;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="44" height="44" style="display:block;"><rect width="128" height="128" rx="28" fill="#EE5426"/><g transform="translate(14, 25)" stroke="#FAF4ED" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M10 12 L33 66 L56 12"/><path d="M44 12 L67 66 L90 12"/></g></svg></div>
             <div class="wasla-voucher-brand-texts">
               <div class="wasla-voucher-kicker" style="font-size:10px;font-weight:700;letter-spacing:0.08em;color:#FDBA74;text-transform:uppercase;">${escapeHtml(copy.headerBadge)}</div>
               <div class="wasla-voucher-main-title" style="font-size:16px;font-weight:800;color:#FFFFFF;margin-top:2px;">${escapeHtml(copy.voucherTitle)}</div>

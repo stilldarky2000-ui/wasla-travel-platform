@@ -3,8 +3,8 @@
 @custom-variant dark (&:where(.dark, .dark *, [data-wasla-theme="dark"], [data-wasla-theme="dark"] *));
 
 @theme {
-  --font-display: "Fraunces", "Cairo", "IBM Plex Sans Arabic", Georgia, serif;
-  --font-sans: "Plus Jakarta Sans", "Inter", "IBM Plex Sans Arabic", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Outfit", "Cairo", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Plus Jakarta Sans", "Inter", "Cairo", ui-sans-serif, system-ui, sans-serif;
   --font-arabic: "Cairo", system-ui, sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
 
@@ -375,34 +375,9 @@ select:not(.bg-transparent):not(.no-led):focus {
   box-shadow: 0 18px 36px -12px rgba(0, 0, 0, 0.65);
 }
 
-/* Disciplined 3-Font Brand Hierarchy (Fraunces + Cairo, Plus Jakarta Sans + IBM Plex Sans Arabic, IBM Plex Mono) */
-.font-hero-editorial {
-  font-family: "Fraunces", "Cairo", "IBM Plex Sans Arabic", Georgia, serif;
-}
-
-.font-hero-modern {
-  font-family: "Plus Jakarta Sans", "Cairo", "IBM Plex Sans Arabic", ui-sans-serif, system-ui, sans-serif;
-}
-
-.font-hero-clean {
-  font-family: "Plus Jakarta Sans", "IBM Plex Sans Arabic", ui-sans-serif, system-ui, sans-serif;
-}
-
-.font-hero-luxury {
-  font-family: "Fraunces", "Cairo", "IBM Plex Sans Arabic", Georgia, serif;
-}
-
-.font-hero-bold {
-  font-family: "Plus Jakarta Sans", "Cairo", "IBM Plex Sans Arabic", ui-sans-serif, system-ui, sans-serif;
-}
-
-.font-hero-architectural {
-  font-family: "Plus Jakarta Sans", "IBM Plex Sans Arabic", ui-sans-serif, system-ui, sans-serif;
-}
-
-/* Locked hero design system (world-class standard): Outfit type (owner choice 2026-11-22), one neutral scrim, focal-point image */
+/* Locked hero design system (world-class standard): Outfit type (owner choice 2026-11-22), one neutral scrim, focal-point image. Arabic falls through to Cairo, the brand Arabic font. */
 .font-hero-standard {
-  font-family: "Outfit", "Inter", "IBM Plex Sans Arabic", "Cairo", ui-sans-serif, system-ui, sans-serif;
+  font-family: "Outfit", "Inter", "Cairo", ui-sans-serif, system-ui, sans-serif;
 }
 
 .wasla-hero-scrim {

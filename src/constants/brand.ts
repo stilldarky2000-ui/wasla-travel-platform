@@ -13,9 +13,9 @@ export const WASLA_BRAND = {
     dividerLight: '#C8C2B8',
     dividerDark: '#334155',
     mutedText: '#64748B',
-    success: '#10B981',
+    success: '#15803D',
     warning: '#F59E0B',
-    danger: '#EF4444',
+    danger: '#DC2626',
   },
   fonts: {
     en: "'Plus Jakarta Sans', 'Inter', system-ui, sans-serif",
