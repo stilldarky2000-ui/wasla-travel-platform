@@ -1,8 +1,6 @@
 export const WASLA_BRAND = {
   nameEn: 'Wasla Travel',
   nameAr: 'وصلة ترافيل',
-  taglineEn: 'Seamless Travel Connections',
-  taglineAr: 'وجهتك الأقرب لكل رحلة',
   colors: {
     navy: '#0F2233',        // Primary Brand, Headings, Dark Mode BG
     navyLight: '#19354F',   // Secondary Hover / Dark Card Surface
