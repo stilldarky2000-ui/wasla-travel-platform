@@ -18,6 +18,7 @@ import {
   MapPin,
   Menu,
   MessageCircle,
+  Phone,
   Plane,
   RotateCcw,
   Search,
@@ -2420,6 +2421,14 @@ export default function App() {
                       className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-white/20 bg-white/8 text-white hover:bg-white/15 hover:border-white/35 transition-colors"
                     >
                       <Mail className="h-4 w-4" aria-hidden="true" />
+                    </a>
+                    <a
+                      href={`tel:+${publicSettings.whatsappNumber.replace(/\D/g, '')}`}
+                      aria-label={tText({ en: 'Call us', ar: 'اتصل بنا', de: 'Rufen Sie uns an' }, lang)}
+                      title={tText({ en: 'Call us', ar: 'اتصل بنا', de: 'Rufen Sie uns an' }, lang)}
+                      className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-white/20 bg-white/8 text-white hover:bg-white/15 hover:border-white/35 transition-colors"
+                    >
+                      <Phone className="h-4 w-4" aria-hidden="true" />
                     </a>
                   </div>
                 </div>
