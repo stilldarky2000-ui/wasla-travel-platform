@@ -149,6 +149,15 @@ function isQuotaError(err: unknown): boolean {
 export function detectRedSeaTransferZone(text: string): string {
   const normalized = text.toLowerCase();
   if (
+    normalized.includes('kalawy') ||
+    normalized.includes('magic life') ||
+    normalized.includes('coral sun') ||
+    normalized.includes('كلاوي') ||
+    normalized.includes('كورال')
+  ) {
+    return 'kalawy';
+  }
+  if (
     normalized.includes('el gouna') ||
     normalized.includes('el-gouna') ||
     normalized.includes('elgouna') ||

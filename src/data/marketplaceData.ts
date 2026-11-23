@@ -175,6 +175,24 @@ export const OUTER_TRANSFER_ZONES: TransferZoneOption[] = [
       ro: 'Safaga (+15 € / pers. extra)',
     },
   },
+  {
+    id: 'kalawy',
+    feePerPersonEur: 15,
+    label: {
+      en: 'Kalawy & Coral Sun (+€15 / person extra transfer)',
+      ar: 'كلاوي وكورال صن (+15€ للفرد توصيل خارج الغردقة)',
+      de: 'Kalawy & Coral Sun (+15 € / Person Transferzuschlag)',
+      fr: 'Kalawy & Coral Sun (+15 € / pers. supplément transfert)',
+      es: 'Kalawy & Coral Sun (+15 € / pers. suplemento traslado)',
+      it: 'Kalawy & Coral Sun (+15 € / pers. extra transfer)',
+      nl: 'Kalawy & Coral Sun (+€15 / pers. extra transfer)',
+      pl: 'Kalawy & Coral Sun (+15 € / os. dopłata za transfer)',
+      pt: 'Kalawy & Coral Sun (+15 € / pessoa transfer extra)',
+      cs: 'Kalawy & Coral Sun (+15 € / os. příplatek za transfer)',
+      sv: 'Kalawy & Coral Sun (+15 € / pers. extra transfer)',
+      ro: 'Kalawy & Coral Sun (+15 € / pers. transfer extra)',
+    },
+  },
 ];
 
 const ZONE_BASE_NAMES: Record<string, { en: string; ar: string; de: string }> = {
@@ -184,12 +202,13 @@ const ZONE_BASE_NAMES: Record<string, { en: string; ar: string; de: string }> = 
   makadi: { en: 'Makadi Bay', ar: 'خليج مكادي', de: 'Makadi Bay' },
   'soma-bay': { en: 'Soma Bay', ar: 'سوما باي', de: 'Soma Bay' },
   safaga: { en: 'Safaga', ar: 'سفاجا', de: 'Safaga' },
+  kalawy: { en: 'Kalawy & Coral Sun', ar: 'كلاوي وكورال صن', de: 'Kalawy & Coral Sun' },
 };
 
 /**
  * Directional Extra Transfer Fee per person (EUR):
  * - Cairo trips (Northbound): Extra transfer applies ONLY to Sahl Hasheesh (+€10/pp), Makadi Bay (+€10/pp), Soma Bay (+€15/pp), and Safaga (+€15/pp). El Gouna & Hurghada City = €0.
- * - Luxor trips (Southbound): Extra transfer applies ONLY to El Gouna (+€10/pp, opposite direction). Hurghada, Sahl Hasheesh, Makadi Bay, Soma Bay, and Safaga = €0.
+ * - Luxor trips (Southbound): Extra transfer applies to El Gouna (+€10/pp, opposite direction), Sahl Hasheesh (+€10/pp), and Kalawy & Coral Sun (+€15/pp). Hurghada, Makadi Bay, Soma Bay, and Safaga = €0.
  * - Hurghada / other trips (when outer transfer applies): El Gouna, Sahl Hasheesh, Makadi Bay (+€10/pp); Soma Bay, Safaga (+€15/pp); Hurghada City = €0.
  */
 export function getZoneTransferFeePerPerson(
@@ -201,13 +220,15 @@ export function getZoneTransferFeePerPerson(
 
   if (destination === 'Cairo') {
     if (zoneId === 'sahl-hasheesh' || zoneId === 'makadi') return 10;
-    if (zoneId === 'soma-bay' || zoneId === 'safaga') return 15;
+    if (zoneId === 'soma-bay' || zoneId === 'safaga' || zoneId === 'kalawy') return 15;
     return 0; // El Gouna & Hurghada are on the way north to Cairo
   }
 
   if (destination === 'Luxor') {
     if (zoneId === 'el-gouna') return 10; // Opposite direction (north of Hurghada)
-    return 0; // Sahl Hasheesh, Makadi, Soma Bay, Safaga are on the southbound route
+    if (zoneId === 'sahl-hasheesh') return 10;
+    if (zoneId === 'kalawy') return 15; // Kalawy & Coral Sun, south of Safaga
+    return 0; // Makadi, Soma Bay, Safaga are on the southbound route
   }
 
   const zone = OUTER_TRANSFER_ZONES.find((z) => z.id === zoneId);
@@ -684,7 +705,7 @@ export const TRIPS: Trip[] = [
     rating: 4.9,
     reviewCount: 49,
     duration: { en: 'Full day', ar: 'يوم كامل', de: 'Ganztags' },
-    departureTimes: ['03:00–04:00'],
+    departureTimes: ['04:00 AM'],
     timingNote: {
       en: 'Hotel pickup between 03:00 and 04:00, exact time confirmed after booking',
       ar: 'الاستلام من الفندق بين 03:00 و04:00 صباحاً، ويتم تأكيد الموعد الدقيق بعد الحجز',
@@ -1115,7 +1136,7 @@ Danach geht es klimatisiert zurück durch die Wüste, mit dem ganzen antiken The
       ar: 'الاستلام من فندقك في الغردقة بين 03:00 و04:00 صباحاً، ويتم تأكيد الموعد الدقيق بعد الحجز.',
       de: 'Hotelabholung in Hurghada zwischen 03:00 und 04:00 Uhr, die genaue Zeit wird nach der Buchung bestätigt.',
     },
-    meetingPointUrl: 'https://maps.google.com/?q=Karnak+Temple+Luxor+Egypt',
+
     whatToBring: [
       {
         en: 'A pillow for the road',
