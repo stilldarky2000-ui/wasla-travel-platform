@@ -279,6 +279,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
   // Public marketing, WhatsApp & Email settings synced with Firestore
   const [metaPixelId, setMetaPixelId] = useState(publicSettings?.metaPixelId || '');
   const [ga4Id, setGa4Id] = useState(publicSettings?.ga4Id || '');
+  const [tiktokPixelId, setTiktokPixelId] = useState(publicSettings?.tiktokPixelId || '');
   const [whatsappInput, setWhatsappInput] = useState(
     publicSettings?.whatsappDisplay || SITE_CONFIG.whatsappDisplay
   );
@@ -753,6 +754,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
     if (!publicSettings) return;
     setMetaPixelId(publicSettings.metaPixelId || '');
     setGa4Id(publicSettings.ga4Id || '');
+    setTiktokPixelId(publicSettings.tiktokPixelId || '');
     setWhatsappInput(publicSettings.whatsappDisplay || SITE_CONFIG.whatsappDisplay);
     setEmailInput(publicSettings.email || SITE_CONFIG.email);
   }, [publicSettings]);
@@ -803,6 +805,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
         email: (emailInput || SITE_CONFIG.email).trim(),
         metaPixelId: metaPixelId.trim(),
         ga4Id: ga4Id.trim(),
+        tiktokPixelId: tiktokPixelId.trim(),
       });
       setSettingsSaved(true);
       window.setTimeout(() => setSettingsSaved(false), 2500);
@@ -1143,7 +1146,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
     const unreadChatsCount = companyRadar.unansweredChats.length;
     const topTrip = companyRadar.topMarginTrips[0];
     const topCommission = topTrip ? Math.round(topTrip.price * (commissionRate / 100)) : 0;
-    const missingTracking = !publicSettings?.metaPixelId && !publicSettings?.ga4Id;
+    const missingTracking = !publicSettings?.metaPixelId && !publicSettings?.ga4Id && !publicSettings?.tiktokPixelId;
     const needsHeroSetup = !publicSettings?.heroImageUrl && !publicSettings?.heroCaptionEn;
 
     const overviewAttention =
@@ -3221,14 +3224,15 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
 
               <div className="border-t border-[#E2E8F0] pt-3 flex flex-wrap items-center justify-between gap-2 text-[11px] text-[#64748B]">
                 <span>
-                  {publicSettings?.metaPixelId || publicSettings?.ga4Id
+                  {publicSettings?.metaPixelId || publicSettings?.ga4Id || publicSettings?.tiktokPixelId
                     ? `Tracking active: ${[
                         publicSettings?.metaPixelId ? 'Meta Pixel' : '',
                         publicSettings?.ga4Id ? 'GA4' : '',
+                        publicSettings?.tiktokPixelId ? 'TikTok Pixel' : '',
                       ]
                         .filter(Boolean)
                         .join(' · ')}`
-                    : 'No Pixel / GA4 connected yet'}
+                    : 'No Pixel / GA4 / TikTok connected yet'}
                 </span>
                 <button
                   type="button"
@@ -3335,6 +3339,20 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                     value={ga4Id}
                     onChange={(e) => setGa4Id(e.target.value)}
                     placeholder="e.g. G-XXXXXXXXXX"
+                    className="w-full rounded-lg border border-[#CBD5E1] bg-white px-3 py-2 text-xs text-[#0F2233] focus:border-[#EE5426] focus:outline-none font-mono"
+                  />
+                </label>
+
+                <label className="block space-y-1.5">
+                  <span className="font-semibold text-[#0F2233]">
+                    {isAr ? 'معرّف TikTok Pixel (اختياري)' : 'TikTok Pixel ID (optional)'}
+                  </span>
+                  <input
+                    type="text"
+                    dir="ltr"
+                    value={tiktokPixelId}
+                    onChange={(e) => setTiktokPixelId(e.target.value)}
+                    placeholder="e.g. C1234567890ABCDEF"
                     className="w-full rounded-lg border border-[#CBD5E1] bg-white px-3 py-2 text-xs text-[#0F2233] focus:border-[#EE5426] focus:outline-none font-mono"
                   />
                 </label>

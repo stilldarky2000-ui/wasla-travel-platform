@@ -169,7 +169,7 @@ export const PrivateMaintenanceGate: React.FC<PrivateMaintenanceGateProps> = ({ 
                 className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#10B981]/20 hover:bg-[#10B981]/30 border border-[#10B981]/40 text-white transition-colors"
               >
                 <MessageCircle className="h-4 w-4 text-[#10B981]" />
-                <span>واتساب مباشر: {SITE_CONFIG.whatsappDisplay}</span>
+                <span>واتساب مباشر</span>
               </a>
             </div>
           </div>
@@ -245,7 +245,7 @@ export const PrivateMaintenanceGate: React.FC<PrivateMaintenanceGateProps> = ({ 
                     handleVerify(val);
                   }
                 }}
-                placeholder="أو اكتب رمز 4004 هنا"
+                placeholder="أو اكتب الرمز هنا"
                 className="w-full px-4 py-2.5 rounded-lg bg-black/40 border border-white/20 text-center text-lg tracking-[0.3em] font-mono text-white focus:outline-none focus:ring-2 focus:ring-[#EE5426] placeholder:text-slate-500 placeholder:text-xs placeholder:tracking-normal"
                 autoFocus
               />

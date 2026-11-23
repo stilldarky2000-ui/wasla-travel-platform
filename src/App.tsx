@@ -597,7 +597,14 @@ export default function App() {
       inline.text = `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${ga}');`;
       document.head.appendChild(inline);
     }
-  }, [publicSettings.metaPixelId, publicSettings.ga4Id]);
+    const tt = (publicSettings.tiktokPixelId || '').trim();
+    if (/^[A-Z0-9]{8,32}$/i.test(tt) && !document.getElementById('wasla-tiktok-pixel')) {
+      const script = document.createElement('script');
+      script.id = 'wasla-tiktok-pixel';
+      script.text = `!function(w,d,t){w.TiktokAnalyticsObject=t;var ttq=w[t]=w[t]||[];ttq.methods=["track","page","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie","holdConsent","revokeConsent","grantConsent"];ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments)))}};for(var i=0;i<ttq.methods.length;i++){ttq.setAndDefer(ttq,ttq.methods[i]);}ttq.instance=function(t){for(var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++){ttq.setAndDefer(e,ttq.methods[n]);}return e;};ttq.load=function(e,n){var r="https://analytics.tiktok.com/i18n/pixel/events.js";var o=n&&n.partner;ttq._i=ttq._i||{};ttq._i[e]=[];ttq._i[e]._u=r;ttq._t=ttq._t||{};ttq._t[e]=+new Date;ttq._o=ttq._o||{};ttq._o[e]=n||{};var s=document.createElement("script");s.type="text/javascript";s.async=!0;s.src=r+"?sdkid="+e+"&lib="+t;var a=document.getElementsByTagName("script")[0];a.parentNode.insertBefore(s,a);};ttq.load('${tt}');ttq.page();}(window,document,'ttq');`;
+      document.head.appendChild(script);
+    }
+  }, [publicSettings.metaPixelId, publicSettings.ga4Id, publicSettings.tiktokPixelId]);
 
   useEffect(() => {
     const activeDir = isRtl ? 'rtl' : 'ltr';
@@ -1094,7 +1101,7 @@ export default function App() {
       >
         <div className="flex items-center gap-2">
           <span className="inline-flex h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-          <span className="font-semibold text-white">🔒 وضع الإغلاق مفعّل للجمهور (Passcode: 4004)</span>
+          <span className="font-semibold text-white">🔒 وضع الإغلاق مفعّل للجمهور</span>
           <span className="hidden sm:inline text-slate-400">— أنت تتصفح حالياً بصلاحية الإدارة</span>
         </div>
         <button

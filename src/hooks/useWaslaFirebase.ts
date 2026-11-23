@@ -95,6 +95,7 @@ export interface PublicStorefrontSettings {
   airTicketsEnabled: boolean;
   metaPixelId?: string;
   ga4Id?: string;
+  tiktokPixelId?: string;
   heroImageUrl?: string;
   heroCaptionEn?: string;
   heroCaptionAr?: string;
@@ -781,6 +782,7 @@ export function useWaslaFirebase() {
     airTicketsEnabled: false,
     metaPixelId: '',
     ga4Id: '',
+    tiktokPixelId: '',
     heroImageUrl: '',
     heroCaptionEn: '',
     heroCaptionAr: '',
@@ -914,6 +916,7 @@ export function useWaslaFirebase() {
             airTicketsEnabled: Boolean(data.airTicketsEnabled),
             metaPixelId: data.metaPixelId || '',
             ga4Id: data.ga4Id || '',
+            tiktokPixelId: data.tiktokPixelId || '',
             heroImageUrl: data.heroImageUrl ? resolveBundledMediaUrl(data.heroImageUrl) : '',
             heroCaptionEn: data.heroCaptionEn || '',
             heroCaptionAr: data.heroCaptionAr || '',
@@ -981,6 +984,7 @@ export function useWaslaFirebase() {
               airTicketsEnabled: false,
               metaPixelId: '',
               ga4Id: '',
+              tiktokPixelId: '',
               updatedAt: serverTimestamp(),
             });
           } catch (err) {
@@ -2499,6 +2503,7 @@ export function useWaslaFirebase() {
         airTicketsEnabled: Boolean(merged.airTicketsEnabled),
         metaPixelId: truncateText(merged.metaPixelId, 64, ''),
         ga4Id: truncateText(merged.ga4Id, 64, ''),
+        tiktokPixelId: truncateText(merged.tiktokPixelId, 64, ''),
         heroImageUrl: safeHeroImg,
         heroCaptionEn: truncateText(merged.heroCaptionEn, 240, ''),
         heroCaptionAr: truncateText(merged.heroCaptionAr, 240, ''),
