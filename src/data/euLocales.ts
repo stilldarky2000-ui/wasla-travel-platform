@@ -94,7 +94,7 @@ export const EU_TRANSLATIONS: Record<EuOnlyLang, Translations> = {
     whyItems: {
       family: { title: 'Adapté aux familles', desc: 'Âges clairs pour les enfants, baies calmes et guides attentionnés.' },
       women: { title: 'Accompagnement dédié aux femmes', desc: 'Opérateurs vérifiés, suivi de prise en charge et assistance de jour.' },
-      pay: { title: 'En ligne ou en espèces', desc: 'Confirmation humaine d’abord, puis lien sécurisé ou paiement sur place.' },
+      pay: { title: 'Paiement en espèces à la prise en charge', desc: 'Le paiement en espèces à la prise en charge est la norme — si vous préférez régler à l’avance, demandez-nous simplement et nous vous enverrons un lien de paiement.' },
       cancel: { title: 'Annulation gratuite jusqu’à 24h avant', desc: 'Changement de programme ? Annulez ou modifiez sans frais jusqu’à 24h avant.' },
       whatsapp: { title: 'Support WhatsApp humain', desc: 'Réponses directes sur les horaires, la mer et les tarifs enfants.' },
     },
@@ -236,7 +236,7 @@ export const EU_TRANSLATIONS: Record<EuOnlyLang, Translations> = {
     whyItems: {
       family: { title: 'Familiar', desc: 'Edades mínimas claras, paradas tranquilas y guías pacientes.' },
       women: { title: 'Respaldado para viajeras', desc: 'Operadores verificados, seguimiento de recogida y atención diaria.' },
-      pay: { title: 'Paga online o en efectivo', desc: 'Confirmamos disponibilidad primero y luego eliges tarjeta o efectivo.' },
+      pay: { title: 'Pago en efectivo al recoger', desc: 'El pago en efectivo al recoger es lo habitual — si prefieres pagar por adelantado, solo pídenoslo y te enviaremos un enlace de pago.' },
       cancel: { title: 'Cancelación gratis hasta 24h antes', desc: '¿Cambios de plan? Cancela o cambia fecha sin coste hasta 24h antes.' },
       whatsapp: { title: 'Soporte directo por WhatsApp', desc: 'Respuestas humanas rápidas sobre horarios, clima y niños.' },
     },
@@ -378,7 +378,7 @@ export const EU_TRANSLATIONS: Record<EuOnlyLang, Translations> = {
     whyItems: {
       family: { title: 'Per famiglie', desc: 'Età minime chiare, soste calme e guide pazienti.' },
       women: { title: 'Supporto per viaggiatrici', desc: 'Partner verificati, orari di prelievo tracciati e assistenza diurna.' },
-      pay: { title: 'Online o in contanti', desc: 'Conferma disponibilità prima di pagare con link sicuro o in loco.' },
+      pay: { title: 'Pagamento in contanti al ritiro', desc: 'Il pagamento in contanti al ritiro è lo standard — se preferisci pagare in anticipo, chiedicelo e ti invieremo un link di pagamento.' },
       cancel: { title: 'Cancellazione gratuita fino a 24h prima', desc: 'Cambio piani? Disdici o sposta gratuitamente fino a 24 ore prima.' },
       whatsapp: { title: 'Assistenza WhatsApp reale', desc: 'Risposte umane immediate su orari di prelievo e mare.' },
     },
@@ -520,7 +520,7 @@ export const EU_TRANSLATIONS: Record<EuOnlyLang, Translations> = {
     whyItems: {
       family: { title: 'Gezinsvriendelijk', desc: 'Duidelijke leeftijden, rustige baaien en geduldige gidsen.' },
       women: { title: 'Veilig voor vrouwen', desc: 'Gecontroleerde partners en heldere ophaalupdates.' },
-      pay: { title: 'Online of contant betalen', desc: 'Eerst beschikbaarheid bevestigen, daarna link of contant.' },
+      pay: { title: 'Contant betalen bij het ophalen', desc: 'Contant betalen bij het ophalen is de standaard — betaal je liever vooraf, vraag het ons gerust en we sturen je een betaallink.' },
       cancel: { title: 'Gratis annuleren tot 24u vooraf', desc: 'Plannen gewijzigd? Kosteloos annuleren of wijzigen.' },
       whatsapp: { title: 'Direct WhatsApp-contact', desc: 'Menselijke antwoorden over ophaaltijden en zeegang.' },
     },
@@ -662,7 +662,7 @@ export const EU_TRANSLATIONS: Record<EuOnlyLang, Translations> = {
     whyItems: {
       family: { title: 'Przyjazne rodzinom', desc: 'Jasny wiek minimalny dzieci i spokojne tempo.' },
       women: { title: 'Wsparcie dla kobiet', desc: 'Sprawdzeni partnerzy i dokładny odbiór spod hotelu.' },
-      pay: { title: 'Online lub gotówką', desc: 'Najpierw potwierdzamy miejsca, potem płacisz linkiem lub przy odbiorze.' },
+      pay: { title: 'Płatność gotówką przy odbiorze', desc: 'Płatność gotówką przy odbiorze to standard — jeśli wolisz zapłacić z góry, po prostu poproś nas, a wyślemy Ci link do płatności.' },
       cancel: { title: 'Bezpłatne anulowanie do 24h przed', desc: 'Zmiana planów? Bezpłatna zmiana lub anulacja do 24 godzin przed.' },
       whatsapp: { title: 'Wsparcie WhatsApp', desc: 'Szybki ludzki kontakt w sprawie godziny odbioru.' },
     },
@@ -804,7 +804,7 @@ export const EU_TRANSLATIONS: Record<EuOnlyLang, Translations> = {
     whyItems: {
       family: { title: 'Familiar', desc: 'Idades claras para crianças e paragens tranquilas.' },
       women: { title: 'Apoio a viajantes', desc: 'Parceiros verificados e acompanhamento diário.' },
-      pay: { title: 'Online ou em dinheiro', desc: 'Confirmamos primeiro a vaga, depois paga por link ou no pickup.' },
+      pay: { title: 'Pagamento em dinheiro na recolha', desc: 'O pagamento em dinheiro na recolha é o padrão — se preferir pagar antecipadamente, basta pedir-nos e enviaremos um link de pagamento.' },
       cancel: { title: 'Cancelamento grátis até 24h antes', desc: 'Mudou de ideias? Cancele sem custos até 24h antes.' },
       whatsapp: { title: 'Apoio WhatsApp direto', desc: 'Respostas humanas rápidas sobre horários e condições.' },
     },
@@ -946,7 +946,7 @@ export const EU_TRANSLATIONS: Record<EuOnlyLang, Translations> = {
     whyItems: {
       family: { title: 'Pro rodiny', desc: 'Jasný minimální věk dětí a klidné tempo výletů.' },
       women: { title: 'Podpora pro cestovatelky', desc: 'Ověření partneři a přesné vyzvednutí u hotelu.' },
-      pay: { title: 'Online nebo hotově', desc: 'Nejprve potvrdíme dostupnost, pak platíte odkazem nebo na místě.' },
+      pay: { title: 'Platba v hotovosti při převzetí', desc: 'Platba v hotovosti při převzetí je standardem — pokud dáváte přednost platbě předem, stačí nám napsat a pošleme vám platební odkaz.' },
       cancel: { title: 'Zrušení zdarma do 24h předem', desc: 'Změna plánu? Zdarma zrušte či upravte do 24 hodin před startem.' },
       whatsapp: { title: 'Přímá podpora WhatsApp', desc: 'Rychlé lidské odpovědi ohledně vyzvednutí i počasí.' },
     },
@@ -1088,7 +1088,7 @@ export const EU_TRANSLATIONS: Record<EuOnlyLang, Translations> = {
     whyItems: {
       family: { title: 'Familjevänligt', desc: 'Tydliga åldersgränser och lugna badstopp.' },
       women: { title: 'Stöd för kvinnliga resenärer', desc: 'Verifierade partners och tydlig upphämtning.' },
-      pay: { title: 'Betala online eller kontant', desc: 'Bekräfta tillgänglighet först, betala sedan smidigt.' },
+      pay: { title: 'Kontant betalning vid upphämtning', desc: 'Kontant betalning vid upphämtning är standard — om du föredrar att betala i förväg är det bara att fråga oss så skickar vi en betalningslänk.' },
       cancel: { title: 'Fri avbokning upp till 24h före', desc: 'Ändrade planer? Boka om eller avboka gratis.' },
       whatsapp: { title: 'Direkt WhatsApp-support', desc: 'Snabba svar om upphämtning och förhållanden.' },
     },
@@ -1113,7 +1113,7 @@ export const EU_TRANSLATIONS: Record<EuOnlyLang, Translations> = {
     modalChildPolicy: 'Familj & trygghet',
     modalWholeEuro: 'Fast europris',
     modalPerAdult: 'per vuxen',
-    modalPayAfter: 'Kontant betaling ved afhentning',
+    modalPayAfter: 'Kontant betalning vid upphämtning',
     modalDateLabel: 'Önskat datum',
     modalAdults: 'Vuxna',
     modalChildren: 'Barn',
@@ -1230,7 +1230,7 @@ export const EU_TRANSLATIONS: Record<EuOnlyLang, Translations> = {
     whyItems: {
       family: { title: 'Pentru familii', desc: 'Vârste clare pentru copii și opriri liniștite.' },
       women: { title: 'Sprijin pentru călătoare', desc: 'Operatori verificați și preluare precisă de la hotel.' },
-      pay: { title: 'Online sau cash', desc: 'Confirmăm disponibilitatea întâi, apoi plătiți cu link sau la preluare.' },
+      pay: { title: 'Plată în numerar la preluare', desc: 'Plata în numerar la preluare este standardul — dacă preferi să plătești în avans, cere-ne și îți trimitem un link de plată.' },
       cancel: { title: 'Anulare gratuită cu 24h înainte', desc: 'Schimbare de plan? Anulați gratuit cu 24h înainte.' },
       whatsapp: { title: 'Suport direct WhatsApp', desc: 'Răspunsuri umane rapide despre orele de preluare.' },
     },

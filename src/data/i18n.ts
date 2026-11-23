@@ -252,8 +252,8 @@ const BASE_I18N: Record<'en' | 'ar' | 'de', Translations> = {
         desc: 'Vetted operators, clear pickup tracking, and responsive daytime support.',
       },
       pay: {
-        title: 'Pay online or cash',
-        desc: 'Confirm availability first, then settle by card link or cash on pickup.',
+        title: 'Pay in cash on pickup',
+        desc: "Cash on pickup is the standard — if you'd rather pay in advance, just ask us and we'll send you a payment link.",
       },
       cancel: {
         title: 'Free cancellation up to 24 hours before',
@@ -424,8 +424,8 @@ const BASE_I18N: Record<'en' | 'ar' | 'de', Translations> = {
         desc: 'مشغلون معتمدون، متابعة دقيقة للتوصيل، ودعم سريع طوال اليوم.',
       },
       pay: {
-        title: 'الدفع أونلاين أو نقداً',
-        desc: 'نؤكد التوافر أولاً ثم تدفع برابط إلكتروني أو نقداً عند الاستلام.',
+        title: 'الدفع نقداً عند الاستلام',
+        desc: 'الدفع نقداً عند الاستلام هو المعتاد — وإذا كنت تفضل الدفع مسبقاً، فقط اطلب منا وسنرسل لك رابط دفع.',
       },
       cancel: {
         title: 'إلغاء مجاني حتى 24 ساعة قبل الموعد',
@@ -596,8 +596,8 @@ const BASE_I18N: Record<'en' | 'ar' | 'de', Translations> = {
         desc: 'Geprüfte lokale Partner, verlässliche Abholung und direkter Tagessupport.',
       },
       pay: {
-        title: 'Online oder bar zahlen',
-        desc: 'Erst Verfügbarkeit prüfen lassen, dann per Zahlungslink oder bar zahlen.',
+        title: 'Barzahlung bei Abholung',
+        desc: 'Barzahlung bei Abholung ist der Standard — wenn Sie lieber vorab zahlen möchten, fragen Sie uns einfach und wir senden Ihnen einen Zahlungslink.',
       },
       cancel: {
         title: 'Kostenlose Stornierung bis 24 Stunden vorher',

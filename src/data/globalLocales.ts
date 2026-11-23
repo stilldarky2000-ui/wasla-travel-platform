@@ -66,7 +66,7 @@ export const GLOBAL_TRANSLATIONS: Record<GlobalOnlyLang, Translations> = {
     whyItems: {
       family: { title: 'Удобно для семей', desc: 'Понятный минимальный возраст, спокойные бухты и заботливые гиды.' },
       women: { title: 'Безопасно для женщин', desc: 'Проверенные операторы, точный трансфер и дневная поддержка.' },
-      pay: { title: 'Онлайн или наличными', desc: 'Сначала подтверждаем места, затем оплата по ссылке или на месте.' },
+      pay: { title: 'Оплата наличными при получении', desc: 'Оплата наличными при посадке — стандартный вариант. Если вы предпочитаете оплатить заранее, просто напишите нам, и мы пришлём ссылку на оплату.' },
       cancel: { title: 'Бесплатная отмена за 24 часа', desc: 'Изменились планы? Отмена или перенос без штрафа за 24 часа.' },
       whatsapp: { title: 'Живая поддержка в WhatsApp', desc: 'Быстрые ответы о времени выезда, погоде и детских тарифах.' },
     },
@@ -208,7 +208,7 @@ export const GLOBAL_TRANSLATIONS: Record<GlobalOnlyLang, Translations> = {
     whyItems: {
       family: { title: 'Зручно для родин', desc: 'Чіткий мінімальний вік дітей, спокійні бухти та уважні гіди.' },
       women: { title: 'Підтримка мандрівниць', desc: 'Перевірені партнери та чіткий час трансферу з готелю.' },
-      pay: { title: 'Онлайн або готівкою', desc: 'Спочатку підтверджуємо місця, потім оплата за посиланням або при посадці.' },
+      pay: { title: 'Оплата готівкою при отриманні', desc: 'Оплата готівкою при посадці — стандартний варіант. Якщо ви бажаєте сплатити наперед, просто напишіть нам, і ми надішлемо посилання для оплати.' },
       cancel: { title: 'Безкоштовне скасування за 24 год', desc: 'Змінилися плани? Скасуйте або перенесіть без комісії за 24 години.' },
       whatsapp: { title: 'Підтримка у WhatsApp', desc: 'Швидкі відповіді про час збору, погоду та дитячі тарифи.' },
     },
@@ -350,7 +350,7 @@ export const GLOBAL_TRANSLATIONS: Record<GlobalOnlyLang, Translations> = {
     whyItems: {
       family: { title: 'Ailelere uygun', desc: 'Net yaş sınırları, sakin koylar ve sabırlı rehberler.' },
       women: { title: 'Kadın gezginler için güvenli', desc: 'Onaylı operatörler ve takipli otel transferi.' },
-      pay: { title: 'Online veya nakit ödeme', desc: 'Önce müsaitliği onaylıyoruz, sonra güvenli link veya araçta nakit.' },
+      pay: { title: 'Teslimde nakit ödeme', desc: 'Alış sırasında nakit ödeme standarttır — önceden ödemek isterseniz bize yazmanız yeterli, size bir ödeme bağlantısı göndeririz.' },
       cancel: { title: '24 saat öncesine kadar ücretsiz iptal', desc: 'Planınız değişirse 24 saat kala ücretsiz iptal veya erteleme.' },
       whatsapp: { title: 'Canlı WhatsApp desteği', desc: 'Alış saatleri ve deniz koşulları için hızlı insan desteği.' },
     },
@@ -492,7 +492,7 @@ export const GLOBAL_TRANSLATIONS: Record<GlobalOnlyLang, Translations> = {
     whyItems: {
       family: { title: '亲子友好', desc: '明确的儿童年龄标准、平静浮潜点与耐心向导。' },
       women: { title: '女性旅客安心保障', desc: '严选合作方、全程接送追踪及日间专属客服。' },
-      pay: { title: '线上支付或现金支付', desc: '人工确认有位后再通过安全链接或上车现金付款。' },
+      pay: { title: '现场现金支付', desc: '接送时现金支付是常规方式——如果您更希望提前付款，只需告诉我们，我们会为您发送付款链接。' },
       cancel: { title: '出发前24小时免费取消', desc: '行程有变？24小时前可免费改期或取消。' },
       whatsapp: { title: 'WhatsApp 真人客服', desc: '直接咨询酒店接送时间、海况与儿童价格。' },
     },
@@ -634,7 +634,7 @@ export const GLOBAL_TRANSLATIONS: Record<GlobalOnlyLang, Translations> = {
     whyItems: {
       family: { title: '家族旅行に最適', desc: '明確な参加年齢と穏やかなシュノーケルポイント。' },
       women: { title: '女性お一人でも安心', desc: '厳選された催行会社と確実なホテル送迎。' },
-      pay: { title: 'オンラインまたは現地払い', desc: '空き状況確認後に決済リンクまたは当日現金でお支払い。' },
+      pay: { title: '現地で現金払い', desc: 'お迎え時の現金払いが基本です。事前決済をご希望の場合は、お気軽にお申し付けいただければ決済リンクをお送りします。' },
       cancel: { title: '24時間前までキャンセル無料', desc: 'ご予定が変わっても24時間前まで無料で変更・取消可能。' },
       whatsapp: { title: 'WhatsAppサポート', desc: 'お迎え時刻や海況について現地スタッフが直接お答えします。' },
     },
@@ -776,7 +776,7 @@ export const GLOBAL_TRANSLATIONS: Record<GlobalOnlyLang, Translations> = {
     whyItems: {
       family: { title: '가족 여행 최적화', desc: '명확한 아동 연령 기준, 잔잔한 스노클링 포인트.' },
       women: { title: '여성 여행자 안심 지원', desc: '검증된 현지 파트너 및 투명한 호텔 픽업 안내.' },
-      pay: { title: '온라인 또는 현장 현금 결제', desc: '좌석 확인 후 안전 결제 링크 또는 픽업 시 현금 결제.' },
+      pay: { title: '현지 현금 결제', desc: '픽업 시 현금 결제가 기본입니다. 사전 결제를 원하시면 말씀해 주세요. 결제 링크를 보내드립니다.' },
       cancel: { title: '24시간 전까지 무료 취소', desc: '일정이 변경되면 24시간 전까지 수수료 없이 취소/변경.' },
       whatsapp: { title: '실시간 WhatsApp 지원', desc: '픽업 시간과 날씨에 대해 담당자가 직접 답변합니다.' },
     },
@@ -918,7 +918,7 @@ export const GLOBAL_TRANSLATIONS: Record<GlobalOnlyLang, Translations> = {
     whyItems: {
       family: { title: 'Familievennlig', desc: 'Tydelig aldersgrense for barn, rolige bukter og tålmodige guider.' },
       women: { title: 'Trygt for kvinner', desc: 'Kvalitetssikrede operatører og tydelig hotellhenting.' },
-      pay: { title: 'Betal på nett eller kontant', desc: 'Vi bekrefter plass først, deretter betalingslenke eller kontant.' },
+      pay: { title: 'Kontant betaling ved henting', desc: 'Kontant betaling ved henting er standard — hvis du foretrekker å betale på forhånd, er det bare å spørre oss så sender vi en betalingslenke.' },
       cancel: { title: 'Gratis avbestilling inntil 24 timer før', desc: 'Endrede planer? Endre eller avbestill gratis 24 timer før.' },
       whatsapp: { title: 'Direkte WhatsApp-hjelp', desc: 'Raske svar om hentetid, vær og barnerabatter.' },
     },
@@ -1060,7 +1060,7 @@ export const GLOBAL_TRANSLATIONS: Record<GlobalOnlyLang, Translations> = {
     whyItems: {
       family: { title: 'Familievenlig', desc: 'Tydelige aldersgrænser for børn og rolige bugter.' },
       women: { title: 'Tryg for kvinder', desc: 'Godkendte partnere og pålidelig afhentning på hotellet.' },
-      pay: { title: 'Betal online eller kontant', desc: 'Vi bekræfter plads først, derefter betalingslink eller kontant.' },
+      pay: { title: 'Kontant betaling ved afhentning', desc: 'Kontant betaling ved afhentning er standard — hvis du foretrækker at betale på forhånd, så spørg os bare, så sender vi dig et betalingslink.' },
       cancel: { title: 'Gratis afbestilling op til 24 timer før', desc: 'Ændrede planer? Annuller gratis indtil 24 timer før start.' },
       whatsapp: { title: 'Direkte WhatsApp-support', desc: 'Hurtige menneskelige svar om afhentning og vejr.' },
     },
@@ -1085,7 +1085,7 @@ export const GLOBAL_TRANSLATIONS: Record<GlobalOnlyLang, Translations> = {
     modalChildPolicy: 'Familie og sikkerhed',
     modalWholeEuro: 'Fast pris i euro',
     modalPerAdult: 'pr. voksen',
-    modalPayAfter: 'Kontant betalning vid upphämtning',
+    modalPayAfter: 'Kontant betaling ved afhentning',
     modalDateLabel: 'Ønsket dato',
     modalAdults: 'Voksne',
     modalChildren: 'Børn',
@@ -1202,7 +1202,7 @@ export const GLOBAL_TRANSLATIONS: Record<GlobalOnlyLang, Translations> = {
     whyItems: {
       family: { title: 'Perheystävällinen', desc: 'Selkeät ikärajat lapsille, rauhalliset lahdet ja kärsivälliset oppaat.' },
       women: { title: 'Tukea naismatkailijoille', desc: 'Tarkistetut kumppanit ja luotettava hotellinouto.' },
-      pay: { title: 'Maksu verkossa tai käteisellä', desc: 'Varmistamme ensin paikat, sen jälkeen maksulinkki tai käteinen.' },
+      pay: { title: 'Käteismaksu noudettaessa', desc: 'Käteismaksu noudettaessa on oletustapa — jos haluat mieluummin maksaa etukäteen, pyydä vain meiltä niin lähetämme maksulinkin.' },
       cancel: { title: 'Ilmainen peruutus 24h etukäteen', desc: 'Suunnitelmat muuttuivat? Peruuta tai siirrä maksutta 24h ennen.' },
       whatsapp: { title: 'Suora WhatsApp-tuki', desc: 'Nopeat vastaukset noutoajoista ja olosuhteista.' },
     },
@@ -1344,7 +1344,7 @@ export const GLOBAL_TRANSLATIONS: Record<GlobalOnlyLang, Translations> = {
     whyItems: {
       family: { title: 'Családbarát', desc: 'Egyértelmű korhatárok és nyugodt tempójú programok.' },
       women: { title: 'Biztonságos nőknek', desc: 'Ellenőrzött partnerek és követhető szállodai transzfer.' },
-      pay: { title: 'Online vagy készpénzben', desc: 'Először ellenőrizzük a helyeket, majd fizetés linkkel vagy helyszínen.' },
+      pay: { title: 'Készpénzes fizetés átvételkor', desc: 'Az átvételkor történő készpénzes fizetés az alapértelmezett — ha inkább előre fizetne, csak szóljon nekünk, és küldünk egy fizetési linket.' },
       cancel: { title: 'Ingyenes lemondás 24 órával előtte', desc: 'Változott a terv? 24 órával indulás előtt díjmentesen lemondható.' },
       whatsapp: { title: 'Közvetlen WhatsApp támogatás', desc: 'Gyors válaszok az indulási időkről és tengeri viszonyokról.' },
     },
@@ -1486,7 +1486,7 @@ export const GLOBAL_TRANSLATIONS: Record<GlobalOnlyLang, Translations> = {
     whyItems: {
       family: { title: 'Ιδανικό για οικογένειες', desc: 'Σαφή όρια ηλικίας, ήρεμοι όρμοι και υπομονετικοί οδηγοί.' },
       women: { title: 'Υποστήριξη για γυναίκες', desc: 'Ελεγμένοι συνεργάτες και ακριβής παραλαβή από το ξενοδοχείο.' },
-      pay: { title: 'Online ή μετρητά', desc: 'Επιβεβαιώνουμε πρώτα τη διαθεσιμότητα και μετά πληρώνετε.' },
+      pay: { title: 'Πληρωμή με μετρητά κατά την παραλαβή', desc: 'Η πληρωμή με μετρητά κατά την παραλαβή είναι ο συνήθης τρόπος — αν προτιμάτε να πληρώσετε εκ των προτέρων, απλώς ζητήστε το μας και θα σας στείλουμε σύνδεσμο πληρωμής.' },
       cancel: { title: 'Δωρεάν ακύρωση έως 24 ώρες πριν', desc: 'Αλλάξατε σχέδια; Ακυρώστε ή μεταφέρετε δωρεάν 24 ώρες πριν.' },
       whatsapp: { title: 'Άμεση υποστήριξη WhatsApp', desc: 'Ανθρώπινες απαντήσεις για ώρες παραλαβής και καιρό.' },
     },
@@ -1628,7 +1628,7 @@ export const GLOBAL_TRANSLATIONS: Record<GlobalOnlyLang, Translations> = {
     whyItems: {
       family: { title: 'परिवार के अनुकूल', desc: 'स्पष्ट आयु सीमा, शांत खाड़ियाँ और धैर्यवान गाइड।' },
       women: { title: 'महिला यात्रियों के लिए सुरक्षित', desc: 'सत्यापित पार्टनर और समय पर होटल पिकअप।' },
-      pay: { title: 'ऑनलाइन या नकद भुगतान', desc: 'पहले उपलब्धता की पुष्टि, फिर भुगतान लिंक या पिकअप पर नकद।' },
+      pay: { title: 'पिकअप पर नकद भुगतान', desc: 'पिकअप के समय नकद भुगतान सामान्य तरीका है — यदि आप पहले भुगतान करना चाहें, तो बस हमसे पूछें और हम आपको भुगतान लिंक भेज देंगे।' },
       cancel: { title: '24 घंटे पहले तक मुफ्त रद्दीकरण', desc: 'योजना बदली? 24 घंटे पहले बिना शुल्क रद्द या बदलाव करें।' },
       whatsapp: { title: 'सीधा WhatsApp सपोर्ट', desc: 'पिकअप समय और मौसम पर तुरंत सहायता।' },
     },

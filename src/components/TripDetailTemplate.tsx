@@ -2961,19 +2961,21 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
                     </>
                   )}
 
-                  <div className="space-y-1">
-                    <p className="text-xs font-medium text-[#475569]">{t.modalPickupDispatchNote}</p>
-                    <p className="text-xs text-[#64748B]">
+                  <div className="space-y-1.5 pt-0.5">
+                    {hasOuterZoneTransfer && (
+                      <p className="text-[11px] leading-relaxed text-[#64748B]">
+                        {t.modalTransferZoneNotice}
+                      </p>
+                    )}
+                    <p className="text-xs font-medium leading-relaxed text-[#475569]">
                       {tText(
                         {
-                          en: 'Free cancellation up to 24h before',
-                          ar: 'إلغاء مجاني قبل ٢٤ ساعة',
-                          de: 'Kostenlos stornierbar bis 24h vorher',
+                          en: 'Pickup time and location will be sent to you the day before the trip at 6:00 PM.',
+                          ar: 'سيتم إرسال موعد ومكان الاستلام (البيك أب) إليك في اليوم السابق للرحلة الساعة 6:00 مساءً.',
+                          de: 'Abholzeit und Abholort werden Ihnen am Tag vor dem Ausflug um 18:00 Uhr zugeschickt.',
                         },
                         lang
                       )}
-                      {' · '}
-                      {t.modalPayAfter}
                     </p>
                   </div>
                 </div>
