@@ -413,47 +413,81 @@ function mergeTripsWithStarterCatalog(remoteTrips: Trip[]): Trip[] {
       const remoteHasRichDesc = Boolean(rt.fullDescription?.en || rt.fullDescription?.ar);
       const remoteHasItinerary = Array.isArray(rt.itinerary) && rt.itinerary.length > 0;
       const remoteStillHasOldTimeline = Boolean(rt.fullDescription?.en?.includes('Full Day Program & Timeline'));
+      const isStaleLuxorStarterCopy =
+        rt.id === 'luxor-valley-small-van' &&
+        (rt.name?.en === 'Luxor Temples & Valley of the Kings Small-Van Day' ||
+          Boolean(rt.fullDescription?.en?.includes('Mercedes Sprinter')));
       remoteById.set(rt.id, {
         ...starter,
         ...rt,
+        name: isStaleLuxorStarterCopy ? starter.name : rt.name ?? starter.name,
+        duration: isStaleLuxorStarterCopy ? starter.duration : rt.duration ?? starter.duration,
+        pickup: isStaleLuxorStarterCopy ? starter.pickup : rt.pickup ?? starter.pickup,
         images: hasCustomDataImage
           ? normalizeRemoteTripImages(rt, starter.images)
           : starter.images,
         galleryCaptions:
-          Array.isArray(rt.galleryCaptions) && rt.galleryCaptions.length > 0
+          hasCustomDataImage && Array.isArray(rt.galleryCaptions) && rt.galleryCaptions.length > 0
             ? rt.galleryCaptions
             : starter.galleryCaptions,
-        departureTimes: rt.departureTimes !== undefined ? rt.departureTimes : starter.departureTimes,
-        timingNote: rt.timingNote ?? starter.timingNote,
-        shortDescription: remoteHasRichDesc ? rt.shortDescription : starter.shortDescription,
+        departureTimes:
+          !isStaleLuxorStarterCopy && rt.departureTimes !== undefined
+            ? rt.departureTimes
+            : starter.departureTimes,
+        timingNote: isStaleLuxorStarterCopy ? starter.timingNote : rt.timingNote ?? starter.timingNote,
+        shortDescription:
+          !isStaleLuxorStarterCopy && remoteHasRichDesc ? rt.shortDescription : starter.shortDescription,
         fullDescription:
-          remoteStillHasOldTimeline || !rt.fullDescription ? starter.fullDescription : rt.fullDescription,
-        itinerary: remoteHasItinerary ? rt.itinerary : starter.itinerary,
+          isStaleLuxorStarterCopy || remoteStillHasOldTimeline || !rt.fullDescription
+            ? starter.fullDescription
+            : rt.fullDescription,
+        itinerary: !isStaleLuxorStarterCopy && remoteHasItinerary ? rt.itinerary : starter.itinerary,
         historicalFacts:
           Array.isArray(rt.historicalFacts) && rt.historicalFacts.length > 0
             ? rt.historicalFacts
             : starter.historicalFacts,
         highlights:
-          remoteHasRichDesc && Array.isArray(rt.highlights) && rt.highlights.length >= starter.highlights.length
+          !isStaleLuxorStarterCopy &&
+          remoteHasRichDesc &&
+          Array.isArray(rt.highlights) &&
+          rt.highlights.length >= starter.highlights.length
             ? rt.highlights
             : starter.highlights,
         included:
-          remoteHasRichDesc && Array.isArray(rt.included) && rt.included.length >= starter.included.length
+          !isStaleLuxorStarterCopy &&
+          remoteHasRichDesc &&
+          Array.isArray(rt.included) &&
+          rt.included.length >= starter.included.length
             ? rt.included
             : starter.included,
         options:
-          remoteHasRichDesc && Array.isArray(rt.options) && rt.options.length >= (starter.options?.length || 0)
+          !isStaleLuxorStarterCopy &&
+          remoteHasRichDesc &&
+          Array.isArray(rt.options) &&
+          rt.options.length >= (starter.options?.length || 0)
             ? rt.options
             : starter.options,
-        tips: rt.tips && rt.tips.length > 0 ? rt.tips : starter.tips,
+        tips: !isStaleLuxorStarterCopy && rt.tips && rt.tips.length > 0 ? rt.tips : starter.tips,
         notSuitableFor:
-          rt.notSuitableFor && rt.notSuitableFor.length > 0 ? rt.notSuitableFor : starter.notSuitableFor,
-        meetingPoint: rt.meetingPoint ?? starter.meetingPoint,
+          !isStaleLuxorStarterCopy && rt.notSuitableFor && rt.notSuitableFor.length > 0
+            ? rt.notSuitableFor
+            : starter.notSuitableFor,
+        meetingPoint: isStaleLuxorStarterCopy
+          ? starter.meetingPoint
+          : rt.meetingPoint ?? starter.meetingPoint,
         meetingPointUrl: rt.meetingPointUrl ?? starter.meetingPointUrl,
-        whatToBring: rt.whatToBring && rt.whatToBring.length > 0 ? rt.whatToBring : starter.whatToBring,
-        notAllowed: rt.notAllowed && rt.notAllowed.length > 0 ? rt.notAllowed : starter.notAllowed,
+        whatToBring:
+          !isStaleLuxorStarterCopy && rt.whatToBring && rt.whatToBring.length > 0
+            ? rt.whatToBring
+            : starter.whatToBring,
+        notAllowed:
+          !isStaleLuxorStarterCopy && rt.notAllowed && rt.notAllowed.length > 0
+            ? rt.notAllowed
+            : starter.notAllowed,
         knowBeforeYouGo:
-          rt.knowBeforeYouGo && rt.knowBeforeYouGo.length > 0 ? rt.knowBeforeYouGo : starter.knowBeforeYouGo,
+          !isStaleLuxorStarterCopy && rt.knowBeforeYouGo && rt.knowBeforeYouGo.length > 0
+            ? rt.knowBeforeYouGo
+            : starter.knowBeforeYouGo,
         outerTransferEnabled: rt.outerTransferEnabled ?? starter.outerTransferEnabled,
         languages: rt.languages && rt.languages.length > 0 ? rt.languages : starter.languages,
         operatingDays:

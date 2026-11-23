@@ -3,8 +3,12 @@ import heroRedSeaVibrantImg from '../assets/images/hero_red_sea_vibrant_17950886
 import orangeBayImg from '../assets/images/trip_orange_bay_boat_1794609167713.jpg';
 import desertSunsetImg from '../assets/images/trip_desert_quad_sunset_1794609167599.jpg';
 import luxorTempleImg from '../assets/images/trip_luxor_temple_columns_1794609167708.jpg';
+import luxorKarnakAvenueImg from '../assets/images/luxor_karnak_avenue_1795453498729.jpg';
+import luxorColossiMemnonImg from '../assets/images/luxor_colossi_memnon_1795453499145.jpg';
 import luxorValleyKingsImg from '../assets/images/luxor_valley_kings_tombs_1795023936503.jpg';
+import luxorRoyalTombImg from '../assets/images/luxor_royal_tomb_1795453499282.jpg';
 import luxorHatshepsutImg from '../assets/images/luxor_hatshepsut_temple_1795023935886.jpg';
+import luxorTempleExteriorImg from '../assets/images/luxor_temple_exterior_1795453498872.jpg';
 import luxorFeluccaImg from '../assets/images/luxor_nile_felucca_dusk_1795023937583.jpg';
 import horseBeachImg from '../assets/images/trip_horse_sahl_hasheesh_1794609168296.jpg';
 import momentGuestImg from '../assets/images/moment_guest_red_sea_1794609167642.jpg';
@@ -334,8 +338,12 @@ const BUNDLED_IMAGE_ENTRIES: Array<{ token: string; asset: string }> = [
   { token: 'trip_orange_bay_boat', asset: orangeBayImg },
   { token: 'trip_desert_quad_sunset', asset: desertSunsetImg },
   { token: 'trip_luxor_temple_columns', asset: luxorTempleImg },
+  { token: 'luxor_karnak_avenue', asset: luxorKarnakAvenueImg },
+  { token: 'luxor_colossi_memnon', asset: luxorColossiMemnonImg },
   { token: 'luxor_valley_kings_tombs', asset: luxorValleyKingsImg },
+  { token: 'luxor_royal_tomb', asset: luxorRoyalTombImg },
   { token: 'luxor_hatshepsut_temple', asset: luxorHatshepsutImg },
+  { token: 'luxor_temple_exterior', asset: luxorTempleExteriorImg },
   { token: 'luxor_nile_felucca_dusk', asset: luxorFeluccaImg },
   { token: 'trip_horse_sahl_hasheesh', asset: horseBeachImg },
   { token: 'moment_guest_red_sea', asset: momentGuestImg },
@@ -615,13 +623,22 @@ export const TRIPS: Trip[] = [
   {
     id: 'luxor-valley-small-van',
     name: {
-      en: 'Luxor Temples & Valley of the Kings Small-Van Day',
-      ar: 'رحلة معابد الأقصر ووادي الملوك بسيارة مرسيدس صغيرة',
-      de: 'Luxor-Tempel & Tal der Könige im Kleinbus',
+      en: "Ancient Thebes in a Day: Karnak, the Valley of the Kings and Hatshepsut's Temple, from Hurghada",
+      ar: 'طيبة القديمة في يوم واحد: الكرنك ووادي الملوك ومعبد حتشبسوت من الغردقة',
+      de: 'Das antike Theben an einem Tag: Karnak, Tal der Könige und Hatschepsut-Tempel ab Hurghada',
     },
     category: 'historical',
     destination: 'Luxor',
-    images: [luxorTempleImg, luxorValleyKingsImg, luxorHatshepsutImg, luxorFeluccaImg],
+    images: [
+      luxorTempleImg,
+      luxorKarnakAvenueImg,
+      luxorFeluccaImg,
+      luxorColossiMemnonImg,
+      luxorValleyKingsImg,
+      luxorRoyalTombImg,
+      luxorHatshepsutImg,
+      luxorTempleExteriorImg,
+    ],
     galleryCaptions: [
       {
         en: 'Great Hypostyle Hall & 134 carved sandstone columns at Karnak Temple (East Bank)',
@@ -629,9 +646,29 @@ export const TRIPS: Trip[] = [
         de: 'Große Säulenhalle mit 134 Sandsteinsäulen im Karnak-Tempel (Ostufer)',
       },
       {
-        en: 'Sunlit canyon cliffs & royal painted tomb entrance in the Valley of the Kings',
-        ar: 'منحدرات جبال طيبة ومداخل المقابر الملكية الملونة في وادي الملوك بالبر الغربي',
+        en: 'Processional Avenue of Ram-Headed Sphinxes & First Pylon at Karnak Temple',
+        ar: 'طريق الكباش والصرح الأول المهيب في مدخل معبد الكرنك',
+        de: 'Widderköpfige Sphinxallee und Erster Pylon am Karnak-Tempel',
+      },
+      {
+        en: 'Traditional Nile boat crossing toward the palm groves and hills of the West Bank',
+        ar: 'عبور نهر النيل بالمركب أمام بساتين النخيل وتلال البر الغربي بالأقصر',
+        de: 'Bootsfahrt über den Nil Richtung Palmenhaine und Thebanische Berge am Westufer',
+      },
+      {
+        en: 'Twin Colossi of Memnon standing on the sunlit Theban plain (West Bank)',
+        ar: 'تمثالا ممنون العملاقان في سهل طيبة بالبر الغربي بالأقصر',
+        de: 'Die beiden Memnonkolosse in der sonnigen Ebene von Theben (Westufer)',
+      },
+      {
+        en: 'Sunlit canyon cliffs & royal tomb entrances in the Valley of the Kings',
+        ar: 'منحدرات جبال طيبة ومداخل المقابر الملكية في وادي الملوك بالبر الغربي',
         de: 'Sonnendurchflutete Kalksteinfelsen und Königsgräber im Tal der Könige',
+      },
+      {
+        en: 'Vivid painted hieroglyphs & astronomical starry ceiling inside a royal tomb',
+        ar: 'نقوش هيروغليفية ملونة وسقف فلكي مزيّن بالنجوم داخل إحدى المقابر الملكية',
+        de: 'Farbenprächtige Hieroglyphen und Sternenhimmel im Inneren eines Königsgrabs',
       },
       {
         en: 'Three-tiered limestone colonnades of Queen Hatshepsut at Deir el-Bahari',
@@ -639,100 +676,114 @@ export const TRIPS: Trip[] = [
         de: 'Dreistufige Terrassenanlage der Königin Hatschepsut in Deir el-Bahari',
       },
       {
-        en: 'Traditional Nile Felucca boat gliding past palm groves and Theban hills',
-        ar: 'مركب الفلوكة الشراعي التقليدي يعبر نهر النيل أمام تلال البر الغربي',
-        de: 'Traditionelle Felukke auf dem Nil vor Palmenhainen und den Thebanischen Bergen',
+        en: 'Grand exterior pylon, Ramses II statues & obelisk at Luxor Temple',
+        ar: 'واجهة معبد الأقصر من الخارج وتماثيل رمسيس الثاني والمسلة وطريق الكباش',
+        de: 'Außenfassade des Luxor-Tempels mit Ramses-II.-Statuen, Obelisk und Sphinxallee',
       },
     ],
     rating: 4.9,
     reviewCount: 49,
-    duration: { en: '14 hours', ar: '14 ساعة (يوم كامل)', de: '14 Stunden' },
-    departureTimes: ['05:00 AM'],
+    duration: { en: 'Full day', ar: 'يوم كامل', de: 'Ganztags' },
+    departureTimes: ['03:00–04:00'],
     timingNote: {
-      en: 'Direct hotel pickup 04:45–05:15 AM · Return to hotel around 08:00 PM',
-      ar: 'الاستلام من الفندق 04:45–05:15 صباحاً · العودة للفندق حوالي 08:00 مساءً',
-      de: 'Hotelabholung 04:45–05:15 Uhr · Rückkehr ca. 20:00 Uhr',
+      en: 'Hotel pickup between 03:00 and 04:00, exact time confirmed after booking',
+      ar: 'الاستلام من الفندق بين 03:00 و04:00 صباحاً، ويتم تأكيد الموعد الدقيق بعد الحجز',
+      de: 'Hotelabholung zwischen 03:00 und 04:00 Uhr, genaue Zeit wird nach Buchung bestätigt',
     },
     price: 78,
     options: [
       {
         id: 'opt-luxor-van',
         title: {
-          en: '8-Seat Mercedes Small-Van Tour',
-          ar: 'جولة بميكروباص مرسيدس VIP (بحد أقصى 8 أفراد)',
-          de: '8-Sitzer Mercedes Kleinbus-Tour',
+          en: 'Luxor Full-Day Trip (Standard)',
+          ar: 'رحلة الأقصر اليوم الكامل (البرنامج الأساسي)',
+          de: 'Luxor Tagestour (Standard)',
         },
         detail: {
-          en: 'Licensed Egyptologist + Karnak, Valley of the Kings (3 tombs), Hatshepsut Temple & Nile lunch',
-          ar: 'مرشد أثري مرخص + معبد الكرنك ووادي الملوك (3 مقابر) وحتشبسوت وغداء على النيل',
-          de: 'Ägyptologe + Karnak, Tal der Könige (3 Gräber), Hatschepsut & Nil-Mittagessen',
+          en: "Karnak Temple, Colossi of Memnon, Valley of the Kings (3 included tombs), Hatshepsut's Temple, lunch with drinks & licensed Egyptologist",
+          ar: 'معبد الكرنك، تمثالا ممنون، وادي الملوك (3 مقابر مشمولة)، معبد حتشبسوت، غداء مع المشروبات، ومرشد أثري مرخّص',
+          de: 'Karnak-Tempel, Memnonkolosse, Tal der Könige (3 Gräber inklusive), Hatschepsut-Tempel, Mittagessen mit Getränken & lizenzierter Ägyptologe',
         },
         price: 78,
       },
       {
         id: 'opt-luxor-felucca',
         title: {
-          en: 'Small-Van Tour + Felucca Nile Sail & Banana Island',
-          ar: 'جولة الميكروباص الصغير + رحلة فلوكة في النيل وجزيرة الموز',
-          de: 'Kleinbus-Tour + Felukenfahrt auf dem Nil & Bananeninsel',
+          en: 'Luxor Full-Day Trip + Nile Boat Crossing',
+          ar: 'رحلة الأقصر اليوم الكامل + عبور النيل بالمركب',
+          de: 'Luxor Tagestour + Nil-Bootsüberfahrt',
         },
         detail: {
-          en: 'Includes all East & West Bank temples + 45-min traditional Felucca boat crossing & fruit tasting',
-          ar: 'شامل جميع معابد البر الشرقي والغربي + جولة فلوكة شراعية 45 دقيقة في النيل وتذوق الفاكهة',
-          de: 'Inkl. Ost- & Westufer-Tempel + 45 Min. traditionelle Felukenfahrt & Obstverkostung',
+          en: 'Includes the full standard program plus the boat crossing on the Nile to the West Bank',
+          ar: 'يشمل البرنامج الأساسي بالكامل بالإضافة إلى عبور نهر النيل بالمركب نحو البر الغربي',
+          de: 'Inklusive komplettem Standardprogramm plus Bootsüberfahrt über den Nil zum Westufer',
         },
-        price: 94,
+        price: 88,
       },
       {
-        id: 'opt-luxor-private',
+        id: 'opt-luxor-tutankhamun',
         title: {
-          en: 'Private Sedan / Van + Dedicated Egyptologist',
-          ar: 'سيارة خاصة + مرشد أثري خاص بك وعائلتك فقط',
-          de: 'Privater PKW / Van + eigener Ägyptologe',
+          en: 'Luxor Full-Day Trip + Tomb of Tutankhamun',
+          ar: 'رحلة الأقصر اليوم الكامل + مقبرة توت عنخ آمون',
+          de: 'Luxor Tagestour + Grab des Tutanchamun',
         },
         detail: {
-          en: '100% flexible pace · Private A/C vehicle, custom temple schedule & private Nile-view table',
-          ar: 'خصوصية ومرونة كاملة · سيارة مكيفة خاصة وترتيب مزارات مرن وطاولة غداء خاصة على النيل',
-          de: 'Eigenes Tempo · Klimatisierter Privatwagen, flexibler Zeitplan & privater Tisch am Nil',
+          en: 'Includes the full standard program plus separate entry ticket to the Tomb of Tutankhamun',
+          ar: 'يشمل البرنامج الأساسي بالكامل بالإضافة إلى تذكرة الدخول المنفصلة لمقبرة توت عنخ آمون',
+          de: 'Inklusive komplettem Standardprogramm plus separater Eintrittskarte für das Grab des Tutanchamun',
         },
-        price: 145,
+        price: 103,
+      },
+      {
+        id: 'opt-luxor-complete',
+        title: {
+          en: 'Luxor Full-Day Trip + Nile Boat Crossing & Tomb of Tutankhamun',
+          ar: 'رحلة الأقصر اليوم الكامل + عبور النيل بالمركب ومقبرة توت عنخ آمون',
+          de: 'Luxor Tagestour + Nil-Bootsüberfahrt & Grab des Tutanchamun',
+        },
+        detail: {
+          en: 'Includes the full standard program, the Nile boat crossing to the West Bank, and entry to the Tomb of Tutankhamun',
+          ar: 'يشمل البرنامج الأساسي بالكامل وعبور النيل بالمركب إلى البر الغربي وتذكرة دخول مقبرة توت عنخ آمون',
+          de: 'Inklusive komplettem Standardprogramm, Nil-Bootsüberfahrt zum Westufer und Eintritt zum Grab des Tutanchamun',
+        },
+        price: 113,
       },
     ],
     shortDescription: {
-      en: 'Explore Ancient Thebes in an 8-seat A/C Mercedes Sprinter with a licensed Egyptologist: Karnak Temple, Valley of the Kings, Hatshepsut Temple, Colossi of Memnon, and a freshly cooked Nile-side lunch, with zero forced bazaar stops.',
-      ar: 'استكشف طيبة القديمة في سيارة مرسيدس مكيفة (8 مقاعد فقط) مع مرشد أثري مرخص: معبد الكرنك، وادي الملوك، معبد حتشبسوت، تمثالا ممنون، وغداء مصري طازج على ضفاف النيل، بدون أي توقفات تسوق إجبارية.',
-      de: 'Entdecken Sie das antike Theben im klimatisierten 8-Sitzer Mercedes Sprinter mit lizenziertem Ägyptologen: Karnak-Tempel, Tal der Könige, Hatschepsut-Tempel, Memnonkolosse und Mittagessen am Nil, ohne Verkaufsstopps.',
+      en: "From Hurghada across the desert to ancient Thebes: Karnak Temple, an optional Nile boat crossing, the Colossi of Memnon, three royal tombs in the Valley of the Kings, and Queen Hatshepsut's Temple with a licensed Egyptologist.",
+      ar: 'من الغردقة عبر الطريق الصحراوي إلى طيبة القديمة: معبد الكرنك، عبور النيل اختيارياً بالمركب، تمثالا ممنون، ثلاث مقابر ملكية في وادي الملوك، ومعبد الملكة حتشبسوت بصحبة مرشد أثري مرخّص.',
+      de: 'Von Hurghada durch die Wüste ins antike Theben: Karnak-Tempel, optionale Nil-Bootsüberfahrt, Memnonkolosse, drei Königsgräber im Tal der Könige und der Hatschepsut-Tempel mit lizenziertem Ägyptologen.',
     },
     highlights: [
       {
-        en: 'Strictly 8 guests max per Mercedes Sprinter, beat the 50-seat coach crowds by 90 minutes',
-        ar: 'بحد أقصى 8 ضيوف فقط في سيارة مرسيدس سبرينتر، وصول أسرع وتجنب زحام الأتوبيسات الكبيرة',
-        de: 'Maximal 8 Gäste pro Mercedes Sprinter, 90 Minuten schneller als große Reisebusse',
+        en: "Walk Karnak's processional avenues through one of the largest temple complexes ever built",
+        ar: 'السير في ممرات معبد الكرنك المهيبة داخل أحد أكبر مجمعات المعابد التي بُنيت في التاريخ',
+        de: 'Spazieren Sie über die Prozessionsalleen von Karnak durch eine der größten Tempelanlagen der Geschichte',
       },
       {
-        en: 'Walk through the Great Hypostyle Hall of Karnak Temple (134 giant columns) in the cool morning light',
-        ar: 'جولة معمقة داخل صالة الأعمدة الكبرى بمعبد الكرنك (134 عموداً فرعونياً) في هدوء الصباح',
-        de: 'Spaziergang durch die Große Säulenhalle des Karnak-Tempels (134 Säulen) im kühlen Morgenlicht',
+        en: 'Take to the water: cross the Nile by boat to the West Bank, or stay on the coach over the bridge',
+        ar: 'اعبر نهر النيل بالمركب إلى البر الغربي، أو استكمل الطريق بالباص عبر الكوبري',
+        de: 'Überqueren Sie den Nil optional per Boot zum Westufer oder fahren Sie bequem im Bus über die Brücke',
       },
       {
-        en: 'Enter 3 royal painted tombs inside the Valley of the Kings with full historical briefing',
-        ar: 'دخول 3 مقابر ملكية ملونة داخل وادي الملوك بالبر الغربي مع شرح تاريخي مفصل',
-        de: 'Besuch von 3 reich verzierten Königsgräbern im Tal der Könige mit ausführlicher Führung',
+        en: 'Go underground in the Valley of the Kings, inside three royal tombs, entry included',
+        ar: 'ادخل إلى أعماق وادي الملوك واستكشف ثلاث مقابر ملكية بتذاكر دخول مشمولة',
+        de: 'Steigen Sie im Tal der Könige in drei königliche Gräber hinab, Eintritt inklusive',
       },
       {
-        en: 'Visit the cliff-carved Mortuary Temple of Queen Hatshepsut at Deir el-Bahari & Colossi of Memnon',
-        ar: 'زيارة معبد الملكة حتشبسوت المنحوت في جبل الدير البحري والوقوف أمام تمثالي ممنون العملاقين',
-        de: 'Besichtigung des Terrassentempels der Königin Hatschepsut und der Memnonkolosse',
+        en: 'Add the tomb of Tutankhamun, or the tomb of Ramses V and VI, as an optional extra',
+        ar: 'أضف زيارة مقبرة توت عنخ آمون أو مقبرة رمسيس الخامس والسادس كخيار إضافي',
+        de: 'Ergänzen Sie das Grab des Tutanchamun oder das Grab von Ramses V. und VI. als optionale Leistung',
       },
       {
-        en: 'Freshly prepared Egyptian lunch on a shaded terrace overlooking the Nile River',
-        ar: 'غداء مصري طازج في مطعم مطل مباشرة على نهر النيل في أجواء هادئة ومظللة',
-        de: 'Frisch zubereitetes ägyptisches Mittagessen auf einer schattigen Terrasse direkt am Nil',
+        en: "Face the Colossi of Memnon, then walk the terraced ramps of Queen Hatshepsut's temple",
+        ar: 'قف أمام تمثالي ممنون العملاقين ثم اصعد مدرجات معبد الملكة حتشبسوت المنحوت في الجبل',
+        de: 'Bestaunen Sie die Memnonkolosse und begehen Sie anschließend die Terrassen des Hatschepsut-Tempels',
       },
       {
-        en: '100% Zero-Bazaar Guarantee, no forced alabaster, papyrus, or perfume factory detours',
-        ar: 'ضمان صفر بازارات إجبارية، لا نضيع وقتك في مصانع الألباستر أو البردي أو العطور',
-        de: '100 % Ohne-Verkaufsstopps-Garantie, keine erzwungene Alabaster- oder Papyrusfabriken',
+        en: 'A licensed local Egyptologist leads the day, with deep knowledge of every site you enter',
+        ar: 'يرافقك طوال اليوم مرشد أثري مصري مرخّص بمعرفة عميقة بكل موقع تدخله',
+        de: 'Ein lizenzierter lokaler Ägyptologe begleitet den Tag mit fundiertem Wissen zu jeder Stätte',
       },
     ],
     historicalFacts: [
@@ -778,238 +829,392 @@ export const TRIPS: Trip[] = [
       },
     ],
     fullDescription: {
-      en: `Discover Upper Egypt in an 8-seat A/C Mercedes Sprinter with a licensed Egyptologist, arriving at Karnak Temple 90 minutes ahead of large tour coaches and exploring both East and West Banks at an unhurried pace.
+      en: `The alarm goes off in the dark, and it is worth it. We collect you from your hotel in Hurghada and settle you into an air-conditioned coach or minivan for the desert road south, a bottle of water in hand for the journey. The road unrolls through empty country as the sky lightens, with a pause along the way to stretch your legs, use the facilities and grab a drink.
 
-We guarantee zero forced souvenir, alabaster, or perfume factory detours so your full day stays focused on ancient monuments, shaded rest breaks, and a freshly cooked Nile-side lunch.`,
-      ar: `استكشف مدينة الأقصر في سيارة مرسيدس سبرينتر حديثة ومكيفة بحد أقصى 8 أفراد فقط مع مرشد أثري مرخص، وصول مبكر لمعبد الكرنك قبل زحام الأتوبيسات الكبيرة مع وتيرة مريحة تشمل معابد البر الشرقي والغربي.
+In Luxor, your guide is waiting, in the language you chose when you booked, and the day begins where it should: at Karnak. This is not one temple but a city of them, courts, halls and towering columns added to over more than a thousand years. Walk it with an Egyptologist and the carvings stop being decoration. They become records: names, dates, boasts and prayers cut into stone, and the whole place starts to make sense.
 
-نضمن لك صفر توقفات تسوق إجبارية في مصانع الألباستر أو البردي، ليظل يومك مخصصاً للتاريخ، استراحات الظل، وغداء طازج على ضفاف النيل.`,
-      de: `Erleben Sie Oberägypten im klimatisierten 8-Sitzer Mercedes Sprinter mit lizenziertem Ägyptologen, ohne Massenabfertigung und 90 Minuten vor den großen Reisebussen am Karnak-Tempel.
+Then the river. The coach crosses to the West Bank by bridge, or you can take the older way over: an optional boat crossing, out on the Nile with Luxor behind you and the necropolis ahead.
 
-Wir garantieren 0 % erzwungene Verkaufsstopps, damit der ganze Tag den Tempeln, schattigen Pausen und einem frisch gekochten Mittagessen am Nil gehört.`,
+Lunch is at a local restaurant in Luxor. After it, the giants. The two Colossi of Memnon have sat on the Theban plain for over 3,000 years, and there is time here for photographs and for the story of who they were and why they are still sitting there.
+
+Then down into the valley. Your ticket takes you inside three of the royal tombs open on the day, and no two visits are ever quite the same, because the tombs rotate as restoration work moves from one to the next. If you want to push further, two great names sit on separate tickets: Tutankhamun, and Ramses V and VI. Add either when you book, or decide with your guide on the day.
+
+Before the final visit, a pause. You are welcomed with a cold local drink at a rest stop where you can watch the craftsmen at work, rest, or use the facilities, and gather yourself for the finale.
+
+The day saves a strong sight for last: the Temple of Queen Hatshepsut, its terraces climbing straight out of the desert floor against the cliffs of Deir el-Bahari, built for one of the most remarkable rulers of ancient Egypt.
+
+Then the road home, air conditioning on and the whole of ancient Thebes behind you, back to your hotel in Hurghada.`,
+      ar: `يرن المنبّه قبل الفجر، لكن التجربة تستحق كل لحظة. نصطحبك من فندقك في الغردقة إلى حافلة أو ميني فان مكيفة مريحة في اتجاه الطريق الصحراوي جنوباً، ومعك زجاجة مياه للطريق. يمتد الطريق عبر الصحراء الهادئة مع تباشير الصباح الأولى، مع استراحة في منتصف الطريق لمدّ الساقين واستخدام المرافق وتناول مشروب.
+
+في الأقصر يكون مرشدك في انتظارك باللغة التي اخترتها عند الحجز، ويبدأ اليوم من حيث يجب أن يبدأ: معبد الكرنك. هذا ليس مجرد معبد واحد، بل مدينة كاملة من المعابد والساحات والصالات والأعمدة الشاهقة التي أُضيفت وتوسّعت على مدى أكثر من ألف عام. حين تسير بينها برفقة عالم مصريات، تتحول النقوش من مجرد زخارف إلى سجلات حية: أسماء وتواريخ وانتصارات وصلوات محفورة في الحجر تجعل المكان بأكمله ينبض بالمعنى.
+
+ثم نصل إلى النهر. تعبر الحافلة إلى البر الغربي عبر الكوبري، أو يمكنك اختيار الطريقة الأقدم: عبور اختياري بالمركب على صفحة النيل، حيث تترك الأقصر خلفك وتتجه نحو مدينة الموتى الأثرية.
+
+يُقدَّم الغداء في مطعم محلي في الأقصر. وبعده تقف أمام العملاقين: تمثالا ممنون اللذان يجلسان في سهل طيبة منذ أكثر من ثلاثة آلاف عام، مع وقت كافٍ للتصوير ومعرفة قصتهما ولماذا لا يزالان صامدين في مكانهما حتى اليوم.
+
+بعد ذلك ننزل إلى الوادي. تذكرتك تتيح لك دخول ثلاث من المقابر الملكية المفتوحة في ذلك اليوم، ولا تتشابه زيارتان أبداً لأن المقابر المفتوحة تتبدل دورياً مع استمرار أعمال الترميم. وإذا أردت التعمق أكثر، هناك اسمان بارزان بتذاكر منفصلة: مقبرة توت عنخ آمون، ومقبرة رمسيس الخامس والسادس. يمكنك إضافة أي منهما عند الحجز أو حسم اختيارك مع المرشد في يوم الرحلة.
+
+وقبل المحطة الأخيرة، تأتي استراحة لطيفة تُستقبل فيها بمشروب محلي بارد في استراحة يمكنك فيها مشاهدة الحرفيين أثناء عملهم، أو الاستراحة واستخدام المرافق وتجديد نشاطك قبل الختام.
+
+ويحتفظ اليوم بأقوى مشاهده للنهاية: معبد الملكة حتشبسوت، بمدرجاته التي ترتفع مباشرة من أرض الصحراء في قلب جبال الدير البحري، والذي شُيّد لإحدى أبرز الشخصيات التي حكمت مصر القديمة.
+
+ثم يبدأ طريق العودة في الحافلة المكيفة، وقد حملت معك ذكريات طيبة القديمة كلها، حتى الوصول مجدداً إلى فندقك في الغردقة.`,
+      de: `Der Wecker klingelt noch im Dunkeln, und es lohnt sich. Wir holen Sie an Ihrem Hotel in Hurghada ab und bringen Sie in einem klimatisierten Reisebus oder Minivan auf die Wüstenstraße Richtung Süden, mit einer Flasche Wasser für die Fahrt. Während der Himmel langsam heller wird, führt die Straße durch weite Wüstenlandschaft, unterbrochen von einer Rast zum Beinevertreten, für die sanitären Anlagen und ein Getränk.
+
+In Luxor erwartet Sie Ihr Guide in der bei der Buchung gewählten Sprache, und der Tag beginnt dort, wo er beginnen muss: in Karnak. Dies ist kein einzelner Tempel, sondern eine ganze Tempelstadt aus Höfen, Hallen und gewaltigen Säulen, die über mehr als tausend Jahre hinweg erweitert wurde. Mit einem Ägyptologen an Ihrer Seite werden die Reliefs lebendig: Namen, Daten, Taten und Gebete im Stein fügen sich zu einem verständlichen Bild zusammen.
+
+Dann folgt der Fluss. Der Bus überquert den Nil über die Brücke zum Westufer, oder Sie wählen den historischen Weg: eine optionale Bootsüberfahrt über den Nil, mit Luxor hinter sich und der Nekropole vor Augen.
+
+Das Mittagessen wird in einem lokalen Restaurant in Luxor serviert. Danach warten die Giganten. Die beiden Memnonkolosse wachen seit über 3.000 Jahren über die Ebene von Theben, mit genügend Zeit für Fotos und die Geschichte, wen sie darstellen und warum sie bis heute hier sitzen.
+
+Anschließend geht es hinab ins Tal der Könige. Ihre Eintrittskarte öffnet drei der am jeweiligen Tag zugänglichen Königsgräber, und kaum ein Besuch gleicht dem anderen, da die Gräber im Zuge laufender Restaurierungsarbeiten wechseln. Wer noch tiefer eintauchen möchte, kann zwei berühmte Namen über separate Tickets ergänzen: Tutanchamun sowie Ramses V. und VI. Buchen Sie sie vorab hinzu oder entscheiden Sie am Ausflugstag mit Ihrem Guide.
+
+Vor dem letzten Höhepunkt folgt eine Pause. Bei einem kühlen lokalen Getränk an einem Rastplatz können Sie Handwerkern bei der Arbeit zusehen, sich kurz ausruhen, die Einrichtungen nutzen und Kraft für das Finale sammeln.
+
+Der Tag hebt sich einen starken Anblick bis zum Schluss auf: den Tempel der Königin Hatschepsut, dessen Terrassen vor den Steilwänden von Deir el-Bahari aus dem Wüstenboden aufragen, erbaut für eine der bemerkenswertesten Herrscherinnen des alten Ägypten.
+
+Danach geht es klimatisiert zurück durch die Wüste, mit dem ganzen antiken Theben im Gepäck, bis vor Ihr Hotel in Hurghada.`,
     },
     itinerary: [
       {
         kind: 'pickup',
         title: {
-          en: 'Pickup location:',
-          ar: 'نقطة الاستلام:',
-          de: 'Abholort:',
+          en: 'Hotel pickup in Hurghada',
+          ar: 'الاستلام من الفندق في الغردقة',
+          de: 'Hotelabholung in Hurghada',
         },
         subtitle: {
-          en: 'Hurghada & Outer Zones (05:00 AM)',
-          ar: 'فندقك في الغردقة والمناطق الخارجية (05:00 صباحاً)',
-          de: 'Hurghada & Umgebung (05:00 Uhr)',
-        },
-      },
-      {
-        kind: 'break',
-        title: {
-          en: 'Desert coffee & rest stop (20 min)',
-          ar: 'استراحة قهوة في الطريق الصحراوي (20 دقيقة)',
-          de: 'Kaffee- & Rastpause in der Ostwüste (20 Min.)',
+          en: 'Between 03:00 and 04:00, exact time confirmed after booking',
+          ar: 'بين 03:00 و04:00 صباحاً، ويتم تأكيد الموعد الدقيق بعد الحجز',
+          de: 'Zwischen 03:00 und 04:00 Uhr, genaue Zeit wird nach Buchung bestätigt',
         },
       },
       {
         kind: 'stop',
         title: {
-          en: 'Karnak Temple Complex',
-          ar: 'مجمع معابد الكرنك (البر الشرقي)',
-          de: 'Tempelanlage von Karnak',
-        },
-        subtitle: {
-          en: 'Guided tour · Great Hypostyle Hall (2 hours)',
-          ar: 'جولة إرشادية · صالة الأعمدة الكبرى (ساعتان)',
-          de: 'Geführte Tour · Große Säulenhalle (2 Stunden)',
+          en: 'The desert road to Luxor',
+          ar: 'الطريق الصحراوي إلى الأقصر',
+          de: 'Fahrt über die Wüstenstraße nach Luxor',
         },
       },
       {
         kind: 'break',
         title: {
-          en: 'Nile-side Egyptian lunch',
-          ar: 'غداء مصري طازج على ضفاف النيل',
-          de: 'Mittagessen direkt am Nil',
+          en: 'Rest stop on the road',
+          ar: 'استراحة على الطريق',
+          de: 'Rastpause unterwegs',
+        },
+        subtitle: {
+          en: 'Break, facilities, drinks',
+          ar: 'استراحة، مرافق، مشروبات',
+          de: 'Pause, sanitäre Anlagen, Getränke',
+        },
+      },
+      {
+        kind: 'stop',
+        title: {
+          en: 'Karnak Temple',
+          ar: 'معبد الكرنك',
+          de: 'Karnak-Tempel',
+        },
+        subtitle: {
+          en: 'Guided visit',
+          ar: 'زيارة إرشادية',
+          de: 'Geführte Besichtigung',
+        },
+      },
+      {
+        kind: 'stop',
+        title: {
+          en: 'Crossing to the West Bank',
+          ar: 'العبور إلى البر الغربي',
+          de: 'Überfahrt zum Westufer',
+        },
+        subtitle: {
+          en: 'Optional Nile boat, or by coach over the bridge',
+          ar: 'مركب نيلي اختياري، أو بالحافلة عبر الكوبري',
+          de: 'Optional per Nil-Boot oder mit dem Bus über die Brücke',
+        },
+      },
+      {
+        kind: 'break',
+        title: {
+          en: 'Lunch at a local restaurant',
+          ar: 'غداء في مطعم محلي',
+          de: 'Mittagessen in einem lokalen Restaurant',
+        },
+      },
+      {
+        kind: 'stop',
+        title: {
+          en: 'The Colossi of Memnon',
+          ar: 'تمثالا ممنون',
+          de: 'Die Memnonkolosse',
+        },
+        subtitle: {
+          en: 'Photo stop and visit',
+          ar: 'وقفة تصوير وزيارة',
+          de: 'Fotostopp und Besichtigung',
         },
       },
       {
         kind: 'stop',
         title: {
           en: 'Valley of the Kings',
-          ar: 'وادي الملوك (البر الغربي)',
+          ar: 'وادي الملوك',
           de: 'Tal der Könige',
         },
         subtitle: {
-          en: 'Guided visit & 3 royal painted tombs (1.5 hours)',
-          ar: 'زيارة 3 مقابر ملكية ملونة مع الشرح (ساعة ونصف)',
-          de: 'Führung & 3 Königsgräber (1,5 Stunden)',
+          en: 'Three included tombs',
+          ar: 'ثلاث مقابر مشمولة',
+          de: 'Drei inbegriffene Gräber',
+        },
+      },
+      {
+        kind: 'stop',
+        title: {
+          en: 'Optional extra: the tomb of Tutankhamun',
+          ar: 'إضافة اختيارية: مقبرة توت عنخ آمون',
+          de: 'Optionales Extra: das Grab des Tutanchamun',
+        },
+      },
+      {
+        kind: 'stop',
+        title: {
+          en: 'Optional extra: the tomb of Ramses V and VI',
+          ar: 'إضافة اختيارية: مقبرة رمسيس الخامس والسادس',
+          de: 'Optionales Extra: das Grab von Ramses V. und VI.',
+        },
+      },
+      {
+        kind: 'break',
+        title: {
+          en: 'Rest stop',
+          ar: 'استراحة',
+          de: 'Rastpause',
+        },
+        subtitle: {
+          en: 'Cold drink, craftsmen at work, facilities, free time',
+          ar: 'مشروب بارد، مشاهدة الحرفيين أثناء العمل، مرافق، وقت حر',
+          de: 'Kühles Getränk, Handwerker bei der Arbeit, Einrichtungen, freie Zeit',
         },
       },
       {
         kind: 'stop',
         title: {
           en: 'Temple of Queen Hatshepsut',
-          ar: 'معبد الملكة حتشبسوت (الدير البحري)',
-          de: 'Terrassentempel der Hatschepsut',
+          ar: 'معبد الملكة حتشبسوت',
+          de: 'Tempel der Königin Hatschepsut',
         },
         subtitle: {
-          en: 'Guided tour & photo stop (1 hour)',
-          ar: 'جولة إرشادية وتصوير (ساعة واحدة)',
-          de: 'Führung & Fotostopp (1 Stunde)',
+          en: 'Guided visit',
+          ar: 'زيارة إرشادية',
+          de: 'Geführte Besichtigung',
         },
       },
       {
-        kind: 'stop',
+        kind: 'break',
         title: {
-          en: 'Colossi of Memnon',
-          ar: 'تمثالا ممنون العملاقان',
-          de: 'Memnonkolosse',
-        },
-        subtitle: {
-          en: 'Photo stop (20 min)',
-          ar: 'وقفة تصوير وشرح (20 دقيقة)',
-          de: 'Fotostopp (20 Min.)',
+          en: 'Rest stop on the return road',
+          ar: 'استراحة في طريق العودة',
+          de: 'Rastpause auf dem Rückweg',
         },
       },
       {
         kind: 'end',
         title: {
-          en: 'Arrive back at:',
-          ar: 'العودة إلى:',
-          de: 'Rückkehr nach:',
-        },
-        subtitle: {
-          en: 'Your hotel in Hurghada (~08:00 PM)',
-          ar: 'فندقك في الغردقة (حوالي 08:00 مساءً)',
-          de: 'Ihr Hotel in Hurghada (ca. 20:00 Uhr)',
+          en: 'Return to Hurghada, drop-off at your hotel',
+          ar: 'العودة إلى الغردقة والتوصيل إلى فندقك',
+          de: 'Rückfahrt nach Hurghada, Rücktransfer zu Ihrem Hotel',
         },
       },
     ],
     included: [
       {
-        en: 'Door-to-door A/C 8-seat Mercedes Sprinter transfer with chilled bottled water on board',
-        ar: 'انتقالات من وإلى بوابة الفندق بسيارة مرسيدس سبرينتر 8 مقاعد مكيفة مع مياه معدنية باردة طوال الطريق',
-        de: 'Hin- & Rücktransfer im klimatisierten 8-Sitzer Mercedes Sprinter inkl. gekühltem Wasser',
+        en: 'Pickup from your Hurghada hotel, and drop-off at the end of the day',
+        ar: 'الاستلام من فندقك في الغردقة والتوصيل إليه في نهاية اليوم',
+        de: 'Abholung von Ihrem Hotel in Hurghada und Rücktransfer am Ende des Tages',
       },
       {
-        en: 'Official entry tickets: Karnak Temple, Valley of the Kings (3 tombs), Hatshepsut Temple & Colossi of Memnon',
-        ar: 'تذاكر الدخول الرسمية: معبد الكرنك، وادي الملوك (3 مقابر)، معبد حتشبسوت، وتمثالا ممنون',
-        de: 'Alle Eintrittskarten: Karnak-Tempel, Tal der Könige (3 Gräber), Hatschepsut-Tempel & Memnonkolosse',
+        en: 'Air-conditioned coach or minivan transport in a small group',
+        ar: 'نقل بحافلة أو ميني فان مكيفة ضمن مجموعة صغيرة',
+        de: 'Klimatisierter Transfer im Reisebus oder Minivan in einer kleinen Gruppe',
       },
       {
-        en: 'State-licensed Egyptologist tour guide in your chosen language (English, Arabic, or German)',
-        ar: 'مرشد سياحي وأثري معتمد من وزارة السياحة والآثار باللغة العربية أو الإنجليزية أو الألمانية',
-        de: 'Staatlich lizenzierter Ägyptologe in Ihrer gewählten Sprache (Deutsch, Englisch oder Arabisch)',
+        en: 'Professional live guide in your selected language',
+        ar: 'مرشد سياحي محترف باللغة التي تختارها',
+        de: 'Professioneller Live-Guide in Ihrer gewählten Sprache',
       },
       {
-        en: 'Freshly cooked Egyptian buffet lunch at a shaded Nile-view restaurant',
-        ar: 'وجبة غداء بوفيه مصري طازج في مطعم مطل مباشرة على نهر النيل',
-        de: 'Frisch zubereitetes ägyptisches Mittagsbuffet in einem Restaurant direkt am Nil',
+        en: 'Entry ticket to Karnak Temple',
+        ar: 'تذكرة دخول معبد الكرنك',
+        de: 'Eintrittskarte für den Karnak-Tempel',
       },
       {
-        en: 'All highway security permits, tourist police clearance, taxes & parking fees',
-        ar: 'جميع تصاريح الطريق والأمن السياحي والضرائب ورسوم الانتظار',
-        de: 'Alle Straßengenehmigungen, Steuern und Parkgebühren',
+        en: 'Entry ticket to the Valley of the Kings, including three standard tombs',
+        ar: 'تذكرة دخول وادي الملوك شاملة ثلاث مقابر قياسية',
+        de: 'Eintrittskarte für das Tal der Könige inklusive drei Standardgräbern',
+      },
+      {
+        en: 'Entry ticket to the Temple of Hatshepsut',
+        ar: 'تذكرة دخول معبد حتشبسوت',
+        de: 'Eintrittskarte für den Tempel der Hatschepsut',
+      },
+      {
+        en: 'Visit to the Colossi of Memnon',
+        ar: 'زيارة تمثالي ممنون',
+        de: 'Besuch der Memnonkolosse',
+      },
+      {
+        en: 'Photo stop at Luxor Temple, from the outside',
+        ar: 'وقفة تصوير أمام معبد الأقصر من الخارج',
+        de: 'Fotostopp am Luxor-Tempel von außen',
+      },
+      {
+        en: 'Lunch at a local restaurant in Luxor, with drinks during lunch',
+        ar: 'غداء في مطعم محلي في الأقصر مع المشروبات أثناء الغداء',
+        de: 'Mittagessen in einem lokalen Restaurant in Luxor inklusive Getränken zum Essen',
+      },
+      {
+        en: 'A bottle of water for the road to Luxor',
+        ar: 'زجاجة مياه للطريق إلى الأقصر',
+        de: 'Eine Flasche Wasser für die Fahrt nach Luxor',
       },
     ],
     tips: [
       {
-        en: 'Drinks during restaurant lunch & optional King Tutankhamun extra tomb ticket (~€14 on site)',
-        ar: 'المشروبات داخل مطعم الغداء وتذكرة دخول مقبرة توت عنخ آمون الإضافية (اختيارية ~14 يورو)',
-        de: 'Getränke beim Mittagessen & optionales Zusatz-Ticket für das Tutanchamun-Grab (~14 € vor Ort)',
+        en: 'The optional Nile boat crossing',
+        ar: 'عبور نهر النيل بالمركب (اختياري)',
+        de: 'Die optionale Bootsüberfahrt über den Nil',
       },
       {
-        en: 'Outer-zone hotel pickup surcharge (+€10–15/pp from El Gouna, Makadi, Soma Bay, or Safaga)',
-        ar: 'رسوم التوصيل الإضافية للمناطق الخارجية (+10–15 يورو للفرد من الجونة أو مكادي أو سوما باي أو سفاجا)',
-        de: 'Transferzuschlag für Außenbezirke (+10–15 €/Person ab El Gouna, Makadi, Soma Bay oder Safaga)',
+        en: 'Optional tomb entries (Tutankhamun; Ramses V and VI)',
+        ar: 'تذاكر المقابر الاختيارية (توت عنخ آمون؛ رمسيس الخامس والسادس)',
+        de: 'Optionale Grabeintritte (Tutanchamun; Ramses V. und VI.)',
       },
       {
-        en: 'Optional driver & Egyptologist gratuities',
-        ar: 'إكراميات السائق والمرشد الأثري (اختيارية تماماً)',
-        de: 'Optionale Trinkgelder für Fahrer und Ägyptologen',
+        en: 'Personal expenses and tips',
+        ar: 'المصاريف الشخصية والإكراميات',
+        de: 'Persönliche Ausgaben und Trinkgelder',
       },
     ],
     notSuitableFor: [
       {
-        en: 'Guests with severe mobility impairments unable to walk on uneven temple stones or tomb stairs',
-        ar: 'الأشخاص الذين يعانون من صعوبات حركية شديدة تمنعهم من المشي على أرضيات المعابد أو سلالم المقابر',
-        de: 'Gäste mit starker Gehbehinderung (unebene Tempelböden und Stufen in den Königsgräbern)',
+        en: 'Pregnant women',
+        ar: 'النساء الحوامل',
+        de: 'Schwangere Frauen',
       },
       {
-        en: 'Infants under 2 years old during peak mid-summer daytime temperatures (July–August)',
-        ar: 'الأطفال الرضع أقل من سنتين خلال ذروة حرارة الظهيرة في شهري يوليو وأغسطس',
-        de: 'Kleinkinder unter 2 Jahren während der Hochsommerhitze im Juli und August',
+        en: 'Wheelchair users',
+        ar: 'مستخدمو الكراسي المتحركة',
+        de: 'Rollstuhlfahrer',
       },
     ],
     meetingPoint: {
-      en: 'Direct pickup from your hotel main security gate in Hurghada or outer zones (exact minute confirmed via WhatsApp the evening before) · First monument stop: Karnak Temple Plaza, Luxor.',
-      ar: 'استلام مباشر من البوابة الرئيسية لفندقك في الغردقة أو المناطق المجاورة (يتم تأكيد الدقيقة المحددة عبر واتساب مساء اليوم السابق) · أول نقطة وصول: ساحة معبد الكرنك بالأقصر.',
-      de: 'Direkte Abholung am Haupteingang Ihres Hotels (genaue Uhrzeit am Vorabend per WhatsApp) · Erster Besichtigungspunkt: Karnak-Tempelplatz, Luxor.',
+      en: 'Hotel pickup in Hurghada between 03:00 and 04:00, with the exact time confirmed after booking.',
+      ar: 'الاستلام من فندقك في الغردقة بين 03:00 و04:00 صباحاً، ويتم تأكيد الموعد الدقيق بعد الحجز.',
+      de: 'Hotelabholung in Hurghada zwischen 03:00 und 04:00 Uhr, die genaue Zeit wird nach der Buchung bestätigt.',
     },
     meetingPointUrl: 'https://maps.google.com/?q=Karnak+Temple+Luxor+Egypt',
     whatToBring: [
       {
-        en: 'Passport or clear mobile photo of your passport bio page (required at the Safaga desert checkpoint)',
-        ar: 'جواز السفر أو البطاقة الشخصية (أو صورة واضحة على الهاتف لنقطة تصاريح طريق سفاجا - الأقصر)',
-        de: 'Reisepass oder deutliches Handyfoto der Passseite (erforderlich am Kontrollpunkt Safaga)',
+        en: 'A pillow for the road',
+        ar: 'وسادة سفر للطريق',
+        de: 'Ein Reisekissen für die Fahrt',
       },
       {
-        en: 'Comfortable walking shoes, sunglasses, sun hat & high-SPF sunscreen',
-        ar: 'حذاء مشي مريح، نظارة شمسية، قبعة للرأس، وكريم وقاية من الشمس',
-        de: 'Bequeme Laufschuhe, Sonnenbrille, Sonnenhut und Sonnencreme',
+        en: 'Cash',
+        ar: 'مبلغ نقدي (كاش)',
+        de: 'Bargeld',
       },
       {
-        en: 'Breakfast box from your hotel reception (order it the evening before prior to 08:00 PM)',
-        ar: 'بوكس الإفطار الصباحي من استقبال الفندق (يُطلب من الريسبشن مساء اليوم السابق قبل 8 مساءً)',
-        de: 'Frühstücksbox von Ihrer Hotelrezeption (bitte am Vorabend bis 20:00 Uhr bestellen)',
+        en: 'Sunglasses',
+        ar: 'نظارة شمسية',
+        de: 'Sonnenbrille',
       },
       {
-        en: 'Light shawl or jacket for the air-conditioned van in the early morning',
-        ar: 'شال خفيف أو جاكيت خفيف لبرودة التكييف في الصباح الباكر',
-        de: 'Leichte Jacke oder Schal für den klimatisierten Kleinbus am frühen Morgen',
+        en: 'Camera',
+        ar: 'كاميرا',
+        de: 'Kamera',
+      },
+      {
+        en: 'A charged smartphone',
+        ar: 'هاتف ذكي مشحون بالكامل',
+        de: 'Ein geladenes Smartphone',
+      },
+      {
+        en: 'Sunscreen',
+        ar: 'كريم واقٍ من الشمس',
+        de: 'Sonnencreme',
+      },
+      {
+        en: 'Comfortable shoes',
+        ar: 'حذاء مريح للمشي',
+        de: 'Bequeme Schuhe',
       },
     ],
     notAllowed: [
       {
-        en: 'Flash photography or professional tripod stands inside the painted tombs of the Valley of the Kings',
-        ar: 'التصوير بالفلاش أو استخدام حامل الكاميرا الثلاثي (Tripod) داخل مقابر وادي الملوك الملونة',
-        de: 'Blitzlichtfotografie oder Stative im Inneren der bemalten Königsgräber',
+        en: 'Luggage or large bags',
+        ar: 'حقائب السفر أو الشنط الكبيرة',
+        de: 'Gepäck oder große Taschen',
       },
       {
-        en: 'Touching carved hieroglyphic reliefs or tomb wall pigments',
-        ar: 'لمس النقوش الهيروغليفية البارزة أو الألوان الأصلية على جدران المقابر',
-        de: 'Berühren der Hieroglyphen-Reliefs oder Wandmalereien in den Gräbern',
+        en: 'Alcohol and drugs',
+        ar: 'الكحول والمواد المخدرة',
+        de: 'Alkohol und Drogen',
       },
       {
-        en: 'Drones or unmanned aerial cameras (strictly prohibited at Egyptian archaeological sites)',
-        ar: 'طائرات الدرون للتصوير الجوي (ممنوعة تماماً في المناطق الأثرية المصرية)',
-        de: 'Drohnen (an allen ägyptischen archäologischen Stätten streng verboten)',
+        en: 'Baby strollers',
+        ar: 'عربات الأطفال',
+        de: 'Kinderwagen',
+      },
+      {
+        en: 'Smoking in the vehicle',
+        ar: 'التدخين داخل المركبة',
+        de: 'Rauchen im Fahrzeug',
       },
     ],
     knowBeforeYouGo: [
       {
-        en: 'Travel license clearance requires guest nationality and room number via WhatsApp by 07:00 PM the day before.',
-        ar: 'لتجهيز تصريح الشرطة السياحية، نحتاج الاسم ورقم الغرفة والجنسية عبر واتساب قبل الساعة 7:00 مساء اليوم السابق.',
-        de: 'Für die Reisegenehmigung benötigen wir bis 19:00 Uhr am Vorabend Ihre Nationalität und Zimmernummer per WhatsApp.',
+        en: 'This is an early start. Pickup runs between 03:00 and 04:00, and your exact pickup time is confirmed after booking.',
+        ar: 'تبدأ الرحلة في وقت مبكر، حيث يتراوح الاستلام بين 03:00 و04:00 صباحاً، ويتم تأكيد موعد الاستلام الدقيق بعد الحجز.',
+        de: 'Der Ausflug beginnt früh. Die Abholung erfolgt zwischen 03:00 und 04:00 Uhr, Ihre genaue Abholzeit wird nach der Buchung bestätigt.',
       },
       {
-        en: 'Mobile photography inside the 3 included royal tombs is completely free of charge.',
-        ar: 'التصوير بالهاتف المحمول (بدون فلاش) داخل المقابر الثلاث المشمولة مجاني تماماً.',
-        de: 'Das Fotografieren mit dem Smartphone (ohne Blitz) ist in den 3 enthaltenen Gräbern kostenlos.',
+        en: 'Staying in Makadi, Sahl Hasheesh, El Gouna, Soma Bay or Safaga? Pickup from your area is available as an add-on. TUI Magic Life Kalawy and Coral Sun sit outside the pickup zone, and pickup from either is available as an add-on.',
+        ar: 'هل تقيم في مكادي أو سهل حشيش أو الجونة أو سوما باي أو سفاجا؟ التوصيل من منطقتك متاح كإضافة. كما يقع فندقا TUI Magic Life Kalawy وCoral Sun خارج نطاق الاستلام الأساسي، ويتوفر التوصيل منهما كإضافة.',
+        de: 'Sie übernachten in Makadi, Sahl Hasheesh, El Gouna, Soma Bay oder Safaga? Die Abholung aus Ihrer Region ist als Zusatzleistung verfügbar. Auch TUI Magic Life Kalawy und Coral Sun liegen außerhalb der Standard-Abholzone und können als Zusatzleistung gebucht werden.',
       },
       {
-        en: 'Vegetarian, vegan, and gluten-free lunch plates are available upon request when booking.',
-        ar: 'تتوفر وجبات غداء نباتية أو خالية من الجلوتين عند الإشارة لذلك في ملاحظات الحجز.',
-        de: 'Vegetarische, vegane und glutenfreie Gerichte sind auf Anfrage beim Mittagessen verfügbar.',
+        en: 'Ask your hotel reception for a breakfast box on the evening before the trip. You will be glad of it on the road.',
+        ar: 'اطلب من استقبال الفندق تجهيز بوكس إفطار في المساء السابق للرحلة، وستسعد بوجوده معك على الطريق.',
+        de: 'Bestellen Sie am Vorabend an Ihrer Hotelrezeption eine Frühstücksbox. Auf der Fahrt werden Sie froh darüber sein.',
+      },
+      {
+        en: 'Your Valley of the Kings ticket opens any three of the tombs open on the day. The tombs rotate for restoration, so which three depends on the day, and Tutankhamun and Ramses V and VI are never part of the three: they sit on separate tickets.',
+        ar: 'تتيح لك تذكرة وادي الملوك دخول أي ثلاث مقابر من المقابر المفتوحة في ذلك اليوم. تتبدل المقابر دورياً لأعمال الترميم، ولا تشمل هذه الثلاث أبداً مقبرة توت عنخ آمون أو رمسيس الخامس والسادس، فلكل منهما تذكرة منفصلة.',
+        de: 'Ihre Eintrittskarte für das Tal der Könige gilt für drei der am jeweiligen Tag geöffneten Gräber. Die Gräber wechseln wegen Restaurierungsarbeiten; Tutanchamun sowie Ramses V. und VI. gehören nie zu diesen drei und erfordern separate Tickets.',
+      },
+      {
+        en: 'Expect plenty of walking, some of it on uneven ground.',
+        ar: 'توقّع الكثير من المشي خلال اليوم، وبعضه على أرضيات غير مستوية.',
+        de: 'Rechnen Sie mit viel Fußweg, teilweise auf unebenem Untergrund.',
+      },
+      {
+        en: "For everyone's safety, the whole group returns to Hurghada together at the end of the day. Staying behind in Luxor is not possible.",
+        ar: 'حرصاً على سلامة الجميع، تعود المجموعة بالكامل معاً إلى الغردقة في نهاية اليوم، ولا يمكن البقاء في الأقصر بعد انتهاء الرحلة.',
+        de: 'Zur Sicherheit aller kehrt die gesamte Gruppe am Ende des Tages gemeinsam nach Hurghada zurück. Ein Verbleib in Luxor ist nicht möglich.',
       },
     ],
     outerTransferEnabled: true,
     pickup: {
-      en: 'Hurghada City included · Outer zones +€10–15/pp',
-      ar: 'مدينة الغردقة مشمولة · المناطق الخارجية +10–15€ للفرد',
-      de: 'Hurghada Stadt inklusive · Außenzonen +10–15 €/Pers.',
+      en: 'Hurghada City included · Outer zones available as add-on',
+      ar: 'مدينة الغردقة مشمولة · المناطق الخارجية متاحة كإضافة',
+      de: 'Hurghada-Stadt inklusive · Außenzonen als Zusatzleistung verfügbar',
     },
     languages: ['English', 'العربية', 'Deutsch'],
-    supplierName: 'Nile Horizon Guides',
+    supplierName: 'Wasla Local Operations',
     familyFriendly: true,
     womenFriendly: true,
     minChildAge: 5,
