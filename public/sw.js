@@ -1,4 +1,4 @@
-const CACHE_NAME = 'wasla-pwa-v1';
+const CACHE_NAME = 'wasla-pwa-v2';
 
 self.addEventListener('install', () => {
   self.skipWaiting();
