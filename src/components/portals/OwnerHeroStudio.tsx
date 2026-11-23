@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Crosshair, Image as ImageIcon, RotateCcw, Save, Upload } from 'lucide-react';
 import { SITE_CONFIG, Trip } from '../../data/marketplaceData';
 import { PublicStorefrontSettings } from '../../hooks/useWaslaFirebase';
+import { optimizeImageToWebP } from '../../lib/imageOptimization';
 
 interface OwnerHeroStudioProps {
   trips: Trip[];
@@ -56,44 +57,23 @@ export const OwnerHeroStudio: React.FC<OwnerHeroStudioProps> = ({
     return Array.from(new Set(imgs)).slice(0, 6);
   }, [trips]);
 
-  const handleUploadHeroFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleUploadHeroFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !file.type.startsWith('image/')) return;
-    setUploadNote('Compressing panorama for instant page loads...');
-    const reader = new FileReader();
-    reader.onload = () => {
-      const img = new Image();
-      img.onload = () => {
-        const tryEncode = (maxW: number, q: number): string => {
-          const scale = img.width > maxW ? maxW / img.width : 1;
-          const canvas = document.createElement('canvas');
-          canvas.width = Math.max(1, Math.round(img.width * scale));
-          canvas.height = Math.max(1, Math.round(img.height * scale));
-          const ctx = canvas.getContext('2d');
-          if (!ctx) return '';
-          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-          return canvas.toDataURL('image/jpeg', q);
-        };
-        let encoded = '';
-        for (const [w, q] of [
-          [1100, 0.72],
-          [900, 0.58],
-          [720, 0.48],
-        ] as Array<[number, number]>) {
-          encoded = tryEncode(w, q);
-          if (encoded && encoded.length <= 225000) break;
-        }
-        if (encoded && encoded.length <= 245000) {
-          setHeroImageUrl(encoded);
-          setUploadNote('Panorama uploaded and ready! Click "Save Hero & Appearance Live" to publish.');
-        } else {
-          setUploadNote('Image too large, please try a lighter JPG or paste an https:// URL.');
-        }
-      };
-      img.src = String(reader.result);
-    };
-    reader.readAsDataURL(file);
-    if (fileRef.current) fileRef.current.value = '';
+    setUploadNote('Resizing & converting panorama to lightweight WebP...');
+    try {
+      const encoded = await optimizeImageToWebP(file, 'hero');
+      if (encoded && encoded.length <= 245000) {
+        setHeroImageUrl(encoded);
+        setUploadNote('WebP panorama uploaded and ready! Click "Save Hero & Appearance Live" to publish.');
+      } else {
+        setUploadNote('Image too large, please try a lighter photo or paste an https:// URL.');
+      }
+    } catch {
+      setUploadNote('Could not process selected photo. Please try another image.');
+    } finally {
+      if (fileRef.current) fileRef.current.value = '';
+    }
   };
 
   const handleSave = async (e: React.FormEvent) => {

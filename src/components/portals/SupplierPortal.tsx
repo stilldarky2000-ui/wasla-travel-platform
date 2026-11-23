@@ -20,6 +20,7 @@ import {
 } from '../../data/platformData';
 import { TripDetailModal } from '../TripDetailModal';
 import { ThemeSwitch } from '../ThemeSwitch';
+import { optimizeTripImage } from '../../lib/imageOptimization';
 import { OwnerTripEditorModal } from './OwnerTripEditorModal';
 
 interface OptionDraft {
@@ -201,54 +202,17 @@ export const SupplierPortal: React.FC<SupplierPortalProps> = ({
     [bookings, activeSupplierName]
   );
 
-  const compressImageFile = (file: File): Promise<string> =>
-    new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onerror = () => reject(new Error('Failed to read image file'));
-      reader.onload = () => {
-        const img = new Image();
-        img.onerror = () => reject(new Error('Invalid image format'));
-        img.onload = () => {
-          const tryEncode = (maxWidth: number, quality: number): string => {
-            const scale = img.width > maxWidth ? maxWidth / img.width : 1;
-            const canvas = document.createElement('canvas');
-            canvas.width = Math.max(1, Math.round(img.width * scale));
-            canvas.height = Math.max(1, Math.round(img.height * scale));
-            const ctx = canvas.getContext('2d');
-            if (!ctx) return '';
-            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-            return canvas.toDataURL('image/jpeg', quality);
-          };
-
-          const candidates: Array<[number, number]> = [
-            [800, 0.7],
-            [720, 0.58],
-            [600, 0.48],
-            [480, 0.4],
-          ];
-          let encoded = '';
-          for (const [w, q] of candidates) {
-            encoded = tryEncode(w, q);
-            if (encoded && encoded.length <= 220000) break;
-          }
-          resolve(encoded);
-        };
-        img.src = String(reader.result);
-      };
-      reader.readAsDataURL(file);
-    });
-
   const handleFilesSelected = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     if (files.length === 0) return;
-    setUploadNote('Processing high-resolution photos...');
+    setUploadNote('Optimizing & converting photos to WebP...');
 
     try {
       const processed: string[] = [];
       for (const file of files.slice(0, 6)) {
         if (!file.type.startsWith('image/')) continue;
-        const dataUrl = await compressImageFile(file);
-        if (dataUrl && dataUrl.length <= 240000) {
+        const { dataUrl } = await optimizeTripImage(file);
+        if (dataUrl && dataUrl.length <= 245000) {
           processed.push(dataUrl);
         }
       }
@@ -257,7 +221,7 @@ export const SupplierPortal: React.FC<SupplierPortalProps> = ({
       setGalleryCaptions((prev) => [...prev, ...nextAdded.map(() => '')].slice(0, 8));
       setUploadNote(
         processed.length > 0
-          ? `Added ${processed.length} optimized photo(s) ready for storefront.`
+          ? `Added ${processed.length} optimized WebP photo(s) ready for storefront.`
           : 'Please choose valid image files (JPG, PNG, WebP).'
       );
     } catch {

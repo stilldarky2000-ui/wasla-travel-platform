@@ -23,6 +23,7 @@ import {
   resolveBundledMediaUrl,
 } from '../../data/marketplaceData';
 import { SupplierProfile } from '../../data/platformData';
+import { optimizeTripImage } from '../../lib/imageOptimization';
 import { TripDetailModal } from '../TripDetailModal';
 
 interface OptionDraft {
@@ -349,50 +350,16 @@ export const OwnerTripEditorModal: React.FC<OwnerTripEditorModalProps> = ({
     return unique.slice(0, 6);
   }, [allTrips]);
 
-  const compressImageFile = (file: File): Promise<string> =>
-    new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onerror = () => reject(new Error('Failed to read image'));
-      reader.onload = () => {
-        const img = new Image();
-        img.onerror = () => reject(new Error('Invalid image'));
-        img.onload = () => {
-          const tryEncode = (maxW: number, q: number): string => {
-            const scale = img.width > maxW ? maxW / img.width : 1;
-            const canvas = document.createElement('canvas');
-            canvas.width = Math.max(1, Math.round(img.width * scale));
-            canvas.height = Math.max(1, Math.round(img.height * scale));
-            const ctx = canvas.getContext('2d');
-            if (!ctx) return '';
-            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-            return canvas.toDataURL('image/jpeg', q);
-          };
-          let encoded = '';
-          for (const [w, q] of [
-            [800, 0.7],
-            [680, 0.56],
-            [520, 0.45],
-          ] as Array<[number, number]>) {
-            encoded = tryEncode(w, q);
-            if (encoded && encoded.length <= 220000) break;
-          }
-          resolve(encoded);
-        };
-        img.src = String(reader.result);
-      };
-      reader.readAsDataURL(file);
-    });
-
   const handleFilesSelected = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     if (files.length === 0) return;
-    setUploadNote('Compressing photo...');
+    setUploadNote('Optimizing & converting photo to WebP...');
     try {
       const processed: string[] = [];
       for (const file of files.slice(0, 5)) {
         if (!file.type.startsWith('image/')) continue;
-        const url = await compressImageFile(file);
-        if (url && url.length <= 240000) processed.push(url);
+        const { dataUrl } = await optimizeTripImage(file);
+        if (dataUrl && dataUrl.length <= 245000) processed.push(dataUrl);
       }
       const nextAdded = processed.slice(0, Math.max(0, 8 - images.length));
       setImages((prev) => [...prev, ...nextAdded].slice(0, 8));
@@ -401,7 +368,7 @@ export const OwnerTripEditorModal: React.FC<OwnerTripEditorModalProps> = ({
         ...nextAdded.map(() => ({ en: '', ar: '', de: '' })),
       ].slice(0, 8));
       setUploadNote(
-        processed.length > 0 ? `Added ${processed.length} optimized image(s).` : 'Select JPG/PNG/WebP images.'
+        processed.length > 0 ? `Added ${processed.length} optimized WebP image(s).` : 'Select JPG/PNG/WebP images.'
       );
     } catch {
       setUploadNote('Could not process selected photo.');

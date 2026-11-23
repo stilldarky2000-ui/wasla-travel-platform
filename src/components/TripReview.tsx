@@ -25,6 +25,7 @@ import {
   useStorefrontTripBookingHandoff,
 } from '../hooks/useBookingReviewVerification';
 import { OperationType, db, handleFirestoreError } from '../lib/firebase';
+import { optimizeImageToWebP } from '../lib/imageOptimization';
 import { WaslaBrandMark } from './WaslaBrandMark';
 
 interface TripReviewProps {
@@ -318,50 +319,11 @@ function getVerificationStatusMessage(
 }
 
 async function compressReviewPhoto(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onerror = () => reject(new Error('Failed to read file'));
-    reader.onload = () => {
-      const img = new Image();
-      img.onerror = () => reject(new Error('Invalid image file'));
-      img.onload = () => {
-        const maxDim = 900;
-        let { width, height } = img;
-        if (width > maxDim || height > maxDim) {
-          if (width >= height) {
-            height = Math.round((height * maxDim) / width);
-            width = maxDim;
-          } else {
-            width = Math.round((width * maxDim) / height);
-            height = maxDim;
-          }
-        }
-        const canvas = document.createElement('canvas');
-        canvas.width = Math.max(1, width);
-        canvas.height = Math.max(1, height);
-        const ctx = canvas.getContext('2d');
-        if (!ctx) {
-          reject(new Error('Canvas unavailable'));
-          return;
-        }
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-        let quality = 0.78;
-        let dataUrl = canvas.toDataURL('image/jpeg', quality);
-        while (dataUrl.length > 220000 && quality > 0.35) {
-          quality -= 0.12;
-          dataUrl = canvas.toDataURL('image/jpeg', quality);
-        }
-        if (dataUrl.length > 240000) {
-          reject(new Error('Image too large after compression'));
-          return;
-        }
-        resolve(dataUrl);
-      };
-      img.src = String(reader.result || '');
-    };
-    reader.readAsDataURL(file);
-  });
+  const dataUrl = await optimizeImageToWebP(file, 'review');
+  if (dataUrl.length > 245000) {
+    throw new Error('Image too large after compression');
+  }
+  return dataUrl;
 }
 
 export const PostTripReviewModal: React.FC<PostTripReviewModalProps> = ({

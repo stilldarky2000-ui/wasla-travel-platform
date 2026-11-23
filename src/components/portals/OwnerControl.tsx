@@ -1,6 +1,7 @@
 import { ConversationWorkspace } from '../conversations/ConversationPanel';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { authFetch } from '../../lib/apiAuth';
+import { optimizeImageToWebP } from '../../lib/imageOptimization';
 import {
   AlertTriangle,
   BadgeCheck,
@@ -461,38 +462,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
   const [reviewLightboxPhoto, setReviewLightboxPhoto] = useState<string | null>(null);
 
   const compressOwnerBookingImage = (file: File): Promise<string> =>
-    new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onerror = () => reject(new Error('Failed to read image'));
-      reader.onload = () => {
-        const img = new Image();
-        img.onerror = () => reject(new Error('Invalid image'));
-        img.onload = () => {
-          const tryEncode = (maxW: number, q: number): string => {
-            const scale = img.width > maxW ? maxW / img.width : 1;
-            const canvas = document.createElement('canvas');
-            canvas.width = Math.max(1, Math.round(img.width * scale));
-            canvas.height = Math.max(1, Math.round(img.height * scale));
-            const ctx = canvas.getContext('2d');
-            if (!ctx) return '';
-            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-            return canvas.toDataURL('image/jpeg', q);
-          };
-          let encoded = '';
-          for (const [w, q] of [
-            [800, 0.7],
-            [680, 0.56],
-            [520, 0.45],
-          ] as Array<[number, number]>) {
-            encoded = tryEncode(w, q);
-            if (encoded && encoded.length <= 220000) break;
-          }
-          resolve(encoded);
-        };
-        img.src = String(reader.result);
-      };
-      reader.readAsDataURL(file);
-    });
+    optimizeImageToWebP(file, 'booking');
 
   const parsePickupParts = (raw: string): { clock: string; period: 'AM' | 'PM' } => {
     const cleaned = (raw || '').trim().toUpperCase();

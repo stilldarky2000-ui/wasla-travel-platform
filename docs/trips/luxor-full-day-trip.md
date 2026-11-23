@@ -95,3 +95,16 @@ Then the road home, air conditioning on and the whole of ancient Thebes behind y
 
 ## Copywriter's note (summary)
 The old draft echoed the standard marketplace template in structure and stock phrases even where words differed. The rewrite runs the description as a narrative arc (dark start, the river as turning point, the valley descent, Hatshepsut as finale), uses short declarative beats and specifics instead of superlatives, and writes the practical sections in the voice of an operator who has run this road for years.
+
+## Gallery photos (optimized WebP, live in `src/assets/images/`)
+1. `src/assets/images/luxor_hatshepsut_golden_real.webp` (Hero/Cover) - Three-tiered Temple of Queen Hatshepsut carved into the cliffs of Deir el-Bahari
+2. `src/assets/images/luxor_karnak_courtyard_real.webp` - Sunlit temple courtyard, colonnades and ancient obelisk at Karnak Temple (East Bank)
+3. `src/assets/images/luxor_karnak_obelisk_real.webp` - Carved granite obelisk of Queen Hatshepsut rising above Karnak Temple
+4. `src/assets/images/luxor_colossi_memnon_real.webp` - Twin Colossi of Memnon standing on the sunlit Theban plain (West Bank)
+5. `src/assets/images/luxor_valley_kings_kv9_real.webp` - Royal burial chamber with astronomical ceiling and sarcophagus in the Valley of the Kings
+6. `src/assets/images/luxor_valley_kings_corridor_real.webp` - Painted descending corridor and winged ceiling inside a royal tomb in the Valley of the Kings
+7. `src/assets/images/luxor_valley_kings_sarcophagus_real.webp` - Carved red granite sarcophagus and vivid hieroglyphic walls inside a royal burial chamber
+8. `src/assets/images/luxor_hatshepsut_cliffs_real.webp` - Panoramic view of Queen Hatshepsut's terraced temple beneath the towering limestone cliffs
+9. `src/assets/images/luxor_hatshepsut_sphinx_real.webp` - Preserved painted sphinx statue of Queen Hatshepsut at Deir el-Bahari
+10. `src/assets/images/luxor_westbank_columns_real.webp` - Carved sandstone temple columns and hieroglyphic reliefs beneath the Theban mountains
+

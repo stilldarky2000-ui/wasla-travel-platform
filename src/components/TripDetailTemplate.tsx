@@ -1,4 +1,5 @@
 import { createBookingReference } from '../lib/bookingReference';
+import { optimizeImageToWebP } from '../lib/imageOptimization';
 import React, { useEffect, useRef, useState } from 'react';
 import {
   AlertCircle,
@@ -150,46 +151,7 @@ function computeChildUnitPrice(adultUnitPrice: number, trip: Trip): number {
 }
 
 async function compressPassportImageFile(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onerror = () => reject(new Error('Failed to read passport photo file'));
-    reader.onload = () => {
-      const img = new Image();
-      img.onerror = () => reject(new Error('Invalid image file'));
-      img.onload = () => {
-        const maxDim = 960;
-        let width = img.width || 800;
-        let height = img.height || 600;
-        if (width > maxDim || height > maxDim) {
-          if (width >= height) {
-            height = Math.round((height * maxDim) / width);
-            width = maxDim;
-          } else {
-            width = Math.round((width * maxDim) / height);
-            height = maxDim;
-          }
-        }
-        const canvas = document.createElement('canvas');
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext('2d');
-        if (!ctx) {
-          reject(new Error('Canvas context unavailable'));
-          return;
-        }
-        ctx.drawImage(img, 0, 0, width, height);
-        let quality = 0.76;
-        let dataUrl = canvas.toDataURL('image/jpeg', quality);
-        while (dataUrl.length > 210000 && quality > 0.35) {
-          quality -= 0.12;
-          dataUrl = canvas.toDataURL('image/jpeg', quality);
-        }
-        resolve(dataUrl);
-      };
-      img.src = String(reader.result || '');
-    };
-    reader.readAsDataURL(file);
-  });
+  return optimizeImageToWebP(file, 'passport');
 }
 
 export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({

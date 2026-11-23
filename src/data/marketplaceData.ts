@@ -10,6 +10,16 @@ import luxorRoyalTombImg from '../assets/images/luxor_royal_tomb_1795453499282.j
 import luxorHatshepsutImg from '../assets/images/luxor_hatshepsut_temple_1795023935886.jpg';
 import luxorTempleExteriorImg from '../assets/images/luxor_temple_exterior_1795453498872.jpg';
 import luxorFeluccaImg from '../assets/images/luxor_nile_felucca_dusk_1795023937583.jpg';
+import luxorHatshepsutGoldenRealImg from '../assets/images/luxor_hatshepsut_golden_real.webp';
+import luxorKarnakCourtyardRealImg from '../assets/images/luxor_karnak_courtyard_real.webp';
+import luxorKarnakObeliskRealImg from '../assets/images/luxor_karnak_obelisk_real.webp';
+import luxorColossiMemnonRealImg from '../assets/images/luxor_colossi_memnon_real.webp';
+import luxorValleyKingsKv9RealImg from '../assets/images/luxor_valley_kings_kv9_real.webp';
+import luxorValleyKingsCorridorRealImg from '../assets/images/luxor_valley_kings_corridor_real.webp';
+import luxorValleyKingsSarcophagusRealImg from '../assets/images/luxor_valley_kings_sarcophagus_real.webp';
+import luxorHatshepsutCliffsRealImg from '../assets/images/luxor_hatshepsut_cliffs_real.webp';
+import luxorHatshepsutSphinxRealImg from '../assets/images/luxor_hatshepsut_sphinx_real.webp';
+import luxorWestbankColumnsRealImg from '../assets/images/luxor_westbank_columns_real.webp';
 import horseBeachImg from '../assets/images/trip_horse_sahl_hasheesh_1794609168296.jpg';
 import momentGuestImg from '../assets/images/moment_guest_red_sea_1794609167642.jpg';
 import cairoPyramidsImg from '../assets/images/trip_cairo_pyramids_giza_1795088654554.jpg';
@@ -366,6 +376,16 @@ const BUNDLED_IMAGE_ENTRIES: Array<{ token: string; asset: string }> = [
   { token: 'luxor_hatshepsut_temple', asset: luxorHatshepsutImg },
   { token: 'luxor_temple_exterior', asset: luxorTempleExteriorImg },
   { token: 'luxor_nile_felucca_dusk', asset: luxorFeluccaImg },
+  { token: 'luxor_hatshepsut_golden_real', asset: luxorHatshepsutGoldenRealImg },
+  { token: 'luxor_karnak_courtyard_real', asset: luxorKarnakCourtyardRealImg },
+  { token: 'luxor_karnak_obelisk_real', asset: luxorKarnakObeliskRealImg },
+  { token: 'luxor_colossi_memnon_real', asset: luxorColossiMemnonRealImg },
+  { token: 'luxor_valley_kings_kv9_real', asset: luxorValleyKingsKv9RealImg },
+  { token: 'luxor_valley_kings_corridor_real', asset: luxorValleyKingsCorridorRealImg },
+  { token: 'luxor_valley_kings_sarcophagus_real', asset: luxorValleyKingsSarcophagusRealImg },
+  { token: 'luxor_hatshepsut_cliffs_real', asset: luxorHatshepsutCliffsRealImg },
+  { token: 'luxor_hatshepsut_sphinx_real', asset: luxorHatshepsutSphinxRealImg },
+  { token: 'luxor_westbank_columns_real', asset: luxorWestbankColumnsRealImg },
   { token: 'trip_horse_sahl_hasheesh', asset: horseBeachImg },
   { token: 'moment_guest_red_sea', asset: momentGuestImg },
   { token: 'trip_cairo_pyramids_giza', asset: cairoPyramidsImg },
@@ -651,30 +671,32 @@ export const TRIPS: Trip[] = [
     category: 'historical',
     destination: 'Luxor',
     images: [
-      luxorTempleImg,
-      luxorKarnakAvenueImg,
-      luxorFeluccaImg,
-      luxorColossiMemnonImg,
-      luxorValleyKingsImg,
-      luxorRoyalTombImg,
-      luxorHatshepsutImg,
-      luxorTempleExteriorImg,
+      luxorHatshepsutGoldenRealImg,
+      luxorKarnakCourtyardRealImg,
+      luxorKarnakObeliskRealImg,
+      luxorColossiMemnonRealImg,
+      luxorValleyKingsKv9RealImg,
+      luxorValleyKingsCorridorRealImg,
+      luxorValleyKingsSarcophagusRealImg,
+      luxorHatshepsutCliffsRealImg,
+      luxorHatshepsutSphinxRealImg,
+      luxorWestbankColumnsRealImg,
     ],
     galleryCaptions: [
       {
-        en: 'Great Hypostyle Hall & 134 carved sandstone columns at Karnak Temple (East Bank)',
-        ar: 'صالة الأعمدة الكبرى و134 عموداً أثرياً في مجمع معابد الكرنك بالبر الشرقي',
-        de: 'Große Säulenhalle mit 134 Sandsteinsäulen im Karnak-Tempel (Ostufer)',
+        en: "Three-tiered Temple of Queen Hatshepsut carved into the cliffs of Deir el-Bahari",
+        ar: 'معبد الملكة حتشبسوت بمدرجاته الثلاثة المنحوتة في جبال الدير البحري بالأقصر',
+        de: 'Dreistufiger Tempel der Königin Hatschepsut vor den Steilwänden von Deir el-Bahari',
       },
       {
-        en: 'Processional Avenue of Ram-Headed Sphinxes & First Pylon at Karnak Temple',
-        ar: 'طريق الكباش والصرح الأول المهيب في مدخل معبد الكرنك',
-        de: 'Widderköpfige Sphinxallee und Erster Pylon am Karnak-Tempel',
+        en: 'Sunlit temple courtyard, colonnades and ancient obelisk at Karnak Temple (East Bank)',
+        ar: 'الساحة المشمسة والأعمدة والمسلة الأثرية داخل مجمع معابد الكرنك بالبر الشرقي',
+        de: 'Sonnendurchfluteter Hof, Säulenhallen und antiker Obelisk im Karnak-Tempel (Ostufer)',
       },
       {
-        en: 'Traditional Nile boat crossing toward the palm groves and hills of the West Bank',
-        ar: 'عبور نهر النيل بالمركب أمام بساتين النخيل وتلال البر الغربي بالأقصر',
-        de: 'Bootsfahrt über den Nil Richtung Palmenhaine und Thebanische Berge am Westufer',
+        en: 'Carved granite obelisk of Queen Hatshepsut rising above Karnak Temple',
+        ar: 'مسلة الجرانيت المنقوشة للملكة حتشبسوت شامخة فوق معبد الكرنك',
+        de: 'Granitobelisk der Königin Hatschepsut über den Mauern des Karnak-Tempels',
       },
       {
         en: 'Twin Colossi of Memnon standing on the sunlit Theban plain (West Bank)',
@@ -682,24 +704,34 @@ export const TRIPS: Trip[] = [
         de: 'Die beiden Memnonkolosse in der sonnigen Ebene von Theben (Westufer)',
       },
       {
-        en: 'Sunlit canyon cliffs & royal tomb entrances in the Valley of the Kings',
-        ar: 'منحدرات جبال طيبة ومداخل المقابر الملكية في وادي الملوك بالبر الغربي',
-        de: 'Sonnendurchflutete Kalksteinfelsen und Königsgräber im Tal der Könige',
+        en: 'Royal burial chamber with astronomical ceiling and sarcophagus in the Valley of the Kings',
+        ar: 'حجرة الدفن الملكية بالسقف الفلكي والتابوت الأثري في وادي الملوك',
+        de: 'Königliche Grabkammer mit astronomischer Decke und Sarkophag im Tal der Könige',
       },
       {
-        en: 'Vivid painted hieroglyphs & astronomical starry ceiling inside a royal tomb',
-        ar: 'نقوش هيروغليفية ملونة وسقف فلكي مزيّن بالنجوم داخل إحدى المقابر الملكية',
-        de: 'Farbenprächtige Hieroglyphen und Sternenhimmel im Inneren eines Königsgrabs',
+        en: 'Painted descending corridor and winged ceiling inside a royal tomb in the Valley of the Kings',
+        ar: 'الممر الهابط المزيّن بالنقوش الملونة والسقف المجنّح داخل إحدى مقابر وادي الملوك',
+        de: 'Bemalter Abstiegskorridor mit geflügelter Decke in einem Königsgrab im Tal der Könige',
       },
       {
-        en: 'Three-tiered limestone colonnades of Queen Hatshepsut at Deir el-Bahari',
-        ar: 'المدرجات الثلاثة المنحوتة في الجبل بمعبد الملكة حتشبسوت بالدير البحري',
-        de: 'Dreistufige Terrassenanlage der Königin Hatschepsut in Deir el-Bahari',
+        en: 'Carved red granite sarcophagus and vivid hieroglyphic walls inside a royal burial chamber',
+        ar: 'تابوت الجرانيت الوردي المنقوش والجدران الهيروغليفية الملونة داخل حجرة دفن ملكية',
+        de: 'Roter Granitsarkophag und farbenprächtige Hieroglyphenwände in einer königlichen Grabkammer',
       },
       {
-        en: 'Grand exterior pylon, Ramses II statues & obelisk at Luxor Temple',
-        ar: 'واجهة معبد الأقصر من الخارج وتماثيل رمسيس الثاني والمسلة وطريق الكباش',
-        de: 'Außenfassade des Luxor-Tempels mit Ramses-II.-Statuen, Obelisk und Sphinxallee',
+        en: "Panoramic view of Queen Hatshepsut's terraced temple beneath the towering limestone cliffs",
+        ar: 'إطلالة بانورامية لمعبد الملكة حتشبسوت أسفل جروف الدير البحري الشاهقة',
+        de: 'Panoramablick auf den Terrassentempel der Königin Hatschepsut unter den Kalksteinfelsen',
+      },
+      {
+        en: 'Preserved painted sphinx statue of Queen Hatshepsut at Deir el-Bahari',
+        ar: 'تمثال أبو الهول الملوّن للملكة حتشبسوت في الدير البحري',
+        de: 'Bemalte Sphinx-Statue der Königin Hatschepsut in Deir el-Bahari',
+      },
+      {
+        en: 'Carved sandstone temple columns and hieroglyphic reliefs beneath the Theban mountains',
+        ar: 'أعمدة الحجر الرملي المنقوشة والرسوم الهيروغليفية أسفل جبال طيبة بالبر الغربي',
+        de: 'Sandsteinsäulen mit feinen Hieroglyphenreliefs vor den Thebanischen Bergen',
       },
     ],
     rating: 4.9,

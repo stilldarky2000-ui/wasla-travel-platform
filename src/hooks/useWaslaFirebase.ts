@@ -65,6 +65,10 @@ import {
   googleProvider,
   handleFirestoreError,
 } from '../lib/firebase';
+import {
+  optimizeTripImageDataUrl,
+  optimizeTripImagesForStorage,
+} from '../lib/imageOptimization';
 
 export type EffectiveRole = 'owner' | 'operations' | 'supplier' | 'none';
 export type HeroFontStyle = 'editorial' | 'modern' | 'clean' | 'luxury' | 'bold' | 'architectural';
@@ -2078,8 +2082,10 @@ export function useWaslaFirebase() {
     async (trip: Trip) => {
       const forcedStatus: Trip['approvalStatus'] =
         effectiveRole === 'owner' ? trip.approvalStatus || 'Approved' : 'Pending';
+      const optimizedImages = await optimizeTripImagesForStorage(trip.images || []);
       const normalizedTrip: Trip = {
         ...trip,
+        images: optimizedImages,
         supplierUid: user?.uid || trip.supplierUid,
         approvalStatus: forcedStatus,
       };
@@ -2117,8 +2123,13 @@ export function useWaslaFirebase() {
 
   const updateTripInDb = useCallback(
     async (trip: Trip) => {
-      setTrips((prev) => prev.map((t) => (t.id === trip.id ? trip : t)));
-      const sanitized = sanitizeTripForFirestore(trip, trip.supplierUid);
+      const optimizedImages = await optimizeTripImagesForStorage(trip.images || []);
+      const normalizedTrip: Trip = {
+        ...trip,
+        images: optimizedImages,
+      };
+      setTrips((prev) => prev.map((t) => (t.id === normalizedTrip.id ? normalizedTrip : t)));
+      const sanitized = sanitizeTripForFirestore(normalizedTrip, normalizedTrip.supplierUid);
       const tripId = String(sanitized.id);
       try {
         const ref = doc(db, 'trips', tripId);
@@ -2475,7 +2486,10 @@ export function useWaslaFirebase() {
       ) as HeroThemeStyle;
 
       const rawHeroImg = typeof merged.heroImageUrl === 'string' ? merged.heroImageUrl.trim() : '';
-      const safeHeroImg = rawHeroImg.length <= 250000 ? rawHeroImg : '';
+      const optimizedHeroImg = rawHeroImg
+        ? await optimizeTripImageDataUrl(rawHeroImg, 'hero')
+        : '';
+      const safeHeroImg = optimizedHeroImg.length <= 250000 ? optimizedHeroImg : '';
 
       const next: PublicStorefrontSettings = {
         whatsappNumber: safeNumber,
