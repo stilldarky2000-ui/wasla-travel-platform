@@ -574,9 +574,9 @@ export const TRIPS: Trip[] = [
     },
     tips: [
       {
-        en: 'Pick-up & drop-off outside Hurghada (El Gouna, Sahl Hasheesh, Makadi +€10/pp · Soma Bay, Safaga +€15/pp) is NOT included — please select your hotel zone at checkout.',
-        ar: 'التوصيل خارج مدينة الغردقة (الجونة، سهل حشيش، مكادي +10€ للفرد · سوما باي، سفاجا +15€ للفرد) غير مشمول — يرجى تحديد منطقة الفندق عند الحجز.',
-        de: 'Abholung außerhalb von Hurghada (El Gouna, Sahl Hasheesh, Makadi +10 €/Pers. · Soma Bay, Safaga +15 €/Pers.) ist nicht inklusive — bitte wählen Sie Ihre Hotelzone beim Buchen.',
+        en: 'Pick-up & drop-off outside Hurghada (El Gouna, Sahl Hasheesh, Makadi +€10/pp · Soma Bay, Safaga +€15/pp) is NOT included, please select your hotel zone at checkout.',
+        ar: 'التوصيل خارج مدينة الغردقة (الجونة، سهل حشيش، مكادي +10€ للفرد · سوما باي، سفاجا +15€ للفرد) غير مشمول، يرجى تحديد منطقة الفندق عند الحجز.',
+        de: 'Abholung außerhalb von Hurghada (El Gouna, Sahl Hasheesh, Makadi +10 €/Pers. · Soma Bay, Safaga +15 €/Pers.) ist nicht inklusive, bitte wählen Sie Ihre Hotelzone beim Buchen.',
       },
       {
         en: 'Optional professional underwater photography & drone gallery session available on board.',
@@ -699,15 +699,15 @@ export const TRIPS: Trip[] = [
       },
     ],
     shortDescription: {
-      en: 'Explore Ancient Thebes in an 8-seat A/C Mercedes Sprinter with a licensed Egyptologist: Karnak Temple, Valley of the Kings, Hatshepsut Temple, Colossi of Memnon, and a freshly cooked Nile-side lunch — with zero forced bazaar stops.',
-      ar: 'استكشف طيبة القديمة في سيارة مرسيدس مكيفة (8 مقاعد فقط) مع مرشد أثري مرخص: معبد الكرنك، وادي الملوك، معبد حتشبسوت، تمثالا ممنون، وغداء مصري طازج على ضفاف النيل — بدون أي توقفات تسوق إجبارية.',
-      de: 'Entdecken Sie das antike Theben im klimatisierten 8-Sitzer Mercedes Sprinter mit lizenziertem Ägyptologen: Karnak-Tempel, Tal der Könige, Hatschepsut-Tempel, Memnonkolosse und Mittagessen am Nil — ohne Verkaufsstopps.',
+      en: 'Explore Ancient Thebes in an 8-seat A/C Mercedes Sprinter with a licensed Egyptologist: Karnak Temple, Valley of the Kings, Hatshepsut Temple, Colossi of Memnon, and a freshly cooked Nile-side lunch, with zero forced bazaar stops.',
+      ar: 'استكشف طيبة القديمة في سيارة مرسيدس مكيفة (8 مقاعد فقط) مع مرشد أثري مرخص: معبد الكرنك، وادي الملوك، معبد حتشبسوت، تمثالا ممنون، وغداء مصري طازج على ضفاف النيل، بدون أي توقفات تسوق إجبارية.',
+      de: 'Entdecken Sie das antike Theben im klimatisierten 8-Sitzer Mercedes Sprinter mit lizenziertem Ägyptologen: Karnak-Tempel, Tal der Könige, Hatschepsut-Tempel, Memnonkolosse und Mittagessen am Nil, ohne Verkaufsstopps.',
     },
     highlights: [
       {
-        en: 'Strictly 8 guests max per Mercedes Sprinter — beat the 50-seat coach crowds by 90 minutes',
-        ar: 'بحد أقصى 8 ضيوف فقط في سيارة مرسيدس سبرينتر — وصول أسرع وتجنب زحام الأتوبيسات الكبيرة',
-        de: 'Maximal 8 Gäste pro Mercedes Sprinter — 90 Minuten schneller als große Reisebusse',
+        en: 'Strictly 8 guests max per Mercedes Sprinter, beat the 50-seat coach crowds by 90 minutes',
+        ar: 'بحد أقصى 8 ضيوف فقط في سيارة مرسيدس سبرينتر، وصول أسرع وتجنب زحام الأتوبيسات الكبيرة',
+        de: 'Maximal 8 Gäste pro Mercedes Sprinter, 90 Minuten schneller als große Reisebusse',
       },
       {
         en: 'Walk through the Great Hypostyle Hall of Karnak Temple (134 giant columns) in the cool morning light',
@@ -730,9 +730,9 @@ export const TRIPS: Trip[] = [
         de: 'Frisch zubereitetes ägyptisches Mittagessen auf einer schattigen Terrasse direkt am Nil',
       },
       {
-        en: '100% Zero-Bazaar Guarantee — no forced alabaster, papyrus, or perfume factory detours',
-        ar: 'ضمان صفر بازارات إجبارية — لا نضيع وقتك في مصانع الألباستر أو البردي أو العطور',
-        de: '100 % Ohne-Verkaufsstopps-Garantie — keine erzwungene Alabaster- oder Papyrusfabriken',
+        en: '100% Zero-Bazaar Guarantee, no forced alabaster, papyrus, or perfume factory detours',
+        ar: 'ضمان صفر بازارات إجبارية، لا نضيع وقتك في مصانع الألباستر أو البردي أو العطور',
+        de: '100 % Ohne-Verkaufsstopps-Garantie, keine erzwungene Alabaster- oder Papyrusfabriken',
       },
     ],
     historicalFacts: [
@@ -778,13 +778,13 @@ export const TRIPS: Trip[] = [
       },
     ],
     fullDescription: {
-      en: `Discover Upper Egypt in an 8-seat A/C Mercedes Sprinter with a licensed Egyptologist — arriving at Karnak Temple 90 minutes ahead of large tour coaches and exploring both East and West Banks at an unhurried pace.
+      en: `Discover Upper Egypt in an 8-seat A/C Mercedes Sprinter with a licensed Egyptologist, arriving at Karnak Temple 90 minutes ahead of large tour coaches and exploring both East and West Banks at an unhurried pace.
 
 We guarantee zero forced souvenir, alabaster, or perfume factory detours so your full day stays focused on ancient monuments, shaded rest breaks, and a freshly cooked Nile-side lunch.`,
-      ar: `استكشف مدينة الأقصر في سيارة مرسيدس سبرينتر حديثة ومكيفة بحد أقصى 8 أفراد فقط مع مرشد أثري مرخص — وصول مبكر لمعبد الكرنك قبل زحام الأتوبيسات الكبيرة مع وتيرة مريحة تشمل معابد البر الشرقي والغربي.
+      ar: `استكشف مدينة الأقصر في سيارة مرسيدس سبرينتر حديثة ومكيفة بحد أقصى 8 أفراد فقط مع مرشد أثري مرخص، وصول مبكر لمعبد الكرنك قبل زحام الأتوبيسات الكبيرة مع وتيرة مريحة تشمل معابد البر الشرقي والغربي.
 
 نضمن لك صفر توقفات تسوق إجبارية في مصانع الألباستر أو البردي، ليظل يومك مخصصاً للتاريخ، استراحات الظل، وغداء طازج على ضفاف النيل.`,
-      de: `Erleben Sie Oberägypten im klimatisierten 8-Sitzer Mercedes Sprinter mit lizenziertem Ägyptologen — ohne Massenabfertigung und 90 Minuten vor den großen Reisebussen am Karnak-Tempel.
+      de: `Erleben Sie Oberägypten im klimatisierten 8-Sitzer Mercedes Sprinter mit lizenziertem Ägyptologen, ohne Massenabfertigung und 90 Minuten vor den großen Reisebussen am Karnak-Tempel.
 
 Wir garantieren 0 % erzwungene Verkaufsstopps, damit der ganze Tag den Tempeln, schattigen Pausen und einem frisch gekochten Mittagessen am Nil gehört.`,
     },
@@ -1053,7 +1053,7 @@ Wir garantieren 0 % erzwungene Verkaufsstopps, damit der ganze Tag den Tempeln, 
     },
     highlights: [
       {
-        en: 'Guided pace matched to your group — never a rushed convoy',
+        en: 'Guided pace matched to your group, never a rushed convoy',
         ar: 'سرعة تناسب مجموعتك بدون استعجال',
         de: 'Angepasstes Tempo ohne gehetzte Kolonnen',
       },
@@ -1081,9 +1081,9 @@ Wir garantieren 0 % erzwungene Verkaufsstopps, damit der ganze Tag den Tempeln, 
     ],
     tips: [
       {
-        en: 'Pick-up & drop-off outside Hurghada (El Gouna, Sahl Hasheesh, Makadi +€10/pp · Soma Bay, Safaga +€15/pp) is NOT included — please select your zone at checkout.',
-        ar: 'التوصيل خارج الغردقة (الجونة، سهل حشيش، مكادي +10€ للفرد · سوما باي، سفاجا +15€ للفرد) رسوم إضافية — اختر منطقتك عند الحجز.',
-        de: 'Abholung außerhalb von Hurghada (+10–15 €/Pers.) ist ein Zusatzoption — bitte Zone beim Buchen wählen.',
+        en: 'Pick-up & drop-off outside Hurghada (El Gouna, Sahl Hasheesh, Makadi +€10/pp · Soma Bay, Safaga +€15/pp) is NOT included, please select your zone at checkout.',
+        ar: 'التوصيل خارج الغردقة (الجونة، سهل حشيش، مكادي +10€ للفرد · سوما باي، سفاجا +15€ للفرد) رسوم إضافية، اختر منطقتك عند الحجز.',
+        de: 'Abholung außerhalb von Hurghada (+10–15 €/Pers.) ist ein Zusatzoption, bitte Zone beim Buchen wählen.',
       },
       { en: 'Desert headscarf (Arafat) & goggles optional at station (€3–€5).', ar: 'الكوفية ونظارة الرمال اختيارية في المحطة.', de: 'Wüstentuch & Schutzbrille optional vor Ort.' },
     ],
@@ -1154,7 +1154,7 @@ Wir garantieren 0 % erzwungene Verkaufsstopps, damit der ganze Tag den Tempeln, 
       de: 'Geführter Ausritt entlang des Roten Meeres oder durch die Wüste – ideal für Anfänger & Fortgeschrittene mit optionalem Fotoshooting.',
     },
     fullDescription: {
-      en: 'Experience a unique horse-riding adventure in Hurghada, combining nature, relaxation and the option to capture unforgettable moments with an optional professional photoshoot.\n\nBegin your journey with a guided horseback ride through stunning desert landscapes or along the Red Sea coast, depending on weather conditions and your preference. Whether you are a beginner or an experienced rider, our professional team will ensure a safe and enjoyable experience tailored to your level.\n\nFor those who want to make the experience even more special, an optional photoshoot is available during the ride. Capture beautiful, Instagram-style moments with the horses in breathtaking natural surroundings — from candid shots to posed photos that highlight the beauty of the landscape.\n\nThis experience is perfect for couples, friends, solo travellers and content creators looking for something unique and memorable in Hurghada. Enjoy the peaceful atmosphere, connect with nature and create lasting memories in one of Egypt’s most beautiful destinations.',
+      en: 'Experience a unique horse-riding adventure in Hurghada, combining nature, relaxation and the option to capture unforgettable moments with an optional professional photoshoot.\n\nBegin your journey with a guided horseback ride through stunning desert landscapes or along the Red Sea coast, depending on weather conditions and your preference. Whether you are a beginner or an experienced rider, our professional team will ensure a safe and enjoyable experience tailored to your level.\n\nFor those who want to make the experience even more special, an optional photoshoot is available during the ride. Capture beautiful, Instagram-style moments with the horses in breathtaking natural surroundings, from candid shots to posed photos that highlight the beauty of the landscape.\n\nThis experience is perfect for couples, friends, solo travellers and content creators looking for something unique and memorable in Hurghada. Enjoy the peaceful atmosphere, connect with nature and create lasting memories in one of Egypt’s most beautiful destinations.',
       ar: 'استمتع بتجربة فريدة لركوب الخيل في الغردقة تجمع بين الطبيعة والاسترخاء وإمكانية توثيق لحظات لا تُنسى مع خيار جلسة تصوير احترافية.\n\nابدأ رحلتك بجولة ركوب خيل مع مدرب عبر المناظر الصحراوية الخلابة أو على ساحل البحر الأحمر حسب حالة الطقس ورغبتك. سواء كنت مبتدئاً أو فارساً محترفاً، يضمن فريقنا تجربة آمنة وممتعة تناسب مستواك.\n\nإذا رغبت بجعل التجربة أكثر تميزاً، تتوفر جلسة تصوير احترافية أثناء الجولة لالتقاط أجمل الصور الطبيعية مع الخيول. هذه التجربة مثالية للأزواج والأصدقاء والمسافرين المنفردين وصنّاع المحتوى.',
       de: 'Erleben Sie ein unvergessliches Reitabenteuer in Hurghada – eine Verbindung aus Natur, Entspannung und der Möglichkeit für ein professionelles Fotoshooting.\n\nBeginnen Sie Ihren geführten Ausritt durch beeindruckende Wüstenlandschaften oder entlang der Küste des Roten Meeres, angepasst an Wetter und Ihr Reitniveau. Ob Anfänger oder erfahrener Reiter: unser Team sorgt für Sicherheit und Freude.\n\nIdeal für Paare, Freunde, Alleinreisende und Content-Creator.',
     },
@@ -1201,7 +1201,7 @@ Wir garantieren 0 % erzwungene Verkaufsstopps, damit der ganze Tag den Tempeln, 
       {
         en: 'Pick-up and drop-off outside Hurghada are not included (Makadi, Sahl Hasheesh, El Gouna +€10/pp · Soma Bay or Safaga +€15/pp). Please select the hotel zone add-on at checkout.',
         ar: 'التوصيل خارج الغردقة غير مشمول بالسعر الأساسي (مكادي، سهل حشيش، الجونة +10€ للفرد · سوما باي أو سفاجا +15€ للفرد). يرجى تحديد منطقة الفندق عند الحجز لتفادي أي خلاف.',
-        de: 'Abholung außerhalb von Hurghada (Makadi, Sahl Hasheesh, El Gouna +10 €/Pers. · Soma Bay, Safaga +15 €/Pers.) ist nicht inklusive — bitte wählen Sie die Zone beim Checkout.',
+        de: 'Abholung außerhalb von Hurghada (Makadi, Sahl Hasheesh, El Gouna +10 €/Pers. · Soma Bay, Safaga +15 €/Pers.) ist nicht inklusive, bitte wählen Sie die Zone beim Checkout.',
       },
     ],
     notSuitableFor: [
@@ -1212,9 +1212,9 @@ Wir garantieren 0 % erzwungene Verkaufsstopps, damit der ganze Tag den Tempeln, 
       { en: 'People over 243 lbs (110 kg)', ar: 'الأشخاص فوق وزن 110 كجم (243 رطل)', de: 'Personen über 110 kg Körpergewicht' },
     ],
     meetingPoint: {
-      en: 'Al-Bahr Coastal Stables, Hurghada South / Hotel Lobby Pickup',
-      ar: 'اسطبلات البحر الساحلية الغردقة أو الاستلام من الفندق',
-      de: 'Al-Bahr Küstenstall Hurghada / Hotelabholung',
+      en: 'Coastal Stables, Hurghada South / Hotel Lobby Pickup',
+      ar: 'اسطبلات ساحلية في جنوب الغردقة أو الاستلام من بهو الفندق',
+      de: 'Küstenstall Hurghada Süd / Hotelabholung',
     },
     meetingPointUrl: 'https://maps.google.com/?q=Sahl+Hasheesh+Hurghada+Egypt',
     whatToBring: [
@@ -1258,13 +1258,13 @@ Wir garantieren 0 % erzwungene Verkaufsstopps, damit der ganze Tag den Tempeln, 
     departureTimes: ['09:00 AM'],
     price: 49,
     shortDescription: {
-      en: 'Sandy-entry bay famous for resident green sea turtles and gentle seagrass meadows — zero boat required.',
+      en: 'Sandy-entry bay famous for resident green sea turtles and gentle seagrass meadows, zero boat required.',
       ar: 'خليج رملي شهير بالسلاحف البحرية الخضراء والشعاب المرجانية الهادئة بدون الحاجة لقارب.',
-      de: 'Sandige Bucht bekannt für Meeresschildkröten und bunte Riffe — direkter Strandeinstieg ohne Boot.',
+      de: 'Sandige Bucht bekannt für Meeresschildkröten und bunte Riffe, direkter Strandeinstieg ohne Boot.',
     },
     highlights: [
       {
-        en: 'Walk straight in from soft sand — ideal for gentle swimmers',
+        en: 'Walk straight in from soft sand, ideal for gentle swimmers',
         ar: 'دخول مباشر من الشاطئ الرملي بدون موج قوي',
         de: 'Bequemer Einstieg direkt vom weichen Sandstrand',
       },
@@ -1326,9 +1326,9 @@ Wir garantieren 0 % erzwungene Verkaufsstopps, damit der ganze Tag den Tempeln, 
         de: 'Auf Wunsch weibliche Reiseleitung für Alleinreisende',
       },
       {
-        en: 'Zero commission shopping pressure — real local bakeries and markets',
-        ar: 'بدون ضغط تسوق — مخابز وأسواق محلية حقيقية',
-        de: 'Kein Verkaufsdruck — echte lokale Bäckereien und Märkte',
+        en: 'Zero commission shopping pressure, real local bakeries and markets',
+        ar: 'بدون ضغط تسوق، مخابز وأسواق محلية حقيقية',
+        de: 'Kein Verkaufsdruck, echte lokale Bäckereien und Märkte',
       },
     ],
     included: [
@@ -1656,7 +1656,7 @@ export const MOMENTS: MomentItem[] = [
     comment: {
       en: 'Gentle mares at sunrise and our 7-year-old felt completely safe walking in the shallows.',
       ar: 'خيول هادئة عند الشروق وابنتنا ذات السبع سنوات شعرت بأمان تام في المياه الضحلة.',
-      de: 'Ruhige Pferde bei Sonnenaufgang — unsere 7-jährige Tochter fühlte sich rundum sicher.',
+      de: 'Ruhige Pferde bei Sonnenaufgang, unsere 7-jährige Tochter fühlte sich rundum sicher.',
     },
     tripId: 'sahl-hasheesh-horse-swim',
   },
@@ -1667,9 +1667,9 @@ export const MOMENTS: MomentItem[] = [
     country: { en: 'Denmark', ar: 'الدنمارك', de: 'Dänemark' },
     rating: 5,
     comment: {
-      en: 'Zero souvenir detours — our small van got us to Karnak right as the golden light hit.',
-      ar: 'بدون توقفات تسوق — وصلنا معبد الكرنك مع أول ضوء ذهبي في الصباح.',
-      de: 'Keine Verkaufsstopps — unser Kleinbus erreichte Karnak genau zum schönsten Licht.',
+      en: 'Zero souvenir detours, our small van got us to Karnak right as the golden light hit.',
+      ar: 'بدون توقفات تسوق، وصلنا معبد الكرنك مع أول ضوء ذهبي في الصباح.',
+      de: 'Keine Verkaufsstopps, unser Kleinbus erreichte Karnak genau zum schönsten Licht.',
     },
     tripId: 'luxor-valley-small-van',
   },

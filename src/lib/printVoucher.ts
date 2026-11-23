@@ -142,7 +142,7 @@ const VOUCHER_COPY: Record<GuestLanguageCode, VoucherLocaleCopy> = {
     boardingBullet2:
       'Present this Digital Boarding Voucher & QR code (on your phone or printed) to your driver or tour representative.',
     boardingBullet3:
-      'No extra hidden fees — hotel transfer and excursion entry as specified in your booking are included.',
+      'No extra hidden fees, hotel transfer and excursion entry as specified in your booking are included.',
     supportFooterTitle: '24/7 Operations & Dispatch Desk',
     issuedAtLabel: 'Issued by Wasla Travel Reservation System',
     toolbarBackBtn: '← Back to Booking',
@@ -184,7 +184,7 @@ const VOUCHER_COPY: Record<GuestLanguageCode, VoucherLocaleCopy> = {
     boardingBullet2:
       'Zeigen Sie diesen digitalen Boarding-Voucher mit QR-Code (auf dem Smartphone oder ausgedruckt) Ihrem Fahrer vor.',
     boardingBullet3:
-      'Keine versteckten Gebühren — Hoteltransfer und Ausflugsleistungen gemäß Buchung sind enthalten.',
+      'Keine versteckten Gebühren, Hoteltransfer und Ausflugsleistungen gemäß Buchung sind enthalten.',
     supportFooterTitle: '24/7 Einsatzleitung & Gästeservice',
     issuedAtLabel: 'Ausgestellt vom Wasla Travel Reservierungssystem',
     toolbarBackBtn: '← Zurück zur Buchung',
@@ -226,7 +226,7 @@ const VOUCHER_COPY: Record<GuestLanguageCode, VoucherLocaleCopy> = {
     boardingBullet2:
       'يرجى إبراز هذه التذكرة الرقمية وكود الـ QR (من الهاتف أو مطبوعة) للسائق أو مندوب الرحلة عند الاستلام.',
     boardingBullet3:
-      'لا توجد أي رسوم خفية — الانتقالات من وإلى الفندق وكافة تفاصيل البرنامج المشمولة بالحجز مؤكدة بالكامل.',
+      'لا توجد أي رسوم خفية، الانتقالات من وإلى الفندق وكافة تفاصيل البرنامج المشمولة بالحجز مؤكدة بالكامل.',
     supportFooterTitle: 'خدمة العملاء والتشغيل على مدار الساعة 24/7',
     issuedAtLabel: 'صدرت رسمياً من نظام حجوزات وصلة ترافيل',
     toolbarBackBtn: '← رجوع للحجز',
@@ -268,7 +268,7 @@ const VOUCHER_COPY: Record<GuestLanguageCode, VoucherLocaleCopy> = {
     boardingBullet2:
       'Présentez ce bon d’embarquement numérique avec code QR (sur téléphone ou imprimé) à votre chauffeur.',
     boardingBullet3:
-      'Aucun frais caché — le transfert hôtel et les prestations réservées sont inclus.',
+      'Aucun frais caché, le transfert hôtel et les prestations réservées sont inclus.',
     supportFooterTitle: 'Assistance et opérations 24h/24 et 7j/7',
     issuedAtLabel: 'Émis par le système de réservation Wasla Travel',
     toolbarBackBtn: '← Retour à la réservation',
@@ -310,7 +310,7 @@ const VOUCHER_COPY: Record<GuestLanguageCode, VoucherLocaleCopy> = {
     boardingBullet2:
       'Mostra questo voucher digitale con codice QR (su smartphone o stampato) all’autista o alla guida.',
     boardingBullet3:
-      'Nessun costo nascosto — trasferimento hotel ed escursione inclusi come da prenotazione.',
+      'Nessun costo nascosto, trasferimento hotel ed escursione inclusi come da prenotazione.',
     supportFooterTitle: 'Assistenza operativa 24/7',
     issuedAtLabel: 'Emesso dal sistema di prenotazione Wasla Travel',
     toolbarBackBtn: '← Torna alla prenotazione',
@@ -352,7 +352,7 @@ const VOUCHER_COPY: Record<GuestLanguageCode, VoucherLocaleCopy> = {
     boardingBullet2:
       'Presente este bono digital con código QR (en su teléfono o impreso) a su conductor o representante.',
     boardingBullet3:
-      'Sin cargos ocultos — traslado del hotel y servicios reservados incluidos.',
+      'Sin cargos ocultos, traslado del hotel y servicios reservados incluidos.',
     supportFooterTitle: 'Centro de Operaciones y Asistencia 24/7',
     issuedAtLabel: 'Emitido por el sistema de reservas de Wasla Travel',
     toolbarBackBtn: '← Volver a la reserva',
@@ -394,7 +394,7 @@ const VOUCHER_COPY: Record<GuestLanguageCode, VoucherLocaleCopy> = {
     boardingBullet2:
       'Toon deze digitale voucher met QR-code (op uw telefoon of geprint) aan uw chauffeur.',
     boardingBullet3:
-      'Geen verborgen kosten — hoteltransfer en geboekte onderdelen zijn inbegrepen.',
+      'Geen verborgen kosten, hoteltransfer en geboekte onderdelen zijn inbegrepen.',
     supportFooterTitle: '24/7 Operaties & Klantenservice',
     issuedAtLabel: 'Uitgegeven door het Wasla Travel reserveringssysteem',
     toolbarBackBtn: '← Terug naar boeking',
@@ -436,7 +436,7 @@ const VOUCHER_COPY: Record<GuestLanguageCode, VoucherLocaleCopy> = {
     boardingBullet2:
       'Okaż ten cyfrowy voucher z kodem QR (na telefonie lub wydrukowany) kierowcy lub przewodnikowi.',
     boardingBullet3:
-      'Brak ukrytych opłat — transfer hotelowy oraz zarezerwowane świadczenia są w cenie.',
+      'Brak ukrytych opłat, transfer hotelowy oraz zarezerwowane świadczenia są w cenie.',
     supportFooterTitle: 'Całodobowe Biuro Operacyjne 24/7',
     issuedAtLabel: 'Wydano przez system rezerwacji Wasla Travel',
     toolbarBackBtn: '← Powrót do rezerwacji',
@@ -478,7 +478,7 @@ const VOUCHER_COPY: Record<GuestLanguageCode, VoucherLocaleCopy> = {
     boardingBullet2:
       'Предъявите этот электронный ваучер с QR-кодом (на экране телефона или в распечатанном виде) водителю или гиду.',
     boardingBullet3:
-      'Никаких скрытых доплат — трансфер из отеля и программа по бронированию полностью включены.',
+      'Никаких скрытых доплат, трансфер из отеля и программа по бронированию полностью включены.',
     supportFooterTitle: 'Круглосуточная служба поддержки 24/7',
     issuedAtLabel: 'Выдано системой бронирования Wasla Travel',
     toolbarBackBtn: '← Назад к бронированию',

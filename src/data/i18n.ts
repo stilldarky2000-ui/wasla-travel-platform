@@ -200,7 +200,7 @@ const BASE_I18N: Record<'en' | 'ar' | 'de', Translations> = {
     heroTitleLine1: 'Small-group days,',
     heroTitleLine2: 'booked without the guesswork.',
     heroLede:
-      'Wasla Travel connects you directly with vetted local tourism providers across the Red Sea and Nile — sea days, desert safaris, Luxor & Cairo history, horse riding, city tours and private transfers.',
+      'Wasla Travel connects you directly with vetted local tourism providers across the Red Sea and Nile, sea days, desert safaris, Luxor & Cairo history, horse riding, city tours and private transfers.',
     searchDestinationLabel: 'Destination',
     searchActivityLabel: 'Activity',
     searchDateLabel: 'Date',
@@ -253,11 +253,11 @@ const BASE_I18N: Record<'en' | 'ar' | 'de', Translations> = {
       },
       pay: {
         title: 'Pay in cash on pickup',
-        desc: "Cash on pickup is the standard — if you'd rather pay in advance, just ask us and we'll send you a payment link.",
+        desc: "Cash on pickup is the standard, if you'd rather pay in advance, just ask us and we'll send you a payment link.",
       },
       cancel: {
         title: 'Free cancellation up to 24 hours before',
-        desc: 'Plans change — cancel or reschedule up to 24 hours ahead at zero fee.',
+        desc: 'Plans change, cancel or reschedule up to 24 hours ahead at zero fee.',
       },
       whatsapp: {
         title: 'WhatsApp support',
@@ -274,10 +274,10 @@ const BASE_I18N: Record<'en' | 'ar' | 'de', Translations> = {
 
     newsletterEyebrow: 'Newsletter',
     newsletterTitle: 'Get the good trips first',
-    newsletterSub: 'One short email when new seasonal trips open. No spam — unsubscribe any time.',
+    newsletterSub: 'One short email when new seasonal trips open. No spam, unsubscribe any time.',
     newsletterPlaceholder: 'you@example.com',
     newsletterButton: 'Subscribe',
-    newsletterSuccess: 'Subscribed — we saved your email for seasonal Hurghada updates.',
+    newsletterSuccess: 'Subscribed, we saved your email for seasonal Hurghada updates.',
 
     footerRights: '© 2026 Wasla Travel · Hurghada, Egypt',
     footerWhatsapp: 'WhatsApp',
@@ -303,7 +303,7 @@ const BASE_I18N: Record<'en' | 'ar' | 'de', Translations> = {
     modalEmailPlaceholder: 'you@example.com',
     modalPickupDispatchNote: 'Exact pickup time & driver details will be sent to both your Email and WhatsApp.',
     modalNotesLabel: 'Notes (children’s ages, preferences)',
-    modalNotesPlaceholder: 'Optional — e.g. 7-year-old beginner swimmer',
+    modalNotesPlaceholder: 'Optional, e.g. 7-year-old beginner swimmer',
     modalEstTotal: 'Estimated total',
     modalSubmitBooking: 'Confirm Booking Request',
     modalNoBotNote: 'Free cancellation up to 24h before. No instant bot charges.',
@@ -335,9 +335,9 @@ const BASE_I18N: Record<'en' | 'ar' | 'de', Translations> = {
     footerAddonEyebrow: 'Private Add-Ons · Hurghada, Luxor & Cairo',
     footerAddonTitle: 'Need a Private Egyptian Guide or Vacation Photographer?',
     footerPhotoTitle: 'Photography Sessions (Beach, Boat & Monuments)',
-    footerPhotoDesc: 'Book a dedicated local photographer for Orange Bay sandbars, Sahl Hasheesh sunrise rides, desert dusk, or Luxor temples — clean edited digital gallery delivered within 48 hours.',
+    footerPhotoDesc: 'Book a dedicated local photographer for Orange Bay sandbars, Sahl Hasheesh sunrise rides, desert dusk, or Luxor temples, clean edited digital gallery delivered within 48 hours.',
     footerGuideTitle: 'Private Licensed Egyptian Guide (All Languages)',
-    footerGuideDesc: 'Hire a Ministry-licensed Egyptologist or Hurghada City Tour host privately in English, German, Arabic, French, Spanish, Dutch, Italian, Polish, or Russian — zero forced shopping stops.',
+    footerGuideDesc: 'Hire a Ministry-licensed Egyptologist or Hurghada City Tour host privately in English, German, Arabic, French, Spanish, Dutch, Italian, Polish, or Russian, zero forced shopping stops.',
     footerAddonCta: 'Request Photography or Private Guide',
 
     modalHighlightsTitle: 'Highlights',
@@ -372,7 +372,7 @@ const BASE_I18N: Record<'en' | 'ar' | 'de', Translations> = {
     heroTitleLine1: 'رحلات بمجموعات صغيرة،',
     heroTitleLine2: 'محجوزة بدون أي حيرة.',
     heroLede:
-      'وصلة ترافل منصتك لحجز الرحلات المحلية الموثوقة في البحر الأحمر والنيل — رحلات بحرية، سفاري الصحراء، آثار الأقصر والقاهرة، ركوب الخيل، جولات المدينة والتوصيلات الخاصة.',
+      'وصلة ترافل منصتك لحجز الرحلات المحلية الموثوقة في البحر الأحمر والنيل، رحلات بحرية، سفاري الصحراء، آثار الأقصر والقاهرة، ركوب الخيل، جولات المدينة والتوصيلات الخاصة.',
     searchDestinationLabel: 'الوجهة',
     searchActivityLabel: 'النشاط',
     searchDateLabel: 'التاريخ',
@@ -425,7 +425,7 @@ const BASE_I18N: Record<'en' | 'ar' | 'de', Translations> = {
       },
       pay: {
         title: 'الدفع نقداً عند الاستلام',
-        desc: 'الدفع نقداً عند الاستلام هو المعتاد — وإذا كنت تفضل الدفع مسبقاً، فقط اطلب منا وسنرسل لك رابط دفع.',
+        desc: 'الدفع نقداً عند الاستلام هو المعتاد، وإذا كنت تفضل الدفع مسبقاً، فقط اطلب منا وسنرسل لك رابط دفع.',
       },
       cancel: {
         title: 'إلغاء مجاني حتى 24 ساعة قبل الموعد',
@@ -449,7 +449,7 @@ const BASE_I18N: Record<'en' | 'ar' | 'de', Translations> = {
     newsletterSub: 'رسالة قصيرة عند فتح رحلات جديدة وعروض موسمية. بدون إزعاج.',
     newsletterPlaceholder: 'you@example.com',
     newsletterButton: 'اشتراك',
-    newsletterSuccess: 'تم الاشتراك — حفظنا بريدك للتحديثات الموسمية في الغردقة.',
+    newsletterSuccess: 'تم الاشتراك، حفظنا بريدك للتحديثات الموسمية في الغردقة.',
 
     footerRights: '© 2026 وصلة للسفريات والسياحة · الغردقة، مصر',
     footerWhatsapp: 'واتساب',
@@ -475,7 +475,7 @@ const BASE_I18N: Record<'en' | 'ar' | 'de', Translations> = {
     modalEmailPlaceholder: 'you@example.com',
     modalPickupDispatchNote: 'سيصلك موعد التحرك الدقيق وبيانات السائق على بريدك الإلكتروني والواتساب معاً.',
     modalNotesLabel: 'ملاحظات (أعمار الأطفال، تفضيلات)',
-    modalNotesPlaceholder: 'اختياري — مثال: طفل بعمر 7 سنوات',
+    modalNotesPlaceholder: 'اختياري، مثال: طفل بعمر 7 سنوات',
     modalEstTotal: 'الإجمالي التقديري',
     modalSubmitBooking: 'إرسال طلب الحجز',
     modalNoBotNote: 'إلغاء مجاني قبل 24 ساعة. لا يتم خصم أي مبلغ قبل التأكيد.',
@@ -507,7 +507,7 @@ const BASE_I18N: Record<'en' | 'ar' | 'de', Translations> = {
     footerAddonEyebrow: 'خدمات خاصة إضافية · الغردقة والأقصر والقاهرة',
     footerAddonTitle: 'هل تحتاج إلى مرشد سياحي خاص أو جلسة تصوير احترافية؟',
     footerPhotoTitle: 'خدمات التصوير الاحترافية (البحر، الصحراء، المعابد)',
-    footerPhotoDesc: 'احجز مصوراً محترفاً لمرافقتك في رحلة أورانج باي أو ركوب الخيل عند الشروق أو سفاري الغروب أو آثار الأقصر — صور عالية الجودة تصلك خلال 48 ساعة.',
+    footerPhotoDesc: 'احجز مصوراً محترفاً لمرافقتك في رحلة أورانج باي أو ركوب الخيل عند الشروق أو سفاري الغروب أو آثار الأقصر، صور عالية الجودة تصلك خلال 48 ساعة.',
     footerGuideTitle: 'مرشد سياحي مصري خاص (Private Guide) بجميع اللغات',
     footerGuideDesc: 'مرشد سياحي مصري مرخص من وزارة السياحة يرافقك وحدك أو مع عائلتك باللغة التي تختارها في المتاحف والمعابد أو جولات المدينة (City Tour) بدون أي توقفات تسوق إجبارية.',
     footerAddonCta: 'اطلب جلسة تصوير أو مرشد خاص',
@@ -544,7 +544,7 @@ const BASE_I18N: Record<'en' | 'ar' | 'de', Translations> = {
     heroTitleLine1: 'Tage in kleiner Gruppe,',
     heroTitleLine2: 'gebucht ohne Rätselraten.',
     heroLede:
-      'Wasla Travel verbindet Sie direkt mit geprüften lokalen Anbietern am Roten Meer und Nil — Bootstage, Wüstensafaris, Luxor & Kairo, Reiten, Stadttouren und private Transfers.',
+      'Wasla Travel verbindet Sie direkt mit geprüften lokalen Anbietern am Roten Meer und Nil, Bootstage, Wüstensafaris, Luxor & Kairo, Reiten, Stadttouren und private Transfers.',
     searchDestinationLabel: 'Reiseziel',
     searchActivityLabel: 'Aktivität',
     searchDateLabel: 'Datum',
@@ -597,11 +597,11 @@ const BASE_I18N: Record<'en' | 'ar' | 'de', Translations> = {
       },
       pay: {
         title: 'Barzahlung bei Abholung',
-        desc: 'Barzahlung bei Abholung ist der Standard — wenn Sie lieber vorab zahlen möchten, fragen Sie uns einfach und wir senden Ihnen einen Zahlungslink.',
+        desc: 'Barzahlung bei Abholung ist der Standard, wenn Sie lieber vorab zahlen möchten, fragen Sie uns einfach und wir senden Ihnen einen Zahlungslink.',
       },
       cancel: {
         title: 'Kostenlose Stornierung bis 24 Stunden vorher',
-        desc: 'Pläne ändern sich — bis 24 Stunden vor Start kostenlos umbuchen oder stornieren.',
+        desc: 'Pläne ändern sich, bis 24 Stunden vor Start kostenlos umbuchen oder stornieren.',
       },
       whatsapp: {
         title: 'WhatsApp-Support',
@@ -618,10 +618,10 @@ const BASE_I18N: Record<'en' | 'ar' | 'de', Translations> = {
 
     newsletterEyebrow: 'Newsletter',
     newsletterTitle: 'Gute Touren zuerst entdecken',
-    newsletterSub: 'Eine kurze Mail bei neuen Saisontouren. Kein Spam — jederzeit abbestellbar.',
+    newsletterSub: 'Eine kurze Mail bei neuen Saisontouren. Kein Spam, jederzeit abbestellbar.',
     newsletterPlaceholder: 'sie@beispiel.de',
     newsletterButton: 'Abonnieren',
-    newsletterSuccess: 'Angemeldet — Ihre E-Mail ist für Saison-Updates gespeichert.',
+    newsletterSuccess: 'Angemeldet, Ihre E-Mail ist für Saison-Updates gespeichert.',
 
     footerRights: '© 2026 Wasla Travel · Hurghada, Ägypten',
     footerWhatsapp: 'WhatsApp',
@@ -647,7 +647,7 @@ const BASE_I18N: Record<'en' | 'ar' | 'de', Translations> = {
     modalEmailPlaceholder: 'sie@beispiel.de',
     modalPickupDispatchNote: 'Genaue Abholzeit & Fahrerdaten erreichen Sie per E-Mail und WhatsApp.',
     modalNotesLabel: 'Hinweise (Kinderalter, Wünsche)',
-    modalNotesPlaceholder: 'Optional — z.B. 7-jähriges Kind',
+    modalNotesPlaceholder: 'Optional, z.B. 7-jähriges Kind',
     modalEstTotal: 'Geschätzter Gesamtpreis',
     modalSubmitBooking: 'Buchungsanfrage senden',
     modalNoBotNote: 'Kostenlos stornierbar bis 24h vorher. Keine Sofortabbuchung.',
@@ -679,9 +679,9 @@ const BASE_I18N: Record<'en' | 'ar' | 'de', Translations> = {
     footerAddonEyebrow: 'Private Extras · Hurghada, Luxor & Kairo',
     footerAddonTitle: 'Privater ägyptischer Guide oder Urlaubsfotograf gewünscht?',
     footerPhotoTitle: 'Professionelle Fotoshootings (Strand, Boot & Tempel)',
-    footerPhotoDesc: 'Buchen Sie einen lokalen Fotografen für Orange Bay, Sonnenaufgangs-Reiten in Sahl Hasheesh, die Wüste oder Tempel in Luxor — fertige Galerie innerhalb von 48 Stunden.',
+    footerPhotoDesc: 'Buchen Sie einen lokalen Fotografen für Orange Bay, Sonnenaufgangs-Reiten in Sahl Hasheesh, die Wüste oder Tempel in Luxor, fertige Galerie innerhalb von 48 Stunden.',
     footerGuideTitle: 'Privater lizenzierter Reiseleiter (Alle Sprachen)',
-    footerGuideDesc: 'Staatlich geprüfter Ägyptologe oder Stadtführer ganz privat für Sie in Deutsch, Englisch, Französisch, Arabisch oder Spanisch — ohne erzwungene Verkaufsstopps.',
+    footerGuideDesc: 'Staatlich geprüfter Ägyptologe oder Stadtführer ganz privat für Sie in Deutsch, Englisch, Französisch, Arabisch oder Spanisch, ohne erzwungene Verkaufsstopps.',
     footerAddonCta: 'Fotoshooting oder Privatguide anfragen',
 
     modalHighlightsTitle: 'Highlights',

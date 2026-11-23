@@ -386,9 +386,9 @@ export const SupplierPortal: React.FC<SupplierPortalProps> = ({
             return trCap || { en: rawCap, ar: rawCap, de: rawCap };
           }
           return {
-            en: `${displayTitle} — Photo ${idx + 1}`,
-            ar: `${displayTitle} — صورة ${idx + 1}`,
-            de: `${displayTitle} — Foto ${idx + 1}`,
+            en: `${displayTitle}, Photo ${idx + 1}`,
+            ar: `${displayTitle}، صورة ${idx + 1}`,
+            de: `${displayTitle}, Foto ${idx + 1}`,
           };
         })
       : undefined;

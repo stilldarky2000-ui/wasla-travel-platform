@@ -243,9 +243,9 @@ export const CustomTripModal: React.FC<CustomTripModalProps> = ({
                 <h3 className="font-display text-xl font-semibold text-[#0F2233]">
                   {tText(
                     {
-                      en: 'Your request is saved — we will contact you after review',
-                      ar: 'تم تأكيد استلام طلبك بنجاح — سنتواصل معك الآن',
-                      de: 'Ihre Anfrage wurde gespeichert — wir melden uns nach der Prüfung',
+                      en: 'Your request is saved, we will contact you after review',
+                      ar: 'تم تأكيد استلام طلبك بنجاح، سنتواصل معك الآن',
+                      de: 'Ihre Anfrage wurde gespeichert, wir melden uns nach der Prüfung',
                     },
                     lang
                   )}

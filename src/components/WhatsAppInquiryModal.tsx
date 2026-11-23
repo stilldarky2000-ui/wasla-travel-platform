@@ -163,9 +163,9 @@ export const WhatsAppInquiryModal: React.FC<WhatsAppInquiryModalProps> = ({
     )} (${bookingRequests.length})`,
     intro: tText(
       {
-        en: 'Message us directly on WhatsApp with children’s ages, swim confidence, or hotel pickup questions — our team replies before you book.',
+        en: 'Message us directly on WhatsApp with children’s ages, swim confidence, or hotel pickup questions, our team replies before you book.',
         ar: 'تواصل معنا مباشرة عبر واتساب للاستفسار عن أعمار الأطفال، تفاصيل الاستلام من الفندق، أو اختيار الرحلة الأنسب لك قبل الحجز.',
-        de: 'Schreiben Sie uns direkt per WhatsApp bei Fragen zu Kinderalter, Hotelabholung oder Tourauswahl — unser Team antwortet vor Ihrer Buchung.',
+        de: 'Schreiben Sie uns direkt per WhatsApp bei Fragen zu Kinderalter, Hotelabholung oder Tourauswahl, unser Team antwortet vor Ihrer Buchung.',
       },
       lang
     ),
@@ -194,9 +194,9 @@ export const WhatsAppInquiryModal: React.FC<WhatsAppInquiryModalProps> = ({
     ),
     questionPlaceholder: tText(
       {
-        en: 'e.g. Travelling with kids aged 6 and 9 — which boat or desert safari works best?',
-        ar: 'مثال: نسافر مع أطفال أعمارهم 6 و9 سنوات — ما هي أفضل رحلة بحرية أو سفاري مناسبة لنا؟',
-        de: 'z. B. Wir reisen mit Kindern (6 und 9 Jahre) — welche Bootstour oder Wüstensafari passt am besten?',
+        en: 'e.g. Travelling with kids aged 6 and 9, which boat or desert safari works best?',
+        ar: 'مثال: نسافر مع أطفال أعمارهم 6 و9 سنوات، ما هي أفضل رحلة بحرية أو سفاري مناسبة لنا؟',
+        de: 'z. B. Wir reisen mit Kindern (6 und 9 Jahre), welche Bootstour oder Wüstensafari passt am besten?',
       },
       lang
     ),
@@ -218,9 +218,9 @@ export const WhatsAppInquiryModal: React.FC<WhatsAppInquiryModalProps> = ({
     ),
     noRequestsSub: tText(
       {
-        en: 'Open any trip and submit a request — no payment is taken until our team confirms your date.',
-        ar: 'افتح أي رحلة وأرسل طلب الحجز — لا يتم دفع أي مبلغ حتى يؤكد فريقنا الموعد معك عبر واتساب.',
-        de: 'Wählen Sie einen Ausflug und senden Sie eine Anfrage — keine Vorauszahlung vor unserer Bestätigung.',
+        en: 'Open any trip and submit a request, no payment is taken until our team confirms your date.',
+        ar: 'افتح أي رحلة وأرسل طلب الحجز، لا يتم دفع أي مبلغ حتى يؤكد فريقنا الموعد معك عبر واتساب.',
+        de: 'Wählen Sie einen Ausflug und senden Sie eine Anfrage, keine Vorauszahlung vor unserer Bestätigung.',
       },
       lang
     ),

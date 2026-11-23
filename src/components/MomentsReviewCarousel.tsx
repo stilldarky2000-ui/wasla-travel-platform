@@ -327,7 +327,7 @@ export const MomentsReviewCarousel: React.FC<MomentsReviewCarouselProps> = ({
                         trip.images?.[0] ||
                         CATEGORY_FALLBACK_IMAGE[trip.category]
                       }
-                      alt={`${moment.guestName} — ${tripLabel}`}
+                      alt={`${moment.guestName}, ${tripLabel}`}
                       loading="eager"
                       className="h-full w-full group-hover:scale-[1.06] transition-transform duration-500 ease-out"
                     />

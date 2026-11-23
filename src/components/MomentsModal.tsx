@@ -106,7 +106,7 @@ export const MomentsModal: React.FC<MomentsModalProps> = ({
                 ? moment.image
                 : moment.fallbackTripImage || linkedTrip?.images[0] || moment.image
             }
-            alt={`${moment.guestName} — ${moment.tripTitleOverride || (linkedTrip ? tText(linkedTrip.name, lang) : '')}`}
+            alt={`${moment.guestName}, ${moment.tripTitleOverride || (linkedTrip ? tText(linkedTrip.name, lang) : '')}`}
             loading="eager"
             className="h-full w-full"
           />

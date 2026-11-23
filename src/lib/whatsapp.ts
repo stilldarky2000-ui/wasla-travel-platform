@@ -512,7 +512,7 @@ export function buildLocalizedPickupConfirmationEmail(params: {
         }`
       : '';
 
-  const subject = `${c.emailSubjectPrefix} — ${params.bookingId} (${params.date})`;
+  const subject = `${c.emailSubjectPrefix}, ${params.bookingId} (${params.date})`;
   const body = [
     `${c.dear} ${params.guestName},`,
     ``,

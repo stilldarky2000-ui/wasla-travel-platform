@@ -71,9 +71,9 @@ export const FavoritesModal: React.FC<FavoritesModalProps> = ({
     ),
     subtitle: tText(
       {
-        en: 'All excursions you marked with a heart — ready to review and book anytime',
+        en: 'All excursions you marked with a heart, ready to review and book anytime',
         ar: 'الرحلات والأنشطة التي اخترتها بعلامة القلب للرجوع إليها وحجزها بسهولة',
-        de: 'Alle Ausflüge, die Sie mit einem Herz markiert haben — jederzeit bereit zur Buchung',
+        de: 'Alle Ausflüge, die Sie mit einem Herz markiert haben, jederzeit bereit zur Buchung',
       },
       lang
     ),

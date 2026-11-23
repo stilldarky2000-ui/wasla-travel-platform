@@ -16,9 +16,9 @@ const FAQ_COPY: Record<'title' | 'subtitle' | 'closingLine', LocalizedText> = {
     de: 'Häufig gestellte Fragen',
   },
   subtitle: {
-    en: 'Pickup, payment, cancellation and weather — the essentials before you book.',
-    ar: 'التوصيل والدفع والإلغاء والطقس — الأساسيات قبل الحجز.',
-    de: 'Abholung, Zahlung, Stornierung und Wetter — das Wichtigste vor Ihrer Buchung.',
+    en: 'Pickup, payment, cancellation and weather, the essentials before you book.',
+    ar: 'التوصيل والدفع والإلغاء والطقس، الأساسيات قبل الحجز.',
+    de: 'Abholung, Zahlung, Stornierung und Wetter, das Wichtigste vor Ihrer Buchung.',
   },
   closingLine: {
     en: 'Still have a question? Message us on WhatsApp',
@@ -36,8 +36,8 @@ const FAQ_ITEMS: FaqItem[] = [
       de: 'Wie funktioniert die Hotelabholung in Hurghada und den umliegenden Resorts?',
     },
     answer: {
-      en: 'Pickup inside Hurghada city is free and door-to-door. After you send your booking request, we confirm your exact pickup time and meeting point (reception or main gate) by WhatsApp and email. Resorts in Sahl Hasheesh, Makadi Bay, El Gouna, Soma Bay and Safaga add a small transfer fee — always shown before you confirm.',
-      ar: 'التوصيل داخل مدينة الغردقة مجاني ومن الباب للباب. بعد إرسال طلب الحجز، نؤكد لك موعد التحرك الدقيق ونقطة الانتظار (الريسبشن أو البوابة الرئيسية) عبر واتساب والإيميل. منتجعات سهل حشيش ومكادي باي والجونة وسوما باي وسفاجا عليها رسم توصيل بسيط — يظهر لك دائمًا قبل تأكيد الحجز.',
+      en: 'Pickup inside Hurghada city is free and door-to-door. After you send your booking request, we confirm your exact pickup time and meeting point (reception or main gate) by WhatsApp and email. Resorts in Sahl Hasheesh, Makadi Bay, El Gouna, Soma Bay and Safaga add a small transfer fee, always shown before you confirm.',
+      ar: 'التوصيل داخل مدينة الغردقة مجاني ومن الباب للباب. بعد إرسال طلب الحجز، نؤكد لك موعد التحرك الدقيق ونقطة الانتظار (الريسبشن أو البوابة الرئيسية) عبر واتساب والإيميل. منتجعات سهل حشيش ومكادي باي والجونة وسوما باي وسفاجا عليها رسم توصيل بسيط، يظهر لك دائمًا قبل تأكيد الحجز.',
       de: 'Die Abholung in Hurghada-Stadt ist kostenlos, von Tür zu Tür. Nach Ihrer Buchungsanfrage bestätigen wir Abholzeit und Treffpunkt (Rezeption oder Haupttor) per WhatsApp und E-Mail. Für Sahl Hasheesh, Makadi Bay, El Gouna, Soma Bay und Safaga fällt ein kleiner Transferzuschlag an – immer vor der Bestätigung angezeigt.',
     },
   },
@@ -49,8 +49,8 @@ const FAQ_ITEMS: FaqItem[] = [
       de: 'Muss ich bei der Buchungsanfrage sofort online bezahlen?',
     },
     answer: {
-      en: 'No. We check real availability first — your card is never charged automatically. Once our team confirms your seats, you simply pay cash on pickup.',
-      ar: 'لا. نتحقق من الإتاحة الحقيقية أولًا — لا يتم خصم أي مبلغ من بطاقتك تلقائيًا. وبمجرد أن يؤكد فريقنا مقاعدك، تدفع كاش عند الاستلام فقط.',
+      en: 'No. We check real availability first, your card is never charged automatically. Once our team confirms your seats, you simply pay cash on pickup.',
+      ar: 'لا. نتحقق من الإتاحة الحقيقية أولًا، لا يتم خصم أي مبلغ من بطاقتك تلقائيًا. وبمجرد أن يؤكد فريقنا مقاعدك، تدفع كاش عند الاستلام فقط.',
       de: 'Nein. Wir prüfen zuerst die echte Verfügbarkeit – Ihre Karte wird nie automatisch belastet. Sobald unser Team Ihre Plätze bestätigt hat, zahlen Sie einfach bar bei der Abholung.',
     },
   },
@@ -75,8 +75,8 @@ const FAQ_ITEMS: FaqItem[] = [
       de: 'Wie lauten die Stornierungs- und Umbuchungsbedingungen?',
     },
     answer: {
-      en: 'Free cancellation or rescheduling up to 24 hours before your pickup time. Inside the last 24 hours, boats, permits and drivers are already booked — but message us on WhatsApp or by email with your booking reference and we will move your date whenever we can.',
-      ar: 'يمكنك الإلغاء أو تغيير الموعد مجانًا حتى 24 ساعة قبل موعد التحرك. خلال آخر 24 ساعة تكون المراكب والتصاريح والسائقون قد حُجزوا بالفعل — لكن راسلنا واتساب أو بالإيميل برقم الحجز وسنغيّر موعدك متى أمكن.',
+      en: 'Free cancellation or rescheduling up to 24 hours before your pickup time. Inside the last 24 hours, boats, permits and drivers are already booked, but message us on WhatsApp or by email with your booking reference and we will move your date whenever we can.',
+      ar: 'يمكنك الإلغاء أو تغيير الموعد مجانًا حتى 24 ساعة قبل موعد التحرك. خلال آخر 24 ساعة تكون المراكب والتصاريح والسائقون قد حُجزوا بالفعل، لكن راسلنا واتساب أو بالإيميل برقم الحجز وسنغيّر موعدك متى أمكن.',
       de: 'Kostenlose Stornierung oder Umbuchung bis 24 Stunden vor der Abholung. Innerhalb der letzten 24 Stunden sind Boote, Genehmigungen und Fahrer bereits gebucht – schreiben Sie uns per WhatsApp oder E-Mail mit Ihrer Buchungsnummer, und wir verschieben Ihren Termin, wann immer möglich.',
     },
   },
@@ -101,8 +101,8 @@ const FAQ_ITEMS: FaqItem[] = [
       de: 'Gibt es Kinderermäßigungen, und reisen Babys kostenlos?',
     },
     answer: {
-      en: 'Yes. Babies travel free (€0) and are still counted in the passenger list for safety. Children pay 50% of the adult price — calculated automatically when you choose your group size in the booking form.',
-      ar: 'نعم. الرضّع مجانًا (0€) مع تسجيلهم ضمن كشف الركاب لضمان الأمان. ويحصل الأطفال على خصم 50% من سعر البالغ — يُحسب تلقائيًا عند تحديد عدد المجموعة في نموذج الحجز.',
+      en: 'Yes. Babies travel free (€0) and are still counted in the passenger list for safety. Children pay 50% of the adult price, calculated automatically when you choose your group size in the booking form.',
+      ar: 'نعم. الرضّع مجانًا (0€) مع تسجيلهم ضمن كشف الركاب لضمان الأمان. ويحصل الأطفال على خصم 50% من سعر البالغ، يُحسب تلقائيًا عند تحديد عدد المجموعة في نموذج الحجز.',
       de: 'Ja. Babys reisen kostenlos (0 €), werden aber für die Sicherheits- und Transferliste mitgezählt. Kinder zahlen 50 % des Erwachsenenpreises – automatisch berechnet, wenn Sie Ihre Gruppengröße im Buchungsformular wählen.',
     },
   },

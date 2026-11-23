@@ -377,7 +377,7 @@ export const HorizontalScrollTableFrame: React.FC<HorizontalScrollTableFrameProp
         </div>
       </div>
 
-      {/* Floating Sticky Bottom Dock — stays right in front of you wherever you scroll vertically */}
+      {/* Floating Sticky Bottom Dock, stays right in front of you wherever you scroll vertically */}
       {renderControlBar('bottom')}
     </div>
   );

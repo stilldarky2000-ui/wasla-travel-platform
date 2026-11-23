@@ -706,9 +706,9 @@ export const TrackBookingModal: React.FC<TrackBookingModalProps> = ({
                       <p className="font-bold text-[#15803D]">
                         {tText(
                           {
-                            en: '✓ Boarding Pass Confirmed — Present this Digital Voucher to your driver or tour representative at hotel pickup.',
-                            ar: '✓ تذكرة الصعود مؤكدة — يرجى إبراز هذه التذكرة الرقمية للسائق أو مندوب الرحلة عند الاستلام من الفندق.',
-                            de: '✓ Boarding-Pass bestätigt — Zeigen Sie diesen digitalen Voucher Ihrem Fahrer bei der Hotelabholung.',
+                            en: '✓ Boarding Pass Confirmed, Present this Digital Voucher to your driver or tour representative at hotel pickup.',
+                            ar: '✓ تذكرة الصعود مؤكدة، يرجى إبراز هذه التذكرة الرقمية للسائق أو مندوب الرحلة عند الاستلام من الفندق.',
+                            de: '✓ Boarding-Pass bestätigt, Zeigen Sie diesen digitalen Voucher Ihrem Fahrer bei der Hotelabholung.',
                           },
                           lang
                         )}

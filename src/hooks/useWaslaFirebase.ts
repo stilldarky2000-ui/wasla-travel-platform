@@ -630,7 +630,7 @@ function buildSupplierDispatchFields(
     supplierUid: supplierUid.slice(0, 128),
     assignedDriverOrGuide: truncateText(booking.assignedDriverOrGuide, 160, ''),
     status: isSupplierVisibleBookingStatus(booking.status) ? booking.status : 'Confirmed',
-    // Strictly dedicated, sanitized operational instructions only — never copies customer booking.notes
+    // Strictly dedicated, sanitized operational instructions only, never copies customer booking.notes
     operationalNotes: sanitizeOperationalNoteForSupplier(booking.supplierNotes),
   });
 }

@@ -393,7 +393,7 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
     if (captionObj) return tText(captionObj, lang);
     const matchingStop = trip.itinerary?.filter((s) => s.kind === 'stop')[idx];
     if (matchingStop) return tText(matchingStop.title, lang);
-    return `${title} — ${trip.destination}`;
+    return `${title}, ${trip.destination}`;
   };
 
   const receiptLabels = {
@@ -627,9 +627,9 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
             <span>
               {tText(
                 {
-                  en: 'Live Trip Page Preview — Guests see this exact full-page layout',
-                  ar: 'معاينة حية لصفحة الرحلة — هذا هو الشكل الكامل الذي يظهر للضيف',
-                  de: 'Live-Reiseseitenvorschau — Gäste sehen exakt dieses vollständige Seitenlayout',
+                  en: 'Live Trip Page Preview, Guests see this exact full-page layout',
+                  ar: 'معاينة حية لصفحة الرحلة، هذا هو الشكل الكامل الذي يظهر للضيف',
+                  de: 'Live-Reiseseitenvorschau, Gäste sehen exakt dieses vollständige Seitenlayout',
                 },
                 lang
               )}
@@ -1745,9 +1745,9 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
                           )
                         : tText(
                             {
-                              en: 'REQUEST SAVED — PENDING REVIEW',
-                              ar: 'تم حفظ الطلب — قيد المراجعة',
-                              de: 'ANFRAGE GESPEICHERT — IN PRÜFUNG',
+                              en: 'REQUEST SAVED, PENDING REVIEW',
+                              ar: 'تم حفظ الطلب، قيد المراجعة',
+                              de: 'ANFRAGE GESPEICHERT, IN PRÜFUNG',
                             },
                             lang
                           )}{' '}
@@ -1785,9 +1785,9 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
                         )
                       : tText(
                           {
-                            en: 'Your request is saved — confirmation will follow after review',
-                            ar: 'تم تسجيل طلبك — التأكيد ورسالة التفاصيل بعد المراجعة',
-                            de: 'Ihre Anfrage ist gespeichert — die Bestätigung folgt nach Prüfung',
+                            en: 'Your request is saved, confirmation will follow after review',
+                            ar: 'تم تسجيل طلبك، التأكيد ورسالة التفاصيل بعد المراجعة',
+                            de: 'Ihre Anfrage ist gespeichert, die Bestätigung folgt nach Prüfung',
                           },
                           lang
                         )}
@@ -1995,9 +1995,9 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
                         <span>
                           {tText(
                             {
-                              en: 'We are preparing your exact hotel pickup time now — your printable boarding voucher unlocks automatically as soon as dispatch assigns your driver.',
-                              ar: 'نقوم الآن بتجهيز موعد الاستلام الدقيق من فندقك — وستفتح التذكرة القابلة للطباعة تلقائياً فور تحديد السائق وموعد التحرك.',
-                              de: 'Wir bereiten Ihre genaue Hotelabholzeit vor — Ihr druckbarer Voucher wird automatisch freigeschaltet, sobald Ihr Fahrer zugewiesen ist.',
+                              en: 'We are preparing your exact hotel pickup time now, your printable boarding voucher unlocks automatically as soon as dispatch assigns your driver.',
+                              ar: 'نقوم الآن بتجهيز موعد الاستلام الدقيق من فندقك، وستفتح التذكرة القابلة للطباعة تلقائياً فور تحديد السائق وموعد التحرك.',
+                              de: 'Wir bereiten Ihre genaue Hotelabholzeit vor, Ihr druckbarer Voucher wird automatisch freigeschaltet, sobald Ihr Fahrer zugewiesen ist.',
                             },
                             lang
                           )}

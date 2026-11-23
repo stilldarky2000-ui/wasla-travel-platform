@@ -635,7 +635,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
     const recipient = bk.guestEmail || (bk.guestContact.includes('@') ? bk.guestContact : '');
     const localizedEmail = buildBookingEmailPayload(bk);
     setEmailModal({
-      to: recipient || 'No email on booking — add email in booking details',
+      to: recipient || 'No email on booking, add email in booking details',
       subject: localizedEmail.subject,
       type: 'Booking Confirmation',
       sentAt: 'Ready to send',
@@ -1140,7 +1140,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
       selectedInboxItem.emailLog?.to || selectedInboxItem.subscriberEmail || '';
     const replySubject = selectedInboxItem.emailLog
       ? `Re: ${selectedInboxItem.emailLog.subject}`
-      : `Wasla Travel Red Sea Offer — ${SITE_CONFIG.domain}`;
+      : `Wasla Travel Red Sea Offer, ${SITE_CONFIG.domain}`;
     if (recipient && onLogDispatchEmail) {
       onLogDispatchEmail(
         recipient,
@@ -1150,8 +1150,8 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
     }
     setConversationFeedback(
       copilotLang === 'ar'
-        ? `تم تسجيل متابعة الإيميل إلى ${recipient} — اضغط فتح تطبيق الإيميل للإرسال`
-        : `Follow-up logged for ${recipient} — tap Open Mail App to send`
+        ? `تم تسجيل متابعة الإيميل إلى ${recipient}، اضغط فتح تطبيق الإيميل للإرسال`
+        : `Follow-up logged for ${recipient}, tap Open Mail App to send`
     );
     window.setTimeout(() => setConversationFeedback(null), 4500);
   };
@@ -1536,7 +1536,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
       }
       const netErr =
         copilotLang === 'ar'
-          ? 'تعذر الاتصال بالمساعد الذكي حالياً — حاول مرة أخرى.'
+          ? 'تعذر الاتصال بالمساعد الذكي حالياً، حاول مرة أخرى.'
           : 'Network error while contacting AI Executive Copilot.';
       setBriefingError(netErr);
       setCopilotMessages((prev) => [
@@ -1762,8 +1762,8 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
           if (audioBlob.size < 120) {
             setVoiceError(
               copilotLang === 'ar'
-                ? 'التسجيل قصير جداً — اضغط على المايك وتحدث ثم اضغط إرسال.'
-                : 'Recording was too short — tap the mic, speak your question, and tap Send.'
+                ? 'التسجيل قصير جداً، اضغط على المايك وتحدث ثم اضغط إرسال.'
+                : 'Recording was too short, tap the mic, speak your question, and tap Send.'
             );
             return;
           }
@@ -1820,8 +1820,8 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
             } else {
               setVoiceError(
                 copilotLang === 'ar'
-                  ? 'لم نسمع كلاماً واضحاً — حاول التحدث بالقرب من المايك ثم اضغط إرسال.'
-                  : 'No clear speech detected — please speak closer to the mic and tap Send.'
+                  ? 'لم نسمع كلاماً واضحاً، حاول التحدث بالقرب من المايك ثم اضغط إرسال.'
+                  : 'No clear speech detected, please speak closer to the mic and tap Send.'
               );
             }
           } catch (err) {
@@ -1830,7 +1830,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
             }
             setVoiceError(
               copilotLang === 'ar'
-                ? 'تعذر إرسال التسجيل الصوتي للخادم — حاول مرة أخرى.'
+                ? 'تعذر إرسال التسجيل الصوتي للخادم، حاول مرة أخرى.'
                 : 'Failed to process voice recording.'
             );
           } finally {
@@ -3068,7 +3068,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                 >
                   {trips.map((trip) => (
                     <option key={trip.id} value={trip.id}>
-                      {trip.name.en} — €{trip.price} ({trip.destination})
+                      {trip.name.en}, €{trip.price} ({trip.destination})
                     </option>
                   ))}
                 </select>
@@ -3588,12 +3588,12 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                         : 'An automated WhatsApp message is pushed to you the moment any new customer booking is submitted.'
                       : alertChannelStatus?.whatsappHasPhoneId && !alertChannelStatus?.whatsappHasToken
                       ? isAr
-                        ? 'تم التعرّف على معرّف رقم الواتساب (whatsapp_phone_id) ✅ — تبقى إضافة مفتاح التوكن WHATSAPP_CLOUD_TOKEN (أو whatsapp_token) من Meta Developer في Secrets.'
-                        : 'Phone Number ID detected ✅ — add WHATSAPP_CLOUD_TOKEN (or whatsapp_token) from Meta Developer in Secrets to activate.'
+                        ? 'تم التعرّف على معرّف رقم الواتساب (whatsapp_phone_id) ✅، تبقى إضافة مفتاح التوكن WHATSAPP_CLOUD_TOKEN (أو whatsapp_token) من Meta Developer في Secrets.'
+                        : 'Phone Number ID detected ✅, add WHATSAPP_CLOUD_TOKEN (or whatsapp_token) from Meta Developer in Secrets to activate.'
                       : alertChannelStatus?.whatsappHasToken && !alertChannelStatus?.whatsappHasPhoneId
                       ? isAr
-                        ? 'تم التعرّف على مفتاح التوكن ✅ — تبقى إضافة WHATSAPP_PHONE_NUMBER_ID (أو whatsapp_phone_id) في Secrets.'
-                        : 'WhatsApp token detected ✅ — add WHATSAPP_PHONE_NUMBER_ID (or whatsapp_phone_id) in Secrets to activate.'
+                        ? 'تم التعرّف على مفتاح التوكن ✅، تبقى إضافة WHATSAPP_PHONE_NUMBER_ID (أو whatsapp_phone_id) في Secrets.'
+                        : 'WhatsApp token detected ✅, add WHATSAPP_PHONE_NUMBER_ID (or whatsapp_phone_id) in Secrets to activate.'
                       : isAr
                       ? 'لتفعيل تنبيه الواتساب التلقائي، أضف أحد الخيارات في Secrets: (CallMeBot مجاني عبر CALLMEBOT_API_KEY، أو Meta WhatsApp Cloud عبر WHATSAPP_CLOUD_TOKEN + whatsapp_phone_id، أو Twilio).'
                       : 'To activate instant WhatsApp alerts, add ONE option in AI Studio Secrets: free personal alerts via CALLMEBOT_API_KEY, official Meta Cloud API (WHATSAPP_CLOUD_TOKEN + whatsapp_phone_id), or Twilio WhatsApp.'}
@@ -3942,7 +3942,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                       <div className="rounded-lg border border-dashed border-[#5EEAD4] bg-white/75 p-4 text-xs text-[#334155] leading-relaxed">
                         {copilotLang === 'ar'
                           ? 'اضغط على زر المايك بالأسفل واتكلم بصوتك أو اكتب سؤالك، والمساعد هيرد عليك كتابياً فوراً.'
-                          : 'Tap the microphone button below to speak or type your question — your AI Chief of Staff replies immediately.'}
+                          : 'Tap the microphone button below to speak or type your question, your AI Chief of Staff replies immediately.'}
                       </div>
                     ) : (
                       <>
@@ -4284,7 +4284,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                         <Bot className="h-4 w-4" aria-hidden="true" />
                         <span>
                           {copilotLang === 'ar'
-                            ? 'مساعد AI Copilot التنفيذي — اسأل أي سؤال عن الشركة أو المراسلات'
+                            ? 'مساعد AI Copilot التنفيذي، اسأل أي سؤال عن الشركة أو المراسلات'
                             : 'AI Copilot Executive Assistant'}
                         </span>
                       </div>
@@ -4313,7 +4313,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                         <div className="space-y-3">
                           <div className="rounded-xl border border-dashed border-[#5EEAD4] bg-white/85 p-4 text-xs text-[#334155] leading-relaxed">
                             {copilotLang === 'ar'
-                              ? 'أهلاً بك في AI Copilot! تكلم بالمايك أو اكتب سؤالك بالأسفل — أو اختر أي مراسلة من القائمة على اليمين لقراءة الإيميل الأصلي أو الرد على الواتساب.'
+                              ? 'أهلاً بك في AI Copilot! تكلم بالمايك أو اكتب سؤالك بالأسفل، أو اختر أي مراسلة من القائمة على اليمين لقراءة الإيميل الأصلي أو الرد على الواتساب.'
                               : 'Ask AI Copilot anything via mic or text below, or pick any WhatsApp chat or sent email on the left.'}
                           </div>
                           <div className="flex flex-wrap gap-1.5">
@@ -4371,7 +4371,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                         const recipientEmail = log?.to || selectedInboxItem.subscriberEmail || SITE_CONFIG.email;
                         const emailType = log?.type || 'Newsletter';
                         const subjectLine =
-                          log?.subject || `Welcome to Wasla Travel Red Sea Insider — ${SITE_CONFIG.domain}`;
+                          log?.subject || `Welcome to Wasla Travel Red Sea Insider, ${SITE_CONFIG.domain}`;
                         const sentTime = log?.sentAt || 'Active Subscriber';
                         const guestDisplay = bk?.guestName || recipientEmail.split('@')[0] || 'Valued Guest';
                         const waHelpUrl = `https://wa.me/${normalizeWhatsAppDigits(
@@ -4702,7 +4702,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                             ? 'جاري تحويل صوتك لنص...'
                             : 'Transcribing voice...'
                           : copilotLang === 'ar'
-                          ? `جاري التسجيل (${recordingSeconds}ث) — تكلم ثم اضغط إرسال`
+                          ? `جاري التسجيل (${recordingSeconds}ث)، تكلم ثم اضغط إرسال`
                           : `Listening (${recordingSeconds}s)...`}
                       </span>
                       <div className="inline-flex items-center gap-1.5">
@@ -4938,7 +4938,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                   </span>
                 </div>
                 <h2 className="text-lg font-semibold text-[#0F2233]">
-                  {bookingModalDraft.guestName} — {bookingModalDraft.tripTitle}
+                  {bookingModalDraft.guestName}, {bookingModalDraft.tripTitle}
                 </h2>
               </div>
               <div className="flex items-center gap-2">
@@ -5524,7 +5524,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                 </label>
               </div>
 
-              {/* Financials, Supplier, Driver & Status — Cleanly Aligned */}
+              {/* Financials, Supplier, Driver & Status, Cleanly Aligned */}
               <div className="grid grid-cols-2 sm:grid-cols-6 gap-3 items-start">
                 <label className="block space-y-1">
                   <span className="block text-xs font-semibold text-[#0F2233] truncate">Adults</span>

@@ -282,10 +282,10 @@ export const OfflineIndicator: React.FC<{ lang?: Lang }> = ({ lang = 'en' }) => 
       <WifiOff className="h-3.5 w-3.5 shrink-0 animate-pulse" aria-hidden="true" />
       <span>
         {lang === 'ar'
-          ? 'وضع عدم الاتصال — يتم عرض البيانات المحفوظة'
+          ? 'وضع عدم الاتصال، يتم عرض البيانات المحفوظة'
           : lang === 'de'
-          ? 'Offline-Modus — Zwischengespeicherte Daten aktiv'
-          : 'Offline Mode — Showing cached trips & bookings'}
+          ? 'Offline-Modus, Zwischengespeicherte Daten aktiv'
+          : 'Offline Mode, Showing cached trips & bookings'}
       </span>
     </div>
   );

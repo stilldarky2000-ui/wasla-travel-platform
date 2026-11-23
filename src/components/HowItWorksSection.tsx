@@ -37,8 +37,8 @@ export const HowItWorksSection: React.FC<HowItWorksSectionProps> = ({
       desc: tText(
         {
           en: 'Send your booking request with your hotel name and group size. Zero automatic card charge or deposit required upfront.',
-          ar: 'أرسل طلب الحجز باسم فندقك وعدد الأفراد في دقيقة واحدة — بدون أي خصم تلقائي أو بطاقة بنكية مسبقاً.',
-          de: 'Senden Sie Ihre unverbindliche Anfrage mit Hotelname und Personenanzahl — ohne sofortige Kartenabbuchung.',
+          ar: 'أرسل طلب الحجز باسم فندقك وعدد الأفراد في دقيقة واحدة، بدون أي خصم تلقائي أو بطاقة بنكية مسبقاً.',
+          de: 'Senden Sie Ihre unverbindliche Anfrage mit Hotelname und Personenanzahl, ohne sofortige Kartenabbuchung.',
         },
         lang
       ),
@@ -113,7 +113,7 @@ export const HowItWorksSection: React.FC<HowItWorksSectionProps> = ({
         {
           en: 'Small groups capped tightly so your day stays focused on reefs, temples, and genuine local places.',
           ar: 'مجموعات صغيرة ومنظمة حتى يستمتع يومك بالبحر والمعابد والتجارب المحلية الحقيقية دون إضاعة وقت.',
-          de: 'Kleine Gruppen ohne Zeitverlust in Souvenirfabriken — voller Fokus auf Riffe, Tempel und echte Erlebnisse.',
+          de: 'Kleine Gruppen ohne Zeitverlust in Souvenirfabriken, voller Fokus auf Riffe, Tempel und echte Erlebnisse.',
         },
         lang
       ),
@@ -148,9 +148,9 @@ export const HowItWorksSection: React.FC<HowItWorksSectionProps> = ({
           <p className="text-[15px] leading-relaxed text-[#64748B]">
             {tText(
               {
-                en: 'Availability-first confirmation by our Hurghada team — clear pricing in whole euros, zero upfront guesswork.',
-                ar: 'نتأكد أولاً من الإتاحة الفعلية ثم نرسل لك تفاصيل التوصيل — أسعار واضحة باليورو بدون أي مفاجآت.',
-                de: 'Zuerst echte Verfügbarkeit prüfen, dann entspannt bestätigen — klare Preise ohne versteckte Kosten.',
+                en: 'Availability-first confirmation by our Hurghada team, clear pricing in whole euros, zero upfront guesswork.',
+                ar: 'نتأكد أولاً من الإتاحة الفعلية ثم نرسل لك تفاصيل التوصيل، أسعار واضحة باليورو بدون أي مفاجآت.',
+                de: 'Zuerst echte Verfügbarkeit prüfen, dann entspannt bestätigen, klare Preise ohne versteckte Kosten.',
               },
               lang
             )}

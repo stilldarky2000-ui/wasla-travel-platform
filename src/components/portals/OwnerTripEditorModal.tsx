@@ -837,9 +837,9 @@ export const OwnerTripEditorModal: React.FC<OwnerTripEditorModalProps> = ({
       const titleFallbackAr = titleAr.trim() || fallbackTitle;
       const titleFallbackDe = titleDe.trim() || fallbackTitle;
       return {
-        en: `${titleFallbackEn} — Photo ${idx + 1}`,
-        ar: `${titleFallbackAr} — صورة ${idx + 1}`,
-        de: `${titleFallbackDe} — Foto ${idx + 1}`,
+        en: `${titleFallbackEn}, Photo ${idx + 1}`,
+        ar: `${titleFallbackAr}، صورة ${idx + 1}`,
+        de: `${titleFallbackDe}, Foto ${idx + 1}`,
       };
     });
 

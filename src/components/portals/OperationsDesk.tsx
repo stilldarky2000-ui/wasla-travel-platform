@@ -190,8 +190,8 @@ function buildDispatchEmailTemplate(
     return {
       logType: 'Booking Confirmation',
       subject: guestIsAr
-        ? `استلام طلب حجزك ${b.id} — ${b.tripTitle}`
-        : `Booking Request Received (${b.id}) — ${b.tripTitle}`,
+        ? `استلام طلب حجزك ${b.id}، ${b.tripTitle}`
+        : `Booking Request Received (${b.id}), ${b.tripTitle}`,
       body: guestIsAr
         ? `مرحباً ${b.guestName}،\n\nشكرًا لحجزك مع وصلة ترافيل. استلمنا طلب حجزك رقم ${b.id} لرحلة "${b.tripTitle}" بتاريخ ${b.date} (${b.adults} بالغين${b.children > 0 ? ` + ${b.children} أطفال` : ''}${(b.infants ?? 0) > 0 ? ` + ${b.infants} رضع` : ''}).\n\nنقوم حالياً بمراجعة الإتاحة وتحديد موعد البيك أب الدقيق لفندقك (${b.hotel})، وسنرسل لك التأكيد النهائي وتذكرة الصعود قريباً.\n\nمع التحية،\nفريق عمليات وصلة ترافيل`
         : `Dear ${b.guestName},\n\nThank you for choosing Wasla Travel. We have received your booking request (${b.id}) for "${b.tripTitle}" on ${b.date} (${b.adults} Adults${b.children > 0 ? `, ${b.children} Children` : ''}${(b.infants ?? 0) > 0 ? `, ${b.infants} Infants` : ''}).\n\nOur Reservations & Dispatch team is verifying seat availability and assigning your exact pickup time from ${b.hotel}. Your final Digital Boarding Voucher will unlock as soon as confirmed.\n\nWarm regards,\nWasla Travel Operations Desk`,
@@ -202,8 +202,8 @@ function buildDispatchEmailTemplate(
     return {
       logType: 'Payment Link',
       subject: guestIsAr
-        ? `تأكيد الإتاحة وخيارات الدفع — حجز ${b.id} (€${b.grossEur})`
-        : `Availability Confirmed & Payment Options — ${b.id} (€${b.grossEur})`,
+        ? `تأكيد الإتاحة وخيارات الدفع، حجز ${b.id} (€${b.grossEur})`
+        : `Availability Confirmed & Payment Options, ${b.id} (€${b.grossEur})`,
       body: guestIsAr
         ? `مرحباً ${b.guestName}،\n\nيسعدنا إبلاغك بتأكيد الإتاحة لرحلتك "${b.tripTitle}" (${b.id}) بتاريخ ${b.date}.\n\n• إجمالي المبلغ: €${b.grossEur}\n• طريقة الدفع الحالية: ${b.paymentStatus}\n• العملات المقبولة عند الدفع كاش: يورو (EUR) أو دولار (USD) أو جنيه مصري (EGP)\n\nيمكنك السداد كاش عند الاستلام من الفندق بأي عملة تفضلها، أو الرد علينا إذا كنت تفضل الدفع أونلاين عبر رابط دفع رسمي.\n\nمع التحية،\nفريق عمليات وصلة ترافيل`
         : `Dear ${b.guestName},\n\nWe are pleased to confirm seat availability for "${b.tripTitle}" (${b.id}) on ${b.date}.\n\n• Total Amount: €${b.grossEur}\n• Registered Payment Method: ${b.paymentStatus}\n• Accepted Currencies for Cash on Pickup: EUR, USD, or EGP\n\nYou may pay Cash on pickup in EUR, USD, or EGP, or reply to this message if you would like us to send an official online payment link.\n\nWarm regards,\nWasla Travel Operations Desk`,
@@ -213,8 +213,8 @@ function buildDispatchEmailTemplate(
   return {
     logType: 'Booking Confirmation',
     subject: guestIsAr
-      ? `متابعة بخصوص حجزك ${b.id} — ${b.tripTitle}`
-      : `Update Regarding Your Booking ${b.id} — ${b.tripTitle}`,
+      ? `متابعة بخصوص حجزك ${b.id}، ${b.tripTitle}`
+      : `Update Regarding Your Booking ${b.id}, ${b.tripTitle}`,
     body: guestIsAr
       ? `مرحباً ${b.guestName}،\n\nبخصوص حجزك رقم ${b.id} لرحلة "${b.tripTitle}" بتاريخ ${b.date}:\n\n`
       : `Dear ${b.guestName},\n\nRegarding your booking ${b.id} for "${b.tripTitle}" on ${b.date}:\n\n`,
@@ -1083,7 +1083,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
       linkedEmails.find((e) => e.direction === 'inbound' && e.from)?.from ||
       linkedEmails.find((e) => !e.to.includes('dispatch@') && !e.to.includes('info@') && !e.to.includes('booking@'))?.to ||
       '';
-    const subject = `${c.bookingRef} Case Resolution (${c.id}) — ${c.issueType}`;
+    const subject = `${c.bookingRef} Case Resolution (${c.id}), ${c.issueType}`;
     const bodyText =
       (complaintReplyText[c.id] || '').trim() ||
       `Dear ${c.customerName},\n\nRegarding booking ${c.bookingRef} (${c.tripTitle}):\n${c.summary}\n\nBest regards,\nWasla Travel Reservations & Quality Desk`;
@@ -2015,7 +2015,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                                             if (onLogDispatchEmail) {
                                               onLogDispatchEmail(
                                                 b.guestEmail || b.guestContact,
-                                                `Pickup Details — ${b.id} (${b.date})`,
+                                                `Pickup Details, ${b.id} (${b.date})`,
                                                 'Booking Confirmation',
                                                 { bookingRef: b.id, direction: 'outbound' }
                                               );
@@ -2191,7 +2191,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
         {activeTab === 'chat' && (
 
           <div className="space-y-4" dir={isAr ? 'rtl' : 'ltr'}>
-            {/* Top Bar — WhatsApp Button Kept, Raw Visible Phone Number Hidden */}
+            {/* Top Bar, WhatsApp Button Kept, Raw Visible Phone Number Hidden */}
             <div className="rounded-xl border border-[#CBD5E1] bg-white px-5 py-4 flex flex-col lg:flex-row lg:items-center justify-between gap-4 shadow-xs">
               <div className="space-y-1">
                 <div className="flex flex-wrap items-center gap-2.5 text-xs">
@@ -2305,7 +2305,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                     >
                       {sortedBookings.map((b) => (
                         <option key={b.id} value={b.id}>
-                          {b.id} — {b.guestName} ({b.guestCountry || 'Guest'}) · {b.tripTitle} ·{' '}
+                          {b.id}, {b.guestName} ({b.guestCountry || 'Guest'}) · {b.tripTitle} ·{' '}
                           {b.date} · €{b.grossEur} [{b.status}]
                         </option>
                       ))}
@@ -3008,7 +3008,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                           </span>
                         </div>
                         <p className="text-base font-bold text-[#0F2233]">
-                          {c.customerName} — {c.tripTitle}
+                          {c.customerName}, {c.tripTitle}
                         </p>
                         <p className="text-xs font-medium text-[#334155] leading-relaxed">
                           {c.summary}
@@ -3300,8 +3300,8 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                             {chatMessages.length === 0 ? (
                               <p className="text-xs font-medium text-[#475569] py-2">
                                 {isAr
-                                  ? 'لا توجد رسائل شات مسجلة بعد — اكتب ردك بالأسفل للتواصل الفوري.'
-                                  : 'No chat messages recorded yet — write a reply below to start.'}
+                                  ? 'لا توجد رسائل شات مسجلة بعد، اكتب ردك بالأسفل للتواصل الفوري.'
+                                  : 'No chat messages recorded yet, write a reply below to start.'}
                               </p>
                             ) : (
                               <div className="space-y-2.5 max-h-[280px] overflow-y-auto pe-1">
@@ -4289,7 +4289,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                     ? isAr
                       ? 'إضافة حجز يدوي جديد'
                       : 'Add Manual Booking'
-                    : `${modalDraft.guestName} — ${modalDraft.tripTitle}`}
+                    : `${modalDraft.guestName}, ${modalDraft.tripTitle}`}
                 </h2>
               </div>
 
@@ -4356,7 +4356,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                               ? '✓ تذكرة العميل الرقمية النهائية مفتوحة ومؤكدة للعميل'
                               : '✓ Customer Digital Boarding Voucher is UNLOCKED & active'
                             : isAr
-                            ? '🔒 تذكرة العميل النهائية مغلقة حالياً — لن تفتح للعميل إلا بعد ضغطك على تأكيد الحجز'
+                            ? '🔒 تذكرة العميل النهائية مغلقة حالياً، لن تفتح للعميل إلا بعد ضغطك على تأكيد الحجز'
                             : '🔒 Customer Final Boarding Voucher is LOCKED until you confirm this booking'}
                         </span>
                       </div>
@@ -4612,7 +4612,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                               if (onLogDispatchEmail) {
                                 onLogDispatchEmail(
                                   modalDraft.guestEmail || modalDraft.guestContact,
-                                  `Pickup Details — ${modalDraft.id} (${modalDraft.date})`,
+                                  `Pickup Details, ${modalDraft.id} (${modalDraft.date})`,
                                   'Booking Confirmation',
                                   { bookingRef: modalDraft.id, direction: 'outbound' }
                                 );
@@ -4663,7 +4663,7 @@ export const OperationsDesk: React.FC<OperationsDeskProps> = ({
                 })()}
               </div>
             ) : (
-              /* EDIT / CREATE FORM (Manual Pickup Time Setter — No Auto Deduction) */
+              /* EDIT / CREATE FORM (Manual Pickup Time Setter, No Auto Deduction) */
               <form onSubmit={handleSaveBookingModal} className="p-6 space-y-5">
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
                   <label className="block space-y-1">

@@ -406,7 +406,7 @@ export default function App() {
 
   // Dynamic document title & TouristTrip JSON-LD when inspecting an excursion
   useEffect(() => {
-    const baseTitle = 'Wasla Travel — Hurghada Travel Marketplace';
+    const baseTitle = 'Wasla Travel, Hurghada Travel Marketplace';
     const existingScript = document.getElementById('wasla-trip-jsonld');
     if (!activeDetailTrip) {
       document.title = baseTitle;
@@ -415,7 +415,7 @@ export default function App() {
     }
 
     const localizedTitle = tText(activeDetailTrip.name, lang);
-    document.title = `${localizedTitle} — Wasla Travel`;
+    document.title = `${localizedTitle}, Wasla Travel`;
 
     const jsonLd = {
       '@context': 'https://schema.org',
@@ -1472,7 +1472,7 @@ export default function App() {
             <div className="mx-auto flex h-16 sm:h-[70px] max-w-[1200px] items-center justify-between gap-1.5 sm:gap-6 px-2.5 sm:px-6">
               <a
                 href="#top"
-                aria-label="Wasla Travel — وصلة ترافيل"
+                aria-label="Wasla Travel، وصلة ترافيل"
                 className="whitespace-nowrap shrink-0"
               >
                 {renderAnimatedBrand('header')}

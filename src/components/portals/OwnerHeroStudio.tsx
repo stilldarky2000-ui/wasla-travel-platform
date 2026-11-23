@@ -87,7 +87,7 @@ export const OwnerHeroStudio: React.FC<OwnerHeroStudioProps> = ({
           setHeroImageUrl(encoded);
           setUploadNote('Panorama uploaded and ready! Click "Save Hero & Appearance Live" to publish.');
         } else {
-          setUploadNote('Image too large — please try a lighter JPG or paste an https:// URL.');
+          setUploadNote('Image too large, please try a lighter JPG or paste an https:// URL.');
         }
       };
       img.src = String(reader.result);
@@ -144,7 +144,7 @@ export const OwnerHeroStudio: React.FC<OwnerHeroStudioProps> = ({
 
   return (
     <form onSubmit={handleSave} className="space-y-6">
-      {/* Live Visual Mini-Preview — locked design; click to place the focal point */}
+      {/* Live Visual Mini-Preview, locked design; click to place the focal point */}
       <div
         className="relative overflow-hidden rounded-2xl bg-[#0F2233] text-white border border-[#E2E8F0] cursor-crosshair"
         onClick={handlePreviewClick}
@@ -333,7 +333,7 @@ export const OwnerHeroStudio: React.FC<OwnerHeroStudioProps> = ({
 
           <p className="text-xs leading-relaxed text-[#64748B]">
             Click the preview photo above to place the focal point. Desktop and mobile crop
-            differently — set each one.
+            differently, set each one.
           </p>
         </div>
       </div>

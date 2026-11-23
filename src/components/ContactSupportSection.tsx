@@ -135,9 +135,9 @@ export const ContactSupportSection: React.FC<ContactSupportSectionProps> = ({
               <p className="text-sm leading-relaxed text-[#64748B]">
                 {tText(
                   {
-                    en: 'Ask about child ages, sea conditions, hotel pickup zones, or group pricing. You message the owner directly — the person who runs your trip. No call centre, no bots.',
-                    ar: 'اسأل عن مناسبة الرحلة للأطفال، حالة البحر، منطقة توصيل فندقك، أو أسعار المجموعات. بتكلم صاحب الشغل نفسه مباشرة — الشخص اللي هيشغّل رحلتك. من غير كول سنتر ولا ردود آلية.',
-                    de: 'Fragen zu Kindern, Seebedingungen, Abholzonen oder Gruppenpreisen? Sie schreiben direkt dem Inhaber — der Person, die Ihre Tour durchführt. Kein Callcenter, keine Bots.',
+                    en: 'Ask about child ages, sea conditions, hotel pickup zones, or group pricing. You message the owner directly, the person who runs your trip. No call centre, no bots.',
+                    ar: 'اسأل عن مناسبة الرحلة للأطفال، حالة البحر، منطقة توصيل فندقك، أو أسعار المجموعات. بتكلم صاحب الشغل نفسه مباشرة، الشخص اللي هيشغّل رحلتك. من غير كول سنتر ولا ردود آلية.',
+                    de: 'Fragen zu Kindern, Seebedingungen, Abholzonen oder Gruppenpreisen? Sie schreiben direkt dem Inhaber, der Person, die Ihre Tour durchführt. Kein Callcenter, keine Bots.',
                   },
                   lang
                 )}
@@ -181,9 +181,9 @@ export const ContactSupportSection: React.FC<ContactSupportSectionProps> = ({
               <p className="text-xs leading-relaxed text-[#64748B]">
                 {tText(
                   {
-                    en: 'On hand throughout the day, every day — including follow-up while Cairo and Luxor trips are on the road · The owner replies personally as soon as your message arrives.',
-                    ar: 'متابعة مباشرة طوال اليوم، كل يوم — بما فيها متابعة رحلات القاهرة والأقصر أثناء تنفيذها · صاحب العمل يرد عليك بنفسه فور وصول رسالتك.',
-                    de: 'Den ganzen Tag über für Sie da, jeden Tag — inklusive Begleitung während der Kairo- und Luxor-Ausflüge unterwegs · Der Inhaber antwortet persönlich, sobald Ihre Nachricht eintrifft.',
+                    en: 'On hand throughout the day, every day, including follow-up while Cairo and Luxor trips are on the road · The owner replies personally as soon as your message arrives.',
+                    ar: 'متابعة مباشرة طوال اليوم، كل يوم، بما فيها متابعة رحلات القاهرة والأقصر أثناء تنفيذها · صاحب العمل يرد عليك بنفسه فور وصول رسالتك.',
+                    de: 'Den ganzen Tag über für Sie da, jeden Tag, inklusive Begleitung während der Kairo- und Luxor-Ausflüge unterwegs · Der Inhaber antwortet persönlich, sobald Ihre Nachricht eintrifft.',
                   },
                   lang
                 )}
@@ -210,7 +210,7 @@ export const ContactSupportSection: React.FC<ContactSupportSectionProps> = ({
                       {
                         en: 'Pick a topic and your message is written for you.',
                         ar: 'اختار الموضوع ورسالتك هتتكتب مكانك.',
-                        de: 'Wählen Sie ein Thema — Ihre Nachricht wird für Sie formuliert.',
+                        de: 'Wählen Sie ein Thema, Ihre Nachricht wird für Sie formuliert.',
                       },
                       lang
                     )}
