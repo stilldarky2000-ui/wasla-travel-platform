@@ -74,9 +74,9 @@ export const HowItWorksSection: React.FC<HowItWorksSectionProps> = ({
       ),
       desc: tText(
         {
-          en: 'Once confirmed, settle conveniently in cash on the morning of your trip or via an official payment link sent by Operations. Cancel free up to 24h before.',
-          ar: 'بعد التأكيد، اختر الدفع كاش عند الاستلام صباح الرحلة أو عبر رابط دفع رسمي من فريق العمليات، مع إلغاء مجاني قبل 24 ساعة.',
-          de: 'Nach Bestätigung zahlen Sie bequem bar bei Abholung oder über einen offiziellen Zahlungslink. Kostenlos stornierbar bis 24 Std. vorab.',
+          en: 'Once confirmed, pay cash on pickup on the morning of your trip. If you would rather pay in advance, just ask us and we will send you a payment link. Cancel free up to 24h before.',
+          ar: 'بعد التأكيد، ادفع كاش عند الاستلام صباح الرحلة. وإذا كنت تفضل الدفع مقدماً، فقط اطلب منا وسنرسل لك رابط دفع. إلغاء مجاني قبل 24 ساعة.',
+          de: 'Nach Bestätigung zahlen Sie bar bei der Abholung. Wenn Sie lieber im Voraus zahlen, fragen Sie uns einfach und wir senden Ihnen einen Zahlungslink. Kostenlos stornierbar bis 24 Std. vorab.',
         },
         lang
       ),

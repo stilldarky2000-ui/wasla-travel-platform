@@ -239,9 +239,9 @@ export const LegalPoliciesModal: React.FC<LegalPoliciesModalProps> = ({
                 <p className="text-xs sm:text-sm text-[#7C2D12]">
                   {tText(
                     {
-                      en: 'Wasla Travel does not charge your card when you submit a booking request. Once our Operations Desk confirms seats and pickup timing, you pay either in cash upon pickup or via an official payment link sent directly to you by our team.',
-                      ar: 'لا تقوم وصلة ترافيل بخصم أي مبلغ من بطاقتك عند إرسال طلب الحجز. بعد تأكيد المقاعد وموعد الاستلام مع فريق العمليات، يمكنك الدفع كاش عند الاستلام من الفندق أو عبر رابط دفع رسمي يرسله لك فريقنا مباشرة.',
-                      de: 'Wasla Travel belastet Ihre Karte bei der Anfrage nicht. Nach Bestätigung durch unser Team zahlen Sie entweder bar bei Abholung oder über einen offiziellen Zahlungslink unseres Teams.',
+                      en: 'Wasla Travel does not charge your card when you submit a booking request. Once our Operations Desk confirms seats and pickup timing, you pay in cash upon pickup. If you would rather pay in advance, just ask us and we will send you a payment link.',
+                      ar: 'لا تقوم وصلة ترافيل بخصم أي مبلغ من بطاقتك عند إرسال طلب الحجز. بعد تأكيد المقاعد وموعد الاستلام مع فريق العمليات، تدفع كاش عند الاستلام من الفندق. وإذا كنت تفضل الدفع مقدماً، فقط اطلب منا وسنرسل لك رابط دفع.',
+                      de: 'Wasla Travel belastet Ihre Karte bei der Anfrage nicht. Nach Bestätigung durch unser Team zahlen Sie bar bei Abholung. Wenn Sie lieber im Voraus zahlen, fragen Sie uns einfach und wir senden Ihnen einen Zahlungslink.',
                     },
                     lang
                   )}

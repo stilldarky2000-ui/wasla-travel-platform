@@ -327,9 +327,9 @@ export const CustomTripModal: React.FC<CustomTripModalProps> = ({
               <div className="rounded-xl border border-[#FED7AA] bg-[#FFF7ED] px-3.5 py-2.5 text-xs text-[#9A3412]">
                 {tText(
                   {
-                    en: 'Custom Quote · Zero upfront payment. Operations confirms your tailored route & price before you pay (cash on pickup or official payment link).',
-                    ar: 'عرض سعر مخصص · بدون أي دفع مسبق. يرسل لك فريق العمليات السعر النهائي والتفاصيل قبل الدفع (كاش عند الاستلام أو عبر رابط دفع رسمي).',
-                    de: 'Individuelles Angebot · Keine Vorauszahlung. Sie erhalten erst ein transparentes Angebot (Bar bei Abholung oder offizieller Zahlungslink).',
+                    en: 'Custom Quote · Zero upfront payment. Operations confirms your tailored route & price before you pay (cash on pickup, or ask us and we will send you a payment link).',
+                    ar: 'عرض سعر مخصص · بدون أي دفع مسبق. يرسل لك فريق العمليات السعر النهائي والتفاصيل قبل الدفع (كاش عند الاستلام، أو اطلب منا وسنرسل لك رابط دفع).',
+                    de: 'Individuelles Angebot · Keine Vorauszahlung. Sie erhalten erst ein transparentes Angebot (Bar bei Abholung, oder fragen Sie uns und wir senden Ihnen einen Zahlungslink).',
                   },
                   lang
                 )}
