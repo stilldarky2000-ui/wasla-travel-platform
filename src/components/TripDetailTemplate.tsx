@@ -238,14 +238,14 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
   const [extrasOpen, setExtrasOpen] = useState(false);
   const [receiptOpen, setReceiptOpen] = useState(false);
   const [guideLanguage, setGuideLanguage] = useState<string>(() =>
-    lang === 'de' ? 'German' : lang === 'ar' ? 'Arabic' : 'English'
+    lang === 'de' ? 'German' : 'English'
   );
   const [guestLanguageTouched, setGuestLanguageTouched] = useState(false);
   const [email, setEmail] = useState('');
 
   useEffect(() => {
     if (!guestLanguageTouched) {
-      setGuideLanguage(lang === 'de' ? 'German' : lang === 'ar' ? 'Arabic' : 'English');
+      setGuideLanguage(lang === 'de' ? 'German' : 'English');
     }
   }, [lang, guestLanguageTouched]);
   const [notes, setNotes] = useState('');
@@ -2594,7 +2594,6 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
                       >
                         <option value="English">English</option>
                         <option value="German">Deutsch (German)</option>
-                        <option value="Arabic">العربية (Arabic)</option>
                         <option value="French">Français (French)</option>
                         <option value="Italian">Italiano (Italian)</option>
                         <option value="Spanish">Español (Spanish)</option>

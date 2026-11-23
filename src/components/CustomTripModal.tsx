@@ -51,7 +51,6 @@ const SERVICE_OPTIONS: { id: string; label: { en: string; ar: string; de: string
 const GUIDE_LANGUAGES = [
   { value: 'English', label: { en: 'English', ar: 'الإنجليزية', de: 'Englisch' } },
   { value: 'German', label: { en: 'German', ar: 'الألمانية', de: 'Deutsch' } },
-  { value: 'Arabic', label: { en: 'Arabic', ar: 'العربية', de: 'Arabisch' } },
   { value: 'French', label: { en: 'French', ar: 'الفرنسية', de: 'Französisch' } },
   { value: 'Spanish', label: { en: 'Spanish', ar: 'الإسبانية', de: 'Spanisch' } },
   { value: 'Italian', label: { en: 'Italian', ar: 'الإيطالية', de: 'Italienisch' } },
@@ -80,7 +79,7 @@ export const CustomTripModal: React.FC<CustomTripModalProps> = ({
   const [adults, setAdults] = useState(2);
   const [children, setChildren] = useState(0);
   const [infants, setInfants] = useState(0);
-  const defaultGuideLang = lang === 'de' ? 'German' : lang === 'ar' ? 'Arabic' : 'English';
+  const defaultGuideLang = lang === 'de' ? 'German' : 'English';
   const [guideLanguage, setGuideLanguage] = useState(defaultGuideLang);
   const [services, setServices] = useState<string[]>(
     initialServices && initialServices.length > 0
@@ -97,7 +96,7 @@ export const CustomTripModal: React.FC<CustomTripModalProps> = ({
     setCreatedRef(null);
     setFormError('');
     setWhatsappOptIn(true);
-    setGuideLanguage(lang === 'de' ? 'German' : lang === 'ar' ? 'Arabic' : 'English');
+    setGuideLanguage(lang === 'de' ? 'German' : 'English');
     setServices(
       initialServices && initialServices.length > 0
         ? initialServices

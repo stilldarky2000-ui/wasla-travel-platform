@@ -1234,7 +1234,7 @@ Danach geht es klimatisiert zurück durch die Wüste, mit dem ganzen antiken The
       ar: 'مدينة الغردقة مشمولة · المناطق الخارجية متاحة كإضافة',
       de: 'Hurghada-Stadt inklusive · Außenzonen als Zusatzleistung verfügbar',
     },
-    languages: ['English', 'العربية', 'Deutsch'],
+    languages: ['English', 'German', 'French', 'Spanish', 'Italian'],
     supplierName: 'Wasla Local Operations',
     familyFriendly: true,
     womenFriendly: true,
@@ -1811,7 +1811,7 @@ Danach geht es klimatisiert zurück durch die Wüste, mit dem ganzen antiken The
     womenFriendly: true,
     featured: false,
     operatingDays: [2, 4, 6],
-    languages: ['English', 'German', 'Arabic', 'French', 'Russian'],
+    languages: ['English', 'German', 'French', 'Russian'],
   },
   {
     id: 'egyptologist-private-guide-multilang',
@@ -1855,7 +1855,7 @@ Danach geht es klimatisiert zurück durch die Wüste, mit dem ganzen antiken The
     womenFriendly: true,
     featured: false,
     operatingDays: [0, 1, 2, 3, 4, 5, 6],
-    languages: ['English', 'German', 'French', 'Dutch', 'Spanish', 'Italian', 'Polish', 'Arabic'],
+    languages: ['English', 'German', 'French', 'Dutch', 'Spanish', 'Italian', 'Polish'],
   },
 ];
 
