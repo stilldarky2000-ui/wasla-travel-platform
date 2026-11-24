@@ -626,15 +626,17 @@ export const TRIPS: Trip[] = [
         price: 38,
       },
       {
-        id: 'opt-orange-vip',
-        title: { en: 'VIP Seafood Yacht + Water Sports', ar: 'يخت VIP غداء سي فود + ألعاب مائية', de: 'VIP-Yacht mit Meeresfrüchten & Wassersport' },
-        detail: { en: 'Fresh seafood lunch + sofa/banana boat ride', ar: 'غداء سي فود طازج + بنانا وصوفا بوت', de: 'Meeresfrüchte-Lunch + Bananaboot inklusive' },
-        price: 54,
-      },
-      {
         id: 'opt-orange-private',
-        title: { en: 'Private Speedboat (Up to 6 Guests)', ar: 'سبيد بوت خاص (حتى 6 أفراد)', de: 'Privates Speedboot (bis 6 Personen)' },
-        detail: { en: 'Flexible departure time & private captain', ar: 'ميعاد تحرك مرن وقبطان خاص للرحلة', de: 'Flexible Abfahrtszeit & privater Kapitän' },
+        title: {
+          en: 'Private Speedboat (Whole Boat, Up to 6 Guests · €145 Fixed)',
+          ar: 'سبيد بوت خاص (القارب بالكامل حتى 6 أفراد · 145€ سعر ثابت)',
+          de: 'Privates Speedboot (Ganzes Boot, bis 6 Personen · 145 € Festpreis)',
+        },
+        detail: {
+          en: '€145 fixed price for the whole boat (not per person), up to 6 guests · flexible departure time & private captain',
+          ar: '145€ سعر ثابت للقارب بالكامل وليس للفرد (حتى 6 أفراد) · ميعاد تحرك مرن وقبطان خاص',
+          de: '145 € Festpreis für das gesamte Boot (nicht pro Person), bis zu 6 Gäste · flexible Abfahrtszeit & privater Kapitän',
+        },
         price: 145,
       },
     ],
@@ -716,7 +718,6 @@ export const TRIPS: Trip[] = [
       ar: 'مارينا الغردقة الجديدة أو الاستلام من الفندق',
       de: 'Hurghada New Marina / Hotelabholung',
     },
-    meetingPointUrl: 'https://maps.google.com/?q=Hurghada+Marina+Egypt',
     outerTransferEnabled: true,
     pickup: { en: 'Hurghada City included · Outer zones +€10–15/pp', ar: 'مدينة الغردقة مشمولة · المناطق الخارجية +10–15€ للفرد', de: 'Hurghada Stadt inklusive · Außenzonen +10–15 €/Pers.' },
     supplierName: 'Captain Karim Marine',
@@ -1356,23 +1357,39 @@ Danach geht es klimatisiert zurück durch die Wüste, mit dem ganzen antiken The
     },
     category: 'desert',
     destination: 'Hurghada',
-    images: [desertSunsetImg, horseBeachImg],
+    images: [desertSunsetImg],
     rating: 4.8,
     reviewCount: 53,
-    duration: { en: '4 hours', ar: '4 ساعات', de: '4 Stunden' },
-    departureTimes: ['02:30 PM (Sunset)'],
+    duration: { en: '3 or 7 hours', ar: '3 أو 7 ساعات', de: '3 oder 7 Stunden' },
+    departureTimes: ['09:00 AM (Morning)', '02:30 PM (Sunset)'],
     price: 32,
     options: [
       {
         id: 'opt-safari-quad',
-        title: { en: 'Single Quad + Bedouin Tea', ar: 'بيتش باجي فردي + شاي بدوي', de: 'Einzel-Quad + Beduinentee' },
-        detail: { en: '1 rider per quad · sunset stop + camel ride', ar: 'راكب واحد · توقف للغروب وركوب جمال', de: '1 Fahrer pro Quad · Sonnenuntergang & Kamelritt' },
+        title: {
+          en: 'Single Quad Safari (3 Hours · No Meals)',
+          ar: 'سفاري كواد فردي (3 ساعات · بدون وجبات)',
+          de: 'Einzel-Quad-Safari (3 Stunden · ohne Mahlzeiten)',
+        },
+        detail: {
+          en: '3-hour guided quad ride · 1 rider per quad · Bedouin village, Bedouin tea & camel ride · no meals included',
+          ar: 'جولة كواد موجّهة لمدة 3 ساعات · راكب واحد لكل كواد · قرية بدوية وشاي بدوي وركوب جمال · لا تشمل وجبات',
+          de: '3-stündige geführte Quad-Tour · 1 Fahrer pro Quad · Beduinendorf, Beduinentee & Kamelritt · keine Mahlzeiten inklusive',
+        },
         price: 32,
       },
       {
         id: 'opt-safari-buggy',
-        title: { en: '2-Seat Family Dune Buggy + Dinner', ar: 'باجي عائلي لشخصين + عشاء بدوي', de: '2-Sitzer Familien-Buggy + Abendessen' },
-        detail: { en: 'Side-by-side steering wheel buggy + BBQ dinner', ar: 'باجي بمقود مزدوج للعائلات + عشاء مشويات', de: 'Nebeneinander-Buggy + BBQ-Abendessen' },
+        title: {
+          en: 'Super Safari (7 Hours · Dinner Included)',
+          ar: 'سوبر سفاري (7 ساعات · شامل العشاء)',
+          de: 'Super Safari (7 Stunden · inkl. Abendessen)',
+        },
+        detail: {
+          en: 'Full 7-hour Super Safari · quad & 2-seat family buggy · camel ride, Bedouin village & BBQ dinner included',
+          ar: 'سوبر سفاري كامل لمدة 7 ساعات · كواد وباجي عائلي لشخصين · ركوب جمال وقرية بدوية وعشاء مشويات مشمول',
+          de: 'Volle 7-stündige Super Safari · Quad & 2-Sitzer Familien-Buggy · Kamelritt, Beduinendorf & BBQ-Abendessen inklusive',
+        },
         price: 49,
       },
     ],
@@ -1407,7 +1424,11 @@ Danach geht es klimatisiert zurück durch die Wüste, mit dem ganzen antiken The
     ],
     included: [
       { en: 'Round-trip Hurghada city hotel transfer', ar: 'توصيل ذهاب وعودة من فنادق مدينة الغردقة', de: 'Hin- & Rücktransfer ab Hurghada-Stadt' },
-      { en: 'Quad/buggy, helmet, safety briefing & Bedouin supper', ar: 'الكواد أو الباجي والخوذة وعشاء بدوي وشاي', de: 'Quad/Buggy, Helm, Einweisung & Abendessen' },
+      {
+        en: 'Quad/buggy, helmet, safety briefing & Bedouin tea (BBQ dinner included with Super Safari option only)',
+        ar: 'الكواد أو الباجي والخوذة وشرح الأمان والشاي البدوي (عشاء المشويات مشمول في خيار السوبر سفاري فقط)',
+        de: 'Quad/Buggy, Helm, Sicherheitseinweisung & Beduinentee (BBQ-Abendessen nur bei der Option Super Safari inklusive)',
+      },
     ],
     tips: [
       {
@@ -2641,7 +2662,7 @@ Danach geht es klimatisiert zurück durch die Wüste, mit dem ganzen antiken The
     },
     category: 'historical',
     destination: 'Cairo',
-    images: [cairoPyramidsImg, luxorTempleImg],
+    images: [cairoPyramidsImg],
     rating: 4.9,
     reviewCount: 34,
     duration: { en: '16 hours', ar: '16 ساعة', de: '16 Stunden' },
@@ -2657,11 +2678,6 @@ Danach geht es klimatisiert zurück durch die Wüste, mit dem ganzen antiken The
         en: 'Dedicated Egyptologist focused on architecture and daily life',
         ar: 'مرشد أثري متخصص في التاريخ والعمارة الفرعونية',
         de: 'Eigener Ägyptologe mit Fokus auf Geschichte und Architektur',
-      },
-      {
-        en: 'Optional domestic flight upgrade from Hurghada available',
-        ar: 'إمكانية الترقية لطيران داخلي من الغردقة',
-        de: 'Optionales Inlandsflug-Upgrade ab Hurghada möglich',
       },
     ],
     historicalFacts: [
