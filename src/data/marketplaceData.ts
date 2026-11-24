@@ -1592,6 +1592,501 @@ export const TRIPS: Trip[] = [
     operatingDays: [0, 1, 2, 3, 4, 5, 6],
   },
   {
+    id: 'sahl-hasheesh-beach-dive',
+    name: {
+      en: 'Sahl Hasheesh Beach Dive: A Beginner Dive Straight from the Shore',
+      ar: 'غوص من شاطئ سهل حشيش: تجربة غوص للمبتدئين مباشرة من الشاطئ',
+      de: 'Sahl Hasheesh Strandtauchgang: Ein Anfängertauchgang direkt vom Ufer',
+    },
+    category: 'sea',
+    destination: 'Hurghada',
+    images: [heroCoastImg],
+    rating: 0,
+    reviewCount: 0,
+    duration: { en: '3 hours', ar: '3 ساعات', de: '3 Stunden' },
+    departureTimes: ['09:00 AM'],
+    price: 27,
+    options: [
+      {
+        id: 'opt-beach-dive-intro',
+        title: {
+          en: 'Beach Dive for Beginners (Small Group)',
+          ar: 'غوص شاطئي للمبتدئين (مجموعة صغيرة)',
+          de: 'Strandtauchgang für Anfänger (Kleingruppe)',
+        },
+        detail: {
+          en: 'Shore entry, no boat · full equipment included · max 10 participants',
+          ar: 'دخول مباشر من الشاطئ بدون مركب · المعدات الكاملة مشمولة · بحد أقصى 10 مشاركين',
+          de: 'Einstieg vom Strand, ohne Boot · komplette Ausrüstung inklusive · max. 10 Teilnehmer',
+        },
+        price: 27,
+      },
+    ],
+    shortDescription: {
+      en: 'No boat, no crowds, no pressure. Walk into the Red Sea from the beach at Sahl Hasheesh with a certified instructor beside you, in a small group of at most ten, and discover the coral reef at your own pace.',
+      ar: 'بدون مركب، بدون زحام، وبدون أي ضغط. ادخل البحر الأحمر مشيًا من شاطئ سهل حشيش مع مدرب معتمد بجانبك، في مجموعة صغيرة لا تتجاوز عشرة مشاركين، واكتشف الشعاب المرجانية على مهلك.',
+      de: 'Kein Boot, keine Menschenmassen, kein Druck. Gehen Sie am Strand von Sahl Hasheesh mit einem zertifizierten Tauchlehrer an Ihrer Seite ins Rote Meer, in einer kleinen Gruppe von höchstens zehn Personen, und entdecken Sie das Korallenriff in Ihrem eigenen Tempo.',
+    },
+    fullDescription: {
+      en: 'Most diving starts with a boat. This one starts with your feet in the sand. At Sahl Hasheesh the reef begins right at the shoreline, so your first dive, or your first dive in a long time, can start the easy way: walking in from the beach.\n\nYou are welcomed by the dive team and fitted with high-quality equipment, everything included, mask, fins, tank and wetsuit. Then a full safety briefing and an introduction to the equipment, step by step, until you feel confident and relaxed. No prior experience is needed, and your certified instructor stays beside you for the whole dive.\n\nUnderwater, the Sahl Hasheesh reef does the rest: colourful coral and vibrant marine life in crystal-clear water, explored slowly because the group is small, at most ten participants, and the instructor has time for every single person.\n\nWhether it is your very first dive or simply the calmest way to meet the Red Sea, a beach dive gives you the magic of diving without a boat schedule, without a crowd, and without any rush.',
+      ar: 'معظم تجارب الغوص تبدأ من على متن مركب، أما هذه التجربة فتبدأ وقدماك على الرمل. في سهل حشيش تبدأ الشعاب المرجانية مباشرة من خط الشاطئ، لذلك يمكن لأول غطسة لك، أو أول غطسة منذ فترة طويلة، أن تبدأ بأسهل طريقة ممكنة: بالدخول مشيًا من الشاطئ.\n\nيستقبلك فريق الغوص ويجهزك بمعدات عالية الجودة تشمل كل شيء: القناع والزعانف والأسطوانة وبدلة الغوص. بعدها تحصل على شرح كامل للسلامة وتعريف بالمعدات خطوة بخطوة حتى تشعر بالثقة والراحة. لا يلزم أي خبرة سابقة، ويبقى مدربك المعتمد بجانبك طول الغطسة.\n\nتحت الماء، تتكفل شعاب سهل حشيش بالباقي: مرجان ملون وحياة بحرية نابضة في مياه صافية، تستكشفها بهدوء لأن المجموعة صغيرة بحد أقصى عشرة مشاركين ولأن المدرب لديه وقت كافٍ لكل شخص.\n\nسواء كانت هذه غطستك الأولى على الإطلاق أو أهدأ طريقة للقاء البحر الأحمر، يمنحك الغوص الشاطئي سحر الغوص بدون جدول مركب، وبدون زحام، وبدون أي استعجال.',
+      de: 'Die meisten Tauchgänge beginnen auf einem Boot. Dieser beginnt mit Ihren Füßen im Sand. In Sahl Hasheesh fängt das Riff direkt an der Uferlinie an, sodass Ihr erster Tauchgang, oder Ihr erster nach langer Zeit, ganz entspannt starten kann: indem Sie einfach vom Strand ins Wasser gehen.\n\nDas Tauchteam empfängt Sie und passt Ihnen hochwertige Ausrüstung an, alles inklusive: Maske, Flossen, Flasche und Neoprenanzug. Danach folgen eine ausführliche Sicherheitseinweisung und eine Schritt-für-Schritt-Einführung in die Ausrüstung, bis Sie sich sicher und entspannt fühlen. Vorkenntnisse sind nicht erforderlich, und Ihr zertifizierter Tauchlehrer bleibt den gesamten Tauchgang an Ihrer Seite.\n\nUnter Wasser übernimmt das Riff von Sahl Hasheesh den Rest: farbenfrohe Korallen und lebendige Unterwasserwelt in kristallklarem Wasser, in aller Ruhe erkundet, da die Gruppe mit maximal zehn Teilnehmern klein bleibt und der Tauchlehrer für jeden Einzelnen Zeit hat.\n\nOb es Ihr allererster Tauchgang ist oder einfach die ruhigste Art, das Rote Meer zu erleben: Ein Strandtauchgang schenkt Ihnen die Magie des Tauchens ohne Bootsfahrplan, ohne Gedränge und ohne jede Eile.',
+    },
+    highlights: [
+      {
+        en: 'A warm welcome and full equipment fitting at the beach',
+        ar: 'استقبال دافئ وتجهيز كامل بمعدات الغوص على الشاطئ',
+        de: 'Herzlicher Empfang und komplette Ausrüstungsanpassung am Strand',
+      },
+      {
+        en: 'A complete safety briefing and equipment introduction, step by step',
+        ar: 'شرح كامل للسلامة وتعريف بالمعدات خطوة بخطوة',
+        de: 'Ausführliche Sicherheitseinweisung und Ausrüstungseinführung Schritt für Schritt',
+      },
+      {
+        en: 'A guided dive straight from the shore, no boat required',
+        ar: 'غطسة بإرشاد مباشر من الشاطئ بدون الحاجة لمركب',
+        de: 'Geführter Tauchgang direkt vom Ufer, kein Boot erforderlich',
+      },
+      {
+        en: 'Colourful coral reefs and vibrant marine life',
+        ar: 'شعاب مرجانية ملونة وحياة بحرية نابضة',
+        de: 'Farbenfrohe Korallenriffe und lebendige Unterwasserwelt',
+      },
+      {
+        en: 'A small group of at most ten participants',
+        ar: 'مجموعة صغيرة بحد أقصى عشرة مشاركين',
+        de: 'Kleine Gruppe mit maximal zehn Teilnehmern',
+      },
+      {
+        en: 'Soft drinks included',
+        ar: 'المشروبات الغازية مشمولة',
+        de: 'Softdrinks inklusive',
+      },
+      {
+        en: 'Led by certified professional diving instructors',
+        ar: 'بقيادة مدربي غوص محترفين ومعتمدين',
+        de: 'Geleitet von zertifizierten professionellen Tauchlehrern',
+      },
+    ],
+    included: [
+      {
+        en: 'Professional diving instructor',
+        ar: 'مدرب غوص محترف',
+        de: 'Professioneller Tauchlehrer',
+      },
+      {
+        en: 'Full diving equipment (mask, fins, tank, wetsuit)',
+        ar: 'معدات غوص كاملة (قناع، زعانف، أسطوانة، بدلة غوص)',
+        de: 'Komplette Tauchausrüstung (Maske, Flossen, Flasche, Neoprenanzug)',
+      },
+      {
+        en: 'Introductory dive session from the beach',
+        ar: 'جلسة غوص تعريفية من الشاطئ',
+        de: 'Einführungstauchgang direkt vom Strand',
+      },
+      {
+        en: 'All safety briefings and instructions',
+        ar: 'جميع شروحات وتعليمات السلامة',
+        de: 'Alle Sicherheitseinweisungen und Instruktionen',
+      },
+      {
+        en: 'Soft drinks',
+        ar: 'مشروبات غازية',
+        de: 'Softdrinks',
+      },
+    ],
+    tips: [
+      {
+        en: 'Pickup from El Gouna, Soma Bay or Safaga (available for an additional fee, payable on site)',
+        ar: 'الاستلام من الجونة أو سوما باي أو سفاجا (متاح برسوم إضافية تُدفع في الموقع)',
+        de: 'Abholung ab El Gouna, Soma Bay oder Safaga (gegen Aufpreis vor Ort zahlbar)',
+      },
+      {
+        en: 'Photos (available to purchase)',
+        ar: 'الصور (متاحة للشراء)',
+        de: 'Fotos (gegen Aufpreis erhältlich)',
+      },
+      {
+        en: 'Tips and personal expenses',
+        ar: 'الإكراميات والمصاريف الشخصية',
+        de: 'Trinkgeld und persönliche Ausgaben',
+      },
+    ],
+    notSuitableFor: [
+      {
+        en: 'Children under 10 years',
+        ar: 'الأطفال تحت 10 سنوات',
+        de: 'Kinder unter 10 Jahren',
+      },
+      {
+        en: 'People with heart problems',
+        ar: 'الأشخاص الذين يعانون من مشاكل في القلب',
+        de: 'Personen mit Herzproblemen',
+      },
+      {
+        en: 'Wheelchair users',
+        ar: 'مستخدمو الكراسي المتحركة',
+        de: 'Rollstuhlfahrer',
+      },
+      {
+        en: 'People with respiratory issues',
+        ar: 'الأشخاص الذين يعانون من مشاكل في الجهاز التنفسي',
+        de: 'Personen mit Atemwegsproblemen',
+      },
+    ],
+    whatToBring: [
+      {
+        en: 'Swimwear and a towel',
+        ar: 'ملابس سباحة وفوطة',
+        de: 'Badekleidung und ein Handtuch',
+      },
+      {
+        en: 'Sunscreen',
+        ar: 'واقي شمس',
+        de: 'Sonnencreme',
+      },
+      {
+        en: 'A camera',
+        ar: 'كاميرا',
+        de: 'Eine Kamera',
+      },
+      {
+        en: 'Comfortable clothes',
+        ar: 'ملابس مريحة',
+        de: 'Bequeme Kleidung',
+      },
+    ],
+    notAllowed: [
+      {
+        en: 'Touching marine life',
+        ar: 'لمس الكائنات البحرية',
+        de: 'Berühren von Meereslebewesen',
+      },
+      {
+        en: 'Alcohol and drugs',
+        ar: 'الكحول والمخدرات',
+        de: 'Alkohol und Drogen',
+      },
+    ],
+    knowBeforeYouGo: [
+      {
+        en: 'Participants should be comfortable in the water. No diving licence or prior experience is needed.',
+        ar: 'يجب أن يشعر المشاركون بالراحة في الماء، ولا يلزم وجود رخصة غوص أو خبرة سابقة.',
+        de: 'Teilnehmer sollten sich im Wasser wohlfühlen. Es sind weder Tauchschein noch Vorkenntnisse erforderlich.',
+      },
+      {
+        en: 'Cash on pickup is how you pay. There is nothing to pay in advance.',
+        ar: 'الدفع نقدًا عند الاستلام، ولا يوجد أي مبلغ يُدفع مقدمًا.',
+        de: 'Sie zahlen bar bei Abholung. Eine Vorauszahlung ist nicht erforderlich.',
+      },
+    ],
+    meetingPoint: {
+      en: 'Sahl Hasheesh Beach Dive Center / Hotel Pickup Available',
+      ar: 'مركز الغوص على شاطئ سهل حشيش أو الاستلام من الفندق',
+      de: 'Tauchbasis am Strand von Sahl Hasheesh / Hotelabholung verfügbar',
+    },
+    outerTransferEnabled: true,
+    pickup: {
+      en: 'Sahl Hasheesh & Hurghada pickup available · Extra fee for El Gouna, Soma Bay and Safaga (payable on site)',
+      ar: 'يتوفر الاستلام من سهل حشيش والغردقة · رسوم إضافية للجونة وسوما باي وسفاجا (تُدفع في الموقع)',
+      de: 'Abholung ab Sahl Hasheesh & Hurghada verfügbar · Aufpreis für El Gouna, Soma Bay und Safaga (vor Ort zahlbar)',
+    },
+    supplierName: 'Red Sea Diving Partner',
+    familyFriendly: true,
+    womenFriendly: true,
+    minChildAge: 10,
+    featured: false,
+    languages: ['English', 'German', 'French', 'Italian'],
+    operatingDays: [0, 1, 2, 3, 4, 5, 6],
+  },
+  {
+    id: 'hurghada-diving-snorkeling-boat',
+    name: {
+      en: 'Hurghada Diving and Snorkeling Boat Day: Beginners, Certified Divers and Snorkellers',
+      ar: 'يوم مركب الغوص والسنوركلينج في الغردقة: للمبتدئين والغواصين المعتمدين ومحبي السنوركلينج',
+      de: 'Hurghada Tauch- und Schnorchelboot-Tag: Anfänger, zertifizierte Taucher und Schnorchler',
+    },
+    category: 'sea',
+    destination: 'Hurghada',
+    images: [orangeBayImg],
+    rating: 0,
+    reviewCount: 0,
+    duration: { en: '7 hours', ar: '7 ساعات', de: '7 Stunden' },
+    departureTimes: ['08:30 AM'],
+    price: 25,
+    options: [
+      {
+        id: 'opt-boat-snorkel',
+        title: {
+          en: 'Boat Cruise with 2 Snorkelling Stops',
+          ar: 'رحلة مركب مع وقفتي سنوركلينج',
+          de: 'Bootsfahrt mit 2 Schnorchelstopps',
+        },
+        detail: {
+          en: 'Snorkel two reef sites · no diving · lunch & unlimited soft drinks',
+          ar: 'سنوركلينج في موقعي شعاب مرجانية · بدون غوص · غداء ومشروبات غازية مفتوحة',
+          de: 'Schnorcheln an zwei Riffen · ohne Tauchen · Mittagessen & unbegrenzte Softdrinks',
+        },
+        price: 25,
+      },
+      {
+        id: 'opt-boat-intro-dive',
+        title: {
+          en: 'Boat Cruise with 2 Intro Dives (Beginners)',
+          ar: 'رحلة مركب مع غطستين تعريفيتين (للمبتدئين)',
+          de: 'Bootsfahrt mit 2 Schnuppertauchgängen (Anfänger)',
+        },
+        detail: {
+          en: 'Two guided intro dives, about 15 minutes each · no licence needed · instructor beside you',
+          ar: 'غطستان تعريفيتان بإرشاد، حوالي 15 دقيقة لكل غطسة · بدون رخصة · مدرب بجانبك',
+          de: 'Zwei geführte Schnuppertauchgänge, je ca. 15 Minuten · kein Tauchschein nötig · Tauchlehrer an Ihrer Seite',
+        },
+        price: 42,
+      },
+      {
+        id: 'opt-boat-certified',
+        title: {
+          en: 'Boat Trip for Certified Divers',
+          ar: 'رحلة مركب للغواصين المعتمدين',
+          de: 'Bootsausflug für zertifizierte Taucher',
+        },
+        detail: {
+          en: 'Two guided dives of 45 to 60 minutes · certification required',
+          ar: 'غطستان بإرشاد من 45 إلى 60 دقيقة · تتطلب شهادة غوص معتمدة',
+          de: 'Zwei geführte Tauchgänge von 45 bis 60 Minuten · Tauchschein erforderlich',
+        },
+        price: 38,
+      },
+    ],
+    shortDescription: {
+      en: 'One boat, three ways to meet the reef. Snorkel two coral sites, take two intro dives as a complete beginner, or dive as a certified diver, with buffet lunch, fruit and unlimited soft drinks on board, and all equipment and park fees included.',
+      ar: 'مركب واحد وثلاث طرق للاستمتاع بالشعاب المرجانية. مارس السنوركلينج في موقعين مرجانيين، أو جرّب غطستين تعريفيتين كمبتدئ تمامًا، أو غُص كغواص معتمد، مع غداء بوفيه وفواكه ومشروبات غازية مفتوحة على المركب، وكل المعدات ورسوم المحمية مشمولة.',
+      de: 'Ein Boot, drei Möglichkeiten das Riff zu erleben. Schnorcheln Sie an zwei Korallenplätzen, machen Sie als kompletter Anfänger zwei Schnuppertauchgänge oder tauchen Sie als zertifizierter Taucher, inklusive Mittagsbuffet, Obst, unbegrenzten Softdrinks an Bord sowie kompletter Ausrüstung und Nationalparkgebühren.',
+    },
+    fullDescription: {
+      en: 'This is the Red Sea boat day that fits everyone in your group at once. We pick you up from your hotel in Hurghada and take you to the marina, where you meet the dive team, receive your safety briefing and board a spacious, fully equipped dive boat.\n\nThe boat visits two carefully selected sites in the Red Sea, chosen on the day according to the weather and the experience level of the guests. Between stops, the deck is yours: sunshine, a fresh buffet lunch with fruit, and unlimited soft drinks.\n\nThen you choose how your day goes. Snorkellers swim at both reef sites while the diving happens around them. Beginners take two intro dives under the direct supervision of an instructor, no licence and no experience needed, the underwater world fifteen minutes at a time. Certified divers make two full guided dives with a professional guide who knows these reefs by heart.\n\nAll diving equipment and national park fees are included in every option. There are no hidden rental costs waiting for you on board.',
+      ar: 'هذا هو يوم البحر الأحمر الذي يناسب الجميع في مجموعتك في وقت واحد. نستلمك من فندقك في الغردقة ونوصلك إلى المارينا، حيث تلتقي بفريق الغوص وتتلقى شرح السلامة وتصعد إلى مركب غوص واسع ومجهز بالكامل.\n\nيزور المركب موقعين مختارين بعناية في البحر الأحمر وفقًا لحالة الطقس ومستوى خبرة الضيوف في ذلك اليوم. وبين التوقفات، سطح المركب ملكك بالكامل: شمس دافئة، وغداء بوفيه طازج مع فواكه، ومشروبات غازية مفتوحة.\n\nبعدها تختار كيف تعيش يومك. محبو السنوركلينج يسبحون في الموقعين بينما يجري الغوص حولهم. والمبتدئون يخوضون غطستين تعريفيتين تحت إشراف مباشر من مدرب بدون الحاجة لرخصة أو خبرة سابقة، لاكتشاف عالم الأعماق بهدوء. أما الغواصون المعتمدون فيقومون بغطستين كاملتين مع مرشد محترف يعرف هذه الشعاب عن ظهر قلب.\n\nجميع معدات الغوص ورسوم المحمية الطبيعية مشمولة في كل اختيار، ولا توجد أي رسوم إيجار مخفية بانتظارك على المركب.',
+      de: 'Das ist der Bootstag am Roten Meer, der zu jedem in Ihrer Gruppe gleichzeitig passt. Wir holen Sie von Ihrem Hotel in Hurghada ab und bringen Sie zur Marina, wo Sie das Tauchteam kennenlernen, Ihre Sicherheitseinweisung erhalten und an Bord eines geräumigen, voll ausgestatteten Tauchboots gehen.\n\nDas Boot steuert zwei sorgfältig ausgewählte Plätze im Roten Meer an, die am jeweiligen Tag je nach Wetter und Erfahrungsstand der Gäste gewählt werden. Zwischen den Stopps gehört das Deck Ihnen: Sonnenschein, ein frisches Mittagsbuffet mit Obst und unbegrenzte Softdrinks.\n\nDann entscheiden Sie, wie Ihr Tag verläuft. Schnorchler schwimmen an beiden Riffen, während um sie herum getaucht wird. Anfänger machen zwei Schnuppertauchgänge unter direkter Aufsicht eines Tauchlehrers, ganz ohne Tauchschein und Vorkenntnisse. Zertifizierte Taucher unternehmen zwei vollständige geführte Tauchgänge mit einem professionellen Guide, der diese Riffe in- und auswendig kennt.\n\nDie komplette Tauchausrüstung sowie die Nationalparkgebühren sind in jeder Option inbegriffen. An Bord erwarten Sie keine versteckten Leihgebühren.',
+    },
+    highlights: [
+      {
+        en: 'Hotel pickup in Hurghada and transfer to the marina',
+        ar: 'الاستلام من الفندق في الغردقة والتوصيل إلى المارينا',
+        de: 'Hotelabholung in Hurghada und Transfer zur Marina',
+      },
+      {
+        en: 'A spacious, fully equipped dive boat with a professional dive team',
+        ar: 'مركب غوص واسع ومجهز بالكامل مع فريق غوص محترف',
+        de: 'Geräumiges, voll ausgestattetes Tauchboot mit professionellem Tauchteam',
+      },
+      {
+        en: 'Two Red Sea sites chosen daily for weather and experience level',
+        ar: 'موقعان في البحر الأحمر يُختاران يوميًا حسب الطقس ومستوى الخبرة',
+        de: 'Zwei Plätze im Roten Meer, täglich nach Wetter und Erfahrungsstand gewählt',
+      },
+      {
+        en: 'Your choice on one boat: snorkelling, intro diving or certified diving',
+        ar: 'خيارك على مركب واحد: سنوركلينج أو غوص تعريفي أو غوص للمعتمدين',
+        de: 'Ihre Wahl auf einem Boot: Schnorcheln, Schnuppertauchen oder Tauchen für Zertifizierte',
+      },
+      {
+        en: 'Fresh buffet lunch with fruit and unlimited soft drinks on board',
+        ar: 'غداء بوفيه طازج مع فواكه ومشروبات غازية مفتوحة على المركب',
+        de: 'Frisches Mittagsbuffet mit Obst und unbegrenzten Softdrinks an Bord',
+      },
+      {
+        en: 'All equipment and national park fees included, no rental costs on board',
+        ar: 'جميع المعدات ورسوم المحمية مشمولة بدون أي تكاليف إيجار على المركب',
+        de: 'Komplette Ausrüstung und Nationalparkgebühren inklusive, keine Leihgebühren an Bord',
+      },
+      {
+        en: 'Led by professional local diving instructors',
+        ar: 'بقيادة مدربي غوص محليين محترفين',
+        de: 'Geleitet von professionellen lokalen Tauchlehrern',
+      },
+    ],
+    included: [
+      {
+        en: 'Hotel pickup and drop-off in Hurghada, air-conditioned transfers',
+        ar: 'الاستلام والتوصيل من فنادق الغردقة بسيارات مكيفة',
+        de: 'Hotelabholung und Rücktransfer in Hurghada im klimatisierten Fahrzeug',
+      },
+      {
+        en: 'Full-day boat trip in the Red Sea',
+        ar: 'رحلة مركب ليوم كامل في البحر الأحمر',
+        de: 'Ganztägiger Bootsausflug im Roten Meer',
+      },
+      {
+        en: 'Professional dive instructor and guide',
+        ar: 'مدرب غوص ومرشد محترف',
+        de: 'Professioneller Tauchlehrer und Guide',
+      },
+      {
+        en: 'Two snorkelling stops (snorkelling option)',
+        ar: 'وقفتا سنوركلينج (اختيار السنوركلينج)',
+        de: 'Zwei Schnorchelstopps (Schnorchel-Option)',
+      },
+      {
+        en: 'Two intro dives for beginners (intro dive option)',
+        ar: 'غطستان تعريفيتان للمبتدئين (اختيار الغوص التعريفي)',
+        de: 'Zwei Schnuppertauchgänge für Anfänger (Anfänger-Option)',
+      },
+      {
+        en: 'Two guided dives for certified divers (certified option)',
+        ar: 'غطستان بإرشاد للغواصين المعتمدين (اختيار الغواصين المعتمدين)',
+        de: 'Zwei geführte Tauchgänge für zertifizierte Taucher (Option für Zertifizierte)',
+      },
+      {
+        en: 'Full scuba diving equipment',
+        ar: 'معدات غوص كاملة',
+        de: 'Komplette Tauchausrüstung',
+      },
+      {
+        en: 'Lunch served on board, with fruit',
+        ar: 'غداء يُقدم على المركب مع فواكه',
+        de: 'Mittagessen an Bord inklusive Obst',
+      },
+      {
+        en: 'Soft drinks and water, unlimited',
+        ar: 'مشروبات غازية ومياه مفتوحة',
+        de: 'Softdrinks und Wasser unbegrenzt',
+      },
+      {
+        en: 'National park fees',
+        ar: 'رسوم المحمية الطبيعية',
+        de: 'Nationalparkgebühren',
+      },
+      {
+        en: 'Safety briefing and basic diving instructions',
+        ar: 'شرح السلامة وتعليمات الغوص الأساسية',
+        de: 'Sicherheitseinweisung und grundlegende Tauchinstruktionen',
+      },
+    ],
+    tips: [
+      {
+        en: 'Underwater photos and videos (available to purchase)',
+        ar: 'الصور والفيديوهات تحت الماء (متاحة للشراء)',
+        de: 'Unterwasserfotos und -videos (gegen Aufpreis erhältlich)',
+      },
+      {
+        en: 'Pickup and drop-off outside Hurghada: Makadi, Sahl Hasheesh, El Gouna, Soma Bay, Safaga (extra charge)',
+        ar: 'الاستلام والتوصيل خارج الغردقة: مكادي، سهل حشيش، الجونة، سوما باي، سفاجا (رسوم إضافية)',
+        de: 'Abholung und Rücktransfer außerhalb von Hurghada: Makadi, Sahl Hasheesh, El Gouna, Soma Bay, Safaga (gegen Aufpreis)',
+      },
+      {
+        en: 'Tips',
+        ar: 'الإكراميات',
+        de: 'Trinkgeld',
+      },
+    ],
+    notSuitableFor: [
+      {
+        en: 'People with heart problems',
+        ar: 'الأشخاص الذين يعانون من مشاكل في القلب',
+        de: 'Personen mit Herzproblemen',
+      },
+      {
+        en: 'People with respiratory issues',
+        ar: 'الأشخاص الذين يعانون من مشاكل في الجهاز التنفسي',
+        de: 'Personen mit Atemwegsproblemen',
+      },
+      {
+        en: 'People with epilepsy',
+        ar: 'الأشخاص الذين يعانون من الصرع',
+        de: 'Personen mit Epilepsie',
+      },
+      {
+        en: 'People with recent surgeries',
+        ar: 'الأشخاص الذين أجروا عمليات جراحية مؤخرًا',
+        de: 'Personen mit kürzlichen Operationen',
+      },
+      {
+        en: 'Children under 10 years for diving (children under 10 can snorkel with an adult)',
+        ar: 'الأطفال تحت 10 سنوات للغوص (يمكن للأطفال تحت 10 سنوات ممارسة السنوركلينج برفقة بالغ)',
+        de: 'Kinder unter 10 Jahren beim Tauchen (Kinder unter 10 Jahren können in Begleitung eines Erwachsenen schnorcheln)',
+      },
+    ],
+    whatToBring: [
+      {
+        en: 'Swimwear and a towel',
+        ar: 'ملابس سباحة وفوطة',
+        de: 'Badekleidung und ein Handtuch',
+      },
+      {
+        en: 'Sunscreen and a sun hat',
+        ar: 'واقي شمس وقبعة شمس',
+        de: 'Sonnencreme und Sonnenhut',
+      },
+      {
+        en: 'Sunglasses',
+        ar: 'نظارة شمس',
+        de: 'Sonnenbrille',
+      },
+      {
+        en: 'Your diving certification (certified divers)',
+        ar: 'شهادة الغوص الخاصة بك (للغواصين المعتمدين)',
+        de: 'Ihren Tauchschein (für zertifizierte Taucher)',
+      },
+    ],
+    notAllowed: [
+      {
+        en: 'Unaccompanied minors',
+        ar: 'القُصّر بدون مرافق بالغ',
+        de: 'Unbegleitete Minderjährige',
+      },
+      {
+        en: 'Touching marine life',
+        ar: 'لمس الكائنات البحرية',
+        de: 'Berühren von Meereslebewesen',
+      },
+      {
+        en: 'Alcohol and drugs',
+        ar: 'الكحول والمخدرات',
+        de: 'Alkohol und Drogen',
+      },
+    ],
+    knowBeforeYouGo: [
+      {
+        en: 'Diving and flying on the same day is not permitted. At least 18 hours must pass between your last dive and your flight.',
+        ar: 'لا يُسمح بالغوص والسفر بالطائرة في نفس اليوم؛ يجب مرور 18 ساعة على الأقل بين آخر غطسة وموعد رحلتك الجوية.',
+        de: 'Tauchen und Fliegen am selben Tag ist nicht erlaubt. Zwischen dem letzten Tauchgang und dem Flug müssen mindestens 18 Stunden liegen.',
+      },
+      {
+        en: 'Participants under 18 must be accompanied by a parent or legal guardian.',
+        ar: 'يجب أن يكون المشاركون دون 18 عامًا برفقة أحد الوالدين أو ولي أمر قانوني.',
+        de: 'Teilnehmer unter 18 Jahren müssen von einem Elternteil oder Erziehungsberechtigten begleitet werden.',
+      },
+      {
+        en: 'Weather conditions may affect the choice of dive sites on the day.',
+        ar: 'قد تؤثر الأحوال الجوية على اختيار مواقع الغوص في يوم الرحلة.',
+        de: 'Die Wetterbedingungen können am Tag des Ausflugs die Wahl der Tauchplätze beeinflussen.',
+      },
+      {
+        en: 'Cash on pickup is how you pay. There is nothing to pay in advance.',
+        ar: 'الدفع نقدًا عند الاستلام، ولا يوجد أي مبلغ يُدفع مقدمًا.',
+        de: 'Sie zahlen bar bei Abholung. Eine Vorauszahlung ist nicht erforderlich.',
+      },
+    ],
+    meetingPoint: {
+      en: 'Hurghada Marina / Hotel Lobby Pickup',
+      ar: 'مارينا الغردقة أو الاستلام من بهو الفندق',
+      de: 'Hurghada Marina / Hotelabholung',
+    },
+    outerTransferEnabled: true,
+    pickup: {
+      en: 'Hurghada included · Extra charge for Makadi, Sahl Hasheesh, El Gouna, Soma Bay and Safaga',
+      ar: 'الغردقة مشمولة · رسوم إضافية لمكادي وسهل حشيش والجونة وسوما باي وسفاجا',
+      de: 'Hurghada inklusive · Aufpreis für Makadi, Sahl Hasheesh, El Gouna, Soma Bay und Safaga',
+    },
+    supplierName: 'Red Sea Diving Partner',
+    familyFriendly: true,
+    womenFriendly: true,
+    featured: false,
+    languages: ['English', 'German', 'French', 'Italian'],
+    operatingDays: [0, 1, 2, 3, 4, 5, 6],
+  },
+  {
     id: 'luxor-valley-small-van',
     name: {
       en: "Ancient Thebes in a Day: Karnak, the Valley of the Kings and Hatshepsut's Temple, from Hurghada",
@@ -3962,6 +4457,462 @@ Danach geht es klimatisiert zurück durch die Wüste, mit dem ganzen antiken The
     kidsDiscount: { en: '40% off ages 4–11', ar: 'خصم 40% من 4–11 سنة', de: '40% Rabatt für Kinder (4–11 J.)' },
     featured: true,
     operatingDays: [1, 3, 6],
+  },
+  {
+    id: 'marsa-alam-samadai-dolphin-house',
+    name: {
+      en: 'Dolphin House Adventure from Marsa Alam: Snorkeling with Wild Dolphins at Shaab Samadai',
+      ar: 'مغامرة بيت الدلافين من مرسى علم: سنوركلينج مع الدلافين البرية في شعاب صمداي',
+      de: 'Dolphin House Abenteuer ab Marsa Alam: Schnorcheln mit wilden Delfinen am Shaab Samadai',
+    },
+    category: 'sea',
+    destination: 'Marsa Alam',
+    images: [heroRedSeaVibrantImg],
+    rating: 0,
+    reviewCount: 0,
+    duration: { en: '7 hours', ar: '7 ساعات', de: '7 Stunden' },
+    departureTimes: ['08:00 AM'],
+    price: 68,
+    options: [
+      {
+        id: 'opt-samadai-snorkel',
+        title: {
+          en: 'Dolphin House Snorkeling Day',
+          ar: 'يوم سنوركلينج في بيت الدلافين (صمداي)',
+          de: 'Dolphin House Schnorcheltag',
+        },
+        detail: {
+          en: '2 guided snorkelling sessions at Shaab Samadai · buffet lunch & soft drinks',
+          ar: 'جلستا سنوركلينج بإرشاد في شعاب صمداي · غداء بوفيه ومشروبات غازية',
+          de: '2 geführte Schnorchelgänge am Shaab Samadai · Mittagsbuffet & Softdrinks',
+        },
+        price: 68,
+      },
+    ],
+    shortDescription: {
+      en: 'A full-day boat trip to Shaab Samadai, the reef where spinner dolphins live. Two guided snorkelling sessions over coral gardens full of fish and rays, buffet lunch and soft drinks on board.',
+      ar: 'رحلة مركب ليوم كامل إلى شعاب صمداي حيث تعيش الدلافين الدوّارة. جلستا سنوركلينج بإرشاد فوق حدائق مرجانية مليئة بالأسماك وأسماك الراي، مع غداء بوفيه ومشروبات غازية على المركب.',
+      de: 'Ein ganztägiger Bootsausflug zum Shaab Samadai, dem Riff, in dem Spinnerdelfine leben. Zwei geführte Schnorchelgänge über Korallengärten voller Fische und Rochen, inklusive Mittagsbuffet und Softdrinks an Bord.',
+    },
+    fullDescription: {
+      en: 'Shaab Samadai is a protected reef shaped like a horseshoe, and it is famous for one reason: a resident group of spinner dolphins rests and plays inside it. This trip takes you there from Marsa Alam, with a professional snorkelling guide and two full sessions in the water.\n\nWe collect you from your hotel in Marsa Alam and board the boat for the sail out to the reef. The water over Samadai is warm and clear, and the coral gardens below are busy: clouds of colourful fish, rays gliding over the sand, and, on the days they choose to show themselves, the dolphins moving through their home.\n\nBetween the two snorkelling sessions you relax on deck, eat a freshly prepared buffet lunch and help yourself to refreshments and soft drinks. All snorkelling equipment and life jackets are provided, and the guide is in the water with the group at every stop.\n\nThe dolphins are wild and completely free, and that is exactly what makes meeting them special. They are seen on most trips to this reef, but no honest operator can guarantee them, and the crew never chases or disturbs them.',
+      ar: 'شعاب صمداي محمية طبيعية على شكل حدوة حصان، وتشتهر بسبب واحد مميز: وجود مجموعة مقيمة من الدلافين الدوّارة تستريح وتلعب بداخلها. تأخذك هذه الرحلة إليها من مرسى علم مع مرشد سنوركلينج محترف وجلستين كاملتين في الماء.\n\nنستلمك من فندقك في مرسى علم ونصعد على المركب للإبحار إلى الشعاب. المياه فوق صمداي دافئة وصافية، والحدائق المرجانية بالأسفل عامرة بالحياة: أسراب من الأسماك الملونة، وأسماك الراي تنساب فوق الرمل، وفي الأيام التي تختار فيها الظهور، تتحرك الدلافين بحرية داخل موطنها.\n\nبين جلستي السنوركلينج تسترخي على سطح المركب وتتناول غداء بوفيه مُعدًا طازجًا مع المرطبات والمشروبات الغازية. جميع معدات السنوركلينج وسترات النجاة متوفرة، والمرشد يكون مع المجموعة داخل الماء في كل وقفة.\n\nالدلافين برية وحرة تمامًا، وهذا بالضبط ما يجعل لقاءها مميزًا. تُشاهد في معظم الرحلات إلى هذه الشعاب، لكن لا يمكن لأي منظّم صادق ضمان ظهورها، وطاقمنا لا يطاردها أو يزعجها أبدًا.',
+      de: 'Shaab Samadai ist ein geschütztes, hufeisenförmiges Riff und aus einem Grund berühmt: Eine ansässige Gruppe von Spinnerdelfinen ruht und spielt darin. Dieser Ausflug bringt Sie ab Marsa Alam mit einem professionellen Schnorchelguide und zwei ausgiebigen Schnorchelgängen dorthin.\n\nWir holen Sie von Ihrem Hotel in Marsa Alam ab und gehen an Bord des Bootes für die Fahrt hinaus zum Riff. Das Wasser über Samadai ist warm und klar, und die Korallengärten darunter sind voller Leben: Schwärme bunter Fische, Rochen, die über den Sand gleiten, und an den Tagen, an denen sie sich zeigen möchten, die Delfine in ihrem natürlichen Zuhause.\n\nZwischen den beiden Schnorchelgängen entspannen Sie an Deck, genießen ein frisch zubereitetes Mittagsbuffet sowie Erfrischungen und Softdrinks. Die komplette Schnorchelausrüstung und Schwimmwesten werden gestellt, und der Guide ist bei jedem Stopp mit der Gruppe im Wasser.\n\nDie Delfine sind wild und völlig frei, und genau das macht eine Begegnung so besonders. Sie werden auf den meisten Fahrten zu diesem Riff gesichtet, aber kein seriöser Veranstalter kann Sichtungen garantieren, und die Crew jagt oder stört die Tiere niemals.',
+    },
+    highlights: [
+      {
+        en: 'Hotel pickup in Marsa Alam and boat trip to Shaab Samadai reef',
+        ar: 'الاستلام من الفندق في مرسى علم ورحلة مركب إلى شعاب صمداي',
+        de: 'Hotelabholung in Marsa Alam und Bootsfahrt zum Riff Shaab Samadai',
+      },
+      {
+        en: 'The chance to watch wild spinner dolphins in their natural home',
+        ar: 'فرصة مشاهدة الدلافين الدوّارة البرية في موطنها الطبيعي',
+        de: 'Die Chance, wilde Spinnerdelfine in ihrem natürlichen Lebensraum zu beobachten',
+      },
+      {
+        en: 'First guided snorkelling session over the coral gardens',
+        ar: 'أول جلسة سنوركلينج بإرشاد فوق الحدائق المرجانية',
+        de: 'Erster geführter Schnorchelstopp über den Korallengärten',
+      },
+      {
+        en: 'Buffet lunch and soft drinks on board',
+        ar: 'غداء بوفيه ومشروبات غازية على المركب',
+        de: 'Mittagsbuffet und Softdrinks an Bord',
+      },
+      {
+        en: 'Second guided snorkelling session at the reef',
+        ar: 'ثاني جلسة سنوركلينج بإرشاد في الشعاب المرجانية',
+        de: 'Zweiter geführter Schnorchelstopp am Riff',
+      },
+      {
+        en: 'Full snorkelling equipment and life jackets provided',
+        ar: 'توفير كامل معدات السنوركلينج وسترات النجاة',
+        de: 'Komplette Schnorchelausrüstung und Schwimmwesten inklusive',
+      },
+      {
+        en: 'Led by a professional local snorkelling guide',
+        ar: 'بقيادة مرشد سنوركلينج محلي محترف',
+        de: 'Geleitet von einem professionellen lokalen Schnorchelguide',
+      },
+    ],
+    included: [
+      {
+        en: 'Hotel pickup and drop-off in Marsa Alam',
+        ar: 'الاستلام والتوصيل من فنادق مرسى علم',
+        de: 'Hotelabholung und Rücktransfer in Marsa Alam',
+      },
+      {
+        en: 'Full-day boat trip to Shaab Samadai reef',
+        ar: 'رحلة مركب ليوم كامل إلى شعاب صمداي',
+        de: 'Ganztägiger Bootsausflug zum Riff Shaab Samadai',
+      },
+      {
+        en: 'Two guided snorkelling sessions, equipment included',
+        ar: 'جلستا سنوركلينج بإرشاد مع المعدات',
+        de: 'Zwei geführte Schnorchelgänge inklusive Ausrüstung',
+      },
+      {
+        en: 'Professional snorkelling guide',
+        ar: 'مرشد سنوركلينج محترف',
+        de: 'Professioneller Schnorchelguide',
+      },
+      {
+        en: 'Buffet lunch on board',
+        ar: 'غداء بوفيه على المركب',
+        de: 'Mittagsbuffet an Bord',
+      },
+      {
+        en: 'Refreshments and soft drinks on board',
+        ar: 'مرطبات ومشروبات غازية على المركب',
+        de: 'Erfrischungen und Softdrinks an Bord',
+      },
+      {
+        en: 'Life jackets and safety equipment',
+        ar: 'سترات نجاة ومعدات سلامة',
+        de: 'Schwimmwesten und Sicherheitsausrüstung',
+      },
+    ],
+    tips: [
+      {
+        en: 'Wetsuit (€10 per person)',
+        ar: 'بدلة غوص (10 يورو للفرد)',
+        de: 'Neoprenanzug (10 € pro Person)',
+      },
+      {
+        en: 'Transfers from North and South Marsa Alam hotels (available for an extra charge)',
+        ar: 'التوصيل من فنادق شمال وجنوب مرسى علم (متاح برسوم إضافية)',
+        de: 'Transfers ab Hotels im Norden und Süden von Marsa Alam (gegen Aufpreis)',
+      },
+      {
+        en: 'Photos (provided by a third-party photography service)',
+        ar: 'الصور (تقدمها خدمة تصوير مستقلة)',
+        de: 'Fotos (durch einen externen Fotoservice)',
+      },
+      {
+        en: 'Tips',
+        ar: 'الإكراميات',
+        de: 'Trinkgeld',
+      },
+    ],
+    notSuitableFor: [
+      {
+        en: 'Pregnant women',
+        ar: 'السيدات الحوامل',
+        de: 'Schwangere Frauen',
+      },
+      {
+        en: 'Wheelchair users',
+        ar: 'مستخدمو الكراسي المتحركة',
+        de: 'Rollstuhlfahrer',
+      },
+      {
+        en: 'People prone to seasickness',
+        ar: 'الأشخاص المعرضون لدوار البحر',
+        de: 'Personen, die zu Seekrankheit neigen',
+      },
+    ],
+    whatToBring: [
+      {
+        en: 'Swimwear and a towel',
+        ar: 'ملابس سباحة وفوطة',
+        de: 'Badekleidung und ein Handtuch',
+      },
+      {
+        en: 'Sunscreen',
+        ar: 'واقي شمس',
+        de: 'Sonnencreme',
+      },
+      {
+        en: 'A camera',
+        ar: 'كاميرا',
+        de: 'Eine Kamera',
+      },
+    ],
+    notAllowed: [
+      {
+        en: 'Touching marine life',
+        ar: 'لمس الكائنات البحرية',
+        de: 'Berühren von Meereslebewesen',
+      },
+      {
+        en: 'Alcohol and drugs',
+        ar: 'الكحول والمخدرات',
+        de: 'Alkohol und Drogen',
+      },
+    ],
+    knowBeforeYouGo: [
+      {
+        en: 'Please send a passport copy for every participant, and your hotel room number, immediately after booking confirmation. The passport copies are required for the area permits, and the room number lets our pickup cars enter the resort and collect you from inside.',
+        ar: 'يرجى إرسال صورة جواز السفر لكل مشارك، ورقم غرفتك بالفندق، فور تأكيد الحجز مباشرة. صور جوازات السفر مطلوبة لتصاريح المنطقة، ورقم الغرفة يسمح لسيارات الاستلام بدخول المنتجع واستلامك من الداخل.',
+        de: 'Bitte senden Sie direkt nach der Buchungsbestätigung eine Passkopie für jeden Teilnehmer sowie Ihre Hotelzimmernummer. Die Passkopien sind für die Gebietsgenehmigungen erforderlich, und die Zimmernummer ermöglicht unseren Abholfahrzeugen die Einfahrt ins Resort, um Sie direkt innen abzuholen.',
+      },
+      {
+        en: 'While Shaab Samadai is known for its wild dolphins, sightings cannot be guaranteed, as they are in their natural habitat.',
+        ar: 'رغم شهرة شعاب صمداي بالدلافين البرية، لا يمكن ضمان رؤيتها لأنها تعيش في بيئتها الطبيعية.',
+        de: 'Obwohl Shaab Samadai für seine wilden Delfine bekannt ist, können Sichtungen nicht garantiert werden, da sie in ihrem natürlichen Lebensraum leben.',
+      },
+      {
+        en: 'Basic swimming skills are recommended. Life jackets are available for all participants.',
+        ar: 'يُنصح بإجادة أساسيات السباحة، وتتوفر سترات النجاة لجميع المشاركين.',
+        de: 'Grundlegende Schwimmkenntnisse werden empfohlen. Schwimmwesten stehen für alle Teilnehmer bereit.',
+      },
+      {
+        en: 'Children must be supervised by an adult at all times.',
+        ar: 'يجب أن يكون الأطفال تحت إشراف شخص بالغ طول الوقت.',
+        de: 'Kinder müssen jederzeit von einem Erwachsenen beaufsichtigt werden.',
+      },
+      {
+        en: 'Cash on pickup is how you pay. There is nothing to pay in advance.',
+        ar: 'الدفع نقدًا عند الاستلام، ولا يوجد أي مبلغ يُدفع مقدمًا.',
+        de: 'Sie zahlen bar bei Abholung. Eine Vorauszahlung ist nicht erforderlich.',
+      },
+    ],
+    meetingPoint: {
+      en: 'Marsa Alam Hotel Pickup',
+      ar: 'الاستلام من فنادق مرسى علم',
+      de: 'Hotelabholung in Marsa Alam',
+    },
+    outerTransferEnabled: false,
+    pickup: {
+      en: 'Marsa Alam hotels included · North and South Marsa Alam hotels available for an extra charge',
+      ar: 'فنادق مرسى علم مشمولة · فنادق شمال وجنوب مرسى علم متاحة برسوم إضافية',
+      de: 'Hotels in Marsa Alam inklusive · Hotels im Norden und Süden von Marsa Alam gegen Aufpreis',
+    },
+    supplierName: 'Marsa Alam Sea Partner',
+    familyFriendly: true,
+    womenFriendly: true,
+    featured: false,
+    languages: ['English', 'German', 'French', 'Italian'],
+    operatingDays: [0, 1, 2, 3, 4, 5, 6],
+  },
+  {
+    id: 'marsa-alam-mubarak-turtles',
+    name: {
+      en: 'Marsa Mubarak Snorkeling Trip from Marsa Alam: Sea Turtles and the Dugong Bay',
+      ar: 'رحلة سنوركلينج مرسى مبارك من مرسى علم: السلاحف البحرية وخليج الدوجونج',
+      de: 'Marsa Mubarak Schnorchelausflug ab Marsa Alam: Meeresschildkröten und Dugong-Bucht',
+    },
+    category: 'sea',
+    destination: 'Marsa Alam',
+    images: [momentGuestImg],
+    rating: 0,
+    reviewCount: 0,
+    duration: { en: '8 hours', ar: '8 ساعات', de: '8 Stunden' },
+    departureTimes: ['08:00 AM'],
+    price: 54,
+    options: [
+      {
+        id: 'opt-mubarak-snorkel',
+        title: {
+          en: 'Marsa Mubarak Snorkeling Day',
+          ar: 'يوم سنوركلينج في مرسى مبارك',
+          de: 'Marsa Mubarak Schnorcheltag',
+        },
+        detail: {
+          en: 'Sea turtles & dugong bay · lunch and soft drinks on board · park fees included',
+          ar: 'خليج السلاحف البحرية والدوجونج · غداء ومشروبات غازية على المركب · رسوم المحمية مشمولة',
+          de: 'Bucht der Meeresschildkröten & Dugongs · Mittagessen & Softdrinks an Bord · Nationalparkgebühren inklusive',
+        },
+        price: 54,
+      },
+    ],
+    shortDescription: {
+      en: 'Snorkel the calm, clear bay of Marsa Mubarak, home to graceful sea turtles and the rare dugong. Coral reefs, a freshly prepared lunch and soft drinks on board, and an optional diving session for anyone who wants to go deeper.',
+      ar: 'مارس السنوركلينج في خليج مرسى مبارك الهادئ والصافي، موطن السلاحف البحرية الرشيقة وحيوان الدوجونج النادر. شعاب مرجانية، وغداء طازج ومشروبات غازية على المركب، مع إمكانية إضافة غطسة اختيارية لمن يرغب في التعمق أكثر.',
+      de: 'Schnorcheln Sie in der ruhigen, klaren Bucht von Marsa Mubarak, Heimat anmutiger Meeresschildkröten und des seltenen Dugongs. Korallenriffe, frisch zubereitetes Mittagessen und Softdrinks an Bord sowie ein optionaler Tauchgang für alle, die tiefer eintauchen möchten.',
+    },
+    fullDescription: {
+      en: 'Marsa Mubarak is one of the most loved bays in the Marsa Alam region, and the reason swims slowly over its seagrass beds: sea turtles graze here every day, and the bay is one of the few places in Egypt where the rare dugong, the sea cow, is regularly seen.\n\nWe pick you up in Marsa Alam and transfer you to the bay, where your snorkelling adventure begins in calm, sheltered, crystal-clear water. That shelter is what makes Mubarak special for everyone: beginners feel safe in the shallows, and experienced snorkellers can spend long, quiet sessions over the coral reefs that ring the bay, alive with colourful fish.\n\nYour professional instructors are in the water with you, pointing out the turtles and the reef life you would otherwise swim past. For guests who want more, an optional diving session with a professional instructor is available on the day.\n\nBetween sessions, relax on board in the sun with a freshly prepared lunch and soft drinks. National park fees are included in your price. Turtles are seen here on the great majority of days and the dugong often, but both are wild animals and sightings can never be guaranteed.',
+      ar: 'مرسى مبارك واحد من أحب الخلجان في منطقة مرسى علم، والسبب يسبح ببطء فوق مروج الأعشاب البحرية: السلاحف البحرية ترعى هنا كل يوم، والخليج من الأماكن القليلة في مصر التي يُشاهد فيها حيوان الدوجونج النادر (عروس البحر) بانتظام.\n\nنستلمك من مرسى علم ونوصلك إلى الخليج لتبدأ مغامرة السنوركلينج في مياه هادئة ومحمية وشديدة الصفاء. هذا الهدوء هو ما يجعل مرسى مبارك مثاليًا للجميع: المبتدئون يشعرون بالأمان في المياه الضحلة، وذوو الخبرة يقضون أوقاتًا طويلة وهادئة فوق الشعاب المرجانية المحيطة بالخليج والمليئة بالأسماك الملونة.\n\nيكون مدربوك المحترفون معك في الماء ليدلّوك على السلاحف وتفاصيل الحياة المرجانية التي قد تمر بجوارها دون أن تنتبه لها. وللضيوف الراغبين في المزيد، تتوفر جلسة غوص اختيارية مع مدرب محترف في نفس اليوم.\n\nبين الجلسات تسترخي على المركب تحت الشمس مع غداء مُعد طازجًا ومشروبات غازية. رسوم المحمية الطبيعية مشمولة في السعر. تُشاهد السلاحف هنا في الغالبية العظمى من الأيام ويُشاهد الدوجونج كثيرًا، لكن كليهما من الكائنات البرية ولا يمكن ضمان رؤيتهما أبدًا.',
+      de: 'Marsa Mubarak zählt zu den beliebtesten Buchten der Region Marsa Alam, und der Grund dafür schwimmt gemächlich über ihre Seegraswiesen: Meeresschildkröten grasen hier jeden Tag, und die Bucht gehört zu den wenigen Orten in Ägypten, an denen der seltene Dugong, die Seekuh, regelmäßig gesichtet wird.\n\nWir holen Sie in Marsa Alam ab und bringen Sie zur Bucht, wo Ihr Schnorchelabenteuer in ruhigem, geschütztem, kristallklarem Wasser beginnt. Genau dieser Schutz macht Mubarak für alle so besonders: Anfänger fühlen sich im flachen Wasser sicher, und erfahrene Schnorchler genießen lange, ruhige Erkundungen über den Korallenriffen rund um die Bucht voller bunter Fische.\n\nIhre professionellen Guides sind mit Ihnen im Wasser und zeigen Ihnen die Schildkröten sowie das Riffleben, an dem man sonst leicht vorbeischwimmt. Für Gäste, die mehr möchten, ist am selben Tag ein optionaler Tauchgang mit einem professionellen Tauchlehrer möglich.\n\nZwischen den Gängen entspannen Sie an Bord in der Sonne bei einem frisch zubereiteten Mittagessen und Softdrinks. Die Nationalparkgebühren sind im Preis enthalten. Schildkröten werden hier an den allermeisten Tagen gesichtet und der Dugong oft, doch beide sind Wildtiere und Sichtungen können niemals garantiert werden.',
+    },
+    highlights: [
+      {
+        en: 'Pickup and transfer from Marsa Alam',
+        ar: 'الاستلام والتوصيل من مرسى علم',
+        de: 'Abholung und Transfer ab Marsa Alam',
+      },
+      {
+        en: 'Snorkelling in the calm, sheltered water of Marsa Mubarak',
+        ar: 'سنوركلينج في مياه مرسى مبارك الهادئة والمحمية',
+        de: 'Schnorcheln im ruhigen, geschützten Wasser von Marsa Mubarak',
+      },
+      {
+        en: 'Sea turtles grazing over the seagrass beds',
+        ar: 'السلاحف البحرية وهي ترعى فوق مروج الأعشاب البحرية',
+        de: 'Meeresschildkröten beim Grasen über den Seegraswiesen',
+      },
+      {
+        en: 'The chance to spot the rare dugong, the sea cow',
+        ar: 'فرصة رؤية حيوان الدوجونج النادر (عروس البحر)',
+        de: 'Die Chance, den seltenen Dugong, die Seekuh, zu entdecken',
+      },
+      {
+        en: 'Vibrant coral reefs full of colourful fish',
+        ar: 'شعاب مرجانية زاهية مليئة بالأسماك الملونة',
+        de: 'Farbenprächtige Korallenriffe voller bunter Fische',
+      },
+      {
+        en: 'Freshly prepared lunch and soft drinks on board',
+        ar: 'غداء طازج ومشروبات غازية على المركب',
+        de: 'Frisch zubereitetes Mittagessen und Softdrinks an Bord',
+      },
+      {
+        en: 'An optional diving session with a professional instructor',
+        ar: 'جلسة غوص اختيارية مع مدرب محترف',
+        de: 'Optionaler Tauchgang mit einem professionellen Tauchlehrer',
+      },
+      {
+        en: 'Led by professional local snorkelling instructors',
+        ar: 'بقيادة مدربي سنوركلينج محليين محترفين',
+        de: 'Geleitet von professionellen lokalen Schnorchelguides',
+      },
+    ],
+    included: [
+      {
+        en: 'Pickup and transfer from Marsa Alam',
+        ar: 'الاستلام والتوصيل من مرسى علم',
+        de: 'Abholung und Transfer ab Marsa Alam',
+      },
+      {
+        en: 'Snorkelling adventure with professional instructors',
+        ar: 'مغامرة سنوركلينج مع مدربين محترفين',
+        de: 'Schnorchelabenteuer mit professionellen Guides',
+      },
+      {
+        en: 'Snorkelling equipment (mask, fins, life jacket)',
+        ar: 'معدات السنوركلينج (قناع، زعانف، سترة نجاة)',
+        de: 'Schnorchelausrüstung (Maske, Flossen, Schwimmweste)',
+      },
+      {
+        en: 'Lunch and soft drinks on board',
+        ar: 'غداء ومشروبات غازية على المركب',
+        de: 'Mittagessen und Softdrinks an Bord',
+      },
+      {
+        en: 'National park fees',
+        ar: 'رسوم المحمية الطبيعية',
+        de: 'Nationalparkgebühren',
+      },
+    ],
+    tips: [
+      {
+        en: 'The optional diving session (arranged and paid on the day)',
+        ar: 'جلسة الغوص الاختيارية (تُرتّب وتُدفع في يوم الرحلة)',
+        de: 'Der optionale Tauchgang (wird am Tag vor Ort arrangiert und bezahlt)',
+      },
+      {
+        en: 'Transfers from remote areas of Marsa Alam (available for an extra charge)',
+        ar: 'التوصيل من المناطق البعيدة في مرسى علم (متاح برسوم إضافية)',
+        de: 'Transfers aus entlegenen Gebieten von Marsa Alam (gegen Aufpreis)',
+      },
+      {
+        en: 'Photos (provided by a third-party photography service)',
+        ar: 'الصور (تقدمها خدمة تصوير مستقلة)',
+        de: 'Fotos (durch einen externen Fotoservice)',
+      },
+      {
+        en: 'Tips and personal expenses',
+        ar: 'الإكراميات والمصاريف الشخصية',
+        de: 'Trinkgeld und persönliche Ausgaben',
+      },
+    ],
+    notSuitableFor: [
+      {
+        en: 'Pregnant women',
+        ar: 'السيدات الحوامل',
+        de: 'Schwangere Frauen',
+      },
+      {
+        en: 'Wheelchair users',
+        ar: 'مستخدمو الكراسي المتحركة',
+        de: 'Rollstuhlfahrer',
+      },
+      {
+        en: 'People with respiratory issues',
+        ar: 'الأشخاص الذين يعانون من مشاكل في الجهاز التنفسي',
+        de: 'Personen mit Atemwegsproblemen',
+      },
+    ],
+    whatToBring: [
+      {
+        en: 'Swimwear and a towel',
+        ar: 'ملابس سباحة وفوطة',
+        de: 'Badekleidung und ein Handtuch',
+      },
+      {
+        en: 'Sunscreen',
+        ar: 'واقي شمس',
+        de: 'Sonnencreme',
+      },
+      {
+        en: 'A camera',
+        ar: 'كاميرا',
+        de: 'Eine Kamera',
+      },
+      {
+        en: 'Cash for any extras on the day',
+        ar: 'مبلغ نقدي لأي إضافات في يوم الرحلة',
+        de: 'Bargeld für eventuelle Extras vor Ort',
+      },
+    ],
+    notAllowed: [
+      {
+        en: 'Pets',
+        ar: 'الحيوانات الأليفة',
+        de: 'Haustiere',
+      },
+      {
+        en: 'Touching marine life',
+        ar: 'لمس الكائنات البحرية',
+        de: 'Berühren von Meereslebewesen',
+      },
+      {
+        en: 'Alcohol and drugs',
+        ar: 'الكحول والمخدرات',
+        de: 'Alkohol und Drogen',
+      },
+    ],
+    knowBeforeYouGo: [
+      {
+        en: 'Please send a passport copy for every participant, and your hotel room number, immediately after booking confirmation. The passport copies are required for the area permits, and the room number lets our pickup cars enter the resort and collect you from inside.',
+        ar: 'يرجى إرسال صورة جواز السفر لكل مشارك، ورقم غرفتك بالفندق، فور تأكيد الحجز مباشرة. صور جوازات السفر مطلوبة لتصاريح المنطقة، ورقم الغرفة يسمح لسيارات الاستلام بدخول المنتجع واستلامك من الداخل.',
+        de: 'Bitte senden Sie direkt nach der Buchungsbestätigung eine Passkopie für jeden Teilnehmer sowie Ihre Hotelzimmernummer. Die Passkopien sind für die Gebietsgenehmigungen erforderlich, und die Zimmernummer ermöglicht unseren Abholfahrzeugen die Einfahrt ins Resort, um Sie direkt innen abzuholen.',
+      },
+      {
+        en: 'Sightings of sea turtles and dugongs are common but cannot be guaranteed, as they are wild animals.',
+        ar: 'رؤية السلاحف البحرية والدوجونج شائعة لكنها غير مضمونة لأنها كائنات برية.',
+        de: 'Sichtungen von Meeresschildkröten und Dugongs sind häufig, können aber als Wildtiere nicht garantiert werden.',
+      },
+      {
+        en: 'The trip is subject to weather conditions. In case of cancellation, an alternative date or a full refund is offered.',
+        ar: 'تخضع الرحلة للأحوال الجوية، وفي حالة الإلغاء يُعرض موعد بديل أو استرداد كامل للمبلغ.',
+        de: 'Der Ausflug ist wetterabhängig. Bei einer Absage wird ein Ersatztermin oder eine vollständige Rückerstattung angeboten.',
+      },
+      {
+        en: 'Cash on pickup is how you pay. There is nothing to pay in advance.',
+        ar: 'الدفع نقدًا عند الاستلام، ولا يوجد أي مبلغ يُدفع مقدمًا.',
+        de: 'Sie zahlen bar bei Abholung. Eine Vorauszahlung ist nicht erforderlich.',
+      },
+    ],
+    meetingPoint: {
+      en: 'Marsa Alam Hotel Pickup',
+      ar: 'الاستلام من فنادق مرسى علم',
+      de: 'Hotelabholung in Marsa Alam',
+    },
+    outerTransferEnabled: false,
+    pickup: {
+      en: 'Marsa Alam included · Remote areas of Marsa Alam available for an extra charge',
+      ar: 'مرسى علم مشمولة · المناطق البعيدة في مرسى علم متاحة برسوم إضافية',
+      de: 'Marsa Alam inklusive · Entlegene Gebiete von Marsa Alam gegen Aufpreis',
+    },
+    supplierName: 'Marsa Alam Sea Partner',
+    familyFriendly: true,
+    womenFriendly: true,
+    featured: false,
+    languages: ['English', 'German', 'French', 'Italian'],
+    operatingDays: [0, 1, 2, 3, 4, 5, 6],
   },
   {
     id: 'hurghada-old-town-marina-walk',
