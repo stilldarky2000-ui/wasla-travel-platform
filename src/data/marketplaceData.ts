@@ -10,6 +10,7 @@ import luxorRoyalTombImg from '../assets/images/luxor_royal_tomb_1795453499282.j
 import luxorHatshepsutImg from '../assets/images/luxor_hatshepsut_temple_1795023935886.jpg';
 import luxorTempleExteriorImg from '../assets/images/luxor_temple_exterior_1795453498872.jpg';
 import luxorFeluccaImg from '../assets/images/luxor_nile_felucca_dusk_1795023937583.jpg';
+import luxorThebesCoverImg from '../assets/images/luxor_thebes_cover.webp';
 import luxorHatshepsutGoldenRealImg from '../assets/images/luxor_hatshepsut_golden_real.webp';
 import luxorKarnakCourtyardRealImg from '../assets/images/luxor_karnak_courtyard_real.webp';
 import luxorKarnakObeliskRealImg from '../assets/images/luxor_karnak_obelisk_real.webp';
@@ -376,6 +377,7 @@ const BUNDLED_IMAGE_ENTRIES: Array<{ token: string; asset: string }> = [
   { token: 'luxor_hatshepsut_temple', asset: luxorHatshepsutImg },
   { token: 'luxor_temple_exterior', asset: luxorTempleExteriorImg },
   { token: 'luxor_nile_felucca_dusk', asset: luxorFeluccaImg },
+  { token: 'luxor_thebes_cover', asset: luxorThebesCoverImg },
   { token: 'luxor_hatshepsut_golden_real', asset: luxorHatshepsutGoldenRealImg },
   { token: 'luxor_karnak_courtyard_real', asset: luxorKarnakCourtyardRealImg },
   { token: 'luxor_karnak_obelisk_real', asset: luxorKarnakObeliskRealImg },
@@ -671,6 +673,7 @@ export const TRIPS: Trip[] = [
     category: 'historical',
     destination: 'Luxor',
     images: [
+      luxorThebesCoverImg,
       luxorHatshepsutGoldenRealImg,
       luxorKarnakCourtyardRealImg,
       luxorKarnakObeliskRealImg,
@@ -683,6 +686,11 @@ export const TRIPS: Trip[] = [
       luxorWestbankColumnsRealImg,
     ],
     galleryCaptions: [
+      {
+        en: 'Golden morning light through the Great Hypostyle Hall columns and Hatshepsut obelisk at Karnak Temple',
+        ar: 'ضوء الصباح الذهبي بين أعمدة بهو الأعمدة العظيم ومسلة حتشبسوت في معبد الكرنك',
+        de: 'Goldenes Morgenlicht zwischen den Säulen der Großen Säulenhalle und dem Obelisken der Hatschepsut in Karnak',
+      },
       {
         en: "Three-tiered Temple of Queen Hatshepsut carved into the cliffs of Deir el-Bahari",
         ar: 'معبد الملكة حتشبسوت بمدرجاته الثلاثة المنحوتة في جبال الدير البحري بالأقصر',
