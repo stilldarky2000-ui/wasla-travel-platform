@@ -601,9 +601,9 @@ export const TRIPS: Trip[] = [
   {
     id: 'orange-bay-small-group',
     name: {
-      en: 'Orange Bay & Giftun Reef Small-Group Boat Day',
-      ar: 'رحلة بحرية بمجموعة صغيرة إلى أورانج باي وشعاب الجفتون',
-      de: 'Orange Bay & Giftun Riff Kleingruppen-Bootstag',
+      en: 'Orange Bay Island Day Trip from Hurghada: Snorkeling, White Sand and Buffet Lunch',
+      ar: 'رحلة يوم كامل إلى جزيرة أورانج باي من الغردقة: سنوركلينج ورمل أبيض وغداء بوفيه',
+      de: 'Orange Bay Insel Tagestour ab Hurghada: Schnorcheln, weißer Sand und Mittagsbuffet',
     },
     category: 'sea',
     destination: 'Hurghada',
@@ -615,46 +615,66 @@ export const TRIPS: Trip[] = [
     ],
     rating: 4.9,
     reviewCount: 64,
-    duration: { en: '7 hours', ar: '7 ساعات', de: '7 Stunden' },
+    duration: { en: 'Full day', ar: 'يوم كامل', de: 'Ganztägig' },
     departureTimes: ['09:00 AM'],
-    price: 38,
+    price: 20,
     options: [
       {
         id: 'opt-orange-shared',
         title: { en: 'Small-Group Boat (Standard)', ar: 'مركب مجموعة صغيرة (عادي)', de: 'Kleingruppen-Boot (Standard)' },
-        detail: { en: 'Max 16 guests · 2 snorkel stops + buffet lunch', ar: 'بحد أقصى 16 ضيفاً · غطس + غداء بوفيه', de: 'Max. 16 Gäste · 2 Stopps + Mittagessen' },
-        price: 38,
-      },
-      {
-        id: 'opt-orange-private',
-        title: {
-          en: 'Private Speedboat (Whole Boat, Up to 6 Guests · €145 Fixed)',
-          ar: 'سبيد بوت خاص (القارب بالكامل حتى 6 أفراد · 145€ سعر ثابت)',
-          de: 'Privates Speedboot (Ganzes Boot, bis 6 Personen · 145 € Festpreis)',
-        },
         detail: {
-          en: '€145 fixed price for the whole boat (not per person), up to 6 guests · flexible departure time & private captain',
-          ar: '145€ سعر ثابت للقارب بالكامل وليس للفرد (حتى 6 أفراد) · ميعاد تحرك مرن وقبطان خاص',
-          de: '145 € Festpreis für das gesamte Boot (nicht pro Person), bis zu 6 Gäste · flexible Abfahrtszeit & privater Kapitän',
+          en: '2 coral reef snorkel stops + 2 hours on Orange Bay island · open buffet lunch & drinks all day',
+          ar: 'توقفان للسنوركلينج عند الشعاب + ساعتان على جزيرة أورانج باي · غداء بوفيه مفتوح ومشروبات طول اليوم',
+          de: '2 Korallenriff-Schnorchelstopps + 2 Stunden auf Orange Bay · offenes Mittagsbuffet & Getränke den ganzen Tag',
         },
-        price: 145,
+        price: 20,
       },
     ],
     shortDescription: {
-      en: 'Uncrowded morning sailing to Orange Bay sandbar with two guided coral reef snorkel stops and fresh lunch aboard.',
-      ar: 'إبحار صباحي هادئ إلى جزيرة أورانج باي مع توقفين للغطس السطحي وغداء طازج على القارب.',
-      de: 'Ruhige Morgenfahrt zur Sandbank Orange Bay mit zwei geführten Schnorchelstopps und frischem Mittagessen.',
+      en: 'Sail to two coral reef snorkeling stops, then spend two hours on Orange Bay island, the Red Sea beach with the famous swings in the water. Open buffet lunch on board and drinks all day.',
+      ar: 'أبحر إلى توقفين للسنوركلينج عند الشعاب المرجانية، ثم اقضِ ساعتين على جزيرة أورانج باي، شاطئ البحر الأحمر الشهير بالمراجيح داخل الماء، مع غداء بوفيه مفتوح على اليخت ومشروبات طول اليوم.',
+      de: 'Segeln Sie zu zwei Korallenriff-Schnorchelstopps und verbringen Sie anschließend zwei Stunden auf Orange Bay Island, dem Strand im Roten Meer mit den berühmten Wasserschaukeln. Offenes Mittagsbuffet an Bord und Getränke den ganzen Tag.',
     },
     highlights: [
       {
-        en: 'Capped at 16 guests so the upper sun deck never feels crowded',
-        ar: 'بحد أقصى 16 ضيفاً لراحة كاملة على سطح القارب',
-        de: 'Maximal 16 Gäste für entspannten Platz auf dem Sonnendeck',
+        en: 'Hotel pickup and transfer to the marina',
+        ar: 'الاستلام من الفندق والتوصيل إلى المارينا',
+        de: 'Hotelabholung und Transfer zur Marina',
       },
       {
-        en: 'Two 45-minute snorkel stops over shallow Giftun coral gardens',
-        ar: 'توقفان للغطس السطحي لمدة 45 دقيقة فوق شعاب الجفتون',
-        de: 'Zwei 45-minütige Schnorchelstopps über flachen Korallengärten',
+        en: 'First snorkeling stop at a coral reef, full gear and life jacket provided',
+        ar: 'التوقف الأول للسنوركلينج عند شعاب مرجانية مع توفير المعدات الكاملة وسترة النجاة',
+        de: 'Erster Schnorchelstopp an einem Korallenriff, komplette Ausrüstung und Schwimmweste inklusive',
+      },
+      {
+        en: 'Second snorkeling stop at a different reef',
+        ar: 'التوقف الثاني للسنوركلينج عند موقع شعاب آخر',
+        de: 'Zweiter Schnorchelstopp an einem weiteren Riff',
+      },
+      {
+        en: 'Two hours on Orange Bay island: swimming, the sandbar and the famous water swings',
+        ar: 'ساعتان على جزيرة أورانج باي: السباحة والشريط الرملي والمراجيح المائية الشهيرة',
+        de: 'Zwei Stunden auf Orange Bay Island: Schwimmen, Sandbank und die berühmten Wasserschaukeln',
+      },
+      {
+        en: 'Open buffet lunch on board the yacht',
+        ar: 'غداء بوفيه مفتوح على متن اليخت',
+        de: 'Offenes Mittagsbuffet an Bord der Yacht',
+      },
+      {
+        en: 'Drinks available all day',
+        ar: 'مشروبات متوفرة طول اليوم',
+        de: 'Getränke den ganzen Tag verfügbar',
+      },
+      {
+        en: 'A sea supervisor on board and in the water with the group all day',
+        ar: 'مشرف بحري على متن اليخت وفي الماء مع المجموعة طول اليوم',
+        de: 'Ein Meeresbetreuer den ganzen Tag an Bord und im Wasser bei der Gruppe',
+      },
+      {
+        en: 'Led by a professional local sea guide',
+        ar: 'بقيادة مرشد بحري محلي محترف',
+        de: 'Geführt von einem professionellen lokalen Meeresguide',
       },
     ],
     historicalFacts: [
@@ -680,38 +700,105 @@ export const TRIPS: Trip[] = [
       },
     ],
     included: [
-      { en: 'Hotel pickup & drop-off from Hurghada city', ar: 'التوصيل من وإلى فنادق مدينة الغردقة', de: 'Hotelabholung & Rücktransfer ab Hurghada-Stadt' },
-      { en: 'National park environmental fee & freshly prepared buffet lunch', ar: 'رسوم المحمية الطبيعية وغداء بوفيه طازج', de: 'Nationalparkgebühr & frisch zubereitetes Mittagsbuffet' },
-      { en: 'Snorkel mask, fins, life jacket & English/German speaking boat guide', ar: 'معدات الغطس وسترة النجاة ومرشد بحري', de: 'Schnorchelausrüstung, Schwimmweste & Boot-Guide' },
+      {
+        en: 'Round-trip hotel transfer within Hurghada',
+        ar: 'توصيل ذهاب وعودة من فنادق الغردقة',
+        de: 'Hin- und Rücktransfer ab Hotels in Hurghada',
+      },
+      {
+        en: 'Yacht trip with two snorkeling stops and the Orange Bay island stop',
+        ar: 'رحلة باليخت مع توقفين للسنوركلينج وتوقف جزيرة أورانج باي',
+        de: 'Yachttour mit zwei Schnorchelstopps und dem Stopp auf Orange Bay Island',
+      },
+      {
+        en: 'Full snorkeling gear (mask, fins and snorkel) and life jacket',
+        ar: 'معدات سنوركلينج كاملة (ماسك وزعانف وأنبوب تنفس) وسترة نجاة',
+        de: 'Komplette Schnorchelausrüstung (Maske, Flossen und Schnorchel) und Schwimmweste',
+      },
+      {
+        en: 'Open buffet lunch on board',
+        ar: 'غداء بوفيه مفتوح على متن اليخت',
+        de: 'Offenes Mittagsbuffet an Bord',
+      },
+      {
+        en: 'Drinks all day',
+        ar: 'مشروبات طول اليوم',
+        de: 'Getränke den ganzen Tag',
+      },
+      {
+        en: 'Sea supervisor on board',
+        ar: 'مشرف بحري على متن اليخت',
+        de: 'Meeresbetreuer an Bord',
+      },
     ],
     fullDescription: {
-      en: 'Sail across the turquoise Red Sea aboard a comfortably capped small-group boat limited to 16 guests.\n\nYou will stop at two untouched Giftun Island coral gardens with calm morning visibility before relaxing for nearly two hours on the white sandbars of Orange Bay. Freshly cooked Egyptian lunch, chilled soft drinks, and shaded deck seating are included all day.',
-      ar: 'أبحر عبر مياه البحر الأحمر الفيروزية على متن قارب بمجموعة صغيرة بحد أقصى 16 ضيفاً.\n\nستتوقف في موقعين رائعين للشعاب المرجانية حول جزيرة الجفتون مع رؤية صباحية صافية قبل الاسترخاء على الرمال البيضاء في أورانج باي. يشمل اليوم غداءً طازجاً ومشروبات باردة وأماكن مظللة.',
-      de: 'Segeln Sie über das türkisfarbene Rote Meer auf einem ruhigen Kleingruppenboot (maximal 16 Gäste).\n\nEs erwarten Sie zwei ruhige Korallenriffe vor der Giftun-Insel sowie rund zwei Stunden Entspannung an den weißen Sandbänken der Orange Bay inklusive frischem Mittagessen und Schattenplätzen.',
+      en: 'Some beaches you look at. Orange Bay you walk into, slowly, because the water is that clear and the sand is that white. We pick you up from your hotel and take you to the marina, where the yacht is waiting and the crew hands you your snorkeling gear and life jacket for the day.\n\nThe yacht heads out to the first coral reef stop. The Red Sea does the showing off here: coral gardens in shallow, sunlit water, and fish in numbers that make first time snorkelers forget to be nervous. A sea supervisor is on board all day and in the water with the group, so beginners are looked after from the first minute.\n\nAfter a second snorkeling stop at another reef, the yacht anchors at Orange Bay island. You have two full hours on the island: swim in the shallow turquoise water, walk the sandbar, take your photos on the famous swings, or simply lie on the white sand and do nothing at all.\n\nLunch is an open buffet served on board the yacht, and drinks are available all day. In the afternoon the yacht sails back to the marina and the transfers take you back to your hotel.\n\nThere are no water games and no banana boats on this trip. It is a snorkeling and island day, and it is better for it.',
+      ar: 'في شواطئ تتفرج عليها، لكن أورانج باي تمشي جواها بهدوء لأن المياه صافية جدًا والرمل أبيض ناعم. نستلمك من فندقك ونوصلك إلى المارينا، حيث ينتظرك اليخت ويسلمك الطاقم معدات السنوركلينج وسترة النجاة لليوم.\n\nيتجه اليخت إلى أول توقف عند الشعاب المرجانية. هنا يُظهر البحر الأحمر جماله الحقيقي: حدائق مرجانية في مياه ضحلة مضاءة بالشمس، وأسماك بأعداد تجعل المبتدئين في السنوركلينج ينسون أي توتر. يوجد مشرف بحري على متن اليخت وفي الماء مع المجموعة طول اليوم، فيتم الاهتمام بالمبتدئين من أول دقيقة.\n\nبعد توقف ثانٍ للسنوركلينج عند شعاب أخرى، يرسو اليخت عند جزيرة أورانج باي. لديك ساعتان كاملتان على الجزيرة: اسبح في المياه الفيروزية الضحلة، امشِ على الشريط الرملي، التقط صورك على المراجيح الشهيرة، أو استلقِ ببساطة على الرمل الأبيض واسترخِ.\n\nالغداء بوفيه مفتوح يُقدم على متن اليخت، والمشروبات متوفرة طول اليوم. بعد الظهر يُبحر اليخت عائدًا إلى المارينا وتعيدك التوصيلات إلى فندقك.\n\nلا توجد ألعاب مائية ولا بنانا بوت في هذه الرحلة. إنه يوم للسنوركلينج والجزيرة فقط، وهذا ما يجعله أفضل.',
+      de: 'Manche Strände schaut man nur an. In Orange Bay geht man langsam hinein, weil das Wasser so klar und der Sand so weiß ist. Wir holen Sie von Ihrem Hotel ab und bringen Sie zur Marina, wo die Yacht wartet und die Crew Ihnen Schnorchelausrüstung und Schwimmweste für den Tag aushändigt.\n\nDie Yacht fährt zum ersten Korallenriff-Stopp. Hier zeigt das Rote Meer seine ganze Pracht: Korallengärten in flachem, sonnendurchflutetem Wasser und Fische in einer Vielfalt, die selbst Anfänger beim Schnorcheln jede Aufregung vergessen lässt. Ein Meeresbetreuer ist den ganzen Tag an Bord und im Wasser bei der Gruppe, sodass Anfänger von der ersten Minute an gut betreut sind.\n\nNach einem zweiten Schnorchelstopp an einem anderen Riff ankert die Yacht vor Orange Bay Island. Sie haben zwei volle Stunden auf der Insel: Schwimmen Sie im flachen türkisfarbenen Wasser, spazieren Sie über die Sandbank, machen Sie Fotos auf den berühmten Schaukeln oder liegen Sie einfach im weißen Sand und entspannen Sie.\n\nDas Mittagessen wird als offenes Buffet an Bord der Yacht serviert, und Getränke stehen den ganzen Tag zur Verfügung. Am Nachmittag segelt die Yacht zurück zur Marina und der Transfer bringt Sie zurück zu Ihrem Hotel.\n\nAuf dieser Tour gibt es keine Wasserspiele und kein Bananaboot. Es ist ein reiner Schnorchel- und Inseltag, und genau das macht ihn besser.',
     },
     tips: [
       {
-        en: 'Pick-up & drop-off outside Hurghada (El Gouna, Sahl Hasheesh, Makadi +€10/pp · Soma Bay, Safaga +€15/pp) is NOT included, please select your hotel zone at checkout.',
-        ar: 'التوصيل خارج مدينة الغردقة (الجونة، سهل حشيش، مكادي +10€ للفرد · سوما باي، سفاجا +15€ للفرد) غير مشمول، يرجى تحديد منطقة الفندق عند الحجز.',
-        de: 'Abholung außerhalb von Hurghada (El Gouna, Sahl Hasheesh, Makadi +10 €/Pers. · Soma Bay, Safaga +15 €/Pers.) ist nicht inklusive, bitte wählen Sie Ihre Hotelzone beim Buchen.',
+        en: 'Transfer from El Gouna, Sahl Hasheesh or Makadi Bay (€10 per person)',
+        ar: 'التوصيل من الجونة أو سهل حشيش أو مكادي باي (10 يورو للفرد)',
+        de: 'Transfer ab El Gouna, Sahl Hasheesh oder Makadi Bay (10 € pro Person)',
       },
       {
-        en: 'Optional professional underwater photography & drone gallery session available on board.',
-        ar: 'جلسة التصوير الاحترافية تحت الماء اختيارية وغير مشمولة ما لم تُطلب.',
-        de: 'Optionale professionelle Unterwasserfotografie ist gegen Aufpreis zubuchbar.',
+        en: 'Transfer from Soma Bay or Safaga (€15 per person)',
+        ar: 'التوصيل من سوما باي أو سفاجا (15 يورو للفرد)',
+        de: 'Transfer ab Soma Bay oder Safaga (15 € pro Person)',
+      },
+      {
+        en: 'Photos (available to purchase)',
+        ar: 'الصور (متاحة للشراء)',
+        de: 'Fotos (gegen Aufpreis erhältlich)',
+      },
+      {
+        en: 'Tips',
+        ar: 'الإكراميات',
+        de: 'Trinkgeld',
+      },
+    ],
+    notSuitableFor: [
+      {
+        en: 'Guests looking for water games or banana boat rides: this is a snorkeling and island day only',
+        ar: 'الضيوف الباحثون عن ألعاب مائية أو ركوب بنانا بوت: هذه رحلة سنوركلينج وجزيرة فقط',
+        de: 'Gäste, die Wasserspiele oder Bananaboot-Fahrten suchen: Dies ist ein reiner Schnorchel- und Inseltag',
       },
     ],
     whatToBring: [
-      { en: 'Swimwear, beach towel & reef-safe sunscreen', ar: 'ملابس السباحة، منشفة، وواقي شمس', de: 'Badekleidung, Handtuch & Sonnencreme' },
-      { en: 'Sunglasses & a copy/photo of passport for marina coast guard check', ar: 'نظارة شمسية وصورة جواز السفر لتصريح المارينا', de: 'Sonnenbrille & Ausweisfoto für den Hafen' },
+      { en: 'Swimsuit and towel', ar: 'مايوه وفوطة', de: 'Badekleidung und Handtuch' },
+      { en: 'Sunscreen', ar: 'واقي شمس', de: 'Sonnencreme' },
+      { en: 'Sunglasses and a hat', ar: 'نظارة شمس وقبعة', de: 'Sonnenbrille und Hut' },
+      {
+        en: 'A waterproof phone pouch if you want photos in the water',
+        ar: 'جراب موبايل مقاوم للماء لو أردت التصوير في الماء',
+        de: 'Eine wasserdichte Handyhülle, wenn Sie Fotos im Wasser machen möchten',
+      },
     ],
     notAllowed: [
-      { en: 'Touching or standing on living coral reefs', ar: 'لمس أو الوقوف على الشعاب المرجانية', de: 'Berühren oder Betreten lebender Korallen' },
-      { en: 'Single-use glass bottles on sun deck', ar: 'العبوات الزجاجية على سطح القارب', de: 'Glasflaschen auf dem Sonnendeck' },
+      { en: 'Alcohol and drugs', ar: 'الكحول والمخدرات', de: 'Alkohol und Drogen' },
     ],
     knowBeforeYouGo: [
-      { en: 'Life jackets in adult and children sizes are carried on every vessel', ar: 'سترات نجاة متوفرة للكبار والأطفال على القارب', de: 'Schwimmwesten für Erwachsene und Kinder sind an Bord' },
-      { en: 'Exact marina pickup time (Reception or Outside Gate) arrives via Email & WhatsApp the evening before.', ar: 'موعد البيك أب الدقيق ومكان الانتظار (الريسبشن أو البوابة) يصلك عبر الإيميل والواتساب.', de: 'Genaue Abholzeit & Treffpunkt folgen am Vorabend per E-Mail & WhatsApp.' },
+      {
+        en: 'Your exact pickup time is confirmed the day before your trip. Boats leave on time, so please be ready at your pickup point.',
+        ar: 'يتأكد وقت الاستلام بالظبط قبل الرحلة بيوم. القوارب تتحرك في موعدها، برجاء التواجد في نقطة الاستلام في الموعد.',
+        de: 'Ihre genaue Abholzeit wird einen Tag vor der Tour bestätigt. Die Boote legen pünktlich ab, bitte seien Sie rechtzeitig am Abholpunkt.',
+      },
+      {
+        en: 'The island stop is two hours. The rest of the day is sailing and snorkeling, which is exactly how this trip is meant to be spent.',
+        ar: 'التوقف على الجزيرة ساعتان، وبقية اليوم إبحار وسنوركلينج، وهذه هي الطريقة المصممة لها الرحلة.',
+        de: 'Der Inselaufenthalt dauert zwei Stunden. Der Rest des Tages ist Segeln und Schnorcheln, genau dafür ist diese Tour gedacht.',
+      },
+      {
+        en: 'You do not need to be a strong swimmer. Life jackets are provided for everyone and the supervisor stays with the group in the water.',
+        ar: 'لا يشترط أن تكون سباحًا محترفًا. سترات النجاة متوفرة للجميع والمشرف يبقى مع المجموعة في الماء.',
+        de: 'Sie müssen kein starker Schwimmer sein. Schwimmwesten stehen für alle bereit und der Betreuer bleibt im Wasser bei der Gruppe.',
+      },
+      {
+        en: 'Cash on pickup is how you pay. There is nothing to pay in advance.',
+        ar: 'الدفع نقدًا عند الاستلام، ولا يوجد أي مبلغ يُدفع مقدمًا.',
+        de: 'Sie zahlen bar bei Abholung. Eine Vorauszahlung ist nicht erforderlich.',
+      },
     ],
     meetingPoint: {
       en: 'New Marina Hurghada / Hotel Lobby Pickup',
@@ -719,13 +806,789 @@ export const TRIPS: Trip[] = [
       de: 'Hurghada New Marina / Hotelabholung',
     },
     outerTransferEnabled: true,
-    pickup: { en: 'Hurghada City included · Outer zones +€10–15/pp', ar: 'مدينة الغردقة مشمولة · المناطق الخارجية +10–15€ للفرد', de: 'Hurghada Stadt inklusive · Außenzonen +10–15 €/Pers.' },
+    pickup: {
+      en: 'Hurghada included · El Gouna, Sahl Hasheesh and Makadi +€10/pp · Soma Bay and Safaga +€15/pp',
+      ar: 'الغردقة مشمولة · الجونة وسهل حشيش ومكادي +10 يورو للفرد · سوما باي وسفاجا +15 يورو للفرد',
+      de: 'Hurghada inklusive · El Gouna, Sahl Hasheesh und Makadi +10 €/Pers. · Soma Bay und Safaga +15 €/Pers.',
+    },
     supplierName: 'Captain Karim Marine',
     familyFriendly: true,
     womenFriendly: true,
     minChildAge: 3,
     kidsDiscount: { en: '50% off ages 4–11 · under 4 free', ar: 'خصم 50% من 4–11 سنة · مجاناً تحت 4 سنوات', de: '50% Rabatt (4–11 J.) · unter 4 frei' },
     featured: true,
+    languages: ['English', 'German'],
+    operatingDays: [0, 1, 2, 3, 4, 5, 6],
+  },
+  {
+    id: 'dolphin-house-snorkeling',
+    name: {
+      en: 'Dolphin House Snorkeling Trip from Hurghada: Wild Dolphins and Coral Reefs',
+      ar: 'رحلة سنوركلينج بيت الدلافين من الغردقة: دلافين برية وشعاب مرجانية',
+      de: 'Dolphin House Schnorcheltour ab Hurghada: Wilde Delfine und Korallenriffe',
+    },
+    category: 'sea',
+    destination: 'Hurghada',
+    images: [heroRedSeaVibrantImg],
+    rating: 0,
+    reviewCount: 0,
+    duration: { en: 'Full day', ar: 'يوم كامل', de: 'Ganztägig' },
+    departureTimes: ['08:30 AM'],
+    price: 17,
+    options: [
+      {
+        id: 'opt-dolphin-shared',
+        title: { en: 'Small-Group Boat (Standard)', ar: 'مركب مجموعة صغيرة (عادي)', de: 'Kleingruppen-Boot (Standard)' },
+        detail: {
+          en: 'Dolphin House reef + 2 snorkel stops · buffet lunch & drinks',
+          ar: 'شعاب بيت الدلافين + توقفان للسنوركلينج · غداء بوفيه ومشروبات',
+          de: 'Dolphin-House-Riff + 2 Schnorchelstopps · Mittagsbuffet & Getränke',
+        },
+        price: 17,
+      },
+    ],
+    shortDescription: {
+      en: 'Sail to the Dolphin House reef, where wild dolphins come to rest and play, for your chance to watch them and swim near them. Two more coral reef snorkeling stops, buffet lunch and drinks all day.',
+      ar: 'أبحر إلى شعاب بيت الدلافين، حيث تأتي الدلافين البرية للراحة واللعب، لفرصة مشاهدتها والسباحة بالقرب منها، مع توقفين إضافيين للسنوركلينج عند الشعاب وغداء بوفيه ومشروبات طول اليوم.',
+      de: 'Segeln Sie zum Dolphin-House-Riff, wo wilde Delfine ruhen und spielen, mit der Chance, sie zu beobachten und in ihrer Nähe zu schwimmen. Zwei weitere Korallenriff-Schnorchelstopps, Mittagsbuffet und Getränke den ganzen Tag.',
+    },
+    fullDescription: {
+      en: "There is a reef off Hurghada where the dolphins choose to spend their days. Not a pool, not a show, their own place, on their own terms. That reef is the Dolphin House, and it is where this trip goes first.\n\nWe pick you up from your hotel and sail out in the morning. At the Dolphin House, the guide reads the water and the dolphins' mood. On most days they are there, cruising slowly over the reef or playing in the bow wave, and when conditions are right you slip into the water with your mask and fins and swim while they pass around you. It is the kind of moment people cross oceans for.\n\nHonesty matters more than hype here: these are wild animals and nobody can book them. Sightings happen on the great majority of trips, but they are never guaranteed, and if the dolphins are resting or absent, the crew will not chase or disturb them. What is guaranteed is the rest of the day: two further snorkeling stops at coral reefs full of colour and fish, with a professional sea guide in the water who teaches beginners how to snorkel properly and stays with anyone who is nervous.\n\nBetween stops, the yacht is yours to relax on. Lunch is an open buffet served on board, and drinks are available all day. Then the sail back to the marina and the transfer to your hotel.",
+      ar: 'هناك شعاب مرجانية قبالة الغردقة تختار الدلافين أن تقضي فيها أيامها. ليست حوضًا ولا عرضًا، بل مكانها الطبيعي وبشروطها الخاصة. هذه الشعاب هي بيت الدلافين، وهي أول وجهة في هذه الرحلة.\n\nنستلمك من فندقك ونبحر صباحًا. عند بيت الدلافين يراقب المرشد حالة المياه ومزاج الدلافين. في معظم الأيام تكون موجودة تسبح بهدوء فوق الشعاب أو تلعب عند مقدمة القارب، وعندما تكون الظروف مناسبة تنزل إلى الماء بالماسك والزعانف لتسبح بينما تمر حولك. إنها اللحظة التي يسافر الناس عبر المحيطات من أجلها.\n\nالصدق هنا أهم من المبالغة: هذه كائنات برية ولا أحد يستطيع حجزها. تحدث المشاهدة في الغالبية العظمى من الرحلات، لكنها ليست مضمونة أبدًا، وإذا كانت الدلافين ترتاح أو غير موجودة فلن يطاردها الطاقم أو يزعجها. أما المضمون فهو بقية اليوم: توقفان إضافيان للسنوركلينج عند شعاب مرجانية مليئة بالألوان والأسماك، مع مرشد بحري محترف في الماء يعلّم المبتدئين طريقة السنوركلينج الصحيحة ويبقى مع أي شخص يشعر بالتوتر.\n\nبين التوقفات، اليخت ملكك للاسترخاء. الغداء بوفيه مفتوح يُقدم على متن اليخت، والمشروبات متوفرة طول اليوم، ثم الإبحار عائدًا إلى المارينا والتوصيل إلى فندقك.',
+      de: 'Vor Hurghada liegt ein Riff, an dem Delfine ihre Tage verbringen. Kein Becken, keine Show, ihr eigener Ort, zu ihren eigenen Bedingungen. Dieses Riff ist das Dolphin House, und dorthin führt diese Tour zuerst.\n\nWir holen Sie am Hotel ab und legen am Morgen ab. Am Dolphin House liest der Guide das Wasser und die Stimmung der Delfine. An den meisten Tagen sind sie da, gleiten ruhig über das Riff oder spielen in der Bugwelle, und wenn die Bedingungen stimmen, gleiten Sie mit Maske und Flossen ins Wasser und schwimmen, während sie an Ihnen vorbeiziehen. Ein Moment, für den Menschen Ozeane überqueren.\n\nEhrlichkeit zählt hier mehr als große Versprechen: Es sind wilde Tiere, die niemand buchen kann. Sichtungen gelingen auf den allermeisten Touren, sind aber nie garantiert, und wenn die Delfine ruhen oder nicht da sind, wird die Crew sie niemals jagen oder stören. Garantiert ist der Rest des Tages: zwei weitere Schnorchelstopps an farbenfrohen Korallenriffen voller Fische, begleitet von einem professionellen Meeresguide im Wasser, der Anfängern das richtige Schnorcheln zeigt und bei unsicheren Schwimmern bleibt.\n\nZwischen den Stopps entspannen Sie an Bord der Yacht. Das Mittagessen wird als offenes Buffet an Bord serviert, Getränke stehen den ganzen Tag bereit. Danach segeln wir zurück zur Marina und bringen Sie zu Ihrem Hotel.',
+    },
+    highlights: [
+      {
+        en: 'Hotel pickup and transfer to the marina',
+        ar: 'الاستلام من الفندق والتوصيل إلى المارينا',
+        de: 'Hotelabholung und Transfer zur Marina',
+      },
+      {
+        en: 'The Dolphin House reef: watch wild dolphins, and swim near them when conditions allow',
+        ar: 'شعاب بيت الدلافين: شاهد الدلافين البرية واسبح بالقرب منها عندما تسمح الظروف',
+        de: 'Das Dolphin-House-Riff: wilde Delfine beobachten und bei geeigneten Bedingungen in ihrer Nähe schwimmen',
+      },
+      {
+        en: 'Two further snorkeling stops at coral reefs',
+        ar: 'توقفان إضافيان للسنوركلينج عند الشعاب المرجانية',
+        de: 'Zwei weitere Schnorchelstopps an Korallenriffen',
+      },
+      {
+        en: 'Full snorkeling gear and life jacket provided',
+        ar: 'توفير معدات السنوركلينج الكاملة وسترة النجاة',
+        de: 'Komplette Schnorchelausrüstung und Schwimmweste inklusive',
+      },
+      {
+        en: 'Open buffet lunch on board the yacht',
+        ar: 'غداء بوفيه مفتوح على متن اليخت',
+        de: 'Offenes Mittagsbuffet an Bord der Yacht',
+      },
+      {
+        en: 'Drinks available all day',
+        ar: 'مشروبات متوفرة طول اليوم',
+        de: 'Getränke den ganzen Tag verfügbar',
+      },
+      {
+        en: 'A professional sea guide in the water, teaching beginners and looking after the group',
+        ar: 'مرشد بحري محترف في الماء يعلّم المبتدئين ويعتني بالمجموعة',
+        de: 'Ein professioneller Meeresguide im Wasser, der Anfänger anleitet und die Gruppe betreut',
+      },
+      {
+        en: 'Led by a professional local sea guide',
+        ar: 'بقيادة مرشد بحري محلي محترف',
+        de: 'Geführt von einem professionellen lokalen Meeresguide',
+      },
+    ],
+    included: [
+      {
+        en: 'Round-trip hotel transfer within Hurghada',
+        ar: 'توصيل ذهاب وعودة من فنادق الغردقة',
+        de: 'Hin- und Rücktransfer ab Hotels in Hurghada',
+      },
+      {
+        en: 'Yacht trip to the Dolphin House and two further reef stops',
+        ar: 'رحلة باليخت إلى بيت الدلافين وتوقفين إضافيين عند الشعاب',
+        de: 'Yachttour zum Dolphin House und zwei weiteren Riffstopps',
+      },
+      {
+        en: 'Full snorkeling gear (mask, fins and snorkel) and life jacket',
+        ar: 'معدات سنوركلينج كاملة (ماسك وزعانف وأنبوب تنفس) وسترة نجاة',
+        de: 'Komplette Schnorchelausrüstung (Maske, Flossen und Schnorchel) und Schwimmweste',
+      },
+      {
+        en: 'Open buffet lunch on board',
+        ar: 'غداء بوفيه مفتوح على متن اليخت',
+        de: 'Offenes Mittagsbuffet an Bord',
+      },
+      {
+        en: 'Drinks all day',
+        ar: 'مشروبات طول اليوم',
+        de: 'Getränke den ganzen Tag',
+      },
+      {
+        en: 'Professional sea guide',
+        ar: 'مرشد بحري محترف',
+        de: 'Professioneller Meeresguide',
+      },
+    ],
+    tips: [
+      {
+        en: 'Transfer from El Gouna, Sahl Hasheesh or Makadi Bay (€10 per person)',
+        ar: 'التوصيل من الجونة أو سهل حشيش أو مكادي باي (10 يورو للفرد)',
+        de: 'Transfer ab El Gouna, Sahl Hasheesh oder Makadi Bay (10 € pro Person)',
+      },
+      {
+        en: 'Transfer from Soma Bay or Safaga (€15 per person)',
+        ar: 'التوصيل من سوما باي أو سفاجا (15 يورو للفرد)',
+        de: 'Transfer ab Soma Bay oder Safaga (15 € pro Person)',
+      },
+      {
+        en: 'Photos and videos (available to purchase)',
+        ar: 'الصور والفيديوهات (متاحة للشراء)',
+        de: 'Fotos und Videos (gegen Aufpreis erhältlich)',
+      },
+      {
+        en: 'Tips',
+        ar: 'الإكراميات',
+        de: 'Trinkgeld',
+      },
+    ],
+    notSuitableFor: [
+      {
+        en: 'Guests who need a guaranteed dolphin sighting: the dolphins are wild, and no honest operator can promise them',
+        ar: 'الضيوف الذين يشترطون مشاهدة مضمونة للدلافين: الدلافين برية ولا يمكن لأي منظم صادق ضمان ظهورها',
+        de: 'Gäste, die eine garantierte Delfinsichtung erwarten: Die Delfine leben wild, kein seriöser Anbieter kann sie garantieren',
+      },
+    ],
+    whatToBring: [
+      { en: 'Swimsuit and towel', ar: 'مايوه وفوطة', de: 'Badekleidung und Handtuch' },
+      { en: 'Sunscreen', ar: 'واقي شمس', de: 'Sonnencreme' },
+      { en: 'Sunglasses and a hat', ar: 'نظارة شمس وقبعة', de: 'Sonnenbrille und Hut' },
+      {
+        en: 'An underwater camera if you have one, this is the day for it',
+        ar: 'كاميرا تحت الماء إن وُجدت، فهذا هو اليوم المناسب لها',
+        de: 'Eine Unterwasserkamera, falls vorhanden, das ist der richtige Tag dafür',
+      },
+    ],
+    notAllowed: [
+      { en: 'Alcohol and drugs', ar: 'الكحول والمخدرات', de: 'Alkohol und Drogen' },
+    ],
+    knowBeforeYouGo: [
+      {
+        en: 'Wild dolphins cannot be guaranteed. They are seen on most trips to this reef, but if they are resting or away, we watch the reef instead and never chase or disturb them.',
+        ar: 'لا يمكن ضمان مشاهدة الدلافين البرية. تظهر في معظم الرحلات لهذه الشعاب، ولكن إذا كانت ترتاح أو غائبة نستمتع بالشعاب ولا نطاردها أو نزعجها أبدًا.',
+        de: 'Wilde Delfine können nicht garantiert werden. Sie werden auf den meisten Touren zu diesem Riff gesehen, doch wenn sie ruhen oder fernbleiben, beobachten wir stattdessen das Riff und jagen oder stören sie niemals.',
+      },
+      {
+        en: "Swimming near the dolphins depends on their behaviour and the sea conditions on the day, and the guide's call is final.",
+        ar: 'السباحة بالقرب من الدلافين تعتمد على سلوكها وحالة البحر في ذلك اليوم، وقرار المرشد نهائي.',
+        de: 'Das Schwimmen in der Nähe der Delfine hängt von ihrem Verhalten und den Seebedingungen am Tag ab, die Entscheidung des Guides ist verbindlich.',
+      },
+      {
+        en: 'Your exact pickup time is confirmed the day before your trip. Please be ready at your pickup point.',
+        ar: 'يتأكد وقت الاستلام بالظبط قبل الرحلة بيوم. برجاء التواجد في نقطة الاستلام في الموعد.',
+        de: 'Ihre genaue Abholzeit wird einen Tag vor der Tour bestätigt. Bitte seien Sie rechtzeitig am Abholpunkt.',
+      },
+      {
+        en: 'Cash on pickup is how you pay. There is nothing to pay in advance.',
+        ar: 'الدفع نقدًا عند الاستلام، ولا يوجد أي مبلغ يُدفع مقدمًا.',
+        de: 'Sie zahlen bar bei Abholung. Eine Vorauszahlung ist nicht erforderlich.',
+      },
+    ],
+    meetingPoint: {
+      en: 'Hurghada Marina / Hotel Lobby Pickup',
+      ar: 'مارينا الغردقة أو الاستلام من بهو الفندق',
+      de: 'Hurghada Marina / Hotelabholung',
+    },
+    outerTransferEnabled: true,
+    pickup: {
+      en: 'Hurghada included · El Gouna, Sahl Hasheesh and Makadi +€10/pp · Soma Bay and Safaga +€15/pp',
+      ar: 'الغردقة مشمولة · الجونة وسهل حشيش ومكادي +10 يورو للفرد · سوما باي وسفاجا +15 يورو للفرد',
+      de: 'Hurghada inklusive · El Gouna, Sahl Hasheesh und Makadi +10 €/Pers. · Soma Bay und Safaga +15 €/Pers.',
+    },
+    supplierName: 'Red Sea Boat Partner',
+    familyFriendly: true,
+    womenFriendly: true,
+    featured: false,
+    languages: ['English', 'German'],
+    operatingDays: [0, 1, 2, 3, 4, 5, 6],
+  },
+  {
+    id: 'paradise-island-premium',
+    name: {
+      en: 'Paradise Island Premium Day Trip: Quiet Reefs, Fewer Guests and Lunch on the Island',
+      ar: 'رحلة جزيرة بارادايس بريميوم: شعاب هادئة وعدد ضيوف أقل وغداء على الجزيرة',
+      de: 'Paradise Island Premium Tagestour: Ruhige Riffe, weniger Gäste und Mittagessen auf der Insel',
+    },
+    category: 'sea',
+    destination: 'Hurghada',
+    images: [orangeBayImg],
+    rating: 0,
+    reviewCount: 0,
+    duration: { en: 'Full day', ar: 'يوم كامل', de: 'Ganztägig' },
+    departureTimes: ['08:30 AM'],
+    price: 37,
+    options: [
+      {
+        id: 'opt-paradise-premium',
+        title: { en: 'Premium Small-Group Boat', ar: 'قارب مجموعة صغيرة بريميوم', de: 'Premium-Kleingruppen-Boot' },
+        detail: {
+          en: 'Fewer guests · 2 quiet reef stops · premium lunch on the island',
+          ar: 'عدد ضيوف أقل · توقفان عند شعاب هادئة · غداء بريميوم على الجزيرة',
+          de: 'Weniger Gäste · 2 ruhige Riffstopps · Premium-Mittagessen auf der Insel',
+        },
+        price: 37,
+      },
+    ],
+    shortDescription: {
+      en: 'The island day, done quietly. Snorkel protected reefs away from the crowds with deliberately fewer guests on board, then a long, slow stop on Paradise Island with a premium buffet lunch served on the island itself.',
+      ar: 'يوم الجزيرة بهدوء حقيقي. استمتع بالسنوركلينج في شعاب محمية بعيدًا عن الزحام مع عدد ضيوف أقل عمدًا على المركب، ثم توقف طويل وهادئ على جزيرة بارادايس مع غداء بوفيه بريميوم يُقدم على الجزيرة نفسها.',
+      de: 'Der Inseltag in aller Ruhe. Schnorcheln Sie an geschützten Riffen abseits der Massen mit bewusst weniger Gästen an Bord und genießen Sie danach einen langen, entspannten Aufenthalt auf Paradise Island samt Premium-Mittagsbuffet direkt auf der Insel.',
+    },
+    fullDescription: {
+      en: "Paradise Island is what the Red Sea looks like when nobody is in a hurry. This trip is built around that feeling, and everything about it is deliberately calmer than the standard island run.\n\nWe keep the boat's guest list short on purpose. Fewer people at the rail, fewer fins in the water at each stop, more room on deck, and a crew that actually has time for you. We pick you up from your hotel and sail out to the first snorkeling stop, in a protected reef area away from the busy sites, where the coral is healthy and the water is clear enough to read the reef like a map.\n\nAfter a second snorkeling stop, again chosen away from the crowds, the boat takes you to Paradise Island for the long stop of the day. This is not a rushed photo break. It is hours of white sand and shallow turquoise water, with time to swim, walk the shoreline, or claim a quiet corner and stay there.\n\nLunch is the other difference you will notice: a premium open buffet served on the island, not on board, so you eat with your feet near the sand and the sea in front of you. Drinks are varied and available through the day. In the afternoon, the sail back to the marina and the transfer to your hotel.\n\nIf you want the liveliest boat in the marina, this is not it. If you want the Red Sea at its most peaceful, it is.",
+      ar: 'جزيرة بارادايس هي شكل البحر الأحمر عندما لا يكون أحد في عجلة من أمره. هذه الرحلة مبنية حول هذا الإحساس، وكل تفصيلة فيها أهدأ عن قصد من رحلات الجزر المعتادة.\n\nنحافظ عمدًا على قائمة ضيوف محدودة على القارب: أشخاص أقل عند السور، زعانف أقل في الماء عند كل توقف، مساحة أوسع على السطح، وطاقم لديه وقت فعلي للاهتمام بك. نستلمك من فندقك ونبحر إلى أول توقف للسنوركلينج في منطقة شعاب محمية بعيدة عن المواقع المزدحمة، حيث المرجان صحي والمياه صافية كالمرآة.\n\nبعد توقف ثانٍ للسنوركلينج مختار أيضًا بعيدًا عن الزحام، يأخذك القارب إلى جزيرة بارادايس للتوقف الطويل في اليوم. هذه ليست استراحة سريعة للصور، بل ساعات من الرمل الأبيض والمياه الفيروزية الضحلة، مع وقت للسباحة أو المشي على الشاطئ أو الاسترخاء في ركن هادئ.\n\nوالغداء هو الفارق الثاني الذي ستلاحظه فورًا: بوفيه مفتوح بريميوم يُقدم على الجزيرة نفسها وليس على القارب، فتتناول طعامك وقدميك قرب الرمل والبحر أمامك. المشروبات متنوعة ومتوفرة خلال اليوم، وفي فترة بعد الظهر نبحر عائدين إلى المارينا والتوصيل إلى فندقك.\n\nإن كنت تبحث عن أكثر قارب صاخب في المارينا فهذه ليست رحلتك، أما إن أردت البحر الأحمر في أهدأ وأرقى صورة، فهذه هي.',
+      de: 'Paradise Island zeigt, wie das Rote Meer aussieht, wenn niemand in Eile ist. Diese Tour dreht sich genau um dieses Gefühl, und alles daran ist bewusst ruhiger als eine Standard-Inseltour.\n\nWir halten die Gästeliste an Bord absichtlich kurz: weniger Menschen an der Reling, weniger Flossen im Wasser bei jedem Stopp, mehr Platz an Deck und eine Crew, die wirklich Zeit für Sie hat. Wir holen Sie vom Hotel ab und segeln zum ersten Schnorchelstopp in einem geschützten Riffgebiet abseits der belebten Spots, wo die Korallen gesund sind und das Wasser glasklar ist.\n\nNach einem zweiten Schnorchelstopp, erneut abseits der Massen gewählt, bringt Sie das Boot nach Paradise Island für den langen Aufenthalt des Tages. Das ist keine gehetzte Fotopause, sondern Stunden voller weißem Sand und flachem türkisfarbenem Wasser zum Schwimmen, Spazieren am Ufer oder einfach zum Verweilen in einer ruhigen Ecke.\n\nDas Mittagessen ist der zweite Unterschied, den Sie sofort bemerken: ein hochwertiges offenes Buffet direkt auf der Insel, nicht an Bord, sodass Sie mit den Füßen nah am Sand und Blick aufs Meer essen. Abwechslungsreiche Getränke stehen den ganzen Tag bereit. Am Nachmittag geht es zurück zur Marina und per Transfer zu Ihrem Hotel.\n\nWenn Sie das lauteste Boot der Marina suchen, ist diese Tour nichts für Sie. Wenn Sie das Rote Meer von seiner friedlichsten Seite erleben möchten, ist sie genau richtig.',
+    },
+    highlights: [
+      {
+        en: 'Hotel pickup and transfer to the marina',
+        ar: 'الاستلام من الفندق والتوصيل إلى المارينا',
+        de: 'Hotelabholung und Transfer zur Marina',
+      },
+      {
+        en: 'Deliberately fewer guests on board than a standard island trip',
+        ar: 'عدد ضيوف أقل عن قصد على متن القارب مقارنة بالرحلات العادية',
+        de: 'Bewusst weniger Gäste an Bord als bei einer Standard-Inseltour',
+      },
+      {
+        en: 'First snorkeling stop at a protected reef away from the crowds',
+        ar: 'التوقف الأول للسنوركلينج عند شعاب محمية بعيدًا عن الزحام',
+        de: 'Erster Schnorchelstopp an einem geschützten Riff abseits der Massen',
+      },
+      {
+        en: 'Second snorkeling stop at another quiet reef',
+        ar: 'التوقف الثاني للسنوركلينج عند شعاب هادئة أخرى',
+        de: 'Zweiter Schnorchelstopp an einem weiteren ruhigen Riff',
+      },
+      {
+        en: 'A long, unhurried stop on Paradise Island',
+        ar: 'توقف طويل وهادئ بدون استعجال على جزيرة بارادايس',
+        de: 'Ein langer, entspannter Aufenthalt auf Paradise Island',
+      },
+      {
+        en: 'Premium open buffet lunch served on the island',
+        ar: 'غداء بوفيه مفتوح بريميوم يُقدم على الجزيرة',
+        de: 'Premium-Mittagsbuffet direkt auf der Insel serviert',
+      },
+      {
+        en: 'Varied drinks available through the day',
+        ar: 'مشروبات متنوعة متوفرة خلال اليوم',
+        de: 'Abwechslungsreiche Getränke den ganzen Tag verfügbar',
+      },
+      {
+        en: 'Led by a professional local sea guide',
+        ar: 'بقيادة مرشد بحري محلي محترف',
+        de: 'Geführt von einem professionellen lokalen Meeresguide',
+      },
+    ],
+    included: [
+      {
+        en: 'Round-trip hotel transfer within Hurghada',
+        ar: 'توصيل ذهاب وعودة من فنادق الغردقة',
+        de: 'Hin- und Rücktransfer ab Hotels in Hurghada',
+      },
+      {
+        en: 'Yacht trip with a reduced guest list',
+        ar: 'رحلة باليخت بعدد ضيوف محدود',
+        de: 'Yachttour mit reduzierter Gästezahl',
+      },
+      {
+        en: 'Full snorkeling gear (mask, fins and snorkel) and life jacket',
+        ar: 'معدات سنوركلينج كاملة (ماسك وزعانف وأنبوب تنفس) وسترة نجاة',
+        de: 'Komplette Schnorchelausrüstung (Maske, Flossen und Schnorchel) und Schwimmweste',
+      },
+      {
+        en: 'Two snorkeling stops in protected reef areas',
+        ar: 'توقفان للسنوركلينج في مناطق شعاب محمية',
+        de: 'Zwei Schnorchelstopps in geschützten Riffgebieten',
+      },
+      {
+        en: 'Premium open buffet lunch on Paradise Island',
+        ar: 'غداء بوفيه مفتوح بريميوم على جزيرة بارادايس',
+        de: 'Premium-Mittagsbuffet auf Paradise Island',
+      },
+      {
+        en: 'Varied drinks through the day',
+        ar: 'مشروبات متنوعة خلال اليوم',
+        de: 'Abwechslungsreiche Getränke während des Tages',
+      },
+    ],
+    tips: [
+      {
+        en: 'Transfer from El Gouna, Sahl Hasheesh or Makadi Bay (€10 per person)',
+        ar: 'التوصيل من الجونة أو سهل حشيش أو مكادي باي (10 يورو للفرد)',
+        de: 'Transfer ab El Gouna, Sahl Hasheesh oder Makadi Bay (10 € pro Person)',
+      },
+      {
+        en: 'Transfer from Soma Bay or Safaga (€15 per person)',
+        ar: 'التوصيل من سوما باي أو سفاجا (15 يورو للفرد)',
+        de: 'Transfer ab Soma Bay oder Safaga (15 € pro Person)',
+      },
+      {
+        en: 'Photos (available to purchase)',
+        ar: 'الصور (متاحة للشراء)',
+        de: 'Fotos (gegen Aufpreis erhältlich)',
+      },
+      {
+        en: 'Tips',
+        ar: 'الإكراميات',
+        de: 'Trinkgeld',
+      },
+    ],
+    notSuitableFor: [
+      {
+        en: 'Guests looking for a party boat or water games: this trip is deliberately quiet',
+        ar: 'الضيوف الباحثون عن قارب حفلات أو ألعاب مائية: هذه الرحلة هادئة عن قصد',
+        de: 'Gäste, die ein Partyboot oder Wasserspiele suchen: Diese Tour ist bewusst ruhig gehalten',
+      },
+    ],
+    whatToBring: [
+      { en: 'Swimsuit and towel', ar: 'مايوه وفوطة', de: 'Badekleidung und Handtuch' },
+      { en: 'Sunscreen', ar: 'واقي شمس', de: 'Sonnencreme' },
+      { en: 'Sunglasses and a hat', ar: 'نظارة شمس وقبعة', de: 'Sonnenbrille und Hut' },
+      {
+        en: 'A book, if you are the kind of person who reads on beaches. You will have time',
+        ar: 'كتاب، إن كنت تحب القراءة على الشاطئ، سيكون لديك وقت كافٍ',
+        de: 'Ein Buch, falls Sie gern am Strand lesen. Sie werden die Zeit dafür haben',
+      },
+    ],
+    notAllowed: [
+      { en: 'Alcohol and drugs', ar: 'الكحول والمخدرات', de: 'Alkohol und Drogen' },
+    ],
+    knowBeforeYouGo: [
+      {
+        en: 'The smaller guest list is real and it is the point of this trip, so places are limited each day and booking ahead is wise in busy weeks.',
+        ar: 'عدد الضيوف المحدود حقيقي وهو جوهر هذه الرحلة، لذا فالأماكن محدودة يوميًا ويفضل الحجز مبكرًا في الأسابيع المزدحمة.',
+        de: 'Die kleinere Gästeliste ist echt und der Kern dieser Tour, daher sind die Plätze täglich begrenzt und eine frühzeitige Buchung in belebten Wochen ratsam.',
+      },
+      {
+        en: 'Lunch is served on the island on this trip, not on the boat.',
+        ar: 'يُقدم الغداء على الجزيرة في هذه الرحلة وليس على القارب.',
+        de: 'Das Mittagessen wird bei dieser Tour auf der Insel serviert, nicht auf dem Boot.',
+      },
+      {
+        en: 'Your exact pickup time is confirmed the day before your trip. Please be ready at your pickup point.',
+        ar: 'يتأكد وقت الاستلام بالظبط قبل الرحلة بيوم. برجاء التواجد في نقطة الاستلام في الموعد.',
+        de: 'Ihre genaue Abholzeit wird einen Tag vor der Tour bestätigt. Bitte seien Sie rechtzeitig am Abholpunkt.',
+      },
+      {
+        en: 'Cash on pickup is how you pay. There is nothing to pay in advance.',
+        ar: 'الدفع نقدًا عند الاستلام، ولا يوجد أي مبلغ يُدفع مقدمًا.',
+        de: 'Sie zahlen bar bei Abholung. Eine Vorauszahlung ist nicht erforderlich.',
+      },
+    ],
+    meetingPoint: {
+      en: 'Hurghada Marina / Hotel Lobby Pickup',
+      ar: 'مارينا الغردقة أو الاستلام من بهو الفندق',
+      de: 'Hurghada Marina / Hotelabholung',
+    },
+    outerTransferEnabled: true,
+    pickup: {
+      en: 'Hurghada included · El Gouna, Sahl Hasheesh and Makadi +€10/pp · Soma Bay and Safaga +€15/pp',
+      ar: 'الغردقة مشمولة · الجونة وسهل حشيش ومكادي +10 يورو للفرد · سوما باي وسفاجا +15 يورو للفرد',
+      de: 'Hurghada inklusive · El Gouna, Sahl Hasheesh und Makadi +10 €/Pers. · Soma Bay und Safaga +15 €/Pers.',
+    },
+    supplierName: 'Red Sea Boat Partner',
+    familyFriendly: true,
+    womenFriendly: true,
+    featured: false,
+    languages: ['English', 'German'],
+    operatingDays: [0, 1, 2, 3, 4, 5, 6],
+  },
+  {
+    id: 'hula-hula-island',
+    name: {
+      en: 'Hula Hula Island Day Trip from Hurghada: Snorkeling and a Quieter White-Sand Island',
+      ar: 'رحلة جزيرة هولا هولا من الغردقة: سنوركلينج وجزيرة رمل أبيض أهدأ',
+      de: 'Hula Hula Island Tagestour ab Hurghada: Schnorcheln und eine ruhigere Weißsandinsel',
+    },
+    category: 'sea',
+    destination: 'Hurghada',
+    images: [momentGuestImg],
+    rating: 0,
+    reviewCount: 0,
+    duration: { en: 'Full day', ar: 'يوم كامل', de: 'Ganztägig' },
+    departureTimes: ['08:30 AM'],
+    price: 22,
+    options: [
+      {
+        id: 'opt-hula-shared',
+        title: { en: 'Small-Group Boat (Standard)', ar: 'مركب مجموعة صغيرة (عادي)', de: 'Kleingruppen-Boot (Standard)' },
+        detail: {
+          en: '2 snorkel stops + 2 hours on Hula Hula island · buffet lunch & drinks',
+          ar: 'توقفان للسنوركلينج + ساعتان على جزيرة هولا هولا · غداء بوفيه ومشروبات',
+          de: '2 Schnorchelstopps + 2 Stunden auf Hula Hula Island · Mittagsbuffet & Getränke',
+        },
+        price: 22,
+      },
+    ],
+    shortDescription: {
+      en: 'Two snorkeling stops among clouds of colourful fish, then two hours on Hula Hula island, soft white sand and crystal water, without the crowds of the famous name beaches. Buffet lunch and drinks all day.',
+      ar: 'توقفان للسنوركلينج بين أسراب الأسماك الملونة، ثم ساعتان على جزيرة هولا هولا برملها الأبيض الناعم ومياهها الكريستالية بعيدًا عن زحام الشواطئ الشهيرة، مع غداء بوفيه ومشروبات طول اليوم.',
+      de: 'Zwei Schnorchelstopps inmitten bunter Fischschwärme, anschließend zwei Stunden auf Hula Hula Island mit feinem weißem Sand und kristallklarem Wasser, ohne den Trubel der bekanntesten Strände. Mittagsbuffet und Getränke den ganzen Tag.',
+    },
+    fullDescription: {
+      en: 'Everyone in Hurghada has heard of the famous island. Fewer have heard of Hula Hula, and the island is better for it. This is the island day for people who looked at the popular beach, saw the crowds, and wanted the same turquoise water with room to breathe in it.\n\nWe pick you up from your hotel and sail out to the first snorkeling stop, where the reef is busy in the right way: shoals of colourful fish moving over the coral like one animal. Your gear and life jacket are included, and a sea supervision and rescue team is on board all day, so everyone from confident swimmers to first timers is properly looked after in the water.\n\nA second snorkeling stop follows, then the boat anchors at Hula Hula island and the pace changes completely. You have two hours on soft white sand at the edge of water so clear it barely looks real. Swim, walk out along the shallows, take the photos, or find your spot and stay in it.\n\nLunch is an open buffet served on board the yacht, and drinks are available all day. In the afternoon, the sail back to the marina and the transfer to your hotel.\n\nSame sea, same reefs, calmer island. That is the whole idea of this trip, and it works.',
+      ar: 'الجميع في الغردقة سمع عن الجزيرة الأشهر، لكن قليلين سمعوا عن هولا هولا، وهذا ما يجعلها أجمل. هذه رحلة الجزيرة لمن نظروا إلى الشاطئ الأشهر ورأوا الزحام، فأرادوا نفس المياه الفيروزية مع مساحة أكبر للتنفس والهدوء.\n\nنستلمك من فندقك ونبحر إلى التوقف الأول للسنوركلينج، حيث الشعاب مزدحمة بالطريقة الصحيحة: أسراب من الأسماك الملونة تتحرك فوق المرجان معًا. معداتك وسترة النجاة مشمولة، وهناك فريق إشراف وإنقاذ بحري على متن اليخت طول اليوم، ليحظى الجميع من السباحين المتمرسين إلى المبتدئين برعاية كاملة في الماء.\n\nيتبع ذلك توقف ثانٍ للسنوركلينج، ثم يرسو القارب عند جزيرة هولا هولا ويتغير الإيقاع تمامًا. لديك ساعتان على رمل أبيض ناعم على حافة مياه صافية بشكل مدهش. اسبح، امشِ في المياه الضحلة، التقط صورك، أو اختر مكانك واستمتع به.\n\nالغداء بوفيه مفتوح يُقدم على متن اليخت، والمشروبات متوفرة طول اليوم. بعد الظهر نبحر عائدين إلى المارينا والتوصيل إلى فندقك.\n\nنفس البحر، نفس الشعاب، وجزيرة أهدأ. هذه هي فكرة الرحلة كلها، وهي تنجح بامتياز.',
+      de: 'Jeder in Hurghada hat von der berühmtesten Insel gehört. Weniger kennen Hula Hula, und genau das tut der Insel gut. Dies ist der Inseltag für alle, die den bekannten Strand gesehen, den Trubel bemerkt und sich dasselbe türkisfarbene Wasser mit mehr Platz zum Durchatmen gewünscht haben.\n\nWir holen Sie vom Hotel ab und segeln zum ersten Schnorchelstopp, wo das Riff auf die schönste Art belebt ist: Schwärme bunter Fische ziehen gemeinsam über die Korallen. Ausrüstung und Schwimmweste sind inklusive, und ein Meeresaufsichts- und Rettungsteam ist den ganzen Tag an Bord, sodass sichere Schwimmer wie auch Anfänger im Wasser bestens betreut sind.\n\nEs folgt ein zweiter Schnorchelstopp, dann ankert das Boot vor Hula Hula Island und das Tempo verlangsamt sich spürbar. Sie haben zwei Stunden auf weichem weißem Sand an kristallklarem Wasser. Schwimmen Sie, laufen Sie durch das flache Wasser, machen Sie Fotos oder suchen Sie sich Ihren ruhigen Platz.\n\nDas Mittagessen wird als offenes Buffet an Bord der Yacht serviert, Getränke gibt es den ganzen Tag. Am Nachmittag segeln wir zurück zur Marina und bringen Sie zum Hotel.\n\nDasselbe Meer, dieselben Riffe, eine ruhigere Insel. Das ist die ganze Idee dieser Tour, und sie geht auf.',
+    },
+    highlights: [
+      {
+        en: 'Hotel pickup and transfer to the marina',
+        ar: 'الاستلام من الفندق والتوصيل إلى المارينا',
+        de: 'Hotelabholung und Transfer zur Marina',
+      },
+      {
+        en: 'First snorkeling stop among colourful reef fish, full gear and life jacket provided',
+        ar: 'التوقف الأول للسنوركلينج بين أسماك الشعاب الملونة مع المعدات الكاملة وسترة النجاة',
+        de: 'Erster Schnorchelstopp inmitten bunter Rifffische, komplette Ausrüstung und Schwimmweste inklusive',
+      },
+      {
+        en: 'Second snorkeling stop at another reef',
+        ar: 'التوقف الثاني للسنوركلينج عند شعاب أخرى',
+        de: 'Zweiter Schnorchelstopp an einem weiteren Riff',
+      },
+      {
+        en: 'Two hours on Hula Hula island: soft white sand and crystal clear water',
+        ar: 'ساعتان على جزيرة هولا هولا: رمل أبيض ناعم ومياه كريستالية صافية',
+        de: 'Zwei Stunden auf Hula Hula Island: weicher weißer Sand und kristallklares Wasser',
+      },
+      {
+        en: 'Open buffet lunch on board the yacht',
+        ar: 'غداء بوفيه مفتوح على متن اليخت',
+        de: 'Offenes Mittagsbuffet an Bord der Yacht',
+      },
+      {
+        en: 'Drinks available all day',
+        ar: 'مشروبات متوفرة طول اليوم',
+        de: 'Getränke den ganzen Tag verfügbar',
+      },
+      {
+        en: 'A sea supervision and rescue team on board all day',
+        ar: 'فريق إشراف وإنقاذ بحري على متن اليخت طول اليوم',
+        de: 'Ein Meeresaufsichts- und Rettungsteam den ganzen Tag an Bord',
+      },
+      {
+        en: 'Led by a professional local sea guide',
+        ar: 'بقيادة مرشد بحري محلي محترف',
+        de: 'Geführt von einem professionellen lokalen Meeresguide',
+      },
+    ],
+    included: [
+      {
+        en: 'Round-trip hotel transfer within Hurghada',
+        ar: 'توصيل ذهاب وعودة من فنادق الغردقة',
+        de: 'Hin- und Rücktransfer ab Hotels in Hurghada',
+      },
+      {
+        en: 'Yacht trip with two snorkeling stops and the Hula Hula island stop',
+        ar: 'رحلة باليخت مع توقفين للسنوركلينج وتوقف جزيرة هولا هولا',
+        de: 'Yachttour mit zwei Schnorchelstopps und dem Stopp auf Hula Hula Island',
+      },
+      {
+        en: 'Full snorkeling gear (mask, fins and snorkel) and life jacket',
+        ar: 'معدات سنوركلينج كاملة (ماسك وزعانف وأنبوب تنفس) وسترة نجاة',
+        de: 'Komplette Schnorchelausrüstung (Maske, Flossen und Schnorchel) und Schwimmweste',
+      },
+      {
+        en: 'Open buffet lunch on board',
+        ar: 'غداء بوفيه مفتوح على متن اليخت',
+        de: 'Offenes Mittagsbuffet an Bord',
+      },
+      {
+        en: 'Drinks all day',
+        ar: 'مشروبات طول اليوم',
+        de: 'Getränke den ganzen Tag',
+      },
+      {
+        en: 'Sea supervision and rescue team on board',
+        ar: 'فريق إشراف وإنقاذ بحري على متن اليخت',
+        de: 'Meeresaufsichts- und Rettungsteam an Bord',
+      },
+    ],
+    tips: [
+      {
+        en: 'Transfer from El Gouna, Sahl Hasheesh or Makadi Bay (€10 per person)',
+        ar: 'التوصيل من الجونة أو سهل حشيش أو مكادي باي (10 يورو للفرد)',
+        de: 'Transfer ab El Gouna, Sahl Hasheesh oder Makadi Bay (10 € pro Person)',
+      },
+      {
+        en: 'Transfer from Soma Bay or Safaga (€15 per person)',
+        ar: 'التوصيل من سوما باي أو سفاجا (15 يورو للفرد)',
+        de: 'Transfer ab Soma Bay oder Safaga (15 € pro Person)',
+      },
+      {
+        en: 'Photos (available to purchase)',
+        ar: 'الصور (متاحة للشراء)',
+        de: 'Fotos (gegen Aufpreis erhältlich)',
+      },
+      {
+        en: 'Tips',
+        ar: 'الإكراميات',
+        de: 'Trinkgeld',
+      },
+    ],
+    notSuitableFor: [
+      {
+        en: 'Guests who want the busiest, most famous beach scene: this island is the quiet alternative',
+        ar: 'الضيوف الذين يريدون أكثر شاطئ صاخب ومشهور: هذه الجزيرة هي البديل الأهدأ',
+        de: 'Gäste, die die belebteste und bekannteste Strandszene suchen: Diese Insel ist die ruhigere Alternative',
+      },
+    ],
+    whatToBring: [
+      { en: 'Swimsuit and towel', ar: 'مايوه وفوطة', de: 'Badekleidung und Handtuch' },
+      { en: 'Sunscreen', ar: 'واقي شمس', de: 'Sonnencreme' },
+      { en: 'Sunglasses and a hat', ar: 'نظارة شمس وقبعة', de: 'Sonnenbrille und Hut' },
+      {
+        en: 'A waterproof phone pouch if you want photos in the water',
+        ar: 'جراب موبايل مقاوم للماء لو أردت التصوير في الماء',
+        de: 'Eine wasserdichte Handyhülle, wenn Sie Fotos im Wasser machen möchten',
+      },
+    ],
+    notAllowed: [
+      { en: 'Alcohol and drugs', ar: 'الكحول والمخدرات', de: 'Alkohol und Drogen' },
+    ],
+    knowBeforeYouGo: [
+      {
+        en: 'The island stop is two hours. The rest of the day is sailing and snorkeling.',
+        ar: 'التوقف على الجزيرة ساعتان، وبقية اليوم إبحار وسنوركلينج.',
+        de: 'Der Inselaufenthalt dauert zwei Stunden. Der Rest des Tages ist Segeln und Schnorcheln.',
+      },
+      {
+        en: 'You do not need to be a strong swimmer. Life jackets are provided for everyone and the team stays with the group in the water.',
+        ar: 'لا يشترط أن تكون سباحًا محترفًا. سترات النجاة متوفرة للجميع والفريق يبقى مع المجموعة في الماء.',
+        de: 'Sie müssen kein starker Schwimmer sein. Schwimmwesten stehen für alle bereit und das Team bleibt im Wasser bei der Gruppe.',
+      },
+      {
+        en: 'Your exact pickup time is confirmed the day before your trip. Please be ready at your pickup point.',
+        ar: 'يتأكد وقت الاستلام بالظبط قبل الرحلة بيوم. برجاء التواجد في نقطة الاستلام في الموعد.',
+        de: 'Ihre genaue Abholzeit wird einen Tag vor der Tour bestätigt. Bitte seien Sie rechtzeitig am Abholpunkt.',
+      },
+      {
+        en: 'Cash on pickup is how you pay. There is nothing to pay in advance.',
+        ar: 'الدفع نقدًا عند الاستلام، ولا يوجد أي مبلغ يُدفع مقدمًا.',
+        de: 'Sie zahlen bar bei Abholung. Eine Vorauszahlung ist nicht erforderlich.',
+      },
+    ],
+    meetingPoint: {
+      en: 'Hurghada Marina / Hotel Lobby Pickup',
+      ar: 'مارينا الغردقة أو الاستلام من بهو الفندق',
+      de: 'Hurghada Marina / Hotelabholung',
+    },
+    outerTransferEnabled: true,
+    pickup: {
+      en: 'Hurghada included · El Gouna, Sahl Hasheesh and Makadi +€10/pp · Soma Bay and Safaga +€15/pp',
+      ar: 'الغردقة مشمولة · الجونة وسهل حشيش ومكادي +10 يورو للفرد · سوما باي وسفاجا +15 يورو للفرد',
+      de: 'Hurghada inklusive · El Gouna, Sahl Hasheesh und Makadi +10 €/Pers. · Soma Bay und Safaga +15 €/Pers.',
+    },
+    supplierName: 'Red Sea Boat Partner',
+    familyFriendly: true,
+    womenFriendly: true,
+    featured: false,
+    languages: ['English', 'German'],
+    operatingDays: [0, 1, 2, 3, 4, 5, 6],
+  },
+  {
+    id: 'hurghada-private-speed-boat',
+    name: {
+      en: 'Private Speed Boat in Hurghada: One Fixed Price for the Whole Boat',
+      ar: 'سبيد بوت خاص في الغردقة: سعر واحد ثابت للقارب بالكامل',
+      de: 'Privates Speedboot in Hurghada: Ein Festpreis für das ganze Boot',
+    },
+    category: 'sea',
+    destination: 'Hurghada',
+    images: [heroCoastImg],
+    rating: 0,
+    reviewCount: 0,
+    duration: { en: 'By agreement', ar: 'بالاتفاق', de: 'Nach Vereinbarung' },
+    departureTimes: [],
+    timingNote: {
+      en: 'Departure time and trip length are agreed with you when you book.',
+      ar: 'يتم الاتفاق معك على وقت الانطلاق ومدة الرحلة عند الحجز.',
+      de: 'Abfahrtszeit und Dauer der Tour werden bei der Buchung mit Ihnen vereinbart.',
+    },
+    price: 101,
+    options: [
+      {
+        id: 'opt-speedboat-whole',
+        title: {
+          en: 'Private Speed Boat (Whole Boat · €101 Fixed)',
+          ar: 'سبيد بوت خاص (القارب بالكامل · 101€ سعر ثابت)',
+          de: 'Privates Speedboot (Ganzes Boot · 101 € Festpreis)',
+        },
+        detail: {
+          en: '€101 fixed for the whole boat, up to 6 guests · departure time agreed when you book · private captain & guide',
+          ar: '101€ سعر ثابت للقارب بالكامل حتى 6 ضيوف · وقت الانطلاق بالاتفاق عند الحجز · قبطان ومرشد خاص',
+          de: '101 € Festpreis für das gesamte Boot, bis zu 6 Gäste · Abfahrtszeit nach Vereinbarung · privater Kapitän & Guide',
+        },
+        price: 101,
+      },
+    ],
+    shortDescription: {
+      en: 'Your own speed boat, your own pace. €101 covers the entire boat for your group, with a professional guide and a trained captain, photo stops wherever the light is best, and drinks on board throughout.',
+      ar: 'قاربك السريع الخاص وبإيقاعك الخاص. 101 يورو تغطي القارب بالكامل لمجموعتك، مع مرشد محترف وقبطان مدرب، ووقفات تصوير أينما كانت الإضاءة أجمل، ومشروبات على متن القارب طول الرحلة.',
+      de: 'Ihr eigenes Speedboot, Ihr eigenes Tempo. 101 € decken das gesamte Boot für Ihre Gruppe ab, inklusive professionellem Guide, erfahrenem Kapitän, Fotostopps beim besten Licht und Getränken an Bord während der gesamten Fahrt.',
+    },
+    fullDescription: {
+      en: "No group to keep up with, no schedule written by strangers, no waiting for forty people to climb back on board. A private speed boat is the Red Sea at your speed, and this one is priced the simple way: one fixed price for the whole boat, whoever is in it, within the boat's capacity.\n\nWe pick you up from your hotel and bring you to the marina, where your boat, your professional guide and your trained captain are ready. Then it is out onto open water: fast runs across the blue, slower stretches when someone spots something worth looking at, and photo stops wherever the coast, the light or a quiet bay asks for one.\n\nFamilies use this boat to give the kids the ride of the holiday without a crowd around them. Small groups of friends use it to make the day entirely theirs. Couples use it to disappear for a while. The boat does not mind which one you are.\n\nLife jackets and full safety equipment are on board for everyone, and drinks are served throughout the trip. The departure time and the length of the trip are agreed with you when you book, so the day fits around your plans rather than the other way round.\n\nOne boat, one price, your group only. That is the whole offer, and it needs nothing added.",
+      ar: 'لا مجموعة تضطر لمجاراتها، ولا جدول وضعه غرباء، ولا انتظار لأربعين شخصًا حتى يصعدوا للقارب. السبيد بوت الخاص هو البحر الأحمر بسرعتك الخاصة، وتسعيره بسيط وواضح: سعر واحد ثابت للقارب بالكامل مهما كان عددكم ضمن سعة القارب.\n\nنستلمك من فندقك ونوصلك إلى المارينا، حيث يكون قاربك ومرشدك المحترف وقبطانك المدرب جاهزين. بعدها تنطلق في المياه المفتوحة: انطلاقات سريعة فوق الزرقة، وتباطؤ هادئ كلما لمحت ما يستحق المشاهدة، ووقفات تصوير أينما طلبت الساحل أو الإضاءة أو خليج هادئ.\n\nالعائلات تختار هذا القارب لتمنح الأطفال أجمل جولة في الإجازة بدون زحام. مجموعات الأصدقاء الصغيرة تجعل اليوم ملكها بالكامل. والأزواج يختارونه لخصوصية هادئة لبعض الوقت.\n\nسترات النجاة ومعدات السلامة الكاملة متوفرة للجميع على القارب، والمشروبات تُقدم طول الرحلة. يتم الاتفاق معك على وقت الانطلاق ومدة الرحلة عند الحجز ليناسب اليوم خططك تمامًا.\n\nقارب واحد، سعر واحد، ومجموعتك فقط. هذا هو العرض كله ولا يحتاج أي إضافات.',
+      de: 'Keine Gruppe, mit der Sie Schritt halten müssen, kein fremder Zeitplan, kein Warten darauf, dass vierzig Personen wieder an Bord klettern. Ein privates Speedboot ist das Rote Meer in Ihrem Tempo, und der Preis ist einfach: ein Festpreis für das ganze Boot, innerhalb der Bootskapazität.\n\nWir holen Sie vom Hotel ab und bringen Sie zur Marina, wo Ihr Boot, Ihr professioneller Guide und Ihr erfahrener Kapitän bereitstehen. Dann geht es hinaus aufs offene Meer: schnelle Fahrten über das Blau, ruhigere Abschnitte, wenn jemand etwas Besonderes entdeckt, und Fotostopps überall dort, wo Küste, Licht oder eine stille Bucht danach verlangen.\n\nFamilien nutzen dieses Boot, um den Kindern ohne Menschenmenge die schönste Fahrt des Urlaubs zu schenken. Kleine Freundesgruppen machen den Tag ganz zu ihrem eigenen. Paare gönnen sich eine private Auszeit auf dem Wasser.\n\nSchwimmwesten und vollständige Sicherheitsausrüstung sind für alle an Bord, und Getränke werden während der gesamten Tour serviert. Abfahrtszeit und Dauer werden bei der Buchung mit Ihnen abgestimmt, damit sich der Tag nach Ihren Plänen richtet.\n\nEin Boot, ein Preis, nur Ihre Gruppe. Das ist das ganze Angebot, mehr braucht es nicht.',
+    },
+    highlights: [
+      {
+        en: 'Hotel pickup and transfer to the marina',
+        ar: 'الاستلام من الفندق والتوصيل إلى المارينا',
+        de: 'Hotelabholung und Transfer zur Marina',
+      },
+      {
+        en: 'A private speed boat for your group only',
+        ar: 'سبيد بوت خاص لمجموعتك فقط',
+        de: 'Ein privates Speedboot nur für Ihre Gruppe',
+      },
+      {
+        en: 'Fast runs across the open Red Sea',
+        ar: 'انطلاقات سريعة عبر مياه البحر الأحمر المفتوحة',
+        de: 'Schnelle Fahrten über das offene Rote Meer',
+      },
+      {
+        en: 'Photo stops along the coast wherever you want them',
+        ar: 'وقفات تصوير على طول الساحل أينما أردت',
+        de: 'Fotostopps entlang der Küste, wo immer Sie möchten',
+      },
+      {
+        en: 'Life jackets and full safety equipment for everyone',
+        ar: 'سترات نجاة ومعدات سلامة كاملة للجميع',
+        de: 'Schwimmwesten und komplette Sicherheitsausrüstung für alle',
+      },
+      {
+        en: 'Drinks served throughout the trip',
+        ar: 'مشروبات تُقدم طول الرحلة',
+        de: 'Getränke während der gesamten Tour serviert',
+      },
+      {
+        en: 'A professional guide and a trained captain on board with you',
+        ar: 'مرشد محترف وقبطان مدرب معك على متن القارب',
+        de: 'Ein professioneller Guide und ein geschulter Kapitän an Bord',
+      },
+    ],
+    included: [
+      {
+        en: 'Round-trip hotel transfer within Hurghada',
+        ar: 'توصيل ذهاب وعودة من فنادق الغردقة',
+        de: 'Hin- und Rücktransfer ab Hotels in Hurghada',
+      },
+      {
+        en: 'Private speed boat for the agreed trip',
+        ar: 'سبيد بوت خاص للرحلة المتفق عليها',
+        de: 'Privates Speedboot für die vereinbarte Tour',
+      },
+      {
+        en: 'Professional guide and trained captain',
+        ar: 'مرشد محترف وقبطان مدرب',
+        de: 'Professioneller Guide und geschulter Kapitän',
+      },
+      {
+        en: 'Life jackets and full safety equipment',
+        ar: 'سترات نجاة ومعدات سلامة كاملة',
+        de: 'Schwimmwesten und komplette Sicherheitsausrüstung',
+      },
+      {
+        en: 'Drinks throughout the trip',
+        ar: 'مشروبات طول الرحلة',
+        de: 'Getränke während der gesamten Tour',
+      },
+    ],
+    tips: [
+      {
+        en: 'Transfer from El Gouna, Sahl Hasheesh or Makadi Bay (€10 per person)',
+        ar: 'التوصيل من الجونة أو سهل حشيش أو مكادي باي (10 يورو للفرد)',
+        de: 'Transfer ab El Gouna, Sahl Hasheesh oder Makadi Bay (10 € pro Person)',
+      },
+      {
+        en: 'Transfer from Soma Bay or Safaga (€15 per person)',
+        ar: 'التوصيل من سوما باي أو سفاجا (15 يورو للفرد)',
+        de: 'Transfer ab Soma Bay oder Safaga (15 € pro Person)',
+      },
+      {
+        en: 'Photos (available to purchase)',
+        ar: 'الصور (متاحة للشراء)',
+        de: 'Fotos (gegen Aufpreis erhältlich)',
+      },
+      {
+        en: 'Tips',
+        ar: 'الإكراميات',
+        de: 'Trinkgeld',
+      },
+    ],
+    whatToBring: [
+      {
+        en: 'Sunscreen and sunglasses (the wind on a fast boat is stronger than it feels)',
+        ar: 'واقي شمس ونظارة شمس (الهواء على القارب السريع أقوى مما يبدو)',
+        de: 'Sonnencreme und Sonnenbrille (der Fahrtwind auf einem schnellen Boot ist stärker, als er sich anfühlt)',
+      },
+      {
+        en: 'A towel and swimsuit if you plan to swim at a stop',
+        ar: 'فوطة ومايوه إن كنت تخطط للسباحة في أحد التوقفات',
+        de: 'Handtuch und Badekleidung, wenn Sie bei einem Stopp schwimmen möchten',
+      },
+      {
+        en: 'A light layer for the ride back',
+        ar: 'قطعة ملابس خفيفة لطريق العودة',
+        de: 'Eine leichte Schicht für die Rückfahrt',
+      },
+    ],
+    notAllowed: [
+      { en: 'Alcohol and drugs', ar: 'الكحول والمخدرات', de: 'Alkohol und Drogen' },
+    ],
+    knowBeforeYouGo: [
+      {
+        en: 'The price is €101 for the whole boat, not per person. Split it between your group however you like.',
+        ar: 'السعر 101 يورو للقارب بالكامل وليس للفرد، ويمكن تقسيمه بين مجموعتك كما تشاء.',
+        de: 'Der Preis von 101 € gilt für das ganze Boot, nicht pro Person. Sie können ihn beliebig in Ihrer Gruppe aufteilen.',
+      },
+      {
+        en: 'Departure time and trip length are agreed with you when you book.',
+        ar: 'يتم الاتفاق معك على وقت الانطلاق ومدة الرحلة عند الحجز.',
+        de: 'Abfahrtszeit und Dauer der Tour werden bei der Buchung mit Ihnen vereinbart.',
+      },
+      {
+        en: 'The boat takes up to 6 guests.',
+        ar: 'يتسع القارب حتى 6 ضيوف.',
+        de: 'Das Boot bietet Platz für bis zu 6 Gäste.',
+      },
+      {
+        en: 'Cash on pickup is how you pay. There is nothing to pay in advance.',
+        ar: 'الدفع نقدًا عند الاستلام، ولا يوجد أي مبلغ يُدفع مقدمًا.',
+        de: 'Sie zahlen bar bei Abholung. Eine Vorauszahlung ist nicht erforderlich.',
+      },
+    ],
+    meetingPoint: {
+      en: 'Hurghada Marina / Hotel Lobby Pickup',
+      ar: 'مارينا الغردقة أو الاستلام من بهو الفندق',
+      de: 'Hurghada Marina / Hotelabholung',
+    },
+    outerTransferEnabled: true,
+    pickup: {
+      en: 'Hurghada included · El Gouna, Sahl Hasheesh and Makadi +€10/pp · Soma Bay and Safaga +€15/pp',
+      ar: 'الغردقة مشمولة · الجونة وسهل حشيش ومكادي +10 يورو للفرد · سوما باي وسفاجا +15 يورو للفرد',
+      de: 'Hurghada inklusive · El Gouna, Sahl Hasheesh und Makadi +10 €/Pers. · Soma Bay und Safaga +15 €/Pers.',
+    },
+    supplierName: 'Red Sea Boat Partner',
+    familyFriendly: true,
+    womenFriendly: true,
+    featured: false,
+    languages: ['English', 'German'],
     operatingDays: [0, 1, 2, 3, 4, 5, 6],
   },
   {
@@ -1351,63 +2214,93 @@ Danach geht es klimatisiert zurück durch die Wüste, mit dem ganzen antiken The
   {
     id: 'eastern-desert-sunset-safari',
     name: {
-      en: 'Eastern Desert Quad, Buggy & Bedouin Tea at Dusk',
-      ar: 'سفاري الصحراء الشرقية بالكواد وشاي بدوي عند الغروب',
-      de: 'Wüstensafari mit Quad, Buggy & Beduinentee',
+      en: 'Quad Safari from Hurghada: Desert Ride to a Bedouin Village, Camel Ride and Bedouin Tea',
+      ar: 'سفاري كواد من الغردقة: جولة صحراوية إلى قرية بدوية وركوب جمل وشاي بدوي',
+      de: 'Quad-Safari ab Hurghada: Wüstenfahrt zu einem Beduinendorf, Kamelritt und Beduinentee',
     },
     category: 'desert',
     destination: 'Hurghada',
     images: [desertSunsetImg],
     rating: 4.8,
     reviewCount: 53,
-    duration: { en: '3 or 7 hours', ar: '3 أو 7 ساعات', de: '3 oder 7 Stunden' },
+    duration: { en: '3 hours', ar: '3 ساعات', de: '3 Stunden' },
     departureTimes: ['09:00 AM (Morning)', '02:30 PM (Sunset)'],
     price: 32,
     options: [
       {
         id: 'opt-safari-quad',
         title: {
-          en: 'Single Quad Safari (3 Hours · No Meals)',
-          ar: 'سفاري كواد فردي (3 ساعات · بدون وجبات)',
-          de: 'Einzel-Quad-Safari (3 Stunden · ohne Mahlzeiten)',
+          en: 'Morning Departure, 09:00',
+          ar: 'انطلاق الصباح، 09:00',
+          de: 'Morgenabfahrt, 09:00 Uhr',
         },
         detail: {
-          en: '3-hour guided quad ride · 1 rider per quad · Bedouin village, Bedouin tea & camel ride · no meals included',
-          ar: 'جولة كواد موجّهة لمدة 3 ساعات · راكب واحد لكل كواد · قرية بدوية وشاي بدوي وركوب جمال · لا تشمل وجبات',
-          de: '3-stündige geführte Quad-Tour · 1 Fahrer pro Quad · Beduinendorf, Beduinentee & Kamelritt · keine Mahlzeiten inklusive',
+          en: 'The full quad program in the cool of the morning: 40 km desert ride, Bedouin village, bread baking, tea and a camel ride. Back at your hotel around midday, with the rest of the day free.',
+          ar: 'برنامج الكواد الكامل في هدوء الصباح: 40 كم قيادة في الصحراء وقرية بدوية وخبز بدوي وشاي وركوب جمل، والعودة للفندق قرب الظهر مع بقية اليوم حرة.',
+          de: 'Das volle Quad-Programm am kühlen Morgen: 40 km Wüstenfahrt, Beduinendorf, Brotbacken, Tee und Kamelritt. Rückkehr am Hotel um die Mittagszeit.',
         },
         price: 32,
       },
       {
-        id: 'opt-safari-buggy',
+        id: 'opt-safari-quad-sunset',
         title: {
-          en: 'Super Safari (7 Hours · Dinner Included)',
-          ar: 'سوبر سفاري (7 ساعات · شامل العشاء)',
-          de: 'Super Safari (7 Stunden · inkl. Abendessen)',
+          en: 'Sunset Departure',
+          ar: 'انطلاق الغروب',
+          de: 'Sonnenuntergangs-Abfahrt',
         },
         detail: {
-          en: 'Full 7-hour Super Safari · quad & 2-seat family buggy · camel ride, Bedouin village & BBQ dinner included',
-          ar: 'سوبر سفاري كامل لمدة 7 ساعات · كواد وباجي عائلي لشخصين · ركوب جمال وقرية بدوية وعشاء مشويات مشمول',
-          de: 'Volle 7-stündige Super Safari · Quad & 2-Sitzer Familien-Buggy · Kamelritt, Beduinendorf & BBQ-Abendessen inklusive',
+          en: 'The same full program timed for the golden hour: ride out in the afternoon light and make the return ride as the sun drops behind the mountains. No dinner is served on this departure either.',
+          ar: 'نفس البرنامج الكامل في توقيت الساعة الذهبية: الانطلاق في ضوء العصر والعودة مع غروب الشمس خلف الجبال، ولا يوجد عشاء في هذا الانطلاق أيضًا.',
+          de: 'Dasselbe volle Programm zur goldenen Stunde: Hinfahrt im Nachmittagslicht und Rückfahrt, wenn die Sonne hinter den Bergen untergeht. Auch hier wird kein Abendessen serviert.',
         },
-        price: 49,
+        price: 32,
       },
     ],
     shortDescription: {
-      en: 'Ride open Red Sea mountain wadis before sunset, enjoy fresh Bedouin bread and tea, and return under clear desert skies.',
-      ar: 'جولة في وديان جبال البحر الأحمر قبل الغروب مع خبز بدوي طازج وشاي تحت سماء الصحراء.',
-      de: 'Fahrt durch weite Bergwadis zum Sonnenuntergang mit frischem Beduinenbrot und Tee.',
+      en: 'Ride your own quad 40 km into the desert to a traditional Bedouin village, taste bread baked the Bedouin way, sip Bedouin tea and take a camel ride, then ride back. No meals, just the desert.',
+      ar: 'قد الكواد الخاص بك لمسافة 40 كم داخل الصحراء إلى قرية بدوية تقليدية، تذوق الخبز البدوي الطازج واشرب الشاي البدوي واركب الجمل ثم عد بالقيادة. بدون وجبات، الصحراء فقط.',
+      de: 'Fahren Sie Ihr eigenes Quad 40 km durch die Wüste zu einem traditionellen Beduinendorf, probieren Sie Beduinenbrot, trinken Sie Beduinentee, reiten Sie ein Kamel und fahren Sie zurück. Keine Mahlzeiten, nur die Wüste.',
+    },
+    fullDescription: {
+      en: 'The resorts end, the asphalt ends, and the desert takes over. We pick you up from your hotel in an air-conditioned vehicle and drive you to the quad station, where the team fits your helmet, walks you through the controls and gives you a short practice ride so that every rider, first timer or experienced, sets off steady and confident.\n\nThen the real ride begins: 40 km of quad biking across open desert, over packed tracks and soft sand, with the Red Sea mountains growing on the horizon. Your destination is a traditional Bedouin village, where life runs at a different speed. Watch bread being baked the Bedouin way, sit down in the shade for a glass of Bedouin tea, and take a camel ride with the mountains behind you.\n\nAfter the village, it is back on the quads for the return ride to the station and the transfer back to your hotel. Choose the morning departure for clear light and cooler air, or the sunset departure and ride the last stretch in the golden hour.\n\nThis trip serves no meals at all, and that is deliberate: it is a riding trip, not a dinner trip. Eat before you come, bring your appetite for the desert instead.',
+      ar: 'تنتهي المنتجعات، وينتهي الأسفلت، وتبدأ الصحراء. نستلمك من فندقك في سيارة مكيفة ونوصلك إلى محطة الكواد، حيث يضبط الفريق خوذتك ويشرح لك التحكم ويمنحك تجربة قيادة قصيرة حتى ينطلق كل راكب، مبتدئًا كان أو متمرسًا، بثبات وثقة.\n\nثم تبدأ الجولة الحقيقية: 40 كم من قيادة الكواد عبر الصحراء المفتوحة، بين الدروب الممهدة والرمال الناعمة، بينما تكبر جبال البحر الأحمر في الأفق. وجهتك هي قرية بدوية تقليدية تسير فيها الحياة بإيقاع مختلف. شاهد خبز البدو يُخبز بالطريقة التقليدية، واجلس في الظل لكوب شاي بدوي، واستمتع بركوب الجمل والجبال خلفك.\n\nبعد القرية، تعود على الكواد في رحلة الرجوع إلى المحطة ثم التوصيل إلى فندقك. اختر الانطلاق الصباحي للإضاءة الصافية والهواء الألطف، أو انطلاق الغروب لتقود المرحلة الأخيرة في الساعة الذهبية.\n\nهذه الرحلة لا تقدم أي وجبات على الإطلاق، وذلك عن قصد: إنها رحلة قيادة، وليست رحلة عشاء. تناول طعامك قبل الحضور، وأحضر شغفك بالصحراء فقط.',
+      de: 'Die Resorts enden, der Asphalt endet, und die Wüste übernimmt. Wir holen Sie in einem klimatisierten Fahrzeug vom Hotel ab und bringen Sie zur Quad-Station, wo das Team Ihren Helm anpasst, die Bedienung erklärt und eine kurze Übungsfahrt mit Ihnen macht, damit jeder Fahrer, ob Anfänger oder erfahren, sicher und gelassen startet.\n\nDann beginnt die eigentliche Fahrt: 40 km Quadfahren durch die offene Wüste, über feste Pisten und weichen Sand, während die Berge des Roten Meeres am Horizont wachsen. Ihr Ziel ist ein traditionelles Beduinendorf, in dem das Leben in einem anderen Tempo läuft. Schauen Sie beim traditionellen Brotbacken zu, genießen Sie im Schatten ein Glas Beduinentee und unternehmen Sie einen Kamelritt vor der Bergkulisse.\n\nNach dem Dorf geht es auf den Quads zurück zur Station und anschließend per Transfer zurück zu Ihrem Hotel. Wählen Sie die Morgenabfahrt für klares Licht und kühlere Luft oder die Sonnenuntergangs-Abfahrt für den letzten Abschnitt in der goldenen Stunde.\n\nAuf dieser Tour werden bewusst keinerlei Mahlzeiten serviert: Es ist eine Fahrttour, keine Dinner-Tour. Essen Sie vorab und bringen Sie Ihren Appetit auf die Wüste mit.',
     },
     highlights: [
       {
-        en: 'Guided pace matched to your group, never a rushed convoy',
-        ar: 'سرعة تناسب مجموعتك بدون استعجال',
-        de: 'Angepasstes Tempo ohne gehetzte Kolonnen',
+        en: 'Hotel pickup in an air-conditioned vehicle',
+        ar: 'الاستلام من الفندق بسيارة مكيفة',
+        de: 'Hotelabholung im klimatisierten Fahrzeug',
       },
       {
-        en: '2-seat family buggies available for parents riding with kids',
-        ar: 'توافر باجي عائلي بمقعدين للأهل مع الأطفال',
-        de: '2-Sitzer-Familienbuggys für Eltern mit Kindern verfügbar',
+        en: 'Helmet fitting, safety briefing and a practice ride at the quad station',
+        ar: 'ضبط الخوذة وشرح الأمان وتجربة قيادة قصيرة في محطة الكواد',
+        de: 'Helmanpassung, Sicherheitseinweisung und Übungsfahrt an der Quad-Station',
+      },
+      {
+        en: 'A 40 km quad ride across open desert to a traditional Bedouin village',
+        ar: 'جولة كواد لمسافة 40 كم عبر الصحراء المفتوحة إلى قرية بدوية تقليدية',
+        de: '40 km Quadfahrt durch die offene Wüste zu einem traditionellen Beduinendorf',
+      },
+      {
+        en: 'Bread baking and Bedouin tea in the village',
+        ar: 'خبز بدوي وشاي بدوي في القرية',
+        de: 'Brotbacken und Beduinentee im Dorf',
+      },
+      {
+        en: 'A camel ride with the Red Sea mountains as your backdrop',
+        ar: 'ركوب الجمل مع جبال البحر الأحمر في الخلفية',
+        de: 'Kamelritt mit den Bergen des Roten Meeres im Hintergrund',
+      },
+      {
+        en: 'The return quad ride to the station, then transfer back to your hotel',
+        ar: 'العودة بالكواد إلى المحطة ثم التوصيل إلى فندقك',
+        de: 'Rückfahrt mit dem Quad zur Station und Transfer zurück zum Hotel',
+      },
+      {
+        en: 'Led by an experienced local desert guide',
+        ar: 'بقيادة مرشد صحراوي محلي خبير',
+        de: 'Geführt von einem erfahrenen lokalen Wüstenguide',
       },
     ],
     historicalFacts: [
@@ -1423,35 +2316,496 @@ Danach geht es klimatisiert zurück durch die Wüste, mit dem ganzen antiken The
       },
     ],
     included: [
-      { en: 'Round-trip Hurghada city hotel transfer', ar: 'توصيل ذهاب وعودة من فنادق مدينة الغردقة', de: 'Hin- & Rücktransfer ab Hurghada-Stadt' },
       {
-        en: 'Quad/buggy, helmet, safety briefing & Bedouin tea (BBQ dinner included with Super Safari option only)',
-        ar: 'الكواد أو الباجي والخوذة وشرح الأمان والشاي البدوي (عشاء المشويات مشمول في خيار السوبر سفاري فقط)',
-        de: 'Quad/Buggy, Helm, Sicherheitseinweisung & Beduinentee (BBQ-Abendessen nur bei der Option Super Safari inklusive)',
+        en: 'Round-trip transfer from Hurghada city hotels (air-conditioned vehicle)',
+        ar: 'توصيل ذهاب وعودة من فنادق مدينة الغردقة (سيارة مكيفة)',
+        de: 'Hin- und Rücktransfer ab Hotels in Hurghada-Stadt (klimatisiertes Fahrzeug)',
+      },
+      {
+        en: 'Quad, helmet, safety briefing & Bedouin tea',
+        ar: 'الكواد والخوذة وشرح الأمان والشاي البدوي',
+        de: 'Quad, Helm, Sicherheitseinweisung & Beduinentee',
+      },
+      {
+        en: 'Practice ride at the quad station',
+        ar: 'تجربة قيادة قصيرة في محطة الكواد',
+        de: 'Übungsfahrt an der Quad-Station',
+      },
+      {
+        en: 'Bedouin village visit with bread baking and Bedouin tea',
+        ar: 'زيارة القرية البدوية مع الخبز البدوي والشاي البدوي',
+        de: 'Besuch eines Beduinendorfs mit Brotbacken und Beduinentee',
+      },
+      {
+        en: 'Camel ride',
+        ar: 'ركوب الجمل',
+        de: 'Kamelritt',
+      },
+      {
+        en: 'Bottled water',
+        ar: 'مياه معبأة',
+        de: 'Wasser in Flaschen',
       },
     ],
     tips: [
       {
-        en: 'Pick-up & drop-off outside Hurghada (El Gouna, Sahl Hasheesh, Makadi +€10/pp · Soma Bay, Safaga +€15/pp) is NOT included, please select your zone at checkout.',
-        ar: 'التوصيل خارج الغردقة (الجونة، سهل حشيش، مكادي +10€ للفرد · سوما باي، سفاجا +15€ للفرد) رسوم إضافية، اختر منطقتك عند الحجز.',
-        de: 'Abholung außerhalb von Hurghada (+10–15 €/Pers.) ist ein Zusatzoption, bitte Zone beim Buchen wählen.',
+        en: 'Meals (no food is served on this trip)',
+        ar: 'الوجبات (لا يُقدم أي طعام في هذه الرحلة)',
+        de: 'Mahlzeiten (auf dieser Tour wird kein Essen serviert)',
       },
-      { en: 'Desert headscarf (Arafat) & goggles optional at station (€3–€5).', ar: 'الكوفية ونظارة الرمال اختيارية في المحطة.', de: 'Wüstentuch & Schutzbrille optional vor Ort.' },
+      {
+        en: 'Transfer from Makadi Bay, Sahl Hasheesh, El Gouna, Safaga or Soma Bay (per-person extra fee)',
+        ar: 'التوصيل من مكادي باي أو سهل حشيش أو الجونة أو سفاجا أو سوما باي (رسوم إضافية للفرد)',
+        de: 'Transfer ab Makadi Bay, Sahl Hasheesh, El Gouna, Safaga oder Soma Bay (Aufpreis pro Person)',
+      },
+      {
+        en: 'Goggles and scarf (available to buy at the station)',
+        ar: 'النظارة والكوفية (متوفرة للشراء في المحطة)',
+        de: 'Schutzbrille und Tuch (an der Station käuflich)',
+      },
+      {
+        en: 'Photos (available to purchase)',
+        ar: 'الصور (متاحة للشراء)',
+        de: 'Fotos (gegen Aufpreis erhältlich)',
+      },
+      {
+        en: 'Tips',
+        ar: 'الإكراميات',
+        de: 'Trinkgeld',
+      },
     ],
     whatToBring: [
-      { en: 'Closed-toe shoes, sunglasses & light scarf', ar: 'حذاء مغلق، نظارة شمسية ووشاح خفيف', de: 'Feste Schuhe, Sonnenbrille & leichtes Tuch' },
+      {
+        en: 'Comfortable clothes that can get dusty',
+        ar: 'ملابس مريحة تتحمل الأتربة',
+        de: 'Bequeme Kleidung, die staubig werden darf',
+      },
+      { en: 'Closed shoes', ar: 'حذاء مقفول', de: 'Geschlossene Schuhe' },
+      { en: 'Sunglasses and sunscreen', ar: 'نظارة شمس وواقي شمس', de: 'Sonnenbrille und Sonnencreme' },
+      {
+        en: 'A scarf against the dust, if you have one',
+        ar: 'كوفية أو وشاح ضد الأتربة إن وُجد',
+        de: 'Ein Tuch gegen den Staub, falls vorhanden',
+      },
     ],
     notSuitableFor: [
-      { en: 'Pregnant women & guests with severe back injuries', ar: 'الحوامل ومن يعانون من إصابات الظهر الشديدة', de: 'Schwangere & Personen mit Rückenproblemen' },
+      { en: 'Children under 6 years', ar: 'الأطفال أقل من 6 سنوات', de: 'Kinder unter 6 Jahren' },
+      { en: 'Pregnant women', ar: 'النساء الحوامل', de: 'Schwangere Frauen' },
+    ],
+    notAllowed: [
+      { en: 'Alcohol and drugs', ar: 'الكحول والمخدرات', de: 'Alkohol und Drogen' },
+      { en: 'Baby strollers', ar: 'عربات الأطفال', de: 'Kinderwagen' },
+    ],
+    knowBeforeYouGo: [
+      {
+        en: 'Guests aged 16 and above may drive their own quad. Children aged 6 to 15 ride as passengers with an adult and are not permitted to drive.',
+        ar: 'يُسمح للضيوف من عمر 16 عامًا فأكثر بقيادة الكواد الخاص بهم. الأطفال من 6 إلى 15 عامًا يركبون كمرافقين مع بالغ ولا يُسمح لهم بالقيادة.',
+        de: 'Gäste ab 16 Jahren dürfen ihr eigenes Quad fahren. Kinder von 6 bis 15 Jahren fahren als Beifahrer bei einem Erwachsenen mit und dürfen nicht selbst fahren.',
+      },
+      {
+        en: 'Your exact pickup time is confirmed the day before your trip. Please be ready at your pickup point at least 10 minutes before it.',
+        ar: 'يتأكد وقت الاستلام بالظبط قبل الرحلة بيوم. برجاء التواجد في نقطة الاستلام قبل الموعد بـ 10 دقائق على الأقل.',
+        de: 'Ihre genaue Abholzeit wird einen Tag vor der Tour bestätigt. Bitte seien Sie mindestens 10 Minuten vorher am Abholpunkt.',
+      },
+      {
+        en: 'No meals are served on this trip, on either departure. Have breakfast or an early meal before pickup.',
+        ar: 'لا تُقدم أي وجبات في هذه الرحلة في أي من الانطلاقين. تناول الإفطار أو وجبة مبكرة قبل الاستلام.',
+        de: 'Auf dieser Tour werden bei keiner der beiden Abfahrten Mahlzeiten serviert. Essen Sie vor der Abholung.',
+      },
+      {
+        en: 'You will get dusty. That is part of the fun, but do not wear your best clothes.',
+        ar: 'ستتعرّض للأتربة، وهذا جزء من المتعة، لذا لا ترتدِ أفضل ملابسك.',
+        de: 'Sie werden staubig werden. Das gehört zum Spaß dazu, tragen Sie also nicht Ihre beste Kleidung.',
+      },
     ],
     outerTransferEnabled: true,
-    pickup: { en: 'Hurghada City included · Outer zones +€10–15/pp', ar: 'الغردقة مشمولة · خارج الغردقة +10–15€ للفرد', de: 'Hurghada Stadt inkl. · Außenzonen +10–15 €/Pers.' },
+    pickup: {
+      en: 'Hurghada included · El Gouna, Sahl Hasheesh and Makadi +€10/pp · Soma Bay and Safaga +€15/pp',
+      ar: 'الغردقة مشمولة · الجونة وسهل حشيش ومكادي +10 يورو للفرد · سوما باي وسفاجا +15 يورو للفرد',
+      de: 'Hurghada inklusive · El Gouna, Sahl Hasheesh und Makadi +10 €/Pers. · Soma Bay und Safaga +15 €/Pers.',
+    },
     supplierName: 'Wadi Trail Hurghada',
     familyFriendly: true,
     womenFriendly: true,
     minChildAge: 6,
-    kidsDiscount: { en: 'Passenger buggy seat €18', ar: 'مقعد مرافق بالباجي 18 يورو', de: 'Beifahrersitz im Buggy €18' },
     featured: true,
+    languages: ['English', 'German'],
+    operatingDays: [0, 1, 2, 3, 4, 5, 6],
+  },
+  {
+    id: 'hurghada-super-safari',
+    name: {
+      en: 'Super Safari from Hurghada: Quad, Spider Car, Bedouin Village and BBQ Dinner Under the Stars',
+      ar: 'سوبر سفاري من الغردقة: كواد وسبايدر كار وقرية بدوية وعشاء مشويات تحت النجوم',
+      de: 'Super Safari ab Hurghada: Quad, Spider Car, Beduinendorf und BBQ-Abendessen unter den Sternen',
+    },
+    category: 'desert',
+    destination: 'Hurghada',
+    images: [desertSunsetImg],
+    rating: 0,
+    reviewCount: 0,
+    duration: { en: '7 hours', ar: '7 ساعات', de: '7 Stunden' },
+    departureTimes: ['01:00 PM'],
+    price: 20,
+    options: [
+      {
+        id: 'opt-super-safari-full',
+        title: {
+          en: 'Super Safari (Full Program · Dinner & Show Included)',
+          ar: 'سوبر سفاري (البرنامج الكامل · شامل العشاء والعرض)',
+          de: 'Super Safari (Komplettprogramm · inkl. Abendessen & Show)',
+        },
+        detail: {
+          en: 'Quad & spider car · jeep to Bedouin village · BBQ buffet dinner & oriental show',
+          ar: 'كواد وسبايدر كار · جيب إلى القرية البدوية · عشاء مشويات بوفيه مفتوح وعرض شرقي',
+          de: 'Quad & Spider Car · Jeep zum Beduinendorf · BBQ-Buffet-Abendessen & orientalische Show',
+        },
+        price: 20,
+      },
+    ],
+    shortDescription: {
+      en: 'The full desert day in one trip: quad biking and a spider car ride, a jeep journey to a Bedouin village with tea and a camel ride, then an open-buffet BBQ dinner and a live oriental show under the stars.',
+      ar: 'يوم الصحراء الكامل في رحلة واحدة: قيادة كواد وسبايدر كار، ورحلة جيب إلى قرية بدوية مع شاي وركوب جمل، ثم عشاء مشويات بوفيه مفتوح وعرض شرقي حي تحت النجوم.',
+      de: 'Der komplette Wüstentag in einer Tour: Quadfahren und eine Fahrt im Spider Car, Jeepfahrt zu einem Beduinendorf mit Tee und Kamelritt, anschließend ein offenes BBQ-Buffet und eine orientalische Live-Show unter den Sternen.',
+    },
+    fullDescription: {
+      en: 'This is the desert day with nothing left out. We pick you up from your hotel and take you to the desert station, where the team runs the safety briefing and a short driving test, fits your helmet, and gets everyone comfortable before the engines start.\n\nFirst the quad bike, across open desert with the mountains ahead of you. Then the spider car, a two-seat buggy built for the sand, fast and low and enormous fun. From the station a jeep takes you deeper, to a traditional Bedouin village, where you sit down for Bedouin tea and take a camel ride, the oldest way of crossing this landscape there is.\n\nAs the light fades the evening program begins: an open-buffet BBQ dinner with freshly grilled meats and local dishes, served in the desert. Then the show, Tanoura spinning, belly dance and a fire performance, under a sky full of stars. When it ends, the transfer takes you back to your hotel.',
+      ar: 'هذا هو يوم الصحراء الكامل دون أن ينقصه شيء. نستلمك من فندقك ونوصلك إلى محطة الصحراء، حيث يقدم الفريق شرح الأمان واختبار قيادة قصيرًا ويضبط خوذتك حتى يطمئن الجميع قبل تشغيل المحركات.\n\nأولًا الكواد عبر الصحراء المفتوحة والجبال أمامك. ثم السبايدر كار، وهي باجي بمقعدين مصممة للرمال، سريعة ومنخفضة وممتعة للغاية. ومن المحطة يأخذك الجيب أعمق نحو قرية بدوية تقليدية، حيث تجلس لشرب الشاي البدوي وتركب الجمل، أقدم وسيلة لعبور هذه الصحراء.\n\nومع خفوت الضوء يبدأ البرنامج المسائي: عشاء مشويات بوفيه مفتوح بلحوم مشوية طازجة وأطباق محلية في قلب الصحراء. ثم العرض الشرقي الحي من التنورة والرقص الشرقي وعرض النار تحت سماء مرصعة بالنجوم، وبعدها يعيدك التوصيل إلى فندقك.',
+      de: 'Dies ist der Wüstentag, bei dem nichts fehlt. Wir holen Sie vom Hotel ab und bringen Sie zur Wüstenstation, wo das Team die Sicherheitseinweisung und eine kurze Fahrprobe durchführt, Ihren Helm anpasst und sicherstellt, dass sich alle wohlfühlen, bevor die Motoren starten.\n\nZuerst das Quad durch die offene Wüste mit den Bergen vor Ihnen. Danach das Spider Car, ein zweisitziger Buggy für den Sand, schnell, flach und voller Fahrspaß. Von der Station bringt Sie ein Jeep tiefer hinein zu einem traditionellen Beduinendorf, wo Sie Beduinentee trinken und auf einem Kamel reiten, der ältesten Art, diese Landschaft zu durchqueren.\n\nWenn das Licht schwindet, beginnt das Abendprogramm: ein offenes BBQ-Buffet mit frisch gegrilltem Fleisch und lokalen Gerichten mitten in der Wüste. Danach folgt die Show mit Tanoura-Tanz, Bauchtanz und Feuershow unter einem Sternenhimmel. Am Ende bringt Sie der Transfer zurück zu Ihrem Hotel.',
+    },
+    highlights: [
+      {
+        en: 'Hotel pickup in an air-conditioned vehicle',
+        ar: 'الاستلام من الفندق بسيارة مكيفة',
+        de: 'Hotelabholung im klimatisierten Fahrzeug',
+      },
+      {
+        en: 'Safety briefing, driving test and helmet fitting at the desert station',
+        ar: 'شرح الأمان واختبار القيادة وضبط الخوذة في محطة الصحراء',
+        de: 'Sicherheitseinweisung, Fahrprobe und Helmanpassung an der Wüstenstation',
+      },
+      {
+        en: 'Quad bike ride across open desert',
+        ar: 'قيادة الكواد عبر الصحراء المفتوحة',
+        de: 'Quadfahrt durch die offene Wüste',
+      },
+      {
+        en: 'Spider car ride, two seats, built for the sand',
+        ar: 'قيادة السبايدر كار بمقعدين، مصممة للرمال',
+        de: 'Fahrt im zweisitzigen Spider Car, gebaut für den Sand',
+      },
+      {
+        en: 'Jeep journey to a traditional Bedouin village',
+        ar: 'رحلة جيب إلى قرية بدوية تقليدية',
+        de: 'Jeepfahrt zu einem traditionellen Beduinendorf',
+      },
+      {
+        en: 'Bedouin tea and a camel ride in the village',
+        ar: 'شاي بدوي وركوب جمل في القرية',
+        de: 'Beduinentee und Kamelritt im Dorf',
+      },
+      {
+        en: 'Open-buffet BBQ dinner in the desert',
+        ar: 'عشاء مشويات بوفيه مفتوح في الصحراء',
+        de: 'Offenes BBQ-Buffet-Abendessen in der Wüste',
+      },
+      {
+        en: 'Live oriental show: Tanoura, belly dance and fire performance',
+        ar: 'عرض شرقي حي: تنورة ورقص شرقي وعرض نار',
+        de: 'Orientalische Live-Show: Tanoura, Bauchtanz und Feuershow',
+      },
+      {
+        en: 'Transfer back to your hotel',
+        ar: 'التوصيل عائدًا إلى فندقك',
+        de: 'Rücktransfer zu Ihrem Hotel',
+      },
+      {
+        en: 'Led by an experienced local desert guide',
+        ar: 'بقيادة مرشد صحراوي محلي خبير',
+        de: 'Geführt von einem erfahrenen lokalen Wüstenguide',
+      },
+    ],
+    included: [
+      {
+        en: 'Round-trip transfer from Hurghada city hotels (air-conditioned vehicle)',
+        ar: 'توصيل ذهاب وعودة من فنادق مدينة الغردقة (سيارة مكيفة)',
+        de: 'Hin- und Rücktransfer ab Hotels in Hurghada-Stadt (klimatisiertes Fahrzeug)',
+      },
+      {
+        en: 'Quad bike ride and spider car ride',
+        ar: 'قيادة الكواد وقيادة السبايدر كار',
+        de: 'Quadfahrt und Fahrt mit dem Spider Car',
+      },
+      {
+        en: 'Jeep trip to the Bedouin village',
+        ar: 'رحلة الجيب إلى القرية البدوية',
+        de: 'Jeepfahrt zum Beduinendorf',
+      },
+      {
+        en: 'Helmet, safety briefing and driving test',
+        ar: 'خوذة وشرح أمان واختبار قيادة',
+        de: 'Helm, Sicherheitseinweisung und Fahrprobe',
+      },
+      {
+        en: 'Bedouin village visit with Bedouin tea',
+        ar: 'زيارة القرية البدوية مع شاي بدوي',
+        de: 'Besuch des Beduinendorfs mit Beduinentee',
+      },
+      {
+        en: 'Camel ride',
+        ar: 'ركوب الجمل',
+        de: 'Kamelritt',
+      },
+      {
+        en: 'Open-buffet BBQ dinner',
+        ar: 'عشاء مشويات بوفيه مفتوح',
+        de: 'Offenes BBQ-Buffet-Abendessen',
+      },
+      {
+        en: 'Oriental show (Tanoura, belly dance, fire show)',
+        ar: 'عرض شرقي (تنورة، رقص شرقي، عرض نار)',
+        de: 'Orientalische Show (Tanoura, Bauchtanz, Feuershow)',
+      },
+      {
+        en: 'Tour guide assistance',
+        ar: 'مرافقة وإرشاد سياحي',
+        de: 'Betreuung durch einen Tourguide',
+      },
+    ],
+    tips: [
+      {
+        en: 'Transfer from El Gouna, Safaga, Sahl Hasheesh or Makadi (per-person extra fee)',
+        ar: 'التوصيل من الجونة أو سفاجا أو سهل حشيش أو مكادي (رسوم إضافية للفرد)',
+        de: 'Transfer ab El Gouna, Safaga, Sahl Hasheesh oder Makadi (Aufpreis pro Person)',
+      },
+      {
+        en: 'Protective goggles and scarf (available at the station)',
+        ar: 'النظارة الواقية والكوفية (متوفرة في المحطة)',
+        de: 'Schutzbrille und Tuch (an der Station erhältlich)',
+      },
+      {
+        en: 'Photo and video sessions (available to purchase)',
+        ar: 'جلسات التصوير والفيديو (متاحة للشراء)',
+        de: 'Foto- und Videoaufnahmen (gegen Aufpreis erhältlich)',
+      },
+      {
+        en: 'Tips',
+        ar: 'الإكراميات',
+        de: 'Trinkgeld',
+      },
+    ],
+    notSuitableFor: [
+      { en: 'Pregnant women', ar: 'النساء الحوامل', de: 'Schwangere Frauen' },
+      { en: 'People with back problems', ar: 'الأشخاص الذين يعانون من مشاكل في الظهر', de: 'Personen mit Rückenproblemen' },
+      { en: 'People over 65 years', ar: 'الأشخاص فوق 65 عامًا', de: 'Personen über 65 Jahre' },
+      { en: 'Wheelchair users', ar: 'مستخدمو الكراسي المتحركة', de: 'Rollstuhlfahrer' },
+      { en: 'Babies under 1 year', ar: 'الرضّع أقل من سنة', de: 'Babys unter 1 Jahr' },
+    ],
+    whatToBring: [
+      {
+        en: 'Comfortable clothes that can get dusty',
+        ar: 'ملابس مريحة تتحمل الأتربة',
+        de: 'Bequeme Kleidung, die staubig werden darf',
+      },
+      { en: 'Comfortable closed shoes', ar: 'حذاء مريح مقفول', de: 'Bequeme geschlossene Schuhe' },
+      { en: 'Sunglasses and sunscreen', ar: 'نظارة شمس وواقي شمس', de: 'Sonnenbrille und Sonnencreme' },
+      {
+        en: 'A light jacket for the desert evening',
+        ar: 'جاكيت خفيف لمساء الصحراء',
+        de: 'Eine leichte Jacke für den Wüstenabend',
+      },
+    ],
+    notAllowed: [
+      { en: 'Alcohol and drugs', ar: 'الكحول والمخدرات', de: 'Alkohol und Drogen' },
+    ],
+    knowBeforeYouGo: [
+      {
+        en: 'Helmets are provided and must be worn during the quad and spider car rides.',
+        ar: 'تُوفر الخوذات ويجب ارتداؤها أثناء قيادة الكواد والسبايدر كار.',
+        de: 'Helme werden gestellt und müssen während der Quad- und Spider-Car-Fahrten getragen werden.',
+      },
+      {
+        en: 'Every driver completes a short driving test at the station before setting off.',
+        ar: 'يجري كل سائق اختبار قيادة قصيرًا في المحطة قبل الانطلاق.',
+        de: 'Jeder Fahrer absolviert vor dem Start eine kurze Fahrprobe an der Station.',
+      },
+      {
+        en: 'Your exact pickup time is confirmed the day before your trip, by WhatsApp or email.',
+        ar: 'يتأكد وقت الاستلام بالظبط قبل الرحلة بيوم عبر واتساب أو البريد الإلكتروني.',
+        de: 'Ihre genaue Abholzeit wird einen Tag vor der Tour per WhatsApp oder E-Mail bestätigt.',
+      },
+    ],
+    outerTransferEnabled: true,
+    pickup: {
+      en: 'Hurghada included · El Gouna, Sahl Hasheesh and Makadi +€10/pp · Soma Bay and Safaga +€15/pp',
+      ar: 'الغردقة مشمولة · الجونة وسهل حشيش ومكادي +10 يورو للفرد · سوما باي وسفاجا +15 يورو للفرد',
+      de: 'Hurghada inklusive · El Gouna, Sahl Hasheesh und Makadi +10 €/Pers. · Soma Bay und Safaga +15 €/Pers.',
+    },
+    supplierName: 'Desert Safari Partner',
+    familyFriendly: true,
+    womenFriendly: true,
+    minChildAge: 1,
+    featured: false,
+    languages: ['English', 'German'],
+    operatingDays: [0, 1, 2, 3, 4, 5, 6],
+  },
+  {
+    id: 'hurghada-star-gazing-jeep',
+    name: {
+      en: 'Star Gazing by Jeep from Hurghada: Desert Dinner and a Sky Full of Stars',
+      ar: 'مشاهدة النجوم بالجيب من الغردقة: عشاء صحراوي وسماء مليئة بالنجوم',
+      de: 'Sternenbeobachtung im Jeep ab Hurghada: Wüsten-Abendessen und ein Himmel voller Sterne',
+    },
+    category: 'desert',
+    destination: 'Hurghada',
+    images: [desertSunsetImg],
+    rating: 0,
+    reviewCount: 0,
+    duration: { en: 'Evening trip', ar: 'رحلة مسائية', de: 'Abendausflug' },
+    departureTimes: ['05:00 PM'],
+    price: 22,
+    options: [
+      {
+        id: 'opt-stargazing-jeep',
+        title: {
+          en: 'Star Gazing by Jeep (Dinner Included)',
+          ar: 'مشاهدة النجوم بالجيب (شامل العشاء)',
+          de: 'Sternenbeobachtung im Jeep (inkl. Abendessen)',
+        },
+        detail: {
+          en: 'Jeep into the desert · dinner included · star watching away from city lights',
+          ar: 'جيب إلى الصحراء · العشاء مشمول · مشاهدة النجوم بعيدًا عن أضواء المدينة',
+          de: 'Jeepfahrt in die Wüste · Abendessen inklusive · Sternenbeobachtung fernab der Stadtlichter',
+        },
+        price: 22,
+      },
+    ],
+    shortDescription: {
+      en: 'Leave the resort lights behind. A jeep takes you into the desert for dinner in the open air, then the main event: a night sky the way it looked before cities existed.',
+      ar: 'اترك أضواء المنتجعات خلفك. يأخذك الجيب إلى الصحراء لعشاء في الهواء الطلق، ثم الحدث الأهم: سماء ليلية كما كانت قبل وجود المدن.',
+      de: 'Lassen Sie die Lichter der Resorts hinter sich. Ein Jeep bringt Sie zum Abendessen unter freiem Himmel in die Wüste, gefolgt vom Höhepunkt: einem Nachthimmel wie aus der Zeit vor den Städten.',
+    },
+    fullDescription: {
+      en: 'Hurghada is bright, and bright is the enemy of stars. So in the early evening we put you in a jeep, collect you from your hotel, and drive the other way, out into the desert, where the lights end and the sky starts doing something most people have never actually seen.\n\nOut in the open desert, dinner is served and included in your price. Eat in the cool evening air, with sand under your feet instead of a restaurant floor.\n\nThen the lights go down and you look up. Away from the city, the Milky Way stops being a photograph you have seen online and becomes a river of light running across the whole sky, with more stars than your eyes know what to do with. Desert silence, cold clear air, and that sky. Some evenings of a holiday get forgotten by February. This is not one of them.\n\nAfter the star watching, the jeep takes you back to your hotel.',
+      ar: 'الغردقة مضيئة، والضوء عدو النجوم. لذلك في بداية المساء نستلمك من فندقك في سيارة جيب ونتجه في الاتجاه المعاكس، إلى قلب الصحراء حيث تنتهي الأضواء وتبدأ السماء في عرض مشهد لم يره معظم الناس من قبل.\n\nفي الصحراء المفتوحة، يُقدم لك العشاء وهو مشمول في السعر. تتناول طعامك في هواء المساء اللطيف والرمل تحت قدميك بدلًا من أرضية مطعم.\n\nثم تنطفئ الأضواء وتنظر إلى الأعلى. بعيدًا عن المدينة، لا تعود مجرة درب التبانة مجرد صورة رأيتها على الإنترنت، بل تتحول إلى نهر من الضوء يمتد عبر السماء كلها مع نجوم أكثر مما تستوعبه عيناك. صمت الصحراء، هواء نقي بارد، وهذه السماء. بعض أمسيات الإجازة تُنسى سريعًا، أما هذه فلا.\n\nوبعد مشاهدة النجوم، يعيدك الجيب إلى فندقك.',
+      de: 'Hurghada ist hell, und Helligkeit ist der Feind der Sterne. Deshalb holen wir Sie am frühen Abend im Jeep vom Hotel ab und fahren in die entgegengesetzte Richtung hinaus in die Wüste, dorthin, wo die Lichter enden und der Himmel etwas zeigt, das die meisten Menschen noch nie wirklich gesehen haben.\n\nDraußen in der offenen Wüste wird das im Preis inbegriffene Abendessen serviert. Sie essen in der kühlen Abendluft, mit Sand unter den Füßen statt eines Restaurantbodens.\n\nDann gehen die Lichter aus und Sie blicken hinauf. Fernab der Stadt ist die Milchstraße kein Foto mehr aus dem Internet, sondern ein Lichtfluss quer über den ganzen Himmel mit mehr Sternen, als das Auge fassen kann. Wüstenstille, klare Luft und dieser Himmel. Manche Urlaubsabende vergisst man bis Februar. Dieser gehört nicht dazu.\n\nNach der Sternenbeobachtung bringt Sie der Jeep zurück zu Ihrem Hotel.',
+    },
+    highlights: [
+      {
+        en: 'Hotel pickup in the early evening',
+        ar: 'الاستلام من الفندق في بداية المساء',
+        de: 'Hotelabholung am frühen Abend',
+      },
+      {
+        en: 'A jeep ride out into the open desert, away from the city lights',
+        ar: 'رحلة جيب إلى الصحراء المفتوحة بعيدًا عن أضواء المدينة',
+        de: 'Jeepfahrt hinaus in die offene Wüste, fernab der Stadtlichter',
+      },
+      {
+        en: 'Dinner served in the desert, included in the price',
+        ar: 'عشاء يُقدم في الصحراء ومشمول في السعر',
+        de: 'Abendessen in der Wüste, im Preis inbegriffen',
+      },
+      {
+        en: 'Star watching under a dark desert sky, with the Milky Way overhead',
+        ar: 'مشاهدة النجوم تحت سماء صحراوية مظلمة مع مجرة درب التبانة فوقك',
+        de: 'Sternenbeobachtung unter dunklem Wüstenhimmel mit der Milchstraße über Ihnen',
+      },
+      {
+        en: 'The jeep ride back to your hotel',
+        ar: 'العودة بالجيب إلى فندقك',
+        de: 'Rückfahrt im Jeep zu Ihrem Hotel',
+      },
+      {
+        en: 'Led by an experienced local desert guide',
+        ar: 'بقيادة مرشد صحراوي محلي خبير',
+        de: 'Geführt von einem erfahrenen lokalen Wüstenguide',
+      },
+    ],
+    included: [
+      {
+        en: 'Round-trip hotel transfer',
+        ar: 'توصيل ذهاب وعودة من الفندق',
+        de: 'Hin- und Rücktransfer vom Hotel',
+      },
+      {
+        en: 'Jeep desert trip',
+        ar: 'رحلة صحراوية بالجيب',
+        de: 'Wüstentour im Jeep',
+      },
+      {
+        en: 'Dinner',
+        ar: 'العشاء',
+        de: 'Abendessen',
+      },
+      {
+        en: 'Star watching in the desert',
+        ar: 'مشاهدة النجوم في الصحراء',
+        de: 'Sternenbeobachtung in der Wüste',
+      },
+    ],
+    tips: [
+      {
+        en: 'Transfer from Makadi Bay, Sahl Hasheesh, El Gouna, Safaga or Soma Bay (per-person extra fee)',
+        ar: 'التوصيل من مكادي باي أو سهل حشيش أو الجونة أو سفاجا أو سوما باي (رسوم إضافية للفرد)',
+        de: 'Transfer ab Makadi Bay, Sahl Hasheesh, El Gouna, Safaga oder Soma Bay (Aufpreis pro Person)',
+      },
+      {
+        en: 'Photos (available to purchase)',
+        ar: 'الصور (متاحة للشراء)',
+        de: 'Fotos (gegen Aufpreis erhältlich)',
+      },
+      {
+        en: 'Tips',
+        ar: 'الإكراميات',
+        de: 'Trinkgeld',
+      },
+    ],
+    notSuitableFor: [],
+    whatToBring: [
+      {
+        en: 'A light jacket: the desert cools down fast after sunset, even after a hot day',
+        ar: 'جاكيت خفيف: تبرد الصحراء سريعًا بعد الغروب حتى بعد يوم حار',
+        de: 'Eine leichte Jacke: Die Wüste kühlt nach Sonnenuntergang schnell ab, selbst nach einem heißen Tag',
+      },
+      { en: 'Comfortable shoes for sand', ar: 'حذاء مريح للرمل', de: 'Bequeme Schuhe für Sand' },
+      {
+        en: 'Your phone or camera, if you want to try photographing the sky',
+        ar: 'هاتفك أو كاميرتك إن أردت تجربة تصوير السماء',
+        de: 'Ihr Handy oder Ihre Kamera, wenn Sie den Himmel fotografieren möchten',
+      },
+    ],
+    notAllowed: [
+      { en: 'Alcohol and drugs', ar: 'الكحول والمخدرات', de: 'Alkohol und Drogen' },
+    ],
+    knowBeforeYouGo: [
+      {
+        en: 'Departure is at 17:00. Your exact pickup time is confirmed the day before your trip, so please be ready at your pickup point.',
+        ar: 'الانطلاق الساعة 17:00. يتأكد وقت الاستلام بالظبط قبل الرحلة بيوم، برجاء التواجد في نقطة الاستلام في الموعد.',
+        de: 'Die Abfahrt ist um 17:00 Uhr. Ihre genaue Abholzeit wird einen Tag vor der Tour bestätigt, bitte seien Sie rechtzeitig am Abholpunkt.',
+      },
+      {
+        en: 'The star watching depends on a clear sky. Cloudy nights happen rarely in the desert, but no one can order the weather.',
+        ar: 'تعتمد مشاهدة النجوم على صفاء السماء. الليالي الغائمة نادرة في الصحراء، لكن لا أحد يتحكم في الطقس.',
+        de: 'Die Sternenbeobachtung hängt von einem klaren Himmel ab. Bewölkte Nächte sind in der Wüste selten, aber das Wetter lässt sich nicht bestellen.',
+      },
+      {
+        en: 'Cash on pickup is how you pay. There is nothing to pay in advance.',
+        ar: 'الدفع نقدًا عند الاستلام، ولا يوجد أي مبلغ يُدفع مقدمًا.',
+        de: 'Sie zahlen bar bei Abholung. Eine Vorauszahlung ist nicht erforderlich.',
+      },
+    ],
+    outerTransferEnabled: true,
+    pickup: {
+      en: 'Hurghada included · El Gouna, Sahl Hasheesh and Makadi +€10/pp · Soma Bay and Safaga +€15/pp',
+      ar: 'الغردقة مشمولة · الجونة وسهل حشيش ومكادي +10 يورو للفرد · سوما باي وسفاجا +15 يورو للفرد',
+      de: 'Hurghada inklusive · El Gouna, Sahl Hasheesh und Makadi +10 €/Pers. · Soma Bay und Safaga +15 €/Pers.',
+    },
+    supplierName: 'Desert Safari Partner',
+    familyFriendly: true,
+    womenFriendly: true,
+    featured: false,
+    languages: ['English', 'German'],
     operatingDays: [0, 1, 2, 3, 4, 5, 6],
   },
   {
