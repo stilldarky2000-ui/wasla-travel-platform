@@ -22,6 +22,38 @@ import luxorHatshepsutCliffsRealImg from '../assets/images/luxor_hatshepsut_clif
 import luxorHatshepsutSphinxRealImg from '../assets/images/luxor_hatshepsut_sphinx_real.webp';
 import luxorWestbankColumnsRealImg from '../assets/images/luxor_westbank_columns_real.webp';
 import horseBeachImg from '../assets/images/trip_horse_sahl_hasheesh_1794609168296.jpg';
+import waslaHorseRideHeroImg from '../assets/images/wasla_horse_ride_hero.jpg';
+import waslaHorseRide02Img from '../assets/images/wasla_horse_ride_02.jpg';
+import waslaHorseRide03Img from '../assets/images/wasla_horse_ride_03.jpg';
+import waslaHorseRide04Img from '../assets/images/wasla_horse_ride_04.jpg';
+import waslaHorseRide05Img from '../assets/images/wasla_horse_ride_05.jpg';
+import waslaHorseRide06Img from '../assets/images/wasla_horse_ride_06.jpg';
+import waslaHorseRide07Img from '../assets/images/wasla_horse_ride_07.jpg';
+import waslaHorseRide08Img from '../assets/images/wasla_horse_ride_08.jpg';
+import waslaHorseSessionHeroImg from '../assets/images/wasla_horse_session_hero.jpg';
+import waslaHorseSession02Img from '../assets/images/wasla_horse_session_02.jpg';
+import waslaHorseSession03Img from '../assets/images/wasla_horse_session_03.jpg';
+import waslaHorseSession04Img from '../assets/images/wasla_horse_session_04.jpg';
+import waslaHorseSession05Img from '../assets/images/wasla_horse_session_05.jpg';
+import waslaHorseSession06Img from '../assets/images/wasla_horse_session_06.jpg';
+import waslaFlyingDressHeroImg from '../assets/images/wasla_flying_dress_hero.jpg';
+import waslaFlyingDress02Img from '../assets/images/wasla_flying_dress_02.jpg';
+import waslaFlyingDress03Img from '../assets/images/wasla_flying_dress_03.jpg';
+import waslaFlyingDress04Img from '../assets/images/wasla_flying_dress_04.jpg';
+import waslaFlyingDress05Img from '../assets/images/wasla_flying_dress_05.jpg';
+import waslaFlyingDress06Img from '../assets/images/wasla_flying_dress_06.jpg';
+import waslaCarriageHeroImg from '../assets/images/wasla_carriage_hero.jpg';
+import waslaCarriage02Img from '../assets/images/wasla_carriage_02.jpg';
+import waslaCarriage03Img from '../assets/images/wasla_carriage_03.jpg';
+import waslaCarriage04Img from '../assets/images/wasla_carriage_04.jpg';
+import waslaCarriage05Img from '../assets/images/wasla_carriage_05.jpg';
+import waslaCarriage06Img from '../assets/images/wasla_carriage_06.jpg';
+import waslaCamelHeroImg from '../assets/images/wasla_camel_hero.jpg';
+import waslaCamel02Img from '../assets/images/wasla_camel_02.jpg';
+import waslaCamel03Img from '../assets/images/wasla_camel_03.jpg';
+import waslaCamel04Img from '../assets/images/wasla_camel_04.jpg';
+import waslaCamel05Img from '../assets/images/wasla_camel_05.jpg';
+import waslaCamel06Img from '../assets/images/wasla_camel_06.jpg';
 import momentGuestImg from '../assets/images/moment_guest_red_sea_1794609167642.jpg';
 import cairoPyramidsImg from '../assets/images/trip_cairo_pyramids_giza_1795088654554.jpg';
 import luxorBalloonImg from '../assets/images/trip_luxor_hot_air_balloon_1795088654794.jpg';
@@ -389,6 +421,38 @@ const BUNDLED_IMAGE_ENTRIES: Array<{ token: string; asset: string }> = [
   { token: 'luxor_hatshepsut_sphinx_real', asset: luxorHatshepsutSphinxRealImg },
   { token: 'luxor_westbank_columns_real', asset: luxorWestbankColumnsRealImg },
   { token: 'trip_horse_sahl_hasheesh', asset: horseBeachImg },
+  { token: 'wasla_horse_ride_hero', asset: waslaHorseRideHeroImg },
+  { token: 'wasla_horse_ride_02', asset: waslaHorseRide02Img },
+  { token: 'wasla_horse_ride_03', asset: waslaHorseRide03Img },
+  { token: 'wasla_horse_ride_04', asset: waslaHorseRide04Img },
+  { token: 'wasla_horse_ride_05', asset: waslaHorseRide05Img },
+  { token: 'wasla_horse_ride_06', asset: waslaHorseRide06Img },
+  { token: 'wasla_horse_ride_07', asset: waslaHorseRide07Img },
+  { token: 'wasla_horse_ride_08', asset: waslaHorseRide08Img },
+  { token: 'wasla_horse_session_hero', asset: waslaHorseSessionHeroImg },
+  { token: 'wasla_horse_session_02', asset: waslaHorseSession02Img },
+  { token: 'wasla_horse_session_03', asset: waslaHorseSession03Img },
+  { token: 'wasla_horse_session_04', asset: waslaHorseSession04Img },
+  { token: 'wasla_horse_session_05', asset: waslaHorseSession05Img },
+  { token: 'wasla_horse_session_06', asset: waslaHorseSession06Img },
+  { token: 'wasla_flying_dress_hero', asset: waslaFlyingDressHeroImg },
+  { token: 'wasla_flying_dress_02', asset: waslaFlyingDress02Img },
+  { token: 'wasla_flying_dress_03', asset: waslaFlyingDress03Img },
+  { token: 'wasla_flying_dress_04', asset: waslaFlyingDress04Img },
+  { token: 'wasla_flying_dress_05', asset: waslaFlyingDress05Img },
+  { token: 'wasla_flying_dress_06', asset: waslaFlyingDress06Img },
+  { token: 'wasla_carriage_hero', asset: waslaCarriageHeroImg },
+  { token: 'wasla_carriage_02', asset: waslaCarriage02Img },
+  { token: 'wasla_carriage_03', asset: waslaCarriage03Img },
+  { token: 'wasla_carriage_04', asset: waslaCarriage04Img },
+  { token: 'wasla_carriage_05', asset: waslaCarriage05Img },
+  { token: 'wasla_carriage_06', asset: waslaCarriage06Img },
+  { token: 'wasla_camel_hero', asset: waslaCamelHeroImg },
+  { token: 'wasla_camel_02', asset: waslaCamel02Img },
+  { token: 'wasla_camel_03', asset: waslaCamel03Img },
+  { token: 'wasla_camel_04', asset: waslaCamel04Img },
+  { token: 'wasla_camel_05', asset: waslaCamel05Img },
+  { token: 'wasla_camel_06', asset: waslaCamel06Img },
   { token: 'moment_guest_red_sea', asset: momentGuestImg },
   { token: 'trip_cairo_pyramids_giza', asset: cairoPyramidsImg },
   { token: 'trip_luxor_hot_air_balloon', asset: luxorBalloonImg },
@@ -1372,102 +1436,187 @@ Danach geht es klimatisiert zurück durch die Wüste, mit dem ganzen antiken The
   {
     id: 'sahl-hasheesh-horse-swim',
     name: {
-      en: 'Hurghada Coastal & Desert Horseback Ride',
-      ar: 'ركوب الخيل على الساحل والصحراء في الغردقة',
-      de: 'Hurghada Ausritt am Strand & durch die Wüste',
+      en: 'Hurghada Horse Riding: Beach or Desert, with a Swim Stop',
+      ar: 'ركوب الخيل في الغردقة: شاطئ أو صحراء مع وقفة سباحة',
+      de: 'Ausritt in Hurghada: Strand oder Wüste, mit Badestopp',
     },
     category: 'horse',
     destination: 'Hurghada',
-    images: [horseBeachImg, heroRedSeaVibrantImg],
-    rating: 5.0,
-    reviewCount: 38,
-    duration: { en: '2.5 hours', ar: '2.5 ساعة', de: '2,5 Stunden' },
-    departureTimes: ['07:30 AM (Sunrise)', '10:00 AM (Morning)', '02:30 PM (Afternoon)', '04:30 PM (Sunset)'],
-    price: 45,
-    options: [
+    images: [
+      waslaHorseRideHeroImg,
+      waslaHorseRide02Img,
+      waslaHorseRide03Img,
+      waslaHorseRide04Img,
+      waslaHorseRide05Img,
+      waslaHorseRide06Img,
+      waslaHorseRide07Img,
+      waslaHorseRide08Img,
+    ],
+    galleryCaptions: [
       {
-        id: 'opt-horse-ride-only',
-        title: {
-          en: 'Guided Horse Ride (Beach or Desert · Hurghada Pickup)',
-          ar: 'جولة ركوب خيل مع مدرب (شاطئ أو صحراء · شامل توصيل الغردقة)',
-          de: 'Geführter Ausritt (Strand oder Wüste · inkl. Hurghada-Transfer)',
-        },
-        detail: {
-          en: 'Safety briefing, instructor & bottled water · 2.5 hrs',
-          ar: 'شرح أمان + مدرب يتحدث الإنجليزية + مياه معدنية · 2.5 ساعة',
-          de: 'Sicherheitseinweisung, Reitlehrer & Wasser · 2,5 Std.',
-        },
-        price: 45,
+        en: 'Riders take their horses deep into the Red Sea',
+        ar: 'فرسان داخلين بخيولهم في البحر الأحمر',
+        de: 'Reiter reiten mit ihren Pferden tief ins Rote Meer',
       },
       {
-        id: 'opt-horse-photoshoot',
+        en: 'A gallop along the beach',
+        ar: 'عدو على الشاطئ',
+        de: 'Galopp am Strand',
+      },
+      {
+        en: 'An evening ride along the shore',
+        ar: 'ركوب مسائي على الشاطئ',
+        de: 'Abendritt entlang der Küste',
+      },
+      {
+        en: 'A swim stop with the horses at sunset',
+        ar: 'وقفة سباحة مع الخيل وقت الغروب',
+        de: 'Badestopp mit den Pferden bei Sonnenuntergang',
+      },
+      {
+        en: 'Friends galloping together on the sand',
+        ar: 'أصدقاء بيعدوا سوا على الرمل',
+        de: 'Freundinnen galoppieren gemeinsam über den Sand',
+      },
+      {
+        en: 'Out in the desert behind Hurghada',
+        ar: 'في صحرا الغردقة',
+        de: 'In der Wüste hinter Hurghada',
+      },
+      {
+        en: 'The group rides back as the sun goes down',
+        ar: 'المجموعة راجعة مع غروب الشمس',
+        de: 'Die Gruppe reitet bei Sonnenuntergang zurück',
+      },
+      {
+        en: 'A quiet moment with your horse after the ride',
+        ar: 'لحظة هادية مع حصانك بعد الرحلة',
+        de: 'Ein ruhiger Moment mit Ihrem Pferd nach dem Ritt',
+      },
+    ],
+    rating: 0,
+    reviewCount: 0,
+    duration: {
+      en: '2 or 3 hours',
+      ar: 'ساعتين أو ٣ ساعات',
+      de: '2 oder 3 Stunden',
+    },
+    departureTimes: ['09:00 AM', '11:00 AM', '01:00 PM', '03:00 PM'],
+    timingNote: {
+      en: '2-hour rides start at the times shown. The 3-hour ride starts at any time you choose, confirmed after booking.',
+      ar: 'رحلات الساعتين تبدأ في المواعيد المعروضة، ورحلة التلات ساعات تبدأ في أي وقت تختاره ويتأكد بعد الحجز.',
+      de: 'Der 2-stündige Ritt startet zu den angegebenen Zeiten. Der 3-stündige Ritt startet zu Ihrer Wunschzeit, bestätigt nach der Buchung.',
+    },
+    price: 40,
+    options: [
+      {
+        id: 'opt-horse-2h',
         title: {
-          en: 'Horseback Ride + Professional Photoshoot Add-On',
-          ar: 'جولة ركوب الخيل + جلسة تصوير فوتوغرافي احترافية',
-          de: 'Ausritt + Professionelles Fotoshooting',
+          en: 'Horse Ride, 2 Hours (Beach or Desert)',
+          ar: 'ركوب خيل، ساعتين (شاطئ أو صحراء)',
+          de: 'Ausritt, 2 Stunden (Strand oder Wüste)',
         },
         detail: {
-          en: 'Dedicated photographer capturing candid & posed Red Sea photos',
-          ar: 'مصور محترف لالتقاط أجمل الصور مع الخيل على البحر والصحراء',
-          de: 'Eigener Fotograf für unvergessliche Strand- & Wüstenfotos',
+          en: 'Guided ride with an instructor, Hurghada hotel pickup included',
+          ar: 'ركوب موجّه مع مدرب، والاستلام من فنادق الغردقة مشمول',
+          de: 'Geführter Ritt mit Reitlehrer, Hotelabholung in Hurghada inklusive',
         },
-        price: 75,
+        price: 40,
+      },
+      {
+        id: 'opt-horse-3h-swim',
+        title: {
+          en: 'Horse Ride, 3 Hours, with a Swim Stop',
+          ar: 'ركوب خيل، ٣ ساعات، مع وقفة سباحة',
+          de: 'Ausritt, 3 Stunden, mit Badestopp',
+        },
+        detail: {
+          en: 'Longer guided ride with a swim stop in the sea with your horse, start at a time of your choice',
+          ar: 'ركوب موجّه أطول مع وقفة سباحة في البحر مع حصانك، والبداية في وقت من اختيارك',
+          de: 'Längerer geführter Ritt mit Badestopp im Meer, Start zu Ihrer Wunschzeit',
+        },
+        price: 60,
       },
     ],
     shortDescription: {
-      en: 'Guided horseback ride along the Red Sea coast or desert wadis, tailored for beginners and experienced riders with optional photoshoot.',
-      ar: 'تجربة فريدة لركوب الخيل على ساحل البحر الأحمر أو في الصحراء للمبتدئين والمحترفين مع خيار جلسة تصوير احترافية.',
-      de: 'Geführter Ausritt entlang des Roten Meeres oder durch die Wüste – ideal für Anfänger & Fortgeschrittene mit optionalem Fotoshooting.',
+      en: 'A real guided ride along the Red Sea shore or through the desert, on a horse matched to your level, with a swim stop on the longer ride.',
+      ar: 'ركوب موجّه حقيقي على شاطئ البحر الأحمر أو في الصحرا، على حصان مناسب لمستواك، مع وقفة سباحة في الرحلة الأطول.',
+      de: 'Ein echter geführter Ritt am Roten Meer oder durch die Wüste, auf einem Pferd passend zu Ihrem Niveau, mit Badestopp beim längeren Ritt.',
     },
     fullDescription: {
-      en: 'Experience a unique horse-riding adventure in Hurghada, combining nature, relaxation and the option to capture unforgettable moments with an optional professional photoshoot.\n\nBegin your journey with a guided horseback ride through stunning desert landscapes or along the Red Sea coast, depending on weather conditions and your preference. Whether you are a beginner or an experienced rider, our professional team will ensure a safe and enjoyable experience tailored to your level.\n\nFor those who want to make the experience even more special, an optional photoshoot is available during the ride. Capture beautiful, Instagram-style moments with the horses in breathtaking natural surroundings, from candid shots to posed photos that highlight the beauty of the landscape.\n\nThis experience is perfect for couples, friends, solo travellers and content creators looking for something unique and memorable in Hurghada. Enjoy the peaceful atmosphere, connect with nature and create lasting memories in one of Egypt’s most beautiful destinations.',
-      ar: 'استمتع بتجربة فريدة لركوب الخيل في الغردقة تجمع بين الطبيعة والاسترخاء وإمكانية توثيق لحظات لا تُنسى مع خيار جلسة تصوير احترافية.\n\nابدأ رحلتك بجولة ركوب خيل مع مدرب عبر المناظر الصحراوية الخلابة أو على ساحل البحر الأحمر حسب حالة الطقس ورغبتك. سواء كنت مبتدئاً أو فارساً محترفاً، يضمن فريقنا تجربة آمنة وممتعة تناسب مستواك.\n\nإذا رغبت بجعل التجربة أكثر تميزاً، تتوفر جلسة تصوير احترافية أثناء الجولة لالتقاط أجمل الصور الطبيعية مع الخيول. هذه التجربة مثالية للأزواج والأصدقاء والمسافرين المنفردين وصنّاع المحتوى.',
-      de: 'Erleben Sie ein unvergessliches Reitabenteuer in Hurghada – eine Verbindung aus Natur, Entspannung und der Möglichkeit für ein professionelles Fotoshooting.\n\nBeginnen Sie Ihren geführten Ausritt durch beeindruckende Wüstenlandschaften oder entlang der Küste des Roten Meeres, angepasst an Wetter und Ihr Reitniveau. Ob Anfänger oder erfahrener Reiter: unser Team sorgt für Sicherheit und Freude.\n\nIdeal für Paare, Freunde, Alleinreisende und Content-Creator.',
+      en: 'This is a riding trip first: you come to ride, and the horses, the shore and the desert do the rest. After pickup from your hotel, you meet the team at the coastal stables, get your safety briefing, and are offered a helmet and vest before you mount. Your horse is matched to your level, and your instructor rides with you the whole way.\n\nYou ride out along the Red Sea shore or into the desert behind Hurghada, as you choose on the day and as the weather allows. The pace follows the least experienced rider in the group, and nobody is ever pushed to go faster than they are comfortable with. On the 3-hour ride there is a swim stop, where you take your horse into the sea.\n\nThe team takes casual photos along the way, and if you want a dedicated photoshoot with directed poses, that is our separate Horse Photoshoot Session. Small groups, a private option, and horses that are worked and rested in rotation.',
+      ar: 'دي رحلة ركوب قبل أي حاجة: انت جاي تركب، والخيل والبحر والصحرا هيكملوا الباقي. بعد الاستلام من فندقك بتقابل الفريق في الاسطبلات الساحلية، تسمع شرح الأمان، وتتجهز بخوذة وصديرية قبل ما تركب. حصانك بيتناسب مع مستواك، ومدربك راكب معاك الطريق كله.\n\nبتركب على شاطئ البحر الأحمر أو في صحرا الغردقة، حسب اختيارك في اليوم وحسب الجو. السرعة على حسب أقل راكب خبرة في المجموعة، ومحدش بيتدفع يجري أسرع من اللي هو مرتاح له أبدًا. وفي رحلة التلات ساعات فيه وقفة سباحة بتدخل فيها بحصانك البحر.\n\nالفريق بياخد لقطات عابرة على الطريق، ولو عايز سيشن تصوير كامل بوقفات موجهة دي رحلتنا المنفصلة سيشن تصوير الحصان. مجموعات صغيرة، واختيار خاص، وخيل بتشتغل وبترتاح بالتناوب.',
+      de: 'Dies ist zuerst ein Reitausflug: Sie kommen zum Reiten, den Rest übernehmen die Pferde, das Meer und die Wüste. Nach der Abholung am Hotel lernen Sie das Team am Küstenstall kennen, erhalten die Sicherheitseinweisung und bekommen Helm und Weste angeboten. Ihr Pferd wird passend zu Ihrem Niveau ausgewählt, Ihr Reitlehrer begleitet Sie den ganzen Weg.\n\nSie reiten am Roten Meer entlang oder in die Wüste hinter Hurghada, nach Ihrer Wahl am Tag und je nach Wetter. Das Tempo richtet sich nach dem unerfahrensten Reiter der Gruppe, niemand wird je zu mehr Tempo gedrängt, als ihm angenehm ist. Beim 3-stündigen Ritt gibt es einen Badestopp, bei dem Sie mit Ihrem Pferd ins Meer reiten.\n\nDas Team macht unterwegs beiläufige Fotos. Wenn Sie ein eigenes Fotoshooting mit angeleiteten Posen möchten, ist das unsere separate Pferde-Fotosession. Kleine Gruppen, eine Privatoption und Pferde, die im Wechsel arbeiten und ruhen.',
     },
     highlights: [
       {
-        en: 'Enjoy a guided horseback ride along the Red Sea or through the desert',
-        ar: 'استمتع بجولة ركوب خيل مع مدرب على ساحل البحر الأحمر أو في الصحراء',
-        de: 'Geführter Ausritt am Roten Meer oder durch die Wüste',
+        en: 'Ride along the Red Sea shore or out into the desert, your choice on the day',
+        ar: 'اركب على شاطئ البحر الأحمر أو في الصحرا، اختيارك في اليوم نفسه',
+        de: 'Reiten Sie am Roten Meer entlang oder in die Wüste, Ihre Wahl am Tag',
       },
       {
-        en: 'Capture your adventure with an optional professional photoshoot',
-        ar: 'وثّق مغامرتك بخيار جلسة تصوير احترافية مع الخيول',
-        de: 'Optionales professionelles Fotoshooting während des Ritts',
+        en: 'A horse and a pace matched to your riding level, beginner or experienced',
+        ar: 'حصان وسرعة مناسبين لمستواك، مبتدئ أو متمرس',
+        de: 'Pferd und Tempo passend zu Ihrem Niveau, Anfänger oder erfahren',
       },
       {
-        en: 'Choose between a beach or desert ride, depending on the weather',
-        ar: 'اختر بين جولة الشاطئ أو الصحراء حسب رغبتك وحالة الطقس',
-        de: 'Wahl zwischen Strand- oder Wüstenritt je nach Wetterlage',
+        en: 'On the 3-hour ride, take your horse into the sea for a swim stop',
+        ar: 'في رحلة التلات ساعات، ادخل بحصانك البحر في وقفة سباحة',
+        de: 'Beim 3-stündigen Ritt reiten Sie mit Ihrem Pferd zum Baden ins Meer',
       },
       {
-        en: 'Get high-quality photos of you with the horses in stunning scenery',
-        ar: 'احصل على صور عالية الجودة لك مع الخيول في مناظر طبيعية خلابة',
-        de: 'Hochwertige Fotos mit den Pferden in traumhafter Kulisse',
+        en: 'Small groups, with a private option for your group only',
+        ar: 'مجموعات صغيرة، مع اختيار خاص لمجموعتك بس',
+        de: 'Kleine Gruppen, mit Privatoption nur für Ihre Gruppe',
       },
       {
-        en: 'Experience a safe and enjoyable ride, whether you’re a beginner or an expert',
-        ar: 'تجربة آمنة وممتعة تناسب المبتدئين والفرسان المحترفين على حد سواء',
-        de: 'Sicherer & angenehmer Ritt für Anfänger wie auch erfahrene Reiter',
+        en: 'A professional instructor rides with you the whole way',
+        ar: 'مدرب محترف راكب معاك الطريق كله',
+        de: 'Ein professioneller Reitlehrer begleitet Sie den ganzen Weg',
       },
     ],
     included: [
-      { en: 'Optional hotel pickup and drop-off from Hurghada (if selected)', ar: 'التوصيل من وإلى فنادق مدينة الغردقة', de: 'Hotelabholung & Rücktransfer ab Hurghada-Stadt' },
-      { en: 'Guided horse riding experience & professional English-speaking instructor', ar: 'تجربة ركوب الخيل مع مدرب محترف يتحدث الإنجليزية', de: 'Geführter Ausritt mit professionellem englischsprachigem Reitlehrer' },
-      { en: 'Professional photoshoot during the activity (if selected)', ar: 'جلسة تصوير احترافية أثناء النشاط (عند اختيار أوبشن التصوير)', de: 'Professionelles Fotoshooting (wenn als Option gewählt)' },
-      { en: 'Safety briefing, assistance, horse equipment & supervision throughout the tour', ar: 'شرح الأمان والمعدات والعناية والإشراف طوال الجولة', de: 'Sicherheitseinweisung, Reitausrüstung & durchgehende Betreuung' },
-      { en: 'Bottled water', ar: 'مياه معدنية معبأة', de: 'Mineralwasser' },
+      {
+        en: 'Hotel pickup and drop-off in Hurghada',
+        ar: 'الاستلام من فنادق الغردقة والرجوع',
+        de: 'Hotelabholung und Rücktransfer in Hurghada',
+      },
+      {
+        en: 'Professional instructor riding with you',
+        ar: 'مدرب محترف راكب معاك',
+        de: 'Professioneller Reitlehrer an Ihrer Seite',
+      },
+      {
+        en: 'Safety briefing and supervision throughout',
+        ar: 'شرح أمان وإشراف طول الرحلة',
+        de: 'Sicherheitseinweisung und Betreuung durchgehend',
+      },
+      {
+        en: 'Horse and full riding equipment',
+        ar: 'الحصان ومعدات الركوب كاملة',
+        de: 'Pferd und komplette Reitausrüstung',
+      },
+      {
+        en: 'Helmet and safety vest, offered to every rider before mounting',
+        ar: 'خوذة وصديرية أمان بيتقدموا لكل راكب قبل الركوب',
+        de: 'Helm und Sicherheitsweste werden jedem Reiter vor dem Aufsteigen angeboten',
+      },
+      {
+        en: 'Bottled water',
+        ar: 'مياه معبأة',
+        de: 'Wasser in Flaschen',
+      },
     ],
     tips: [
       {
-        en: 'Photography services unless the Photoshoot option is selected',
-        ar: 'خدمات التصوير الاحترافي غير مشمولة إلا عند اختيار أوبشن جلسة التصوير',
-        de: 'Fotografieservice nicht inbegriffen, sofern nicht als Option gebucht',
+        en: 'Pickup outside Hurghada and El Gouna is not included: Sahl Hasheesh and Makadi +€10 per person, Soma Bay and Safaga +€15 per person, payable on site.',
+        ar: 'الاستلام خارج الغردقة والجونة غير مشمول: سهل حشيش ومكادي +١٠ يورو للفرد، سوما باي وسفاجا +١٥ يورو للفرد، وتدفع في المكان.',
+        de: 'Abholung außerhalb von Hurghada und El Gouna ist nicht inklusive: Sahl Hasheesh und Makadi +10 € pro Person, Soma Bay und Safaga +15 € pro Person, zahlbar vor Ort.',
       },
       {
-        en: 'Pick-up and drop-off outside Hurghada are not included (Makadi, Sahl Hasheesh, El Gouna +€10/pp · Soma Bay or Safaga +€15/pp). Please select the hotel zone add-on at checkout.',
-        ar: 'التوصيل خارج الغردقة غير مشمول بالسعر الأساسي (مكادي، سهل حشيش، الجونة +10€ للفرد · سوما باي أو سفاجا +15€ للفرد). يرجى تحديد منطقة الفندق عند الحجز لتفادي أي خلاف.',
-        de: 'Abholung außerhalb von Hurghada (Makadi, Sahl Hasheesh, El Gouna +10 €/Pers. · Soma Bay, Safaga +15 €/Pers.) ist nicht inklusive, bitte wählen Sie die Zone beim Checkout.',
+        en: 'A dedicated photoshoot with directed poses is our separate Horse Photoshoot Session',
+        ar: 'سيشن التصوير الكامل بوقفات موجهة هو رحلتنا المنفصلة سيشن تصوير الحصان',
+        de: 'Ein eigenes Fotoshooting mit angeleiteten Posen ist unsere separate Pferde-Fotosession',
       },
     ],
     notSuitableFor: [
@@ -1482,31 +1631,905 @@ Danach geht es klimatisiert zurück durch die Wüste, mit dem ganzen antiken The
       ar: 'اسطبلات ساحلية في جنوب الغردقة أو الاستلام من بهو الفندق',
       de: 'Küstenstall Hurghada Süd / Hotelabholung',
     },
-    meetingPointUrl: 'https://maps.google.com/?q=Sahl+Hasheesh+Hurghada+Egypt',
     whatToBring: [
-      { en: 'Hat', ar: 'قبعة شمسية', de: 'Sonnenhut' },
-      { en: 'Camera', ar: 'كاميرا أو هاتف مشحون', de: 'Kamera' },
+      { en: 'Hat', ar: 'قبعة', de: 'Hut' },
       { en: 'Sunscreen', ar: 'واقي شمس', de: 'Sonnencreme' },
-      { en: 'Comfortable clothes & closed shoes', ar: 'ملابس مريحة وأحذية مغلقة', de: 'Bequeme Kleidung & feste Schuhe' },
+      { en: 'Comfortable clothes and closed shoes', ar: 'ملابس مريحة وحذاء مقفول', de: 'Bequeme Kleidung und geschlossene Schuhe' },
+      { en: 'Swimwear and a towel on the 3-hour ride', ar: 'مايوه وفوطة في رحلة التلات ساعات', de: 'Badesachen und Handtuch beim 3-stündigen Ritt' },
     ],
     notAllowed: [
       { en: 'Pets', ar: 'الحيوانات الأليفة', de: 'Haustiere' },
-      { en: 'Alcohol and drugs', ar: 'الكحوليات والمواد المخدرة', de: 'Alkohol und Drogen' },
+      { en: 'Alcohol and drugs', ar: 'الكحول والمخدرات', de: 'Alkohol und Drogen' },
     ],
     knowBeforeYouGo: [
-      { en: 'This experience is suitable for both beginners and experienced riders', ar: 'التجربة مناسبة للمبتدئين والفرسان أصحاب الخبرة على حد سواء', de: 'Für Anfänger und erfahrene Reiter gleichermaßen geeignet' },
-      { en: 'Please wear comfortable clothing suitable for riding (no skirts or dresses)', ar: 'يرجى ارتداء ملابس مريحة مناسبة للركوب (يُمنع الجيب/الفساتين أثناء الركوب)', de: 'Bitte bequeme Reitkleidung tragen (keine Röcke oder Kleider)' },
-      { en: 'Closed shoes recommended; helmets are fitted cleanly before mounting', ar: 'يفضل ارتداء حذاء رياضي مغلق وتُوفر الخوذة في الاسطبل', de: 'Geschlossene Schuhe empfohlen; Reithelme werden gestellt' },
+      {
+        en: 'Suitable for beginners and experienced riders, the pace follows the least experienced rider and nobody is pushed to ride faster than they are comfortable with',
+        ar: 'مناسبة للمبتدئين والمتمرسين، والسرعة على حسب أقل راكب خبرة ومحدش بيتدفع يجري أسرع من راحته',
+        de: 'Für Anfänger und Erfahrene geeignet, das Tempo richtet sich nach dem unerfahrensten Reiter und niemand wird zu mehr Tempo gedrängt',
+      },
+      {
+        en: 'Want the ride just for your group? A private ride adds €30 per booking, tell us when you book and we will arrange it',
+        ar: 'عايز الرحلة لمجموعتك بس؟ الرحلة الخاصة بتضيف ٣٠ يورو على الحجز كله، قولنا وقت الحجز ونرتبها',
+        de: 'Nur für Ihre Gruppe? Ein privater Ritt kostet 30 € Aufpreis pro Buchung, sagen Sie uns bei der Buchung Bescheid',
+      },
+      {
+        en: 'Tell us your hotel and we confirm your exact pickup time after booking',
+        ar: 'قولنا فندقك ونأكد لك وقت الاستلام بالظبط بعد الحجز',
+        de: 'Nennen Sie uns Ihr Hotel und wir bestätigen Ihre genaue Abholzeit nach der Buchung',
+      },
     ],
     outerTransferEnabled: true,
-    pickup: { en: 'Hurghada City included · Outer zones +€10–15/pp', ar: 'مدينة الغردقة مشمولة · المناطق الخارجية +10–15€ للفرد', de: 'Hurghada Stadt inkl. · Außenzonen +10–15 €/Pers.' },
+    pickup: {
+      en: 'Hurghada and El Gouna included · Sahl Hasheesh and Makadi +€10/pp · Soma Bay and Safaga +€15/pp',
+      ar: 'الغردقة والجونة مشمولة · سهل حشيش ومكادي +١٠ يورو للفرد · سوما باي وسفاجا +١٥ يورو للفرد',
+      de: 'Hurghada und El Gouna inklusive · Sahl Hasheesh und Makadi +10 €/Pers. · Soma Bay und Safaga +15 €/Pers.',
+    },
     supplierName: 'Al-Bahr Stables',
     familyFriendly: true,
     womenFriendly: true,
     minChildAge: 5,
-    kidsDiscount: { en: 'Lead-rein pony walk €25', ar: 'جولة بوني للأطفال 25 يورو', de: 'Geführter Ponyritt €25' },
     featured: true,
-    operatingDays: [1, 3, 5, 6],
+    languages: ['English', 'German'],
+    operatingDays: [0, 1, 2, 3, 4, 5, 6],
+  },
+  {
+    id: 'hurghada-horse-photoshoot-session',
+    name: {
+      en: 'Horse Photoshoot Session in Hurghada: Beach and Sea Shots',
+      ar: 'سيشن تصوير على الحصان في الغردقة: لقطات الشاطئ والبحر',
+      de: 'Pferde-Fotoshooting in Hurghada: Strand- und Meerbilder',
+    },
+    category: 'horse',
+    destination: 'Hurghada',
+    images: [
+      waslaHorseSessionHeroImg,
+      waslaHorseSession02Img,
+      waslaHorseSession03Img,
+      waslaHorseSession04Img,
+      waslaHorseSession05Img,
+      waslaHorseSession06Img,
+    ],
+    galleryCaptions: [
+      {
+        en: 'A quiet portrait with a white horse by the sea',
+        ar: 'بورتريه هادي مع حصان أبيض على البحر',
+        de: 'Ein ruhiges Porträt mit einem weißen Pferd am Meer',
+      },
+      {
+        en: "Reclining on her horse at the water's edge",
+        ar: 'مستلقية على حصانها عند حافة المية',
+        de: 'Zurückgelehnt auf ihrem Pferd am Wasser',
+      },
+      {
+        en: 'Golden hour with a pinto horse',
+        ar: 'الساعة الذهبية مع حصان مرقط',
+        de: 'Goldene Stunde mit einem gescheckten Pferd',
+      },
+      {
+        en: 'A kiss for the horse',
+        ar: 'بوسة للحصان',
+        de: 'Ein Kuss für das Pferd',
+      },
+      {
+        en: 'Standing tall in the shallows',
+        ar: 'واقفة على الحصان في المية الضحلة',
+        de: 'Aufrecht stehend im flachen Wasser',
+      },
+      {
+        en: 'Feeding time at the stables',
+        ar: 'وقت الأكل في الاسطبل',
+        de: 'Fütterungszeit am Stall',
+      },
+    ],
+    rating: 0,
+    reviewCount: 0,
+    duration: {
+      en: '1 or 2 hours',
+      ar: 'ساعة أو ساعتين',
+      de: '1 oder 2 Stunden',
+    },
+    departureTimes: ['09:00 AM', '11:00 AM', '01:00 PM', '03:00 PM'],
+    timingNote: {
+      en: 'Your exact start time is confirmed after booking, around the light you want.',
+      ar: 'وقت البداية بالظبط بيتأكد بعد الحجز، على حسب الإضاءة اللي عايزها.',
+      de: 'Ihre genaue Startzeit wird nach der Buchung bestätigt, passend zum Licht Ihrer Wahl.',
+    },
+    price: 60,
+    options: [
+      {
+        id: 'opt-session-1h',
+        title: {
+          en: 'Photoshoot Session, 1 Hour',
+          ar: 'سيشن تصوير، ساعة',
+          de: 'Fotosession, 1 Stunde',
+        },
+        detail: {
+          en: 'Directed phone photoshoot on a decorated horse, Hurghada pickup included',
+          ar: 'سيشن تصوير موجّه بالموبايل على حصان مزين، واستلام الغردقة مشمول',
+          de: 'Angeleitetes Handy-Fotoshooting auf einem geschmückten Pferd, Abholung in Hurghada inklusive',
+        },
+        price: 60,
+      },
+      {
+        id: 'opt-session-2h',
+        title: {
+          en: 'Photoshoot Session, 2 Hours',
+          ar: 'سيشن تصوير، ساعتين',
+          de: 'Fotosession, 2 Stunden',
+        },
+        detail: {
+          en: 'A longer session with more spots and more looks, same price',
+          ar: 'سيشن أطول بأماكن ولقطات أكتر، بنفس السعر',
+          de: 'Eine längere Session mit mehr Orten und Looks, gleicher Preis',
+        },
+        price: 60,
+      },
+    ],
+    shortDescription: {
+      en: 'A guided photoshoot on horseback at the beach and in the sea shallows, shot on phone with directed poses at the spots that photograph best.',
+      ar: 'سيشن تصوير موجّه على الحصان على الشاطئ وفي المية الضحلة، بيتصور بالموبايل بوقفات موجهة في الأماكن اللي تصويرها أحلى.',
+      de: 'Ein angeleitetes Fotoshooting zu Pferd am Strand und im flachen Meer, mit dem Handy fotografiert und angeleiteten Posen an den fotogensten Orten.',
+    },
+    fullDescription: {
+      en: 'This is the photoshoot, not a riding tour with photos on the side. The team prepares a decorated horse, walks you between the spots that photograph best on the beach and in the sea shallows, and directs every pose: standing with your horse, sitting tall in the saddle, lying back along its neck, walking it through the water.\n\nNo riding experience is needed. Between locations you ride at a gentle walk with a handler beside you, and everyone booked in your group is photographed, not just one of you.\n\nThe session is shot on phone and the photos are shared with you afterwards. If you want a professional camera, a flying dress and edited photos, that is our Flying Dress Photoshoot. If you want to actually ride, that is our Horse Riding trip.',
+      ar: 'ده سيشن التصوير نفسه، مش رحلة ركوب وعلى جنبها صور. الفريق بيجهز حصان مزين، ويمشي بيك بين الأماكن اللي تصويرها أحلى على الشاطئ وفي المية الضحلة، ويوجهك في كل وقفة: واقف جنب حصانك، قاعد على السرج، مستلقي على رقبته، ماشي بيه في المية.\n\nمش محتاج خبرة ركوب. بين الأماكن بتركب بمشية هادية ومرافق جنبك، وكل اللي حاجزين في مجموعتك بيتصوروا مش واحد بس.\n\nالسيشن بيتصور بالموبايل والصور بتوصلك بعدها. ولو عايز كاميرا احترافية وفستان طائر وصور معدلة، دي رحلتنا سيشن الفستان الطائر. ولو عايز تركب بجد، دي رحلتنا ركوب الخيل.',
+      de: 'Dies ist das Fotoshooting selbst, keine Reittour mit Fotos nebenbei. Das Team bereitet ein geschmücktes Pferd vor, führt Sie zu den Orten am Strand und im flachen Meer, die sich am besten fotografieren lassen, und leitet jede Pose an: stehend neben Ihrem Pferd, aufrecht im Sattel, zurückgelehnt am Hals, durchs Wasser führend.\n\nReiterfahrung ist nicht nötig. Zwischen den Orten reiten Sie im ruhigen Schritt mit einem Begleiter an Ihrer Seite, und alle Gebuchten Ihrer Gruppe werden fotografiert, nicht nur einer.\n\nDie Session wird mit dem Handy fotografiert und die Fotos werden Ihnen danach geteilt. Wenn Sie eine Profikamera, ein Flying Dress und bearbeitete Fotos möchten, ist das unser Flying-Dress-Fotoshooting. Wenn Sie wirklich reiten möchten, ist das unser Ausritt.',
+    },
+    highlights: [
+      {
+        en: 'A dedicated photoshoot on a decorated horse, at the beach and in the sea',
+        ar: 'سيشن تصوير كامل على حصان مزين، على الشاطئ وفي البحر',
+        de: 'Ein eigenes Fotoshooting auf einem geschmückten Pferd, am Strand und im Meer',
+      },
+      {
+        en: 'Directed poses at hand-picked spots, the team sets up every shot',
+        ar: 'وقفات موجهة في أماكن مختارة، والفريق بيظبط كل لقطة',
+        de: 'Angeleitete Posen an ausgewählten Orten, das Team richtet jede Aufnahme ein',
+      },
+      {
+        en: 'A gentle ride between locations, no riding experience needed',
+        ar: 'ركوب هادي بين الأماكن، من غير خبرة ركوب',
+        de: 'Ruhiges Reiten zwischen den Orten, keine Reiterfahrung nötig',
+      },
+      {
+        en: 'Everyone in your group gets photographed',
+        ar: 'كل مجموعتك بتتصور',
+        de: 'Alle in Ihrer Gruppe werden fotografiert',
+      },
+      {
+        en: 'Guided throughout by the team who shoot these sessions every day',
+        ar: 'معاك طول الوقت الفريق اللي بيصور السيشنز دي كل يوم',
+        de: 'Begleitet vom Team, das diese Sessions jeden Tag fotografiert',
+      },
+    ],
+    included: [
+      {
+        en: 'Hotel pickup and drop-off in Hurghada',
+        ar: 'الاستلام من فنادق الغردقة والرجوع',
+        de: 'Hotelabholung und Rücktransfer in Hurghada',
+      },
+      {
+        en: 'Decorated horse and handler',
+        ar: 'حصان مزين ومرافق',
+        de: 'Geschmücktes Pferd und Begleiter',
+      },
+      {
+        en: 'Phone photoshoot with directed poses',
+        ar: 'سيشن تصوير بالموبايل بوقفات موجهة',
+        de: 'Handy-Fotoshooting mit angeleiteten Posen',
+      },
+      {
+        en: 'Safety briefing and supervision throughout',
+        ar: 'شرح أمان وإشراف طول السيشن',
+        de: 'Sicherheitseinweisung und Betreuung durchgehend',
+      },
+      {
+        en: 'Bottled water',
+        ar: 'مياه معبأة',
+        de: 'Wasser in Flaschen',
+      },
+    ],
+    tips: [
+      {
+        en: 'Pickup outside Hurghada and El Gouna is not included: Sahl Hasheesh and Makadi +€10 per person, Soma Bay and Safaga +€15 per person, payable on site.',
+        ar: 'الاستلام خارج الغردقة والجونة غير مشمول: سهل حشيش ومكادي +١٠ يورو للفرد، سوما باي وسفاجا +١٥ يورو للفرد، وتدفع في المكان.',
+        de: 'Abholung außerhalb von Hurghada und El Gouna ist nicht inklusive: Sahl Hasheesh und Makadi +10 € pro Person, Soma Bay und Safaga +15 € pro Person, zahlbar vor Ort.',
+      },
+      {
+        en: 'Professional camera work and edited photos are the Flying Dress Photoshoot, a separate experience',
+        ar: 'التصوير بكاميرا احترافية والصور المعدلة هو سيشن الفستان الطائر، تجربة منفصلة',
+        de: 'Profikamera und bearbeitete Fotos sind das Flying-Dress-Fotoshooting, ein separates Erlebnis',
+      },
+    ],
+    notSuitableFor: [
+      { en: 'Children under 5 years', ar: 'الأطفال أقل من 5 سنوات', de: 'Kinder unter 5 Jahren' },
+      { en: 'Pregnant women', ar: 'النساء الحوامل', de: 'Schwangere Frauen' },
+      { en: 'People with back problems', ar: 'الأشخاص الذين يعانون من مشاكل في الظهر', de: 'Personen mit Rückenproblemen' },
+      { en: 'Wheelchair users', ar: 'مستخدمو الكراسي المتحركة', de: 'Rollstuhlfahrer' },
+      { en: 'People over 243 lbs (110 kg)', ar: 'الأشخاص فوق وزن 110 كجم (243 رطل)', de: 'Personen über 110 kg Körpergewicht' },
+    ],
+    meetingPoint: {
+      en: 'Coastal Stables, Hurghada South / Hotel Lobby Pickup',
+      ar: 'اسطبلات ساحلية في جنوب الغردقة أو الاستلام من بهو الفندق',
+      de: 'Küstenstall Hurghada Süd / Hotelabholung',
+    },
+    whatToBring: [
+      { en: 'An outfit you love being photographed in', ar: 'لبس بتحب تتصور بيه', de: 'Ein Outfit, in dem Sie sich gern fotografieren lassen' },
+      { en: 'Sunscreen', ar: 'واقي شمس', de: 'Sonnencreme' },
+      { en: 'Hat', ar: 'قبعة', de: 'Hut' },
+      { en: 'Comfortable clothes and closed shoes for mounting', ar: 'ملابس مريحة وحذاء مقفول للركوب', de: 'Bequeme Kleidung und geschlossene Schuhe zum Aufsteigen' },
+    ],
+    notAllowed: [
+      { en: 'Pets', ar: 'الحيوانات الأليفة', de: 'Haustiere' },
+      { en: 'Alcohol and drugs', ar: 'الكحول والمخدرات', de: 'Alkohol und Drogen' },
+    ],
+    knowBeforeYouGo: [
+      {
+        en: 'No riding experience is needed, the horse is led and a handler walks beside you',
+        ar: 'مش محتاج خبرة ركوب، الحصان بيتمشى بيه ومرافق ماشي جنبك',
+        de: 'Keine Reiterfahrung nötig, das Pferd wird geführt und ein Begleiter geht neben Ihnen',
+      },
+      {
+        en: 'Everyone booked in your group is photographed',
+        ar: 'كل اللي حاجزين في مجموعتك بيتصوروا',
+        de: 'Alle Gebuchten Ihrer Gruppe werden fotografiert',
+      },
+      {
+        en: 'Tell us your hotel and we confirm your exact pickup time after booking',
+        ar: 'قولنا فندقك ونأكد لك وقت الاستلام بالظبط بعد الحجز',
+        de: 'Nennen Sie uns Ihr Hotel und wir bestätigen Ihre genaue Abholzeit nach der Buchung',
+      },
+    ],
+    outerTransferEnabled: true,
+    pickup: {
+      en: 'Hurghada and El Gouna included · Sahl Hasheesh and Makadi +€10/pp · Soma Bay and Safaga +€15/pp',
+      ar: 'الغردقة والجونة مشمولة · سهل حشيش ومكادي +١٠ يورو للفرد · سوما باي وسفاجا +١٥ يورو للفرد',
+      de: 'Hurghada und El Gouna inklusive · Sahl Hasheesh und Makadi +10 €/Pers. · Soma Bay und Safaga +15 €/Pers.',
+    },
+    supplierName: 'Al-Bahr Stables',
+    familyFriendly: true,
+    womenFriendly: true,
+    minChildAge: 5,
+    featured: false,
+    languages: ['English', 'German'],
+    operatingDays: [0, 1, 2, 3, 4, 5, 6],
+  },
+  {
+    id: 'hurghada-flying-dress-photoshoot',
+    name: {
+      en: 'Flying Dress Photoshoot with Horses in Hurghada',
+      ar: 'سيشن الفستان الطائر مع الخيل في الغردقة',
+      de: 'Flying-Dress-Fotoshooting mit Pferden in Hurghada',
+    },
+    category: 'horse',
+    destination: 'Hurghada',
+    images: [
+      waslaFlyingDressHeroImg,
+      waslaFlyingDress02Img,
+      waslaFlyingDress03Img,
+      waslaFlyingDress04Img,
+      waslaFlyingDress05Img,
+      waslaFlyingDress06Img,
+    ],
+    galleryCaptions: [
+      {
+        en: 'The red dress flies over the sea shallows',
+        ar: 'الفستان الأحمر طاير فوق المية الضحلة',
+        de: 'Das rote Kleid fliegt über das flache Meer',
+      },
+      {
+        en: 'A rearing horse under a dramatic sky',
+        ar: 'حصان شابب تحت سما درامية',
+        de: 'Ein steigendes Pferd unter dramatischem Himmel',
+      },
+      {
+        en: 'The blue dress at a gallop',
+        ar: 'الفستان الأزرق في العدو',
+        de: 'Das blaue Kleid im Galopp',
+      },
+      {
+        en: 'The red dress in the desert at sunset',
+        ar: 'الفستان الأحمر في الصحرا وقت الغروب',
+        de: 'Das rote Kleid in der Wüste bei Sonnenuntergang',
+      },
+      {
+        en: 'The blue dress on the beach',
+        ar: 'الفستان الأزرق على الشاطئ',
+        de: 'Das blaue Kleid am Strand',
+      },
+      {
+        en: 'White dress, red hat, calm sea',
+        ar: 'فستان أبيض وقبعة حمرا وبحر هادي',
+        de: 'Weißes Kleid, roter Hut, ruhiges Meer',
+      },
+    ],
+    rating: 0,
+    reviewCount: 0,
+    duration: {
+      en: 'Timing arranged with you',
+      ar: 'التوقيت بيترتب معاك',
+      de: 'Die Zeit wird mit Ihnen abgestimmt',
+    },
+    departureTimes: [],
+    timingNote: {
+      en: 'We arrange the start around the best light and confirm it after booking.',
+      ar: 'بنرتب البداية على أحلى إضاءة ونأكدها بعد الحجز.',
+      de: 'Wir legen den Start auf das beste Licht und bestätigen ihn nach der Buchung.',
+    },
+    price: 250,
+    options: [
+      {
+        id: 'opt-flying-dress',
+        title: {
+          en: 'Flying Dress Photoshoot, Two Locations',
+          ar: 'سيشن الفستان الطائر، مكانين',
+          de: 'Flying-Dress-Fotoshooting, zwei Orte',
+        },
+        detail: {
+          en: 'Two dresses, professional camera and editing, 22 edited photos',
+          ar: 'فستانين، كاميرا احترافية وتعديل احترافي، ٢٢ صورة معدلة',
+          de: 'Zwei Kleider, Profikamera und Bearbeitung, 22 bearbeitete Fotos',
+        },
+        price: 250,
+      },
+    ],
+    shortDescription: {
+      en: 'A professional flying dress shoot on a prepared horse at two locations, with a professional camera, professional editing and 22 finished photos.',
+      ar: 'سيشن فستان طائر احترافي على حصان مجهز في مكانين، بكاميرا احترافية وتعديل احترافي و٢٢ صورة جاهزة.',
+      de: 'Ein professionelles Flying-Dress-Shooting auf einem vorbereiteten Pferd an zwei Orten, mit Profikamera, professioneller Bearbeitung und 22 fertigen Fotos.',
+    },
+    fullDescription: {
+      en: 'You choose your dress and its colour from the dresses provided, and the team prepares your horse. Then the shoot moves between two locations: the sea shallows, where the dress flies over the water, and the open desert.\n\nA professional photographer shoots on a professional camera, and the team sets up every shot around you, the dress and the horse. No riding experience is needed, the horse is led and handled by the team throughout.\n\nYour photos are professionally retouched, and you receive 22 edited photos from the session.',
+      ar: 'بتختاري فستانك ولونه من الفساتين المتوفرة، والفريق بيجهز حصانك. وبعدين السيشن بيتنقل بين مكانين: المية الضحلة على البحر، وهناك الفستان بيطير فوق المية، والصحرا المفتوحة.\n\nمصور محترف بيصور بكاميرا احترافية، والفريق بيظبط كل لقطة حواليكي وحوالين الفستان والحصان. مش محتاجة خبرة ركوب، الحصان بيتمشى بيه والفريق ماسكه طول الوقت.\n\nصورك بتتعدل باحترافية، وبتستلمي ٢٢ صورة معدلة من السيشن.',
+      de: 'Sie wählen Ihr Kleid und seine Farbe aus den bereitgestellten Kleidern, und das Team bereitet Ihr Pferd vor. Dann wechselt das Shooting zwischen zwei Orten: dem flachen Meer, wo das Kleid über dem Wasser fliegt, und der offenen Wüste.\n\nEin professioneller Fotograf fotografiert mit einer Profikamera, und das Team richtet jede Aufnahme um Sie, das Kleid und das Pferd ein. Reiterfahrung ist nicht nötig, das Pferd wird durchgehend vom Team geführt und gehalten.\n\nIhre Fotos werden professionell retuschiert, und Sie erhalten 22 bearbeitete Fotos aus der Session.',
+    },
+    highlights: [
+      {
+        en: 'Choose your dress and colour from the dresses provided',
+        ar: 'اختاري فستانك ولونه من الفساتين المتوفرة',
+        de: 'Wählen Sie Ihr Kleid und seine Farbe aus den bereitgestellten Kleidern',
+      },
+      {
+        en: 'Two locations: the sea shallows and the desert',
+        ar: 'مكانين: المية الضحلة على البحر والصحرا',
+        de: 'Zwei Orte: das flache Meer und die Wüste',
+      },
+      {
+        en: 'A prepared horse and a team that sets up every shot',
+        ar: 'حصان مجهز وفريق بيظبط كل لقطة',
+        de: 'Ein vorbereitetes Pferd und ein Team, das jede Aufnahme einrichtet',
+      },
+      {
+        en: 'Professional camera and professional editing',
+        ar: 'كاميرا احترافية وتعديل احترافي',
+        de: 'Profikamera und professionelle Bearbeitung',
+      },
+      {
+        en: '22 edited photos to take home',
+        ar: '٢٢ صورة معدلة تاخديها معاكي',
+        de: '22 bearbeitete Fotos zum Mitnehmen',
+      },
+    ],
+    included: [
+      {
+        en: 'Private hotel pickup and drop-off',
+        ar: 'استلام خاص من الفندق والرجوع',
+        de: 'Private Hotelabholung und Rücktransfer',
+      },
+      {
+        en: 'Dress of your choice from the dresses provided',
+        ar: 'فستان من اختيارك من الفساتين المتوفرة',
+        de: 'Kleid Ihrer Wahl aus den bereitgestellten Kleidern',
+      },
+      {
+        en: 'Prepared horse and the full team',
+        ar: 'حصان مجهز والفريق كله',
+        de: 'Vorbereitetes Pferd und das ganze Team',
+      },
+      {
+        en: 'Professional photographer and camera',
+        ar: 'مصور محترف وكاميرا احترافية',
+        de: 'Professioneller Fotograf und Kamera',
+      },
+      {
+        en: 'Professional retouching',
+        ar: 'تعديل احترافي على الصور',
+        de: 'Professionelle Retusche',
+      },
+      {
+        en: '22 edited photos',
+        ar: '٢٢ صورة معدلة',
+        de: '22 bearbeitete Fotos',
+      },
+    ],
+    tips: [
+      {
+        en: 'Pickup outside Hurghada is arranged individually, ask us when you book',
+        ar: 'الاستلام خارج الغردقة بيترتب بشكل فردي، اسألنا وقت الحجز',
+        de: 'Abholung außerhalb von Hurghada wird individuell vereinbart, fragen Sie uns bei der Buchung',
+      },
+    ],
+    notSuitableFor: [
+      { en: 'Pregnant women', ar: 'النساء الحوامل', de: 'Schwangere Frauen' },
+      { en: 'People with back problems', ar: 'الأشخاص الذين يعانون من مشاكل في الظهر', de: 'Personen mit Rückenproblemen' },
+      { en: 'Wheelchair users', ar: 'مستخدمو الكراسي المتحركة', de: 'Rollstuhlfahrer' },
+      { en: 'People over 243 lbs (110 kg)', ar: 'الأشخاص فوق وزن 110 كجم (243 رطل)', de: 'Personen über 110 kg Körpergewicht' },
+    ],
+    meetingPoint: {
+      en: 'Coastal Stables, Hurghada South / Hotel Lobby Pickup',
+      ar: 'اسطبلات ساحلية في جنوب الغردقة أو الاستلام من بهو الفندق',
+      de: 'Küstenstall Hurghada Süd / Hotelabholung',
+    },
+    whatToBring: [
+      { en: 'Sunscreen', ar: 'واقي شمس', de: 'Sonnencreme' },
+      { en: 'Hat', ar: 'قبعة', de: 'Hut' },
+      { en: 'Your own camera for behind-the-scenes shots', ar: 'كاميرتك لصور كواليس', de: 'Ihre eigene Kamera für Behind-the-Scenes-Fotos' },
+    ],
+    notAllowed: [
+      { en: 'Pets', ar: 'الحيوانات الأليفة', de: 'Haustiere' },
+      { en: 'Alcohol and drugs', ar: 'الكحول والمخدرات', de: 'Alkohol und Drogen' },
+    ],
+    knowBeforeYouGo: [
+      {
+        en: 'No riding experience is needed, the horse is led by the team throughout',
+        ar: 'مش محتاجة خبرة ركوب، الفريق ماشي بالحصان طول الوقت',
+        de: 'Keine Reiterfahrung nötig, das Pferd wird durchgehend vom Team geführt',
+      },
+      {
+        en: 'The start time is set around the best light and confirmed after booking',
+        ar: 'وقت البداية بيتحط على أحلى إضاءة ويتأكد بعد الحجز',
+        de: 'Die Startzeit wird auf das beste Licht gelegt und nach der Buchung bestätigt',
+      },
+      {
+        en: 'You receive 22 edited photos from the session',
+        ar: 'بتستلمي ٢٢ صورة معدلة من السيشن',
+        de: 'Sie erhalten 22 bearbeitete Fotos aus der Session',
+      },
+    ],
+    outerTransferEnabled: false,
+    pickup: {
+      en: 'Private hotel pickup included',
+      ar: 'استلام خاص من الفندق مشمول',
+      de: 'Private Hotelabholung inklusive',
+    },
+    supplierName: 'Al-Bahr Stables',
+    familyFriendly: false,
+    womenFriendly: true,
+    featured: false,
+    languages: ['English', 'German'],
+    operatingDays: [0, 1, 2, 3, 4, 5, 6],
+  },
+  {
+    id: 'hurghada-horse-carriage-sea-ride',
+    name: {
+      en: 'Horse Carriage Ride in Hurghada: Along the Beach and Into the Sea',
+      ar: 'جولة بعربة الحصان في الغردقة: على الشاطئ وجوه المية',
+      de: 'Kutschfahrt in Hurghada: Am Strand entlang und ins Meer',
+    },
+    category: 'horse',
+    destination: 'Hurghada',
+    images: [
+      waslaCarriageHeroImg,
+      waslaCarriage02Img,
+      waslaCarriage03Img,
+      waslaCarriage04Img,
+      waslaCarriage05Img,
+      waslaCarriage06Img,
+    ],
+    galleryCaptions: [
+      {
+        en: 'The carriage rolls into the sea, and everyone laughs',
+        ar: 'العربة داخلة المية، والكل بيضحك',
+        de: 'Die Kutsche fährt ins Meer, und alle lachen',
+      },
+      {
+        en: 'A family ride at sunset',
+        ar: 'جولة عائلية وقت الغروب',
+        de: 'Eine Familienfahrt bei Sonnenuntergang',
+      },
+      {
+        en: 'Standing in the carriage as the sun goes down',
+        ar: 'واقفين في العربة والشمس بتغيب',
+        de: 'Stehend in der Kutsche, während die Sonne untergeht',
+      },
+      {
+        en: 'The carriage horses on the beach',
+        ar: 'خيول العربة على الشاطئ',
+        de: 'Die Kutschpferde am Strand',
+      },
+      {
+        en: 'Three friends share the carriage',
+        ar: 'تلات صديقات بيتشاركوا العربة',
+        de: 'Drei Freundinnen teilen sich die Kutsche',
+      },
+      {
+        en: 'Into the sea at sunset',
+        ar: 'دخول المية وقت الغروب',
+        de: 'Ins Meer bei Sonnenuntergang',
+      },
+    ],
+    rating: 0,
+    reviewCount: 0,
+    duration: {
+      en: '2 or 3 hours',
+      ar: 'ساعتين أو ٣ ساعات',
+      de: '2 oder 3 Stunden',
+    },
+    departureTimes: ['09:00 AM', '11:00 AM', '01:00 PM', '03:00 PM'],
+    price: 20,
+    options: [
+      {
+        id: 'opt-carriage-2h',
+        title: {
+          en: 'Carriage Ride, 2 Hours',
+          ar: 'جولة بالعربة، ساعتين',
+          de: 'Kutschfahrt, 2 Stunden',
+        },
+        detail: {
+          en: 'Per person, children ride free with a paying adult',
+          ar: 'للفرد، والأطفال مجانًا مع بالغ دافع',
+          de: 'Pro Person, Kinder fahren kostenlos mit einem zahlenden Erwachsenen',
+        },
+        price: 20,
+      },
+      {
+        id: 'opt-carriage-3h',
+        title: {
+          en: 'Carriage Ride, 3 Hours',
+          ar: 'جولة بالعربة، ٣ ساعات',
+          de: 'Kutschfahrt, 3 Stunden',
+        },
+        detail: {
+          en: 'The longer ride, more beach and more photo stops, same price',
+          ar: 'الجولة الأطول، شاطئ أكتر ووقفات تصوير أكتر، بنفس السعر',
+          de: 'Die längere Fahrt, mehr Strand und mehr Fotostopps, gleicher Preis',
+        },
+        price: 20,
+      },
+    ],
+    shortDescription: {
+      en: 'A relaxed horse carriage ride along the Hurghada beach, and right into the shallow sea, with your family together in one carriage.',
+      ar: 'جولة هادية بعربة حصان على شاطئ الغردقة، ودخول بالعربة جوه المية الضحلة، وعيلتك سوا في عربة واحدة.',
+      de: 'Eine entspannte Kutschfahrt am Strand von Hurghada entlang, und direkt ins flache Meer hinein, mit Ihrer Familie gemeinsam in einer Kutsche.',
+    },
+    fullDescription: {
+      en: 'Some Hurghada experiences are about speed. This one is about slowing down. Your carriage rolls along the beach at a walking pace, and then does the thing guests remember most: it rolls straight into the shallow sea, horses and wheels in the water, while you sit back and take it in.\n\nFamilies and groups ride together in one carriage, with a driver and team with you the whole way and photo stops whenever the light or the view asks for one.\n\nIt is an easy, gentle outing for all ages, and children ride free with a paying adult.',
+      ar: 'فيه تجارب في الغردقة عن السرعة، ودي عن الهدوء. عربتك بتمشي على الشاطئ بخطوة هادية، وبعدين بتعمل الحاجة اللي الضيوف بيفتكروها أكتر حاجة: بتدخل على طول جوه المية الضحلة، الخيل والعجل في المية، وانت قاعد مسترخي وبتتفرج.\n\nالعائلات والمجموعات بيركبوا سوا في عربة واحدة، مع سواق وفريق معاك الطريق كله ووقفات تصوير كل ما الإضاءة أو المنظر يطلب.\n\nخروجة سهلة وهادية لكل الأعمار، والأطفال بيركبوا مجانًا مع بالغ دافع.',
+      de: 'Manche Erlebnisse in Hurghada drehen sich um Tempo. Dieses dreht sich ums Entschleunigen. Ihre Kutsche rollt im Schritt am Strand entlang und tut dann das, woran sich Gäste am meisten erinnern: Sie fährt direkt ins flache Meer hinein, Pferde und Räder im Wasser, während Sie sich zurücklehnen und genießen.\n\nFamilien und Gruppen fahren gemeinsam in einer Kutsche, mit Fahrer und Team an Ihrer Seite und Fotostopps, wann immer Licht oder Aussicht danach verlangen.\n\nEin leichter, sanfter Ausflug für alle Altersgruppen, und Kinder fahren kostenlos mit einem zahlenden Erwachsenen.',
+    },
+    highlights: [
+      {
+        en: 'Ride in a traditional horse carriage along the beach',
+        ar: 'اركب عربة حصان تقليدية على الشاطئ',
+        de: 'Fahren Sie in einer traditionellen Pferdekutsche am Strand entlang',
+      },
+      {
+        en: 'The carriage rolls right into the shallow sea',
+        ar: 'العربة بتدخل على طول جوه المية الضحلة',
+        de: 'Die Kutsche fährt direkt ins flache Meer hinein',
+      },
+      {
+        en: 'Families and groups ride together in one carriage',
+        ar: 'العائلات والمجموعات بيركبوا سوا في عربة واحدة',
+        de: 'Familien und Gruppen fahren gemeinsam in einer Kutsche',
+      },
+      {
+        en: 'Photo stops along the way',
+        ar: 'وقفات تصوير على الطريق',
+        de: 'Fotostopps unterwegs',
+      },
+      {
+        en: 'A driver and team with you the whole ride',
+        ar: 'سواق وفريق معاك الجولة كلها',
+        de: 'Ein Fahrer und Team begleiten Sie die ganze Fahrt',
+      },
+    ],
+    included: [
+      {
+        en: 'Hotel pickup and drop-off in Hurghada',
+        ar: 'الاستلام من فنادق الغردقة والرجوع',
+        de: 'Hotelabholung und Rücktransfer in Hurghada',
+      },
+      {
+        en: 'Carriage ride with a driver',
+        ar: 'جولة بالعربة مع سواق',
+        de: 'Kutschfahrt mit Fahrer',
+      },
+      {
+        en: 'Photo stops along the way',
+        ar: 'وقفات تصوير على الطريق',
+        de: 'Fotostopps unterwegs',
+      },
+      {
+        en: 'Assistance and supervision throughout',
+        ar: 'مساعدة وإشراف طول الجولة',
+        de: 'Betreuung und Aufsicht durchgehend',
+      },
+    ],
+    tips: [
+      {
+        en: 'Pickup outside Hurghada and El Gouna is not included: Sahl Hasheesh and Makadi +€10 per person, Soma Bay and Safaga +€15 per person, payable on site.',
+        ar: 'الاستلام خارج الغردقة والجونة غير مشمول: سهل حشيش ومكادي +١٠ يورو للفرد، سوما باي وسفاجا +١٥ يورو للفرد، وتدفع في المكان.',
+        de: 'Abholung außerhalb von Hurghada und El Gouna ist nicht inklusive: Sahl Hasheesh und Makadi +10 € pro Person, Soma Bay und Safaga +15 € pro Person, zahlbar vor Ort.',
+      },
+    ],
+    notSuitableFor: [
+      { en: 'People with back problems', ar: 'الأشخاص الذين يعانون من مشاكل في الظهر', de: 'Personen mit Rückenproblemen' },
+      { en: 'Wheelchair users', ar: 'مستخدمو الكراسي المتحركة', de: 'Rollstuhlfahrer' },
+    ],
+    meetingPoint: {
+      en: 'Coastal Stables, Hurghada South / Hotel Lobby Pickup',
+      ar: 'اسطبلات ساحلية في جنوب الغردقة أو الاستلام من بهو الفندق',
+      de: 'Küstenstall Hurghada Süd / Hotelabholung',
+    },
+    whatToBring: [
+      { en: 'Hat', ar: 'قبعة', de: 'Hut' },
+      { en: 'Sunscreen', ar: 'واقي شمس', de: 'Sonnencreme' },
+      { en: 'Camera', ar: 'كاميرا', de: 'Kamera' },
+    ],
+    notAllowed: [
+      { en: 'Pets', ar: 'الحيوانات الأليفة', de: 'Haustiere' },
+      { en: 'Alcohol and drugs', ar: 'الكحول والمخدرات', de: 'Alkohol und Drogen' },
+    ],
+    knowBeforeYouGo: [
+      {
+        en: 'The price is per person, and children ride free with a paying adult',
+        ar: 'السعر للفرد، والأطفال بيركبوا مجانًا مع بالغ دافع',
+        de: 'Der Preis gilt pro Person, und Kinder fahren kostenlos mit einem zahlenden Erwachsenen',
+      },
+      {
+        en: 'Tell us your hotel and we confirm your exact pickup time after booking',
+        ar: 'قولنا فندقك ونأكد لك وقت الاستلام بالظبط بعد الحجز',
+        de: 'Nennen Sie uns Ihr Hotel und wir bestätigen Ihre genaue Abholzeit nach der Buchung',
+      },
+    ],
+    outerTransferEnabled: true,
+    pickup: {
+      en: 'Hurghada and El Gouna included · Sahl Hasheesh and Makadi +€10/pp · Soma Bay and Safaga +€15/pp',
+      ar: 'الغردقة والجونة مشمولة · سهل حشيش ومكادي +١٠ يورو للفرد · سوما باي وسفاجا +١٥ يورو للفرد',
+      de: 'Hurghada und El Gouna inklusive · Sahl Hasheesh und Makadi +10 €/Pers. · Soma Bay und Safaga +15 €/Pers.',
+    },
+    supplierName: 'Al-Bahr Stables',
+    familyFriendly: true,
+    womenFriendly: true,
+    kidsDiscount: {
+      en: 'Children ride free with a paying adult',
+      ar: 'الأطفال بيركبوا مجانًا مع بالغ دافع',
+      de: 'Kinder fahren kostenlos mit einem zahlenden Erwachsenen',
+    },
+    childPriceEur: 0,
+    featured: false,
+    languages: ['English', 'German'],
+    operatingDays: [0, 1, 2, 3, 4, 5, 6],
+  },
+  {
+    id: 'hurghada-camel-ride-beach',
+    name: {
+      en: 'Camel Ride in Hurghada: Along the Beach at Golden Hour',
+      ar: 'ركوب الجمل في الغردقة: على الشاطئ في الساعة الذهبية',
+      de: 'Kamelritt in Hurghada: Am Strand zur goldenen Stunde',
+    },
+    category: 'desert',
+    destination: 'Hurghada',
+    images: [
+      waslaCamelHeroImg,
+      waslaCamel02Img,
+      waslaCamel03Img,
+      waslaCamel04Img,
+      waslaCamel05Img,
+      waslaCamel06Img,
+    ],
+    galleryCaptions: [
+      {
+        en: 'The camels take a break standing in the sea',
+        ar: 'الجمال واخدة راحة وهي واقفة في البحر',
+        de: 'Die Kamele pausieren stehend im Meer',
+      },
+      {
+        en: 'Riding out at the desert edge',
+        ar: 'ركوب عند حافة الصحرا',
+        de: 'Ausritt am Wüstenrand',
+      },
+      {
+        en: 'A smile from the saddle',
+        ar: 'ابتسامة من على السرج',
+        de: 'Ein Lächeln aus dem Sattel',
+      },
+      {
+        en: 'Pausing on the sand',
+        ar: 'وقفة على الرمل',
+        de: 'Pause auf dem Sand',
+      },
+      {
+        en: 'The group waves from the desert',
+        ar: 'المجموعة بتشاور من الصحرا',
+        de: 'Die Gruppe winkt aus der Wüste',
+      },
+      {
+        en: 'Getting to know her camel on the beach',
+        ar: 'بتتعرف على جملها على الشاطئ',
+        de: 'Sie lernt ihr Kamel am Strand kennen',
+      },
+    ],
+    rating: 0,
+    reviewCount: 0,
+    duration: {
+      en: '1 to 3 hours',
+      ar: 'من ساعة لتلات ساعات',
+      de: '1 bis 3 Stunden',
+    },
+    departureTimes: ['08:00 AM (Morning)', '04:00 PM (Sunset)'],
+    price: 20,
+    options: [
+      {
+        id: 'opt-camel-1h',
+        title: {
+          en: 'Camel Ride, 1 Hour',
+          ar: 'ركوب جمل، ساعة',
+          de: 'Kamelritt, 1 Stunde',
+        },
+        detail: {
+          en: 'A gentle first taste, along the beach',
+          ar: 'تجربة أولى هادية على الشاطئ',
+          de: 'Ein sanfter erster Eindruck, am Strand entlang',
+        },
+        price: 20,
+      },
+      {
+        id: 'opt-camel-2h',
+        title: {
+          en: 'Camel Ride, 2 Hours',
+          ar: 'ركوب جمل، ساعتين',
+          de: 'Kamelritt, 2 Stunden',
+        },
+        detail: {
+          en: 'More beach, the desert edge and a tea stop',
+          ar: 'شاطئ أكتر وحافة الصحرا ووقفة شاي',
+          de: 'Mehr Strand, der Wüstenrand und ein Teestopp',
+        },
+        price: 20,
+      },
+      {
+        id: 'opt-camel-3h',
+        title: {
+          en: 'Camel Ride, 3 Hours',
+          ar: 'ركوب جمل، ٣ ساعات',
+          de: 'Kamelritt, 3 Stunden',
+        },
+        detail: {
+          en: 'The full slow ride, morning or sunset',
+          ar: 'الركوب الهادي الكامل، صباحًا أو مع الغروب',
+          de: 'Der volle langsame Ritt, morgens oder bei Sonnenuntergang',
+        },
+        price: 20,
+      },
+    ],
+    shortDescription: {
+      en: 'A slow camel ride along the Hurghada shore and the desert edge, in the morning or at sunset, with photo stops and a Bedouin tea stop.',
+      ar: 'ركوب جمل هادي على شاطئ الغردقة وحافة الصحرا، صباحًا أو مع الغروب، مع وقفات تصوير ووقفة شاي بدوي.',
+      de: 'Ein langsamer Kamelritt an der Küste von Hurghada und am Wüstenrand, morgens oder bei Sonnenuntergang, mit Fotostopps und einem Beduinentee-Stopp.',
+    },
+    fullDescription: {
+      en: 'Camels do not hurry, and that is the point. You meet your camel at the shore, climb up as it rises, and set off at the oldest pace in the desert: a slow, swaying walk along the beach and the desert edge behind it.\n\nYou ride in the morning or at sunset, when the light turns golden over the sea. There are photo stops along the way, and a stop for traditional Bedouin tea in a quiet spot.\n\nNo experience is needed, the camels are led by an experienced handler, and groups stay small. Children pay the same price as adults on this ride.',
+      ar: 'الجمال مش بتستعجل، ودي هي النقطة. بتقابل جملك على الشاطئ، تطلع عليه وهو بيقوم، وتمشي بأقدم خطوة في الصحرا: مشية هادية متمايلة على الشاطئ وحافة الصحرا وراه.\n\nبتركب صباحًا أو مع الغروب، لما الإضاءة تبقى ذهبية فوق البحر. فيه وقفات تصوير على الطريق، ووقفة لشاي بدوي تقليدي في مكان هادي.\n\nمش محتاج خبرة، الجمال بيتمشى بيها مرشد متمرس، والمجموعات صغيرة. الأطفال بيدفعوا نفس سعر البالغين في الرحلة دي.',
+      de: 'Kamele haben es nicht eilig, und genau das ist der Punkt. Sie treffen Ihr Kamel an der Küste, steigen auf, während es sich erhebt, und ziehen im ältesten Tempo der Wüste los: ein langsamer, wiegender Gang am Strand und am Wüstenrand dahinter.\n\nSie reiten morgens oder bei Sonnenuntergang, wenn das Licht über dem Meer golden wird. Unterwegs gibt es Fotostopps und einen Stopp für traditionellen Beduinentee an einem ruhigen Ort.\n\nErfahrung ist nicht nötig, die Kamele werden von einem erfahrenen Führer geleitet, und die Gruppen bleiben klein. Kinder zahlen bei diesem Ritt denselben Preis wie Erwachsene.',
+    },
+    highlights: [
+      {
+        en: 'Ride a camel along the beach and the desert edge',
+        ar: 'اركب جمل على الشاطئ وحافة الصحرا',
+        de: 'Reiten Sie ein Kamel am Strand und am Wüstenrand',
+      },
+      {
+        en: 'Morning or sunset departures, when the light is best',
+        ar: 'انطلاق صباحًا أو مع الغروب، لما الإضاءة أحلى',
+        de: 'Abfahrt morgens oder bei Sonnenuntergang, wenn das Licht am schönsten ist',
+      },
+      {
+        en: 'Photo stops on the shore along the way',
+        ar: 'وقفات تصوير على الشاطئ على الطريق',
+        de: 'Fotostopps an der Küste unterwegs',
+      },
+      {
+        en: 'A traditional Bedouin tea stop',
+        ar: 'وقفة شاي بدوي تقليدي',
+        de: 'Ein Stopp für traditionellen Beduinentee',
+      },
+      {
+        en: 'Led by an experienced camel handler the whole way',
+        ar: 'معاك مرشد جمال متمرس الطريق كله',
+        de: 'Geführt von einem erfahrenen Kamelführer den ganzen Weg',
+      },
+    ],
+    included: [
+      {
+        en: 'Hotel pickup and drop-off in Hurghada',
+        ar: 'الاستلام من فنادق الغردقة والرجوع',
+        de: 'Hotelabholung und Rücktransfer in Hurghada',
+      },
+      {
+        en: 'Experienced camel handler and guide',
+        ar: 'مرشد جمال متمرس ودليل',
+        de: 'Erfahrener Kamelführer und Guide',
+      },
+      {
+        en: 'Bedouin tea',
+        ar: 'شاي بدوي',
+        de: 'Beduinentee',
+      },
+      {
+        en: 'Safety assistance and supervision throughout',
+        ar: 'مساعدة سلامة وإشراف طول الرحلة',
+        de: 'Sicherheitshilfe und Aufsicht durchgehend',
+      },
+      {
+        en: 'Photo stops',
+        ar: 'وقفات تصوير',
+        de: 'Fotostopps',
+      },
+    ],
+    tips: [
+      {
+        en: 'Pickup outside Hurghada and El Gouna is not included: Sahl Hasheesh and Makadi +€10 per person, Soma Bay and Safaga +€15 per person, payable on site.',
+        ar: 'الاستلام خارج الغردقة والجونة غير مشمول: سهل حشيش ومكادي +١٠ يورو للفرد، سوما باي وسفاجا +١٥ يورو للفرد، وتدفع في المكان.',
+        de: 'Abholung außerhalb von Hurghada und El Gouna ist nicht inklusive: Sahl Hasheesh und Makadi +10 € pro Person, Soma Bay und Safaga +15 € pro Person, zahlbar vor Ort.',
+      },
+      {
+        en: 'Children pay the full price on this ride, there is no child rate',
+        ar: 'الأطفال بيدفعوا السعر الكامل في الرحلة دي، مفيش سعر أطفال',
+        de: 'Kinder zahlen bei diesem Ritt den vollen Preis, es gibt keinen Kindertarif',
+      },
+    ],
+    notSuitableFor: [
+      { en: 'Pregnant women', ar: 'النساء الحوامل', de: 'Schwangere Frauen' },
+      { en: 'People with back problems', ar: 'الأشخاص الذين يعانون من مشاكل في الظهر', de: 'Personen mit Rückenproblemen' },
+      { en: 'Wheelchair users', ar: 'مستخدمو الكراسي المتحركة', de: 'Rollstuhlfahrer' },
+    ],
+    meetingPoint: {
+      en: 'Coastal Stables, Hurghada South / Hotel Lobby Pickup',
+      ar: 'اسطبلات ساحلية في جنوب الغردقة أو الاستلام من بهو الفندق',
+      de: 'Küstenstall Hurghada Süd / Hotelabholung',
+    },
+    whatToBring: [
+      { en: 'Hat', ar: 'قبعة', de: 'Hut' },
+      { en: 'Sunscreen', ar: 'واقي شمس', de: 'Sonnencreme' },
+      { en: 'Camera', ar: 'كاميرا', de: 'Kamera' },
+      { en: 'Comfortable clothes', ar: 'ملابس مريحة', de: 'Bequeme Kleidung' },
+    ],
+    notAllowed: [
+      { en: 'Pets', ar: 'الحيوانات الأليفة', de: 'Haustiere' },
+      { en: 'Alcohol and drugs', ar: 'الكحول والمخدرات', de: 'Alkohol und Drogen' },
+    ],
+    knowBeforeYouGo: [
+      {
+        en: 'Small groups of up to 10, no experience needed, the camels are led',
+        ar: 'مجموعات صغيرة لحد ١٠ أفراد، من غير خبرة، والجمال بتتمشى بيها',
+        de: 'Kleine Gruppen bis zu 10, keine Erfahrung nötig, die Kamele werden geführt',
+      },
+      {
+        en: 'Children pay the full adult price on this ride',
+        ar: 'الأطفال بيدفعوا سعر البالغين الكامل في الرحلة دي',
+        de: 'Kinder zahlen bei diesem Ritt den vollen Erwachsenenpreis',
+      },
+      {
+        en: 'Tell us your hotel and we confirm your exact pickup time after booking',
+        ar: 'قولنا فندقك ونأكد لك وقت الاستلام بالظبط بعد الحجز',
+        de: 'Nennen Sie uns Ihr Hotel und wir bestätigen Ihre genaue Abholzeit nach der Buchung',
+      },
+    ],
+    outerTransferEnabled: true,
+    pickup: {
+      en: 'Hurghada and El Gouna included · Sahl Hasheesh and Makadi +€10/pp · Soma Bay and Safaga +€15/pp',
+      ar: 'الغردقة والجونة مشمولة · سهل حشيش ومكادي +١٠ يورو للفرد · سوما باي وسفاجا +١٥ يورو للفرد',
+      de: 'Hurghada und El Gouna inklusive · Sahl Hasheesh und Makadi +10 €/Pers. · Soma Bay und Safaga +15 €/Pers.',
+    },
+    supplierName: 'Al-Bahr Stables',
+    familyFriendly: true,
+    womenFriendly: true,
+    childPriceEur: 20,
+    featured: false,
+    languages: ['English', 'German'],
+    operatingDays: [0, 1, 2, 3, 4, 5, 6],
   },
   {
     id: 'marsa-alam-abu-dabbab-turtles',
