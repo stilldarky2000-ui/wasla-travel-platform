@@ -4,7 +4,7 @@ Instructions for the entering agent (Gemini in AI Studio / Antigravity). Enter e
 
 PRICES: every price below is marked [AHMED TO SET] with the current market anchor noted for him. Do NOT publish a trip whose price is still marked; enter it as a draft/hidden or wait for the confirmed number.
 
-PASSPORT RULE for both Marsa Alam trips and both diving trips: national park and diving permits require a passport copy for every participant, sent right after booking confirmation. The line is already written into each trip's Know before you go below; keep it word for word.
+PASSPORT + ROOM NUMBER RULE, MARSA ALAM TRIPS ONLY (Samadai and Marsa Mubarak): guests must send a passport copy for every participant AND their hotel room number right after booking confirmation. The passports are needed for the area permits, and the room number is needed because the pickup cars enter the resort and collect guests from inside. The diving boat and the Sahl Hasheesh beach dive do NOT require passport copies; do not add the line to them. The wording is written into the two Marsa Alam trips' Know before you go below; keep it word for word.
 
 ---
 
@@ -71,7 +71,7 @@ The dolphins are wild and completely free, and that is exactly what makes meetin
 - Alcohol and drugs
 
 ### Know before you go
-- Please send a passport copy for every participant immediately after booking confirmation. This is a mandatory requirement for the park permits and secures your trip arrangements.
+- Please send a passport copy for every participant, and your hotel room number, immediately after booking confirmation. The passport copies are required for the area permits, and the room number lets our pickup cars enter the resort and collect you from inside.
 - While Shaab Samadai is known for its wild dolphins, sightings cannot be guaranteed, as they are in their natural habitat.
 - Basic swimming skills are recommended. Life jackets are available for all participants.
 - Children must be supervised by an adult at all times.
@@ -143,7 +143,7 @@ Between sessions, relax on board in the sun with a freshly prepared lunch and so
 - Alcohol and drugs
 
 ### Know before you go
-- Please send a passport copy for every participant immediately after booking confirmation. This is a mandatory requirement to complete and secure your trip arrangements.
+- Please send a passport copy for every participant, and your hotel room number, immediately after booking confirmation. The passport copies are required for the area permits, and the room number lets our pickup cars enter the resort and collect you from inside.
 - Sightings of sea turtles and dugongs are common but cannot be guaranteed, as they are wild animals.
 - The trip is subject to weather conditions. In case of cancellation, an alternative date or a full refund is offered.
 - Cash on pickup is how you pay. There is nothing to pay in advance.
@@ -213,7 +213,6 @@ Whether it is your very first dive or simply the calmest way to meet the Red Sea
 
 ### Know before you go
 - Participants should be comfortable in the water. No diving licence or prior experience is needed.
-- Please send a passport copy for every participant immediately after booking confirmation. This is a mandatory requirement to complete and secure your trip arrangements.
 - Cash on pickup is how you pay. There is nothing to pay in advance.
 
 ---
@@ -290,7 +289,6 @@ All diving equipment and national park fees are included in every option. There 
 - Alcohol and drugs
 
 ### Know before you go
-- Please send a passport copy for every participant immediately after booking confirmation. This is a mandatory requirement to complete and secure your trip arrangements.
 - Diving and flying on the same day is not permitted. At least 18 hours must pass between your last dive and your flight.
 - Participants under 18 must be accompanied by a parent or legal guardian.
 - Weather conditions may affect the choice of dive sites on the day.
