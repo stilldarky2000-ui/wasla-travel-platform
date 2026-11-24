@@ -2,7 +2,7 @@
 
 Instructions for the entering agent (Gemini in AI Studio / Antigravity). Enter every trip exactly to the pattern of the existing trips in `src/data/marketplaceData.ts`. EN copy below is final; produce AR and DE by translation in the existing trips' style. Hard rules: rating 0 and reviewCount 0; NO em dashes; NO supplier or platform name in any guest-visible field (these programs come from the operator's own product knowledge); NO meetingPointUrl; "Alcohol and drugs" once, in Not allowed only; no durations inside description prose; highlights in real day sequence with the guide line last.
 
-PRICES: every price below is marked [AHMED TO SET] with the current market anchor noted for him. Do NOT publish a trip whose price is still marked; enter it as a draft/hidden or wait for the confirmed number.
+PRICES: confirmed 2026-11-24. Platform retail prices carry about 30% commission; Wasla buys at the same net execution price the platform supplier receives (70% of retail, confirmed by the operator) and sells at net + 20%, which lands every price at 84% of platform retail. The confirmed price is written on each trip below; enter exactly those numbers.
 
 PASSPORT + ROOM NUMBER RULE, MARSA ALAM TRIPS ONLY (Samadai and Marsa Mubarak): guests must send a passport copy for every participant AND their hotel room number right after booking confirmation. The passports are needed for the area permits, and the room number is needed because the pickup cars enter the resort and collect guests from inside. The diving boat and the Sahl Hasheesh beach dive do NOT require passport copies; do not add the line to them. The wording is written into the two Marsa Alam trips' Know before you go below; keep it word for word.
 
@@ -12,7 +12,7 @@ PASSPORT + ROOM NUMBER RULE, MARSA ALAM TRIPS ONLY (Samadai and Marsa Mubarak): 
 
 - id: `marsa-alam-samadai-dolphin-house`
 - category 'sea', destination 'Marsa Alam', internal supplierName 'Marsa Alam Sea Partner'
-- Price: [AHMED TO SET] per person (market anchor: this exact day sells at €81 on the big platforms). One option: id `opt-samadai-snorkel`, title 'Dolphin House Snorkeling Day', detail '2 guided snorkelling sessions at Shaab Samadai · buffet lunch & soft drinks', price = trip price.
+- Price: €68 per person (platform retail €81). One option: id `opt-samadai-snorkel`, title 'Dolphin House Snorkeling Day', detail '2 guided snorkelling sessions at Shaab Samadai · buffet lunch & soft drinks', price 68 = trip price.
 - Departure: ['08:00 AM'], duration: '7 hours'
 - Guide languages: ['English', 'German', 'French', 'Italian']
 - Pickup: from Marsa Alam hotels included (the guest is based in Marsa Alam); transfers from North and South Marsa Alam hotels available for an extra charge.
@@ -83,7 +83,7 @@ The dolphins are wild and completely free, and that is exactly what makes meetin
 
 - id: `marsa-alam-mubarak-turtles`
 - category 'sea', destination 'Marsa Alam', internal supplierName 'Marsa Alam Sea Partner'
-- Price: [AHMED TO SET] per person (market anchor: €64 on the big platforms). One option: id `opt-mubarak-snorkel`, title 'Marsa Mubarak Snorkeling Day', detail 'Sea turtles & dugong bay · lunch and soft drinks on board · park fees included', price = trip price. Optional diving session is arranged on board, not a booking option.
+- Price: €54 per person (platform retail €64). One option: id `opt-mubarak-snorkel`, title 'Marsa Mubarak Snorkeling Day', detail 'Sea turtles & dugong bay · lunch and soft drinks on board · park fees included', price 54 = trip price. Optional diving session is arranged on board, not a booking option.
 - Departure: ['08:00 AM'], duration: '8 hours'
 - Guide languages: ['English', 'German', 'French', 'Italian']
 - Note: this is a DIFFERENT bay from the existing Abu Dabbab turtles trip (€49); both stay in the catalogue.
@@ -154,7 +154,7 @@ Between sessions, relax on board in the sun with a freshly prepared lunch and so
 
 - id: `sahl-hasheesh-beach-dive`
 - category 'sea', destination 'Hurghada', internal supplierName 'Red Sea Diving Partner'
-- Price: [AHMED TO SET] per person (market anchor: €32 on the big platforms). One option: id `opt-beach-dive-intro`, title 'Beach Dive for Beginners (Small Group)', detail 'Shore entry, no boat · full equipment included · max 10 participants', price = trip price.
+- Price: €27 per person (platform retail €32). One option: id `opt-beach-dive-intro`, title 'Beach Dive for Beginners (Small Group)', detail 'Shore entry, no boat · full equipment included · max 10 participants', price 27 = trip price.
 - Departure: ['09:00 AM'], duration: '3 hours'
 - Guide languages: ['English', 'German', 'French', 'Italian']
 - Small group: limited to 10 participants. Meeting point in Sahl Hasheesh; pickup available, with an extra fee for El Gouna, Soma Bay and Safaga (payable on site). NO meetingPointUrl (house rule).
@@ -221,10 +221,10 @@ Whether it is your very first dive or simply the calmest way to meet the Red Sea
 
 - id: `hurghada-diving-snorkeling-boat`
 - category 'sea', destination 'Hurghada', internal supplierName 'Red Sea Diving Partner'
-- Prices: THREE options, each [AHMED TO SET] (market anchor: the product sells from €30 on the big platforms, snorkelling is the entry option). Trip price = the snorkelling option price.
-  - `opt-boat-snorkel` — 'Boat Cruise with 2 Snorkelling Stops', detail 'Snorkel two reef sites · no diving · lunch & unlimited soft drinks'
-  - `opt-boat-intro-dive` — 'Boat Cruise with 2 Intro Dives (Beginners)', detail 'Two guided intro dives, about 15 minutes each · no licence needed · instructor beside you'
-  - `opt-boat-certified` — 'Boat Trip for Certified Divers', detail 'Two guided dives of 45 to 60 minutes · certification required'
+- Prices: THREE options (platform retail from €30 for snorkelling; intro and certified priced by the same 84% rule). Trip price = 25, the snorkelling option price.
+  - `opt-boat-snorkel` — €25 — 'Boat Cruise with 2 Snorkelling Stops', detail 'Snorkel two reef sites · no diving · lunch & unlimited soft drinks'
+  - `opt-boat-intro-dive` — €42 — 'Boat Cruise with 2 Intro Dives (Beginners)', detail 'Two guided intro dives, about 15 minutes each · no licence needed · instructor beside you'
+  - `opt-boat-certified` — €38 — 'Boat Trip for Certified Divers', detail 'Two guided dives of 45 to 60 minutes · certification required'
 - Departure: ['08:30 AM'], duration: '7 hours'
 - Guide languages: ['English', 'German', 'French', 'Italian']
 
