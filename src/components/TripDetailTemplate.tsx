@@ -33,7 +33,8 @@ import {
   Users,
   X,
 } from 'lucide-react';
-import { Lang, Translations } from '../data/i18n';
+import { I18N, Lang, Translations } from '../data/i18n';
+import { formatPerGroupUnitLabel, formatTripLockupPrice } from '../lib/tripPricing';
 import {
   CATEGORIES,
   CurrencyCode,
@@ -304,13 +305,9 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
   const isFixedGroupPrice = trip.pricingMode === 'per-group';
   const maxGuestsLimit =
     typeof trip.maxGuests === 'number' && trip.maxGuests > 0 ? trip.maxGuests : null;
-  const fixedPriceUnitLabel =
-    trip.category === 'sea'
-      ? tText({ en: 'boat', ar: 'للقارب بالكامل', de: 'Boot' }, lang)
-      : trip.category === 'transfers'
-        ? tText({ en: 'vehicle', ar: 'للسيارة', de: 'Fahrzeug' }, lang)
-        : tText({ en: 'group', ar: 'للمجموعة', de: 'Gruppe' }, lang);
-  const hasVisibleRating = trip.rating > 0 && trip.reviewCount > 0;
+  const fixedPriceUnitLabel = formatPerGroupUnitLabel(trip, lang);
+  const bookNowMicrocopy = t.bookNowMicrocopy || I18N.en.bookNowMicrocopy;
+  const hasVisibleRating = trip.reviewCount > 0;
 
   const selectedOption = trip.options?.find((o) => o.id === selectedOptionId) || trip.options?.[0];
   const activeUnitPrice = selectedOption ? selectedOption.price : trip.price;
@@ -2099,20 +2096,28 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
                 <div className="border-b border-[#C8C2B8]/60 pb-3 space-y-1.5">
                   <div className="flex items-baseline justify-between gap-2">
                     <div className="tabular-nums">
-                      <span className="text-[11px] font-medium text-[#64748B]">
-                        {isFixedGroupPrice
-                          ? tText({ en: 'Fixed', ar: 'سعر ثابت', de: 'Festpreis' }, lang)
-                          : tText({ en: 'From', ar: 'يبدأ من', de: 'Ab' }, lang)}{' '}
-                      </span>
-                      <span className="font-display text-xl font-bold text-[#0F2233]">
-                        {formatPrice(activeUnitPrice)}
-                      </span>
-                      <span className="text-[11px] font-medium text-[#64748B]">
-                        {' '}/{' '}
-                        {isFixedGroupPrice
-                          ? fixedPriceUnitLabel
-                          : tText({ en: 'person', ar: 'للفرد', de: 'Person' }, lang)}
-                      </span>
+                      {isFixedGroupPrice ? (
+                        <div className="flex flex-wrap items-baseline gap-x-1.5 gap-y-0.5">
+                          <span className="font-display text-xl font-bold text-[#0F2233]">
+                            {formatTripLockupPrice(activeUnitPrice, currency, lang, currency !== 'EUR')}
+                          </span>
+                          <span className="text-xs font-medium text-[#64748B]">
+                            · {fixedPriceUnitLabel}
+                          </span>
+                        </div>
+                      ) : (
+                        <>
+                          <span className="text-[11px] font-medium text-[#64748B]">
+                            {tText({ en: 'From', ar: 'يبدأ من', de: 'Ab' }, lang)}{' '}
+                          </span>
+                          <span className="font-display text-xl font-bold text-[#0F2233]">
+                            {formatPrice(activeUnitPrice)}
+                          </span>
+                          <span className="text-[11px] font-medium text-[#64748B]">
+                            {' '}· {tText({ en: 'per adult', ar: 'للبالغ', de: 'pro Erw.' }, lang)}
+                          </span>
+                        </>
+                      )}
                     </div>
                     {hasVisibleRating && (
                       <span className="inline-flex items-center gap-1 text-xs font-semibold text-[#0F2233] tabular-nums">
@@ -2231,8 +2236,8 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
                                 </span>
                                 <span className="block text-[10px] font-medium text-[#64748B]">
                                   {isFixedGroupPrice
-                                    ? tText({ en: 'fixed price', ar: 'سعر ثابت', de: 'Festpreis' }, lang)
-                                    : tText({ en: 'per adult', ar: 'للفرد البالغ', de: 'pro Erw.' }, lang)}
+                                    ? fixedPriceUnitLabel
+                                    : tText({ en: 'per adult', ar: 'للبالغ', de: 'pro Erw.' }, lang)}
                                 </span>
                               </span>
                             </button>
@@ -3068,24 +3073,34 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
                   )}
 
                   {bookingStep === 1 ? (
-                    <button
-                      type="button"
-                      onClick={handleAdvanceToDetails}
-                      className="min-h-[52px] w-full rounded-xl bg-[#EE5426] hover:bg-[#D9461B] px-6 text-sm font-bold text-white transition-colors cursor-pointer"
-                    >
-                      {tText(
-                        { en: 'Check availability', ar: 'التحقق من التوفر', de: 'Verfügbarkeit prüfen' },
-                        lang
-                      )}
-                    </button>
-                  ) : (
-                    <>
+                    <div className="space-y-1.5">
                       <button
-                        type="submit"
+                        type="button"
+                        onClick={handleAdvanceToDetails}
                         className="min-h-[52px] w-full rounded-xl bg-[#EE5426] hover:bg-[#D9461B] px-6 text-sm font-bold text-white transition-colors cursor-pointer"
                       >
-                        {previewMode ? 'Preview Booking Ticket' : t.modalSubmitBooking}
+                        {tText(
+                          { en: 'Check availability', ar: 'التحقق من التوفر', de: 'Verfügbarkeit prüfen' },
+                          lang
+                        )}
                       </button>
+                      <p className="text-[11px] font-medium text-[#64748B] text-center leading-tight">
+                        {bookNowMicrocopy}
+                      </p>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="space-y-1.5">
+                        <button
+                          type="submit"
+                          className="min-h-[52px] w-full rounded-xl bg-[#EE5426] hover:bg-[#D9461B] px-6 text-sm font-bold text-white transition-colors cursor-pointer"
+                        >
+                          {previewMode ? 'Preview Booking Ticket' : t.modalSubmitBooking}
+                        </button>
+                        <p className="text-[11px] font-medium text-[#64748B] text-center leading-tight">
+                          {bookNowMicrocopy}
+                        </p>
+                      </div>
                       <button
                         type="button"
                         onClick={() => setBookingStep(1)}
@@ -3190,10 +3205,12 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
                     <div className="p-3.5 space-y-1">
                       <div className="flex items-center justify-between gap-2 text-[11px] text-[#64748B] tabular-nums">
                         <span>{rel.destination} · {tText(rel.duration, lang)}</span>
-                        <span className="inline-flex items-center gap-0.5 font-semibold text-[#0F2233]">
-                          <Star className="h-3 w-3 fill-[#F59E0B] text-[#F59E0B]" />
-                          {rel.rating.toFixed(1)}
-                        </span>
+                        {rel.reviewCount > 0 && (
+                          <span className="inline-flex items-center gap-0.5 font-semibold text-[#0F2233]">
+                            <Star className="h-3 w-3 fill-[#F59E0B] text-[#F59E0B]" />
+                            {rel.rating.toFixed(1)}
+                          </span>
+                        )}
                       </div>
                       <p className="text-sm font-semibold text-[#0F2233] line-clamp-2 group-hover:text-[#EE5426] transition-colors">
                         {tText(rel.name, lang)}
@@ -3227,13 +3244,18 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
                 {formatLinePrice(totalEur)}
               </span>
             </div>
-            <button
-              type="button"
-              onClick={() => jumpToSection('trip-booking-form')}
-              className="btn-wasla-primary min-h-[44px] rounded-full px-6 py-2 text-xs sm:text-sm font-bold cursor-pointer whitespace-nowrap"
-            >
-              {t.bookNow}
-            </button>
+            <div className="flex flex-col items-end gap-0.5 shrink-0">
+              <button
+                type="button"
+                onClick={() => jumpToSection('trip-booking-form')}
+                className="btn-wasla-primary min-h-[44px] rounded-full px-6 py-2 text-xs sm:text-sm font-bold cursor-pointer whitespace-nowrap"
+              >
+                {t.bookNow}
+              </button>
+              <span className="text-[10px] text-[#64748B] leading-tight text-end">
+                {bookNowMicrocopy}
+              </span>
+            </div>
           </div>
         </div>
       )}

@@ -435,11 +435,15 @@ export default function App() {
         availability: 'https://schema.org/InStock',
         url: `https://waslatravel.com/?trip=${encodeURIComponent(activeDetailTrip.id)}`,
       },
-      aggregateRating: {
-        '@type': 'AggregateRating',
-        ratingValue: activeDetailTrip.rating,
-        reviewCount: Math.max(1, activeDetailTrip.reviewCount),
-      },
+      ...(activeDetailTrip.reviewCount > 0
+        ? {
+            aggregateRating: {
+              '@type': 'AggregateRating',
+              ratingValue: activeDetailTrip.rating,
+              reviewCount: activeDetailTrip.reviewCount,
+            },
+          }
+        : {}),
     };
 
     const scriptEl =
@@ -1692,7 +1696,7 @@ export default function App() {
                 </div>
                 <div className="absolute inset-0 wasla-hero-scrim" />
 
-                <div className="relative z-10 mx-auto max-w-[1200px] px-4 sm:px-6 pt-12 sm:pt-16 lg:pt-20 pb-10 lg:pb-28 space-y-8">
+                <div className="relative z-10 mx-auto max-w-[1200px] px-4 sm:px-6 pt-7 sm:pt-16 lg:pt-20 pb-6 sm:pb-10 lg:pb-28 space-y-[18px] sm:space-y-8">
                   <div className="hero-enter">
                     <p className="text-xs font-semibold uppercase tracking-[0.12em] text-white/85">{t.heroEyebrow}</p>
                   </div>
@@ -1700,20 +1704,58 @@ export default function App() {
                   <div className="max-w-[640px] space-y-4 hero-enter">
                     <h1
                       id="hero-title"
-                      className="font-hero-standard text-[clamp(2rem,4.4vw,3.5rem)] leading-[1.05] font-bold tracking-[-0.02em] text-white text-balance"
+                      className="font-hero-standard text-[clamp(1.7rem,7.2vw,3.25rem)] leading-[1.08] font-bold tracking-[-0.02em] text-white text-balance"
                     >
                       {customHeroCaption ? (
                         customHeroCaption
                       ) : (
                         <>
-                          {t.heroTitleLine1}
-                          <br />
-                          <span className="text-[#F97316]">{t.heroTitleLine2}</span>
+                          <span className="sm:hidden">
+                            {tText(
+                              {
+                                en: 'Hurghada excursions',
+                                ar: 'رحلات الغردقة',
+                                de: 'Hurghada Ausflüge',
+                              },
+                              lang
+                            )}{' '}
+                            <span className="text-[#F97316]">
+                              {tText(
+                                {
+                                  en: 'in small groups.',
+                                  ar: 'بمجموعات صغيرة.',
+                                  de: 'in kleinen Gruppen.',
+                                },
+                                lang
+                              )}
+                            </span>
+                          </span>
+                          <span className="hidden sm:inline">
+                            {t.heroTitleLine1}
+                            <br />
+                            <span className="text-[#F97316]">{t.heroTitleLine2}</span>
+                          </span>
                         </>
                       )}
                     </h1>
                     <p className="font-hero-standard text-[15px] sm:text-base leading-relaxed text-white/90">
-                      {customHeroSubtitle || t.heroLede}
+                      {customHeroSubtitle ? (
+                        customHeroSubtitle
+                      ) : (
+                        <>
+                          <span className="sm:hidden">
+                            {tText(
+                              {
+                                en: 'Boat trips, desert safaris and Luxor days with hand-picked local operators. Nothing to pay today; cash on pickup.',
+                                ar: 'رحلات بحرية وسفاري وأيام في الأقصر مع مشغلين محليين مختارين بعناية. لا دفع اليوم، والدفع كاش عند الاستلام.',
+                                de: 'Bootstouren, Wüstensafaris und Luxor-Tage mit handverlesenen lokalen Veranstaltern. Heute nichts zu bezahlen; Barzahlung bei Abholung.',
+                              },
+                              lang
+                            )}
+                          </span>
+                          <span className="hidden sm:inline">{t.heroLede}</span>
+                        </>
+                      )}
                     </p>
                   </div>
                 </div>

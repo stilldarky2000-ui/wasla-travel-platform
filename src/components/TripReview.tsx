@@ -884,16 +884,18 @@ export const TripReview: React.FC<TripReviewProps> = ({
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="space-y-1">
           <h3 className="text-base sm:text-lg font-semibold text-[#0F2233]">{copy.heading}</h3>
-          <div className="flex flex-wrap items-center gap-2 text-xs text-[#475569] tabular-nums">
-            <span className="inline-flex items-center gap-1 font-semibold text-[#0F2233]">
-              <Star className="h-3.5 w-3.5 fill-[#F59E0B] text-[#F59E0B]" aria-hidden="true" />
-              <span>{stats.average} / 5.0</span>
-            </span>
-            <span aria-hidden="true">·</span>
-            <span>
-              {stats.count} {stats.count === 1 ? copy.reviewSingular : copy.reviewsWord}
-            </span>
-          </div>
+          {stats.count > 0 && (
+            <div className="flex flex-wrap items-center gap-2 text-xs text-[#475569] tabular-nums">
+              <span className="inline-flex items-center gap-1 font-semibold text-[#0F2233]">
+                <Star className="h-3.5 w-3.5 fill-[#F59E0B] text-[#F59E0B]" aria-hidden="true" />
+                <span>{stats.average} / 5.0</span>
+              </span>
+              <span aria-hidden="true">·</span>
+              <span>
+                {stats.count} {stats.count === 1 ? copy.reviewSingular : copy.reviewsWord}
+              </span>
+            </div>
+          )}
         </div>
 
         {!previewMode && !hideReviewPrompt && (

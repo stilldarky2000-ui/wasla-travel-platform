@@ -1547,7 +1547,9 @@ export const SupplierPortal: React.FC<SupplierPortalProps> = ({
                     </span>
                   )}
                   <div className="flex items-center gap-2 shrink-0">
-                    <span className="tabular-nums">★ {tr.rating.toFixed(1)}</span>
+                    {tr.reviewCount > 0 && (
+                      <span className="tabular-nums">★ {tr.rating.toFixed(1)}</span>
+                    )}
                     <span className="inline-flex items-center gap-1 rounded-md border border-[#FED7AA] bg-[#FFF7ED] px-2 py-0.5 text-[11px] font-semibold text-[#D9461B] group-hover:bg-[#EE5426] group-hover:text-white transition-colors">
                       <Pencil className="h-3 w-3" aria-hidden="true" />
                       <span>تعديل · Edit</span>

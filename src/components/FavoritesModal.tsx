@@ -9,6 +9,7 @@ import {
   tText,
 } from '../data/marketplaceData';
 import { shareTripItem } from '../lib/shareTrip';
+import { formatPerGroupUnitLabel, formatTripLockupPrice } from '../lib/tripPricing';
 import { SmartImage } from './SmartImage';
 
 interface FavoritesModalProps {
@@ -210,13 +211,15 @@ export const FavoritesModal: React.FC<FavoritesModalProps> = ({
                           <Clock className="h-3.5 w-3.5 text-[#EE5426] shrink-0" />
                           <span className="truncate">{tText(trip.duration, lang)}</span>
                         </div>
-                        <div className="text-end">
-                          <div className="inline-flex items-center gap-1 rounded-full bg-[#FAF4ED] border border-[#C8C2B8]/60 px-2.5 py-1 text-xs font-bold text-[#0F2233] tabular-nums">
-                            <Star className="h-3.5 w-3.5 fill-[#F59E0B] text-[#F59E0B]" />
-                            <span>{safeRating}</span>
-                            <span className="font-normal text-[#64748B]">({trip.reviewCount})</span>
+                        {(trip.reviewCount ?? 0) > 0 && (
+                          <div className="text-end">
+                            <div className="inline-flex items-center gap-1 rounded-full bg-[#FAF4ED] border border-[#C8C2B8]/60 px-2.5 py-1 text-xs font-bold text-[#0F2233] tabular-nums">
+                              <Star className="h-3.5 w-3.5 fill-[#F59E0B] text-[#F59E0B]" />
+                              <span>{safeRating}</span>
+                              <span className="font-normal text-[#64748B]">({trip.reviewCount})</span>
+                            </div>
                           </div>
-                        </div>
+                        )}
                       </div>
 
                       <p className="text-xs text-[#64748B] leading-relaxed line-clamp-2">
@@ -242,13 +245,26 @@ export const FavoritesModal: React.FC<FavoritesModalProps> = ({
                   </div>
 
                   <div className="border-t border-[#C8C2B8]/50 dark:border-[#334155] bg-[#FAF4ED]/80 dark:bg-[#0F2233]/60 px-4 py-3 flex items-center justify-between gap-3">
-                    <div className="tabular-nums">
-                      <p className="text-[10.5px] font-medium text-[#64748B]">
-                        {tText({ en: 'From', ar: 'يبدأ من', de: 'Ab' }, lang)}
-                      </p>
-                      <p className="text-base font-bold text-[#0F2233] leading-tight">
-                        {formatCurrencyPrice(trip.price, currency)}
-                      </p>
+                    <div className="tabular-nums min-w-0">
+                      {trip.pricingMode === 'per-group' ? (
+                        <div className="flex flex-wrap items-baseline gap-x-1 gap-y-0.5">
+                          <span className="text-base font-bold text-[#0F2233] leading-tight">
+                            {formatTripLockupPrice(trip.price, currency, lang)}
+                          </span>
+                          <span className="text-[11px] font-medium text-[#64748B] leading-tight">
+                            · {formatPerGroupUnitLabel(trip, lang)}
+                          </span>
+                        </div>
+                      ) : (
+                        <>
+                          <p className="text-[10.5px] font-medium text-[#64748B]">
+                            {tText({ en: 'From', ar: 'يبدأ من', de: 'Ab' }, lang)}
+                          </p>
+                          <p className="text-base font-bold text-[#0F2233] leading-tight">
+                            {formatCurrencyPrice(trip.price, currency)}
+                          </p>
+                        </>
+                      )}
                     </div>
                     <button
                       type="button"

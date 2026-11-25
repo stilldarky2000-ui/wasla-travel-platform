@@ -10,6 +10,7 @@ import {
   tText,
 } from '../data/marketplaceData';
 import { SmartImage } from './SmartImage';
+import { formatPerGroupUnitLabel, formatTripLockupPrice } from '../lib/tripPricing';
 
 interface HeroCarouselProps {
   variant: 'hero';
@@ -233,12 +234,16 @@ const HeroSlider: React.FC<HeroCarouselProps> = ({
                 </h3>
 
                 <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs sm:text-sm text-[#FFF7ED] tabular-nums">
-                  <span className="inline-flex items-center gap-1 font-semibold text-white">
-                    <Star className="h-3.5 w-3.5 fill-[#F0B85A] text-[#F0B85A]" aria-hidden="true" />
-                    {trip.rating.toFixed(1)}
-                    <span className="font-normal text-[#FED7AA]">({trip.reviewCount})</span>
-                  </span>
-                  <span aria-hidden="true">·</span>
+                  {trip.reviewCount > 0 && (
+                    <>
+                      <span className="inline-flex items-center gap-1 font-semibold text-white">
+                        <Star className="h-3.5 w-3.5 fill-[#F0B85A] text-[#F0B85A]" aria-hidden="true" />
+                        {trip.rating.toFixed(1)}
+                        <span className="font-normal text-[#FED7AA]">({trip.reviewCount})</span>
+                      </span>
+                      <span aria-hidden="true">·</span>
+                    </>
+                  )}
                   <span>{tText(trip.duration, lang)}</span>
                   <span aria-hidden="true">·</span>
                   <span className="font-medium text-[#FED7AA]">
@@ -246,11 +251,22 @@ const HeroSlider: React.FC<HeroCarouselProps> = ({
                   </span>
                   <span aria-hidden="true">·</span>
                   <span className="inline-flex items-baseline gap-1.5 tracking-normal">
-                    <span>{t.fromPrice}</span>
-                    <strong className="text-white font-semibold">
-                      {formatCurrencyPrice(trip.price, currency)}
-                    </strong>
-                    <span>{t.perPerson}</span>
+                    {trip.pricingMode === 'per-group' ? (
+                      <>
+                        <strong className="text-white font-semibold">
+                          {formatTripLockupPrice(trip.price, currency, lang)}
+                        </strong>
+                        <span>· {formatPerGroupUnitLabel(trip, lang)}</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>{t.fromPrice}</span>
+                        <strong className="text-white font-semibold">
+                          {formatCurrencyPrice(trip.price, currency)}
+                        </strong>
+                        <span>{t.perPerson}</span>
+                      </>
+                    )}
                   </span>
                 </div>
               </div>

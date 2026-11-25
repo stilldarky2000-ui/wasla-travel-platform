@@ -11,6 +11,7 @@ import {
   tText,
 } from '../data/marketplaceData';
 import { shareTripItem } from '../lib/shareTrip';
+import { formatPerGroupUnitLabel, formatTripLockupPrice } from '../lib/tripPricing';
 import { SmartImage } from './SmartImage';
 
 interface TripCardProps {
@@ -88,20 +89,12 @@ export const TripCard: React.FC<TripCardProps> = ({
   const categoryObj = CATEGORIES.find((c) => c.id === trip.category);
   const categoryLabel = categoryObj ? tText(categoryObj.name, lang) : trip.category;
 
-  const hasVisibleRating = (trip.rating ?? 0) > 0 && (trip.reviewCount ?? 0) > 0;
+  const hasVisibleRating = (trip.reviewCount ?? 0) > 0;
   const safeRating = Number(trip.rating ?? 5).toFixed(1);
   const displayPrice = formatCurrencyPrice(trip.price, currency);
   const isFixedGroupPrice = trip.pricingMode === 'per-group';
-  const fromWord = isFixedGroupPrice
-    ? tText({ en: 'Fixed', ar: 'ثابت', de: 'Festpreis' }, lang)
-    : tText({ en: 'From', ar: 'من', de: 'Ab' }, lang);
-  const perShort = isFixedGroupPrice
-    ? trip.category === 'sea'
-      ? tText({ en: 'boat', ar: 'قارب', de: 'Boot' }, lang)
-      : trip.category === 'transfers'
-        ? tText({ en: 'vehicle', ar: 'سيارة', de: 'Fahrzeug' }, lang)
-        : tText({ en: 'group', ar: 'مجموعة', de: 'Gruppe' }, lang)
-    : tText({ en: 'person', ar: 'فرد', de: 'Pers.' }, lang);
+  const fromWord = tText({ en: 'From', ar: 'من', de: 'Ab' }, lang);
+  const perShort = tText({ en: 'per adult', ar: 'للبالغ', de: 'pro Erw.' }, lang);
 
   const favoriteLabel = isFavorite
     ? tText({ en: 'Remove from favorites', ar: 'إزالة من المفضلة', de: 'Aus Favoriten entfernen' }, lang)
@@ -242,11 +235,22 @@ export const TripCard: React.FC<TripCardProps> = ({
       </div>
 
       <div className="border-t border-[#C8C2B8]/40 dark:border-[#334155] bg-[#FAF4ED]/80 dark:bg-[#0F2233]/60 px-4 sm:px-5 py-3 flex items-center justify-between gap-2">
-        <div className="inline-flex items-baseline gap-1 tabular-nums tracking-normal">
-          <span className="text-[11px] font-medium text-[#64748B]">{fromWord}</span>
-          <span className="font-mono text-[16px] font-bold text-[#0F2233]">{displayPrice}</span>
-          <span className="text-[11px] font-medium text-[#64748B]">/ {perShort}</span>
-        </div>
+        {isFixedGroupPrice ? (
+          <div className="min-w-0 flex flex-wrap items-baseline gap-x-1 gap-y-0.5 tabular-nums tracking-normal">
+            <span className="font-mono text-[15px] font-bold text-[#0F2233]">
+              {formatTripLockupPrice(trip.price, currency, lang)}
+            </span>
+            <span className="text-[11px] font-medium text-[#64748B] leading-tight">
+              · {formatPerGroupUnitLabel(trip, lang)}
+            </span>
+          </div>
+        ) : (
+          <div className="inline-flex items-baseline gap-1 tabular-nums tracking-normal">
+            <span className="text-[11px] font-medium text-[#64748B]">{fromWord}</span>
+            <span className="font-mono text-[16px] font-bold text-[#0F2233]">{displayPrice}</span>
+            <span className="text-[11px] font-medium text-[#64748B]">· {perShort}</span>
+          </div>
+        )}
 
         <span className="btn-wasla-primary gap-1 rounded-lg px-3.5 py-1.5 text-[12px] tracking-normal whitespace-nowrap shrink-0">
           <span>{t.viewTrip}</span>

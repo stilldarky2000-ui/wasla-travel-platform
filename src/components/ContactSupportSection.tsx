@@ -181,9 +181,9 @@ export const ContactSupportSection: React.FC<ContactSupportSectionProps> = ({
               <p className="text-xs leading-relaxed text-[#64748B]">
                 {tText(
                   {
-                    en: 'On hand throughout the day, every day, including follow-up while Cairo and Luxor trips are on the road · The owner replies personally as soon as your message arrives.',
-                    ar: 'متابعة مباشرة طوال اليوم، كل يوم، بما فيها متابعة رحلات القاهرة والأقصر أثناء تنفيذها · صاحب العمل يرد عليك بنفسه فور وصول رسالتك.',
-                    de: 'Den ganzen Tag über für Sie da, jeden Tag, inklusive Begleitung während der Kairo- und Luxor-Ausflüge unterwegs · Der Inhaber antwortet persönlich, sobald Ihre Nachricht eintrifft.',
+                    en: 'You write to the owner, not a call centre. He replies personally, stays in touch while your trip is on the road, and answers every day.',
+                    ar: 'بتكتب للمالك نفسه، مش مركز اتصالات. بيرد عليك بنفسه، وبيفضل على تواصل أثناء رحلتك، وبيرد كل يوم.',
+                    de: 'Sie schreiben dem Inhaber persönlich, nicht einem Callcenter. Er antwortet selbst, bleibt während Ihrer Tour erreichbar und ist jeden Tag für Sie da.',
                   },
                   lang
                 )}

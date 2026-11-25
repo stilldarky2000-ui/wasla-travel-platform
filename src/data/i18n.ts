@@ -70,6 +70,7 @@ export interface Translations {
   sectionAllTrips: string;
   sectionAllTripsSub: string;
   bookNow: string;
+  bookNowMicrocopy?: string;
   familyFriendly: string;
   womenFriendly: string;
   minChildAge: string;
@@ -197,10 +198,10 @@ const BASE_I18N: Record<'en' | 'ar' | 'de', Translations> = {
     deskCount: 'Desk',
 
     heroEyebrow: 'Hurghada · Marsa Alam · Cairo · Luxor',
-    heroTitleLine1: 'Small-group days,',
+    heroTitleLine1: 'Hurghada excursions in small groups,',
     heroTitleLine2: 'booked without the guesswork.',
     heroLede:
-      'Wasla Travel connects you directly with vetted local tourism providers across the Red Sea and Nile, sea days, desert safaris, Luxor & Cairo history, horse riding, city tours and private transfers.',
+      'Boat trips, desert safaris and Luxor days with hand-picked local operators, confirmed personally by the owner. Nothing to pay today; you pay cash when we pick you up.',
     searchDestinationLabel: 'Destination',
     searchActivityLabel: 'Activity',
     searchDateLabel: 'Date',
@@ -227,7 +228,8 @@ const BASE_I18N: Record<'en' | 'ar' | 'de', Translations> = {
 
     sectionAllTrips: 'All trips',
     sectionAllTripsSub: 'Browse every itinerary side by side and inspect images, ratings, and family options before booking.',
-    bookNow: 'Book now',
+    bookNow: 'Reserve your spot',
+    bookNowMicrocopy: 'Nothing to pay today. Cash on pickup.',
     familyFriendly: 'Family friendly',
     womenFriendly: 'Women friendly',
     minChildAge: 'Min child age',
@@ -369,10 +371,10 @@ const BASE_I18N: Record<'en' | 'ar' | 'de', Translations> = {
     deskCount: 'الطلبات',
 
     heroEyebrow: 'الغردقة · مرسى علم · القاهرة · الأقصر',
-    heroTitleLine1: 'رحلات بمجموعات صغيرة،',
+    heroTitleLine1: 'رحلات الغردقة بمجموعات صغيرة،',
     heroTitleLine2: 'محجوزة بدون أي حيرة.',
     heroLede:
-      'وصلة ترافل منصتك لحجز الرحلات المحلية الموثوقة في البحر الأحمر والنيل، رحلات بحرية، سفاري الصحراء، آثار الأقصر والقاهرة، ركوب الخيل، جولات المدينة والتوصيلات الخاصة.',
+      'رحلات بحرية وسفاري صحراوية وأيام في الأقصر مع مشغلين محليين مختارين بعناية، بيأكدها المالك بنفسه. لا دفع اليوم، والدفع كاش عند الاستلام.',
     searchDestinationLabel: 'الوجهة',
     searchActivityLabel: 'النشاط',
     searchDateLabel: 'التاريخ',
@@ -399,7 +401,8 @@ const BASE_I18N: Record<'en' | 'ar' | 'de', Translations> = {
 
     sectionAllTrips: 'كل الرحلات',
     sectionAllTripsSub: 'استعرض جميع البرامج جنباً إلى جنب وشاهد الصور والتقييمات وخيارات العائلة قبل الحجز.',
-    bookNow: 'احجز الآن',
+    bookNow: 'احجز مكانك',
+    bookNowMicrocopy: 'لا دفع اليوم. الدفع كاش عند الاستلام.',
     familyFriendly: 'مناسب للعائلات',
     womenFriendly: 'مناسب ومدعوم للنساء',
     minChildAge: 'أدنى عمر للأطفال',
@@ -541,10 +544,10 @@ const BASE_I18N: Record<'en' | 'ar' | 'de', Translations> = {
     deskCount: 'Anfragen',
 
     heroEyebrow: 'Hurghada · Marsa Alam · Kairo · Luxor',
-    heroTitleLine1: 'Tage in kleiner Gruppe,',
+    heroTitleLine1: 'Hurghada Ausflüge in kleinen Gruppen,',
     heroTitleLine2: 'gebucht ohne Rätselraten.',
     heroLede:
-      'Wasla Travel verbindet Sie direkt mit geprüften lokalen Anbietern am Roten Meer und Nil, Bootstage, Wüstensafaris, Luxor & Kairo, Reiten, Stadttouren und private Transfers.',
+      'Bootstouren, Wüstensafaris und Luxor-Tage mit handverlesenen lokalen Veranstaltern, vom Inhaber persönlich bestätigt. Heute zahlen Sie nichts; die Barzahlung erfolgt bei der Abholung.',
     searchDestinationLabel: 'Reiseziel',
     searchActivityLabel: 'Aktivität',
     searchDateLabel: 'Datum',
@@ -571,7 +574,8 @@ const BASE_I18N: Record<'en' | 'ar' | 'de', Translations> = {
 
     sectionAllTrips: 'Alle Touren',
     sectionAllTripsSub: 'Vergleichen Sie alle Touren direkt nebeneinander inklusive Bildern, Bewertungen und Familieninfos.',
-    bookNow: 'Jetzt buchen',
+    bookNow: 'Platz reservieren',
+    bookNowMicrocopy: 'Heute nichts zu bezahlen. Barzahlung bei Abholung.',
     familyFriendly: 'Familienfreundlich',
     womenFriendly: 'Frauenfreundlich',
     minChildAge: 'Mindestalter',
