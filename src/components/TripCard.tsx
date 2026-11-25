@@ -88,10 +88,20 @@ export const TripCard: React.FC<TripCardProps> = ({
   const categoryObj = CATEGORIES.find((c) => c.id === trip.category);
   const categoryLabel = categoryObj ? tText(categoryObj.name, lang) : trip.category;
 
+  const hasVisibleRating = (trip.rating ?? 0) > 0 && (trip.reviewCount ?? 0) > 0;
   const safeRating = Number(trip.rating ?? 5).toFixed(1);
   const displayPrice = formatCurrencyPrice(trip.price, currency);
-  const fromWord = tText({ en: 'From', ar: 'من', de: 'Ab' }, lang);
-  const perShort = tText({ en: 'person', ar: 'فرد', de: 'Pers.' }, lang);
+  const isFixedGroupPrice = trip.pricingMode === 'per-group';
+  const fromWord = isFixedGroupPrice
+    ? tText({ en: 'Fixed', ar: 'ثابت', de: 'Festpreis' }, lang)
+    : tText({ en: 'From', ar: 'من', de: 'Ab' }, lang);
+  const perShort = isFixedGroupPrice
+    ? trip.category === 'sea'
+      ? tText({ en: 'boat', ar: 'قارب', de: 'Boot' }, lang)
+      : trip.category === 'transfers'
+        ? tText({ en: 'vehicle', ar: 'سيارة', de: 'Fahrzeug' }, lang)
+        : tText({ en: 'group', ar: 'مجموعة', de: 'Gruppe' }, lang)
+    : tText({ en: 'person', ar: 'فرد', de: 'Pers.' }, lang);
 
   const favoriteLabel = isFavorite
     ? tText({ en: 'Remove from favorites', ar: 'إزالة من المفضلة', de: 'Aus Favoriten entfernen' }, lang)
@@ -191,11 +201,15 @@ export const TripCard: React.FC<TripCardProps> = ({
           <div className="pointer-events-none absolute inset-x-0 bottom-0 h-18 bg-gradient-to-t from-[#0F2233]/82 via-[#0F2233]/28 to-transparent" />
           <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 px-3.5 pb-2.5 pt-4 text-white">
             <div className="flex items-center justify-between gap-2 text-[11.5px] text-white/95 tabular-nums">
-              <span className="inline-flex items-center gap-1 font-semibold text-white">
-                <Star className="h-3.5 w-3.5 fill-[#F59E0B] text-[#F59E0B]" aria-hidden="true" />
-                {safeRating}
-                <span className="font-normal text-white/75">({trip.reviewCount})</span>
-              </span>
+              {hasVisibleRating ? (
+                <span className="inline-flex items-center gap-1 font-semibold text-white">
+                  <Star className="h-3.5 w-3.5 fill-[#F59E0B] text-[#F59E0B]" aria-hidden="true" />
+                  {safeRating}
+                  <span className="font-normal text-white/75">({trip.reviewCount})</span>
+                </span>
+              ) : (
+                <span />
+              )}
               <span className="inline-flex items-center gap-1 text-white/95 truncate">
                 <MapPin className="h-3 w-3 text-[#FDBA74] shrink-0" aria-hidden="true" />
                 <span className="truncate">{trip.destination}</span>

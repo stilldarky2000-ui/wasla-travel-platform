@@ -235,6 +235,7 @@ export interface WaslaHotelMapPickerProps {
   onChange: (hotelValue: string) => void;
   destination: DestinationRegion;
   hasOuterZoneTransfer: boolean;
+  freeTransferZones?: string[];
   transferZoneId: string;
   onAutoDetectTransferZone?: (zoneId: string) => void;
   lang: Lang;
@@ -247,6 +248,7 @@ export const WaslaHotelMapPicker: React.FC<WaslaHotelMapPickerProps> = ({
   onChange,
   destination,
   hasOuterZoneTransfer,
+  freeTransferZones,
   transferZoneId,
   onAutoDetectTransferZone,
   lang,
@@ -499,7 +501,8 @@ export const WaslaHotelMapPicker: React.FC<WaslaHotelMapPickerProps> = ({
               const directionalFee = getZoneTransferFeePerPerson(
                 previewZone,
                 destination,
-                hasOuterZoneTransfer
+                hasOuterZoneTransfer,
+                freeTransferZones
               );
 
               return (
@@ -549,7 +552,8 @@ export const WaslaHotelMapPicker: React.FC<WaslaHotelMapPickerProps> = ({
               const directionalFee = getZoneTransferFeePerPerson(
                 hotelItem.zoneId,
                 destination,
-                hasOuterZoneTransfer
+                hasOuterZoneTransfer,
+                freeTransferZones
               );
               return (
                 <li
@@ -609,7 +613,8 @@ export const WaslaHotelMapPicker: React.FC<WaslaHotelMapPickerProps> = ({
                   activeZoneObj.id,
                   destination,
                   lang,
-                  hasOuterZoneTransfer
+                  hasOuterZoneTransfer,
+                  freeTransferZones
                 )}
               </strong>
             </span>

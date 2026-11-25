@@ -257,9 +257,11 @@ const ZONE_BASE_NAMES: Record<string, { en: string; ar: string; de: string }> = 
 export function getZoneTransferFeePerPerson(
   zoneId: string,
   destination?: DestinationRegion | string,
-  hasOuterZoneTransfer: boolean = true
+  hasOuterZoneTransfer: boolean = true,
+  freeTransferZones?: string[]
 ): number {
   if (!hasOuterZoneTransfer || !zoneId || zoneId === 'hurghada') return 0;
+  if (freeTransferZones && freeTransferZones.includes(zoneId)) return 0;
 
   if (destination === 'Cairo') {
     if (zoneId === 'sahl-hasheesh' || zoneId === 'makadi') return 10;
@@ -282,11 +284,12 @@ export function getZoneTransferLabel(
   zoneId: string,
   destination: DestinationRegion | string | undefined,
   lang: Lang,
-  hasOuterZoneTransfer: boolean = true
+  hasOuterZoneTransfer: boolean = true,
+  freeTransferZones?: string[]
 ): string {
   const base = ZONE_BASE_NAMES[zoneId] || ZONE_BASE_NAMES.hurghada;
   const zoneName = lang === 'ar' ? base.ar : lang === 'de' ? base.de : base.en;
-  const fee = getZoneTransferFeePerPerson(zoneId, destination, hasOuterZoneTransfer);
+  const fee = getZoneTransferFeePerPerson(zoneId, destination, hasOuterZoneTransfer, freeTransferZones);
   if (fee === 0) {
     return lang === 'ar'
       ? `${zoneName} (التوصيل مشمول · 0€)`
@@ -350,6 +353,12 @@ export interface Trip {
   notAllowed?: LocalizedText[];
   knowBeforeYouGo?: LocalizedText[];
   outerTransferEnabled?: boolean;
+  /** Optional outer transfer zone IDs included at €0 for this specific trip (e.g. ['el-gouna'] or ['sahl-hasheesh']). */
+  freeTransferZones?: string[];
+  /** Pricing model: 'per-group' for fixed whole-boat / whole-vehicle bookings (not multiplied by guests). */
+  pricingMode?: 'per-person' | 'per-group';
+  /** Optional maximum guest capacity for the booking (e.g. 6 for a private speed boat). */
+  maxGuests?: number;
   pickup: LocalizedText;
   supplierName: string;
   supplierUid?: string;
@@ -1579,6 +1588,8 @@ export const TRIPS: Trip[] = [
       de: 'Hurghada Marina / Hotelabholung',
     },
     outerTransferEnabled: true,
+    pricingMode: 'per-group',
+    maxGuests: 6,
     pickup: {
       en: 'Hurghada included · El Gouna, Sahl Hasheesh and Makadi +€10/pp · Soma Bay and Safaga +€15/pp',
       ar: 'الغردقة مشمولة · الجونة وسهل حشيش ومكادي +10 يورو للفرد · سوما باي وسفاجا +15 يورو للفرد',
@@ -1787,6 +1798,7 @@ export const TRIPS: Trip[] = [
       de: 'Tauchbasis am Strand von Sahl Hasheesh / Hotelabholung verfügbar',
     },
     outerTransferEnabled: true,
+    freeTransferZones: ['sahl-hasheesh'],
     pickup: {
       en: 'Sahl Hasheesh & Hurghada pickup available · Extra fee for El Gouna, Soma Bay and Safaga (payable on site)',
       ar: 'يتوفر الاستلام من سهل حشيش والغردقة · رسوم إضافية للجونة وسوما باي وسفاجا (تُدفع في الموقع)',
@@ -3529,6 +3541,7 @@ Danach geht es klimatisiert zurück durch die Wüste, mit dem ganzen antiken The
       },
     ],
     outerTransferEnabled: true,
+    freeTransferZones: ['el-gouna'],
     pickup: {
       en: 'Hurghada and El Gouna included · Sahl Hasheesh and Makadi +€10/pp · Soma Bay and Safaga +€15/pp',
       ar: 'الغردقة والجونة مشمولة · سهل حشيش ومكادي +١٠ يورو للفرد · سوما باي وسفاجا +١٥ يورو للفرد',
@@ -3751,6 +3764,7 @@ Danach geht es klimatisiert zurück durch die Wüste, mit dem ganzen antiken The
       },
     ],
     outerTransferEnabled: true,
+    freeTransferZones: ['el-gouna'],
     pickup: {
       en: 'Hurghada and El Gouna included · Sahl Hasheesh and Makadi +€10/pp · Soma Bay and Safaga +€15/pp',
       ar: 'الغردقة والجونة مشمولة · سهل حشيش ومكادي +١٠ يورو للفرد · سوما باي وسفاجا +١٥ يورو للفرد',
@@ -4154,6 +4168,7 @@ Danach geht es klimatisiert zurück durch die Wüste, mit dem ganzen antiken The
       },
     ],
     outerTransferEnabled: true,
+    freeTransferZones: ['el-gouna'],
     pickup: {
       en: 'Hurghada and El Gouna included · Sahl Hasheesh and Makadi +€10/pp · Soma Bay and Safaga +€15/pp',
       ar: 'الغردقة والجونة مشمولة · سهل حشيش ومكادي +١٠ يورو للفرد · سوما باي وسفاجا +١٥ يورو للفرد',
@@ -4388,6 +4403,7 @@ Danach geht es klimatisiert zurück durch die Wüste, mit dem ganzen antiken The
       },
     ],
     outerTransferEnabled: true,
+    freeTransferZones: ['el-gouna'],
     pickup: {
       en: 'Hurghada and El Gouna included · Sahl Hasheesh and Makadi +€10/pp · Soma Bay and Safaga +€15/pp',
       ar: 'الغردقة والجونة مشمولة · سهل حشيش ومكادي +١٠ يورو للفرد · سوما باي وسفاجا +١٥ يورو للفرد',
@@ -5057,6 +5073,8 @@ Danach geht es klimatisiert zurück durch die Wüste, mit dem ganzen antiken The
       { en: 'Flight delay waiting & luggage help', ar: 'انتظار تأخير الطيران ومساعدة الحقائب', de: 'Wartezeit bei Verspätung & Gepäckhilfe' },
       { en: 'All highway & airport parking fees', ar: 'رسوم الطرق ومواقف المطار', de: 'Alle Maut- und Parkgebühren' },
     ],
+    outerTransferEnabled: false,
+    pricingMode: 'per-group',
     pickup: { en: 'HRG Airport, Hurghada, El Gouna & Marsa Alam', ar: 'مطار الغردقة، الجونة، مرسى علم', de: 'Flughafen HRG, Hurghada, El Gouna & Marsa Alam' },
     supplierName: 'Wasla Fleet Dispatch',
     familyFriendly: true,

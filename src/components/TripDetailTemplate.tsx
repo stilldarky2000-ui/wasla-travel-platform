@@ -123,6 +123,7 @@ interface TicketReceiptSnapshot {
   transferSurchargeTotalEur: number;
   totalEur: number;
   zoneLabel?: string;
+  isFixedGroupPrice?: boolean;
 }
 
 function computeChildUnitPrice(adultUnitPrice: number, trip: Trip): number {
@@ -184,7 +185,7 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [descExpanded, setDescExpanded] = useState(false);
-  const [adults, setAdults] = useState(2);
+  const [adults, setAdults] = useState(trip.familyFriendly === false ? 1 : 2);
   const [children, setChildren] = useState(0);
   const [infants, setInfants] = useState(0);
   const [hotel, setHotel] = useState('');
@@ -241,7 +242,7 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
     setActiveImageIndex(0);
     setLightboxOpen(false);
     setDescExpanded(false);
-    setAdults(2);
+    setAdults(trip.familyFriendly === false ? 1 : 2);
     setChildren(0);
     setInfants(0);
     setRoomNumber('');
@@ -276,24 +277,44 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
   }, [lightboxOpen, galleryImages.length]);
 
   const hasOuterZoneTransfer =
-    trip.destination === 'Hurghada' ||
-    trip.destination === 'Cairo' ||
-    trip.destination === 'Luxor' ||
-    trip.outerTransferEnabled === true;
+    trip.outerTransferEnabled === false
+      ? false
+      : trip.destination === 'Hurghada' ||
+        trip.destination === 'Cairo' ||
+        trip.destination === 'Luxor' ||
+        trip.outerTransferEnabled === true;
   const activeZone =
     OUTER_TRANSFER_ZONES.find((z) => z.id === transferZoneId) ?? OUTER_TRANSFER_ZONES[0];
   const zoneFeePerPerson = getZoneTransferFeePerPerson(
     transferZoneId,
     trip.destination,
-    hasOuterZoneTransfer
+    hasOuterZoneTransfer,
+    trip.freeTransferZones
   );
   const directionalZoneLabel = hasOuterZoneTransfer
-    ? getZoneTransferLabel(activeZone.id, trip.destination, lang, hasOuterZoneTransfer)
+    ? getZoneTransferLabel(
+        activeZone.id,
+        trip.destination,
+        lang,
+        hasOuterZoneTransfer,
+        trip.freeTransferZones
+      )
     : undefined;
+
+  const isFixedGroupPrice = trip.pricingMode === 'per-group';
+  const maxGuestsLimit =
+    typeof trip.maxGuests === 'number' && trip.maxGuests > 0 ? trip.maxGuests : null;
+  const fixedPriceUnitLabel =
+    trip.category === 'sea'
+      ? tText({ en: 'boat', ar: 'للقارب بالكامل', de: 'Boot' }, lang)
+      : trip.category === 'transfers'
+        ? tText({ en: 'vehicle', ar: 'للسيارة', de: 'Fahrzeug' }, lang)
+        : tText({ en: 'group', ar: 'للمجموعة', de: 'Gruppe' }, lang);
+  const hasVisibleRating = trip.rating > 0 && trip.reviewCount > 0;
 
   const selectedOption = trip.options?.find((o) => o.id === selectedOptionId) || trip.options?.[0];
   const activeUnitPrice = selectedOption ? selectedOption.price : trip.price;
-  const childPrice = computeChildUnitPrice(activeUnitPrice, trip);
+  const childPrice = isFixedGroupPrice ? 0 : computeChildUnitPrice(activeUnitPrice, trip);
 
   const startTimeOptions = getTripStartTimeOptions(trip);
   const scheduleSummary = formatTripScheduleSummary(trip, lang, false);
@@ -314,9 +335,10 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
   const safeInfants = Math.max(0, infants);
   const payingGuestsCount = safeAdults + safeChildren;
   const totalHeadcount = safeAdults + safeChildren + safeInfants;
+  const atMaxGuestCapacity = maxGuestsLimit !== null && totalHeadcount >= maxGuestsLimit;
 
-  const adultsSubtotalEur = safeAdults * activeUnitPrice;
-  const childrenSubtotalEur = safeChildren * childPrice;
+  const adultsSubtotalEur = isFixedGroupPrice ? activeUnitPrice : safeAdults * activeUnitPrice;
+  const childrenSubtotalEur = isFixedGroupPrice ? 0 : safeChildren * childPrice;
   const transferSurchargeTotal = payingGuestsCount * zoneFeePerPerson;
   const totalEur = adultsSubtotalEur + childrenSubtotalEur + transferSurchargeTotal;
 
@@ -331,6 +353,7 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
     transferSurchargeTotalEur: transferSurchargeTotal,
     totalEur,
     zoneLabel: directionalZoneLabel,
+    isFixedGroupPrice,
   };
 
   const title = tText(trip.name, lang);
@@ -762,12 +785,16 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
                       <MapPin className="h-3.5 w-3.5" aria-hidden="true" />
                       {trip.destination}
                     </span>
-                    <span aria-hidden="true">·</span>
-                    <span className="inline-flex items-center gap-1 text-[#0F2233]">
-                      <Star className="h-3.5 w-3.5 fill-[#F59E0B] text-[#F59E0B]" aria-hidden="true" />
-                      {trip.rating.toFixed(1)} ({trip.reviewCount}{' '}
-                      {tText({ en: 'reviews', ar: 'تقييم', de: 'Bewertungen' }, lang)})
-                    </span>
+                    {hasVisibleRating && (
+                      <>
+                        <span aria-hidden="true">·</span>
+                        <span className="inline-flex items-center gap-1 text-[#0F2233]">
+                          <Star className="h-3.5 w-3.5 fill-[#F59E0B] text-[#F59E0B]" aria-hidden="true" />
+                          {trip.rating.toFixed(1)} ({trip.reviewCount}{' '}
+                          {tText({ en: 'reviews', ar: 'تقييم', de: 'Bewertungen' }, lang)})
+                        </span>
+                      </>
+                    )}
                     <span aria-hidden="true">·</span>
                     <span className="inline-flex items-center gap-1 text-[#15803D]">
                       <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
@@ -786,7 +813,9 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
                   </div>
                   <div className="text-end">
                     <span className="text-[11px] font-medium text-[#64748B] block">
-                      {tText({ en: 'Starting from', ar: 'يبدأ من', de: 'Ab' }, lang)}
+                      {isFixedGroupPrice
+                        ? tText({ en: 'Fixed price', ar: 'سعر ثابت', de: 'Festpreis' }, lang)
+                        : tText({ en: 'Starting from', ar: 'يبدأ من', de: 'Ab' }, lang)}
                     </span>
                     <span className="font-display text-2xl font-bold text-[#0F2233] tabular-nums">
                       {formatPrice(activeUnitPrice)}
@@ -911,12 +940,12 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
                   {t.modalHighlightsTitle}
                 </h2>
                 <span className="text-xs font-medium text-[#64748B] tabular-nums">
-                  {Math.min(trip.highlights.length, 5)}{' '}
+                  {trip.highlights.length}{' '}
                   {tText({ en: 'key highlights', ar: 'نقاط مميزة', de: 'Highlights' }, lang)}
                 </span>
               </div>
               <ul className="list-disc ps-5 space-y-2.5 text-[14.5px] leading-relaxed text-[#0F2233] marker:text-[#EE5426]">
-                {trip.highlights.slice(0, 5).map((item, idx) => (
+                {trip.highlights.map((item, idx) => (
                   <li key={idx}>{tText(item, lang)}</li>
                 ))}
               </ul>
@@ -1456,8 +1485,8 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
                     </div>
 
                     {pendingTicketRequest.tripStartTime && (
-                      <div className="py-2.5 flex items-center justify-between gap-4">
-                        <span className="text-[#64748B]">
+                      <div className="py-2.5 flex items-start justify-between gap-4">
+                        <span className="text-[#64748B] shrink-0">
                           {isTransferTrip
                             ? tText(
                                 {
@@ -1476,7 +1505,7 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
                                 lang
                               )}
                         </span>
-                        <strong className="font-semibold text-[#EE5426] tabular-nums text-end">
+                        <strong className="font-semibold text-[#EE5426] tabular-nums text-end min-w-0 leading-snug">
                           {pendingTicketRequest.tripStartTime}
                         </strong>
                       </div>
@@ -1577,14 +1606,23 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
                       <div className="rounded-xl border-[1.5px] border-[#94A3B8] bg-[#F8FAFC] p-4 space-y-2 text-xs tabular-nums">
                         <div className="flex items-center justify-between text-[#334155]">
                           <span>
-                            {receiptLabels.adultsUnit} ({pendingTicketRequest.adults} × {formatLinePrice(snap.adultUnitEur)})
+                            {snap.isFixedGroupPrice
+                              ? tText(
+                                  {
+                                    en: `Fixed rate (${fixedPriceUnitLabel})`,
+                                    ar: `سعر ثابت (${fixedPriceUnitLabel})`,
+                                    de: `Festpreis (${fixedPriceUnitLabel})`,
+                                  },
+                                  lang
+                                )
+                              : `${receiptLabels.adultsUnit} (${pendingTicketRequest.adults} × ${formatLinePrice(snap.adultUnitEur)})`}
                           </span>
                           <span className="font-semibold text-[#0F2233]">
                             {formatLinePrice(snap.adultsSubtotalEur)}
                           </span>
                         </div>
 
-                        {pendingTicketRequest.children > 0 && (
+                        {pendingTicketRequest.children > 0 && !snap.isFixedGroupPrice && (
                           <div className="flex items-center justify-between text-[#334155]">
                             <span>
                               {receiptLabels.childrenUnit} ({pendingTicketRequest.children} × {formatLinePrice(snap.childUnitEur)})
@@ -1798,8 +1836,8 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
                       <strong className="font-mono font-semibold text-[#0F2233]">{confirmedRequest.date}</strong>
                     </div>
                     {confirmedRequest.tripStartTime && (
-                      <div className="py-2 flex items-center justify-between gap-3">
-                        <span className="text-[#64748B]">
+                      <div className="py-2 flex items-start justify-between gap-3">
+                        <span className="text-[#64748B] shrink-0">
                           {isTransferTrip
                             ? tText(
                                 {
@@ -1818,7 +1856,7 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
                                 lang
                               )}
                         </span>
-                        <strong className="font-semibold text-[#EE5426] tabular-nums text-end">
+                        <strong className="font-semibold text-[#EE5426] tabular-nums text-end min-w-0 leading-snug">
                           {confirmedRequest.tripStartTime}
                         </strong>
                       </div>
@@ -1850,13 +1888,22 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
                       <div className="pt-2.5 border-t border-dashed border-[#94A3B8] space-y-1.5 tabular-nums">
                         <div className="flex items-center justify-between text-[#475569]">
                           <span>
-                            {receiptLabels.adultsUnit} ({confirmedRequest.adults} × {formatLinePrice(snap.adultUnitEur)})
+                            {snap.isFixedGroupPrice
+                              ? tText(
+                                  {
+                                    en: `Fixed rate (${fixedPriceUnitLabel})`,
+                                    ar: `سعر ثابت (${fixedPriceUnitLabel})`,
+                                    de: `Festpreis (${fixedPriceUnitLabel})`,
+                                  },
+                                  lang
+                                )
+                              : `${receiptLabels.adultsUnit} (${confirmedRequest.adults} × ${formatLinePrice(snap.adultUnitEur)})`}
                           </span>
                           <span className="font-semibold text-[#0F2233]">
                             {formatLinePrice(snap.adultsSubtotalEur)}
                           </span>
                         </div>
-                        {confirmedRequest.children > 0 && (
+                        {confirmedRequest.children > 0 && !snap.isFixedGroupPrice && (
                           <div className="flex items-center justify-between text-[#475569]">
                             <span>
                               {receiptLabels.childrenUnit} ({confirmedRequest.children} × {formatLinePrice(snap.childUnitEur)})
@@ -2053,20 +2100,27 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
                   <div className="flex items-baseline justify-between gap-2">
                     <div className="tabular-nums">
                       <span className="text-[11px] font-medium text-[#64748B]">
-                        {tText({ en: 'From', ar: 'يبدأ من', de: 'Ab' }, lang)}{' '}
+                        {isFixedGroupPrice
+                          ? tText({ en: 'Fixed', ar: 'سعر ثابت', de: 'Festpreis' }, lang)
+                          : tText({ en: 'From', ar: 'يبدأ من', de: 'Ab' }, lang)}{' '}
                       </span>
                       <span className="font-display text-xl font-bold text-[#0F2233]">
                         {formatPrice(activeUnitPrice)}
                       </span>
                       <span className="text-[11px] font-medium text-[#64748B]">
-                        {' '}/ {tText({ en: 'person', ar: 'للفرد', de: 'Person' }, lang)}
+                        {' '}/{' '}
+                        {isFixedGroupPrice
+                          ? fixedPriceUnitLabel
+                          : tText({ en: 'person', ar: 'للفرد', de: 'Person' }, lang)}
                       </span>
                     </div>
-                    <span className="inline-flex items-center gap-1 text-xs font-semibold text-[#0F2233] tabular-nums">
-                      <Star className="h-3.5 w-3.5 fill-[#F59E0B] text-[#F59E0B]" aria-hidden="true" />
-                      {trip.rating.toFixed(1)} ({trip.reviewCount}{' '}
-                      {tText({ en: 'reviews', ar: 'تقييم', de: 'Bewertungen' }, lang)})
-                    </span>
+                    {hasVisibleRating && (
+                      <span className="inline-flex items-center gap-1 text-xs font-semibold text-[#0F2233] tabular-nums">
+                        <Star className="h-3.5 w-3.5 fill-[#F59E0B] text-[#F59E0B]" aria-hidden="true" />
+                        {trip.rating.toFixed(1)} ({trip.reviewCount}{' '}
+                        {tText({ en: 'reviews', ar: 'تقييم', de: 'Bewertungen' }, lang)})
+                      </span>
+                    )}
                   </div>
                   <p className="text-[11.5px] font-medium text-[#475569]">
                     {tText(
@@ -2130,7 +2184,20 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
                               type="button"
                               role="radio"
                               aria-checked={isSelected}
-                              onClick={() => setSelectedOptionId(opt.id)}
+                              onClick={() => {
+                                setSelectedOptionId(opt.id);
+                                if (startTimeOptions.length > 1) {
+                                  const optLower = `${opt.id} ${opt.title.en}`.toLowerCase();
+                                  const matchedSlot = startTimeOptions.find((s) => {
+                                    const sl = s.toLowerCase();
+                                    return (
+                                      (optLower.includes('morning') && sl.includes('morning')) ||
+                                      (optLower.includes('sunset') && sl.includes('sunset'))
+                                    );
+                                  });
+                                  if (matchedSlot) setSelectedDepartureTime(matchedSlot);
+                                }
+                              }}
                               className={`w-full text-start rounded-xl border p-3 transition-all cursor-pointer flex items-start justify-between gap-3 ${
                                 isSelected
                                   ? 'border-[#EE5426] bg-[#FFF7ED]/60 ring-1 ring-[#EE5426]/40'
@@ -2163,7 +2230,9 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
                                   {formatLinePrice(opt.price)}
                                 </span>
                                 <span className="block text-[10px] font-medium text-[#64748B]">
-                                  {tText({ en: 'per adult', ar: 'للفرد البالغ', de: 'pro Erw.' }, lang)}
+                                  {isFixedGroupPrice
+                                    ? tText({ en: 'fixed price', ar: 'سعر ثابت', de: 'Festpreis' }, lang)
+                                    : tText({ en: 'per adult', ar: 'للفرد البالغ', de: 'pro Erw.' }, lang)}
                                 </span>
                               </span>
                             </button>
@@ -2290,7 +2359,20 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
                               <button
                                 key={slot}
                                 type="button"
-                                onClick={() => setSelectedDepartureTime(slot)}
+                                onClick={() => {
+                                  setSelectedDepartureTime(slot);
+                                  if (trip.options && trip.options.length > 1) {
+                                    const slotLower = slot.toLowerCase();
+                                    const matchedOpt = trip.options.find((o) => {
+                                      const ol = `${o.id} ${o.title.en}`.toLowerCase();
+                                      return (
+                                        (slotLower.includes('morning') && ol.includes('morning')) ||
+                                        (slotLower.includes('sunset') && ol.includes('sunset'))
+                                      );
+                                    });
+                                    if (matchedOpt) setSelectedOptionId(matchedOpt.id);
+                                  }
+                                }}
                                 aria-pressed={activeSlot}
                                 className={`min-h-[52px] rounded-xl border px-2 py-1.5 transition-all cursor-pointer tabular-nums flex flex-col items-center justify-center ${
                                   activeSlot
@@ -2311,7 +2393,7 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
                           })}
                         </div>
                       </div>
-                    ) : (
+                    ) : startTimeOptions[0] ? (
                       <div className="rounded-xl border border-[#C8C2B8]/60 bg-[#F8FAFC] px-3.5 py-2.5 flex items-center justify-between gap-3">
                         <div className="min-w-0">
                           <span className="block text-[11px] font-semibold text-[#0F2233]">
@@ -2324,7 +2406,7 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
                               lang
                             )}
                           </span>
-                          <span className="block text-[11px] text-[#64748B]">
+                          <span className="block text-[11px] text-[#64748B] leading-snug">
                             {tText(
                               {
                                 en: 'Exact hotel pickup time dispatched evening before',
@@ -2335,8 +2417,34 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
                             )}
                           </span>
                         </div>
-                        <span className="shrink-0 font-bold text-xs text-[#0F2233] tabular-nums">
-                          {startTimeOptions[0] ? formatSlotLabel(startTimeOptions[0], lang) : scheduleSummary}
+                        <span className="shrink-0 font-bold text-xs text-[#0F2233] tabular-nums whitespace-nowrap">
+                          {formatSlotLabel(startTimeOptions[0], lang)}
+                        </span>
+                      </div>
+                    ) : (
+                      <div className="rounded-xl border border-[#C8C2B8]/60 bg-[#F8FAFC] px-3.5 py-3 space-y-1">
+                        <span className="block text-[11px] font-semibold text-[#0F2233]">
+                          {tText(
+                            {
+                              en: 'Trip Start Time',
+                              ar: 'توقيت بداية الرحلة',
+                              de: 'Offizielle Startzeit',
+                            },
+                            lang
+                          )}
+                        </span>
+                        <p className="text-xs font-bold text-[#0F2233] leading-snug break-words">
+                          {scheduleSummary}
+                        </p>
+                        <span className="block text-[11px] text-[#64748B] leading-snug">
+                          {tText(
+                            {
+                              en: 'Exact hotel pickup time dispatched evening before',
+                              ar: 'موعد البيك أب من الفندق يصلك مساءً حسب موقع فندقك',
+                              de: 'Genaue Hotelabholzeit folgt am Vorabend je nach Zone',
+                            },
+                            lang
+                          )}
                         </span>
                       </div>
                     )}
@@ -2346,7 +2454,16 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
                         <div>
                           <span className="block text-sm font-semibold text-[#0F2233]">{t.modalAdults}</span>
                           <span className="block text-[11px] text-[#64748B] tabular-nums">
-                            {formatLinePrice(activeUnitPrice)}
+                            {isFixedGroupPrice
+                              ? tText(
+                                  {
+                                    en: 'Included in fixed price',
+                                    ar: 'مشمول في السعر الثابت',
+                                    de: 'Im Festpreis enthalten',
+                                  },
+                                  lang
+                                )
+                              : formatLinePrice(activeUnitPrice)}
                           </span>
                         </div>
                         <div className="flex items-center gap-2.5">
@@ -2361,8 +2478,13 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
                           <span className="text-sm font-bold tabular-nums min-w-[18px] text-center">{safeAdults}</span>
                           <button
                             type="button"
-                            onClick={() => setAdults((a) => Math.min(12, a + 1))}
-                            className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-[#C8C2B8] bg-white text-[#0F2233] hover:border-[#EE5426] cursor-pointer"
+                            disabled={atMaxGuestCapacity}
+                            onClick={() =>
+                              setAdults((a) =>
+                                atMaxGuestCapacity ? a : Math.min(maxGuestsLimit ?? 12, a + 1)
+                              )
+                            }
+                            className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-[#C8C2B8] bg-white text-[#0F2233] hover:border-[#EE5426] disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
                             aria-label="Increase adults"
                           >
                             <Plus className="h-4 w-4" />
@@ -2374,7 +2496,20 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
                         <div>
                           <span className="block text-sm font-semibold text-[#0F2233]">{t.modalChildren}</span>
                           <span className="block text-[11px] text-[#64748B] tabular-nums">
-                            {formatLinePrice(childPrice)}
+                            {isFixedGroupPrice ? (
+                              tText(
+                                {
+                                  en: 'Included in fixed price',
+                                  ar: 'مشمول في السعر الثابت',
+                                  de: 'Im Festpreis enthalten',
+                                },
+                                lang
+                              )
+                            ) : childPrice === 0 ? (
+                              <span className="font-semibold text-[#15803D]">{receiptLabels.freeLabel}</span>
+                            ) : (
+                              formatLinePrice(childPrice)
+                            )}
                           </span>
                         </div>
                         <div className="flex items-center gap-2.5">
@@ -2389,8 +2524,13 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
                           <span className="text-sm font-bold tabular-nums min-w-[18px] text-center">{children}</span>
                           <button
                             type="button"
-                            onClick={() => setChildren((c) => Math.min(10, c + 1))}
-                            className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-[#C8C2B8] bg-white text-[#0F2233] hover:border-[#EE5426] cursor-pointer"
+                            disabled={atMaxGuestCapacity}
+                            onClick={() =>
+                              setChildren((c) =>
+                                atMaxGuestCapacity ? c : Math.min(maxGuestsLimit ?? 10, c + 1)
+                              )
+                            }
+                            className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-[#C8C2B8] bg-white text-[#0F2233] hover:border-[#EE5426] disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
                             aria-label="Increase children"
                           >
                             <Plus className="h-4 w-4" />
@@ -2419,8 +2559,13 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
                           <span className="text-sm font-bold tabular-nums min-w-[18px] text-center">{infants}</span>
                           <button
                             type="button"
-                            onClick={() => setInfants((i) => Math.min(10, i + 1))}
-                            className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-[#C8C2B8] bg-white text-[#0F2233] hover:border-[#EE5426] cursor-pointer"
+                            disabled={atMaxGuestCapacity}
+                            onClick={() =>
+                              setInfants((i) =>
+                                atMaxGuestCapacity ? i : Math.min(maxGuestsLimit ?? 10, i + 1)
+                              )
+                            }
+                            className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-[#C8C2B8] bg-white text-[#0F2233] hover:border-[#EE5426] disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
                             aria-label="Increase infants"
                           >
                             <Plus className="h-4 w-4" />
@@ -2435,6 +2580,19 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
                         <strong className="font-bold text-[#0F2233]">
                           {totalHeadcount} {receiptLabels.paxWord}
                         </strong>
+                        {maxGuestsLimit !== null && (
+                          <span className="text-[#475569]">
+                            {' '}·{' '}
+                            {tText(
+                              {
+                                en: `max ${maxGuestsLimit} guests`,
+                                ar: `بحد أقصى ${maxGuestsLimit} ضيوف`,
+                                de: `max. ${maxGuestsLimit} Gäste`,
+                              },
+                              lang
+                            )}
+                          </span>
+                        )}
                       </p>
                     </div>
 
@@ -2453,7 +2611,13 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
                         >
                           {OUTER_TRANSFER_ZONES.map((z) => (
                             <option key={z.id} value={z.id}>
-                              {tText(z.label, lang)}
+                              {getZoneTransferLabel(
+                                z.id,
+                                trip.destination,
+                                lang,
+                                hasOuterZoneTransfer,
+                                trip.freeTransferZones
+                              )}
                             </option>
                           ))}
                         </select>
@@ -2478,6 +2642,7 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
                         onChange={setHotel}
                         destination={trip.destination}
                         hasOuterZoneTransfer={hasOuterZoneTransfer}
+                        freeTransferZones={trip.freeTransferZones}
                         transferZoneId={transferZoneId}
                         onAutoDetectTransferZone={setTransferZoneId}
                         lang={lang}
@@ -2815,36 +2980,49 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
                                   lang
                                 )}
                           </span>
-                          <span className="font-semibold text-[#0F2233] text-end truncate">
+                          <span className="font-semibold text-[#0F2233] text-end min-w-0 leading-snug break-words">
                             {resolvedTripStartTime}
                           </span>
                         </div>
 
                         <div className="flex items-center justify-between gap-3">
                           <span className="text-[#475569]">
-                            {receiptLabels.adultsUnit} ({safeAdults} × {formatLinePrice(activeUnitPrice)})
+                            {isFixedGroupPrice
+                              ? tText(
+                                  {
+                                    en: `Fixed rate (${fixedPriceUnitLabel})`,
+                                    ar: `سعر ثابت (${fixedPriceUnitLabel})`,
+                                    de: `Festpreis (${fixedPriceUnitLabel})`,
+                                  },
+                                  lang
+                                )
+                              : `${receiptLabels.adultsUnit} (${safeAdults} × ${formatLinePrice(activeUnitPrice)})`}
                           </span>
                           <span className="font-semibold text-[#0F2233]">
                             {formatLinePrice(adultsSubtotalEur)}
                           </span>
                         </div>
 
-                        {safeChildren > 0 ? (
-                          <div className="flex items-center justify-between gap-3">
-                            <span className="text-[#475569]">
-                              {receiptLabels.childrenUnit} ({safeChildren} × {formatLinePrice(childPrice)})
-                            </span>
-                            <span className="font-semibold text-[#0F2233]">
-                              {formatLinePrice(childrenSubtotalEur)}
-                            </span>
-                          </div>
-                        ) : (
-                          <div className="flex items-center justify-between gap-3 text-[11px] text-[#64748B]">
-                            <span>{receiptLabels.childrenUnit}</span>
-                            <span>
-                              {formatLinePrice(childPrice)} / {tText({ en: 'child', ar: 'طفل', de: 'Kind' }, lang)}
-                            </span>
-                          </div>
+                        {!isFixedGroupPrice && (
+                          safeChildren > 0 ? (
+                            <div className="flex items-center justify-between gap-3">
+                              <span className="text-[#475569]">
+                                {receiptLabels.childrenUnit} ({safeChildren} × {formatLinePrice(childPrice)})
+                              </span>
+                              <span className="font-semibold text-[#0F2233]">
+                                {formatLinePrice(childrenSubtotalEur)}
+                              </span>
+                            </div>
+                          ) : (
+                            <div className="flex items-center justify-between gap-3 text-[11px] text-[#64748B]">
+                              <span>{receiptLabels.childrenUnit}</span>
+                              <span>
+                                {childPrice === 0
+                                  ? receiptLabels.freeLabel
+                                  : `${formatLinePrice(childPrice)} / ${tText({ en: 'child', ar: 'طفل', de: 'Kind' }, lang)}`}
+                              </span>
+                            </div>
+                          )
                         )}
 
                         {safeInfants > 0 && (
