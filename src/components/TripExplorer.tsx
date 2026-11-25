@@ -22,6 +22,7 @@ import {
   formatCurrencyPrice,
   formatTripOperatingDaysLabel,
   formatTripScheduleSummary,
+  resolveBundledMediaUrl,
   tText,
 } from '../data/marketplaceData';
 import { shareTripItem } from '../lib/shareTrip';
@@ -162,15 +163,45 @@ export const TripExplorer: React.FC<TripExplorerProps> = ({
 
   const activeTrip =
     filteredListTrips.find((tr) => tr.id === selectedTripId) || filteredListTrips[0] || null;
-  const [imageIndex, setImageIndex] = useState(0);
-  const [fadeKey, setFadeKey] = useState(0);
+  const activeTripId = activeTrip?.id ?? '';
+  const [galleryState, setGalleryState] = useState<{ tripId: string; index: number }>({
+    tripId: activeTripId,
+    index: 0,
+  });
+  const imageIndex = galleryState.tripId === activeTripId ? galleryState.index : 0;
+  const setImageIndex = (updater: number | ((prev: number) => number)) => {
+    setGalleryState((prev) => {
+      const current = prev.tripId === activeTripId ? prev.index : 0;
+      const next = typeof updater === 'function' ? updater(current) : updater;
+      return { tripId: activeTripId, index: next };
+    });
+  };
   const touchStartX = useRef<number | null>(null);
   const listRef = useRef<HTMLDivElement | null>(null);
+  const preloadedTripsRef = useRef<Map<string, HTMLImageElement[]>>(new Map());
 
   useEffect(() => {
-    setImageIndex(0);
-    setFadeKey((k) => k + 1);
-  }, [activeTrip?.id]);
+    if (!activeTrip || activeTrip.images.length === 0) return;
+    if (preloadedTripsRef.current.has(activeTrip.id)) return;
+    const preloaded: HTMLImageElement[] = [];
+    for (const rawUrl of activeTrip.images) {
+      if (!rawUrl || !rawUrl.trim()) continue;
+      const resolvedUrl = resolveBundledMediaUrl(rawUrl);
+      if (!resolvedUrl) continue;
+      const img = new window.Image();
+      img.decoding = 'async';
+      img.referrerPolicy = 'no-referrer';
+      img.src = resolvedUrl;
+      preloaded.push(img);
+    }
+    preloadedTripsRef.current.set(activeTrip.id, preloaded);
+  }, [activeTrip]);
+
+  useEffect(() => {
+    return () => {
+      preloadedTripsRef.current.clear();
+    };
+  }, []);
 
   const resetLocalFilters = () => {
     setQuickFilter('all');
@@ -280,7 +311,7 @@ export const TripExplorer: React.FC<TripExplorerProps> = ({
   const fromWord = tText({ en: 'From', ar: 'يبدأ من', de: 'Ab' }, lang);
 
   const images = activeTrip && activeTrip.images.length > 0 ? activeTrip.images : [''];
-  const currentImg = images[imageIndex] ?? '';
+  const currentImg = images[imageIndex] ?? images[0] ?? '';
   const prevImage = () => setImageIndex((i) => (i - 1 + images.length) % images.length);
   const nextImage = () => setImageIndex((i) => (i + 1) % images.length);
 
@@ -333,7 +364,7 @@ export const TripExplorer: React.FC<TripExplorerProps> = ({
           </div>
         ) : (
           <>
-            <div key={fadeKey} className="space-y-4 animate-[heroRise_280ms_ease-out]">
+            <div key={activeTrip.id} className="space-y-4 animate-[heroRise_280ms_ease-out]">
               <div
                 className="group relative aspect-[16/10] w-full overflow-hidden rounded-xl border border-[#E2E8F0] bg-[#FFF7ED]"
                 onTouchStart={handleTouchStart}
@@ -528,8 +559,8 @@ export const TripExplorer: React.FC<TripExplorerProps> = ({
       </div>
 
       {/* List half with keyword search, sorting, destination & trait filters */}
-      <div className="card-wasla order-1 lg:order-2 p-4 sm:p-5 flex flex-col">
-        <div className="flex flex-col gap-2.5 pb-3 mb-2 border-b border-[#C8C2B8]/50 dark:border-[#334155]">
+      <div className="card-wasla order-1 lg:order-2 p-4 sm:p-5 flex flex-col lg:min-h-0">
+        <div className="shrink-0 flex flex-col gap-2.5 pb-3 mb-2 border-b border-[#C8C2B8]/50 dark:border-[#334155]">
           <div className="flex items-center justify-between gap-2">
             <span className="text-xs font-semibold text-[#475569]">{t.allTripsListHeading}</span>
             <div className="flex items-center gap-2">
@@ -708,10 +739,11 @@ export const TripExplorer: React.FC<TripExplorerProps> = ({
             </button>
           </div>
         ) : (
-          <div
-            ref={listRef}
-            className="no-scrollbar carousel-track flex flex-row gap-3 overflow-x-auto snap-x snap-proximity pb-1 lg:flex-col lg:gap-2 lg:max-h-[420px] lg:overflow-y-auto lg:overflow-x-visible lg:pb-0 lg:pe-1"
-          >
+          <div className="lg:relative lg:flex-1 lg:min-h-0">
+            <div
+              ref={listRef}
+              className="no-scrollbar carousel-track flex flex-row gap-3 overflow-x-auto snap-x snap-proximity pb-1 lg:absolute lg:inset-0 lg:flex-col lg:gap-2 lg:overflow-y-auto lg:overflow-x-hidden lg:pb-0 lg:pe-1"
+            >
             {filteredListTrips.map((trip) => {
               const isSelected = activeTrip?.id === trip.id;
               const isFav = favoriteTripIds.includes(trip.id);
@@ -803,6 +835,7 @@ export const TripExplorer: React.FC<TripExplorerProps> = ({
                 </div>
               );
             })}
+            </div>
           </div>
         )}
       </div>

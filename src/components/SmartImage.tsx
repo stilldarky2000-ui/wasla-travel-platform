@@ -30,43 +30,74 @@ export const SmartImage: React.FC<SmartImageProps> = ({
     src && src.trim().length > 0 ? resolveBundledMediaUrl(src) : safeFallback;
 
   const [usedFallback, setUsedFallback] = useState(false);
-  const [loaded, setLoaded] = useState(false);
+  const [loadedSrc, setLoadedSrc] = useState<string | null>(null);
+  const [previousSrc, setPreviousSrc] = useState<string | null>(null);
   const [errored, setErrored] = useState(false);
   const imgRef = useRef<HTMLImageElement | null>(null);
+  const loadedSrcRef = useRef<string | null>(null);
+  loadedSrcRef.current = loadedSrc;
 
   const activeSrc = usedFallback ? safeFallback : resolvedPrimary;
+  const isCurrentLoaded = loadedSrc === activeSrc;
+  const backdropSrc =
+    loadedSrc && loadedSrc !== activeSrc ? loadedSrc : previousSrc;
+
+  const markLoaded = useCallback((targetSrc: string) => {
+    if (loadedSrcRef.current === targetSrc) {
+      setErrored(false);
+      return;
+    }
+    const prev = loadedSrcRef.current;
+    if (prev && prev !== targetSrc) {
+      setPreviousSrc(prev);
+    }
+    loadedSrcRef.current = targetSrc;
+    setLoadedSrc(targetSrc);
+    setErrored(false);
+  }, []);
 
   useEffect(() => {
     setUsedFallback(false);
     setErrored(false);
-    const el = imgRef.current;
-    if (el && el.complete && el.naturalWidth > 0) {
-      setLoaded(true);
-    } else {
-      setLoaded(false);
-    }
   }, [resolvedPrimary]);
+
+  useEffect(() => {
+    if (!previousSrc) return;
+    const timer = window.setTimeout(() => {
+      setPreviousSrc(null);
+    }, 240);
+    return () => window.clearTimeout(timer);
+  }, [previousSrc]);
 
   useEffect(() => {
     const el = imgRef.current;
     if (el && el.complete && el.naturalWidth > 0) {
-      setLoaded(true);
-      return;
+      if (!loadedSrcRef.current) {
+        markLoaded(activeSrc);
+        return;
+      }
+      const rafId = window.requestAnimationFrame(() => {
+        markLoaded(activeSrc);
+      });
+      return () => window.cancelAnimationFrame(rafId);
     }
-    // Fail-safe so horizontal carousel or cached images never stay hidden at opacity-0
+    if (loadedSrcRef.current) return;
+    // Fail-safe on initial load so horizontal carousel or cached images never stay hidden at opacity-0
     const timer = window.setTimeout(() => {
-      setLoaded(true);
+      markLoaded(activeSrc);
     }, 550);
     return () => window.clearTimeout(timer);
-  }, [activeSrc]);
+  }, [activeSrc, markLoaded]);
 
-  const handleImgRef = useCallback((node: HTMLImageElement | null) => {
-    imgRef.current = node;
-    if (node && node.complete && node.naturalWidth > 0) {
-      setLoaded(true);
-      setErrored(false);
-    }
-  }, []);
+  const handleImgRef = useCallback(
+    (node: HTMLImageElement | null) => {
+      imgRef.current = node;
+      if (node && node.complete && node.naturalWidth > 0 && !loadedSrcRef.current) {
+        markLoaded(activeSrc);
+      }
+    },
+    [activeSrc, markLoaded]
+  );
 
   const handleError = () => {
     if (!usedFallback && activeSrc !== safeFallback) {
@@ -79,7 +110,7 @@ export const SmartImage: React.FC<SmartImageProps> = ({
 
   return (
     <div className={`wasla-img-glare relative overflow-hidden bg-[#FFF7ED] ${className}`}>
-      {!loaded && !errored && (
+      {!isCurrentLoaded && !backdropSrc && !errored && (
         <div
           aria-hidden="true"
           className="shimmer-wave pointer-events-none absolute inset-0 bg-[#FFF7ED]"
@@ -91,23 +122,33 @@ export const SmartImage: React.FC<SmartImageProps> = ({
           {placeholderLabel && <span className="text-xs font-medium">{placeholderLabel}</span>}
         </div>
       ) : (
-        <img
-          ref={handleImgRef}
-          src={activeSrc}
-          alt={alt}
-          loading={loading}
-          decoding="async"
-          sizes={sizes}
-          referrerPolicy="no-referrer"
-          onLoad={() => {
-            setLoaded(true);
-            setErrored(false);
-          }}
-          onError={handleError}
-          className={`h-full w-full object-cover transition-[opacity,transform] duration-300 ease-out ${
-            loaded ? 'opacity-100' : 'opacity-0'
-          }`}
-        />
+        <>
+          {backdropSrc && (
+            <img
+              src={backdropSrc}
+              alt=""
+              aria-hidden="true"
+              decoding="async"
+              referrerPolicy="no-referrer"
+              className="pointer-events-none absolute inset-0 h-full w-full object-cover"
+            />
+          )}
+          <img
+            key={activeSrc}
+            ref={handleImgRef}
+            src={activeSrc}
+            alt={alt}
+            loading={loading}
+            decoding="async"
+            sizes={sizes}
+            referrerPolicy="no-referrer"
+            onLoad={() => markLoaded(activeSrc)}
+            onError={handleError}
+            className={`relative h-full w-full object-cover transition-[opacity,transform] duration-200 ease-out ${
+              isCurrentLoaded ? 'opacity-100' : 'opacity-0'
+            }`}
+          />
+        </>
       )}
     </div>
   );
