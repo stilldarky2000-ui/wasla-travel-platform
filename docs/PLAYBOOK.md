@@ -18,7 +18,7 @@ Hurghada's lowest-friction excursion marketplace. The guest pays nothing in adva
 Item zero: complete the catalogue. The sea and safari expansion pack (6 trips plus two restructures, including the Orange Bay repricing) is written and priced and must be entered before anything that promotes it. Luxor, the horse trips and the diving/Marsa Alam trips are already in.
 
 Pre-launch checklist, in order:
-1. EMAIL AND ALERTS FIRST: move the booking-email and owner-alert code out of the Node server file into a Cloudflare Worker. On the planned static Cloudflare Pages deploy the server file never runs, so without this move booking alerts silently never fire. Include the scheduled sweep for bookings never alert-flagged, then a real send test from booking@waslatravel.com (inbox vs spam).
+1. EMAIL AND ALERTS FIRST: implemented as a Cloudflare Worker (instant alert on booking, plus a scheduled sweep for bookings never alert-flagged), PORTING the logic of the `functions/src/index.ts` codebase as the reference implementation and reusing its email templates (`waslaEmailTemplate.ts`) as-is. The functions code is the spec, not the deploy target: this project is an AI Studio Starter project with no billing and a hard owner rule of no Firebase billing, no Blaze, free tiers only (a Cloud Functions v2 deploy needs Blaze and the Cloud Build/Eventarc/Artifact Registry APIs, which restricted IAM may also block). Then a real end-to-end booking test with the device timezone set to Berlin, and a real send test from booking@waslatravel.com (inbox vs spam).
 2. Production secret for the voucher link signer.
 3. A real Google Maps Platform key for the hotel picker, with the Google billing decision it may force.
 4. Clean the seeded sample emails from the demo data.
@@ -27,7 +27,7 @@ Pre-launch checklist, in order:
 7. Wire the booking form's hotel field into the post-booking WhatsApp pre-fill ({hotelName}).
 
 Decisions and setup in parallel:
-- Freeze the WhatsApp number BEFORE any content publishes. Every reel and bio burns the number into the brand; changing it later burns the content. Only after the number is final: unify Instagram/TikTok/Facebook (orange W icon, bio with waslatravel.com and WhatsApp button, pin the 30-second video), then publish content.
+- Freeze the WhatsApp number BEFORE any content publishes. Every reel and bio burns the number into the brand; changing it later burns the content. Owner confirms the line is being purchased 2026-11-24 and the final number arrives 2026-11-25; only after the number is final: unify Instagram/TikTok/Facebook (orange W icon, bio with waslatravel.com and WhatsApp button, pin the 30-second video), then publish content.
 - Approve and ship the personal-testimonials section (built, awaiting the owner's word) together with the placeholder-rating removal.
 - Pixels: create the Meta, TikTok and GA4 accounts, enter the IDs in the owner panel, put cookie consent in front of firing (legal requirement for German traffic), then verify with the Pixel Helper extensions.
 - Load the 5 approved WhatsApp templates (EN/DE) as quick replies: post-booking, day-before confirmation, pickup-morning, pickup-point, review request.
@@ -53,7 +53,7 @@ Deploy: once, at the end, on the finished version, when the owner says so. Code-
 ## 6. Paid scale (after the soft-launch gate passes)
 
 - First paid channel: META. TikTok paid stays frozen: the business has no legal papers, and TikTok Ads Manager document verification becomes mandatory past a spend threshold. Organic TikTok posting continues throughout (it carries no ad-authorisation requirement). Paid TikTok reopens only when the owner decides to formalise.
-- Start at about $20 to 30 per day (owner to confirm the real monthly budget and rescale). EN and DE videos on Reels/TikTok organic plus Meta placements, click-to-WhatsApp campaigns first.
+- CONFIRMED BUDGET (owner, 2026-11-24): €20 per MONTH to start. At this level paid ads are a learning budget, not a scaling budget: expect a handful of clicks per day, so every euro goes to click-to-WhatsApp on the single best-performing trip, one country at a time (start German DACH), and the kill rule judges campaigns only after roughly €15 of spend has produced real attribution data. Scaling spend above this happens only from revenue, never from new owner money. Organic content and WhatsApp networks carry the growth until then. EN and DE videos on Reels/TikTok organic plus Meta placements, click-to-WhatsApp campaigns first.
 - THE KILL RULE, restated: cost is measured PER BOOKING, scaled by party size (a booking of 4 may cost up to 4 times a single-person booking, because margin is per person: current per-person margins run about €4 to €11.30). A campaign is kept while its cost per confirmed booking stays under 25% of that booking's gross margin; budget rises 30% per week on campaigns that pass; failing ad sets are killed, not the budget. Attribution follows the Sprint 0 attribution design; an unattributed booking does not count for or against a campaign.
 - Product in parallel: per-trip SEO pages per language, GA4 funnels, review widget once real reviews exist.
 
