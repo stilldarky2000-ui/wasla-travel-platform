@@ -286,6 +286,7 @@ export default function App() {
   const [searchActivity, setSearchActivity] = useState<ActivityCategoryId | 'all'>('all');
   // Single optional trip date ('' = "Any date", no date filtering)
   const [searchTripDate, setSearchTripDate] = useState('');
+  const [mobileHeroSearchOpen, setMobileHeroSearchOpen] = useState(false);
   const [selectedExplorerTripId, setSelectedExplorerTripId] = useState<string>(TRIPS[0].id);
   const [activeDetailTrip, setActiveDetailTrip] = useState<Trip | null>(null);
   const [favoriteTripIds, setFavoriteTripIds] = useState<string[]>(() => {
@@ -1768,7 +1769,89 @@ export default function App() {
                   role="search"
                   className="wasla-led-ring hero-enter-delayed max-w-5xl rounded-2xl bg-white p-2 text-[#0F2233]"
                 >
-                  <div className="flex flex-col gap-1.5 lg:flex-row lg:items-stretch lg:gap-2">
+                  {(() => {
+                    const selectedActivityObj =
+                      searchActivity !== 'all'
+                        ? CATEGORIES.find((c) => c.id === searchActivity)
+                        : null;
+                    const selectedSummaryParts: string[] = [];
+                    if (searchDestination !== 'all') {
+                      selectedSummaryParts.push(searchDestination);
+                    }
+                    if (selectedActivityObj) {
+                      selectedSummaryParts.push(tText(selectedActivityObj.name, lang));
+                    }
+                    if (searchTripDate) {
+                      selectedSummaryParts.push(tripDateCaption || searchTripDate);
+                    }
+                    const mobileBarLabel = tText(
+                      { en: 'Search trips', ar: 'ابحث عن رحلة', de: 'Touren suchen' },
+                      lang
+                    );
+                    const mobileBarHint =
+                      selectedSummaryParts.length > 0
+                        ? selectedSummaryParts.join(' · ')
+                        : tText(
+                            {
+                              en: 'Destination, activity, date',
+                              ar: 'الوجهة، النشاط، التاريخ',
+                              de: 'Ziel, Aktivität, Datum',
+                            },
+                            lang
+                          );
+
+                    return !mobileHeroSearchOpen ? (
+                      <button
+                        type="button"
+                        aria-expanded={false}
+                        aria-controls="hero-search-fields"
+                        onClick={() => setMobileHeroSearchOpen(true)}
+                        className="lg:hidden flex w-full items-center justify-between gap-3 rounded-xl px-2.5 py-2 text-start cursor-pointer"
+                      >
+                        <span className="flex min-w-0 items-center gap-3">
+                          <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#EE5426] text-white">
+                            <Search className="h-4 w-4" aria-hidden="true" />
+                          </span>
+                          <span className="min-w-0">
+                            <span className="block text-[14px] font-semibold leading-tight text-[#0F2233]">
+                              {mobileBarLabel}
+                            </span>
+                            <span className="block truncate text-[12px] font-medium text-[#64748B] mt-0.5">
+                              {mobileBarHint}
+                            </span>
+                          </span>
+                        </span>
+                        <ChevronDown
+                          className="h-4 w-4 shrink-0 text-[#64748B] stroke-[1.75]"
+                          aria-hidden="true"
+                        />
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        aria-expanded={true}
+                        aria-controls="hero-search-fields"
+                        onClick={() => setMobileHeroSearchOpen(false)}
+                        className="lg:hidden flex w-full items-center justify-between gap-3 rounded-xl px-3 py-2 mb-1 border-b border-[#0F2233]/10 text-start cursor-pointer"
+                      >
+                        <span className="flex items-center gap-2 text-[13px] font-semibold text-[#0F2233]">
+                          <Search className="h-3.5 w-3.5 shrink-0 text-[#EE5426]" aria-hidden="true" />
+                          <span>{mobileBarLabel}</span>
+                        </span>
+                        <ChevronDown
+                          className="h-4 w-4 shrink-0 rotate-180 text-[#64748B] stroke-[1.75]"
+                          aria-hidden="true"
+                        />
+                      </button>
+                    );
+                  })()}
+
+                  <div
+                    id="hero-search-fields"
+                    className={`${
+                      mobileHeroSearchOpen ? 'flex' : 'hidden lg:flex'
+                    } flex-col gap-1.5 lg:flex-row lg:items-stretch lg:gap-2`}
+                  >
                     <div className="grid flex-1 grid-cols-1 lg:grid-cols-[1.05fr_auto_1.22fr_auto_1fr] items-stretch">
                       {/* Destination */}
                       <label className="wasla-search-field group relative flex flex-col justify-center rounded-xl px-3.5 py-2.5 lg:px-4 cursor-pointer">
