@@ -622,17 +622,17 @@ export const TRIPS: Trip[] = [
       },
       {
         kind: 'stop',
-        title: { en: 'Second snorkeling stop', ar: 'ثاني محطة سنوركلينج', de: 'Zweiter Schnorchelstopp' },
-        subtitle: { en: 'A different reef', ar: 'شعاب مرجانية مختلفة', de: 'Ein anderes Riff' },
-      },
-      {
-        kind: 'stop',
         title: { en: 'Orange Bay island', ar: 'جزيرة أورانج باي', de: 'Insel Orange Bay' },
         subtitle: { en: 'Swimming, the sandbar and the famous water swings', ar: 'سباحة واللسان الرملي والأرجوحات المائية الشهيرة', de: 'Schwimmen, die Sandbank und die berühmten Wasserschaukeln' },
       },
       {
         kind: 'break',
         title: { en: 'Open buffet lunch on board', ar: 'غداء بوفيه مفتوح على المركب', de: 'Offenes Buffet-Mittagessen an Bord' },
+      },
+      {
+        kind: 'stop',
+        title: { en: 'Second snorkeling stop', ar: 'ثاني محطة سنوركلينج', de: 'Zweiter Schnorchelstopp' },
+        subtitle: { en: 'A different reef', ar: 'شعاب مرجانية مختلفة', de: 'Ein anderes Riff' },
       },
       {
         kind: 'end',
@@ -873,17 +873,12 @@ export const TRIPS: Trip[] = [
         subtitle: { en: 'Watch wild dolphins, and swim near them when conditions allow', ar: 'مشاهدة الدلافين البرية، والسباحة قربها عندما تسمح الظروف', de: 'Wilde Delfine beobachten und, wenn die Bedingungen es erlauben, in ihrer Nähe schwimmen' },
       },
       {
-        kind: 'stop',
-        title: { en: 'Second snorkeling stop', ar: 'ثاني محطة سنوركلينج', de: 'Zweiter Schnorchelstopp' },
-        subtitle: { en: 'Coral reef, full gear and life jacket provided', ar: 'شعاب مرجانية، مع كامل المعدات وسترة نجاة', de: 'Korallenriff, komplette Ausrüstung und Schwimmweste inklusive' },
-      },
-      {
         kind: 'break',
         title: { en: 'Open buffet lunch on board', ar: 'غداء بوفيه مفتوح على المركب', de: 'Offenes Buffet-Mittagessen an Bord' },
       },
       {
         kind: 'stop',
-        title: { en: 'Third snorkeling stop', ar: 'ثالث محطة سنوركلينج', de: 'Dritter Schnorchelstopp' },
+        title: { en: 'Second snorkeling stop', ar: 'ثاني محطة سنوركلينج', de: 'Zweiter Schnorchelstopp' },
         subtitle: { en: 'Another coral reef', ar: 'شعاب مرجانية أخرى', de: 'Ein weiteres Korallenriff' },
       },
       {
@@ -1097,17 +1092,17 @@ export const TRIPS: Trip[] = [
       },
       {
         kind: 'stop',
-        title: { en: 'Second snorkeling stop', ar: 'ثاني محطة سنوركلينج', de: 'Zweiter Schnorchelstopp' },
-        subtitle: { en: 'Another quiet reef', ar: 'شعاب هادئة أخرى', de: 'Ein weiteres ruhiges Riff' },
-      },
-      {
-        kind: 'stop',
         title: { en: 'Paradise Island', ar: 'جزيرة بارادايس', de: 'Paradise Island' },
         subtitle: { en: 'A long, unhurried stop on the island', ar: 'وقفة طويلة على الجزيرة من غير استعجال', de: 'Ein langer, entspannter Aufenthalt auf der Insel' },
       },
       {
         kind: 'break',
         title: { en: 'Premium open buffet lunch on the island', ar: 'غداء بوفيه مفتوح فاخر على الجزيرة', de: 'Premium-Buffet-Mittagessen auf der Insel' },
+      },
+      {
+        kind: 'stop',
+        title: { en: 'Second snorkeling stop', ar: 'ثاني محطة سنوركلينج', de: 'Zweiter Schnorchelstopp' },
+        subtitle: { en: 'Another quiet reef', ar: 'شعاب هادئة أخرى', de: 'Ein weiteres ruhiges Riff' },
       },
       {
         kind: 'end',
@@ -1320,17 +1315,17 @@ export const TRIPS: Trip[] = [
       },
       {
         kind: 'stop',
-        title: { en: 'Second snorkeling stop', ar: 'ثاني محطة سنوركلينج', de: 'Zweiter Schnorchelstopp' },
-        subtitle: { en: 'Another reef', ar: 'شعاب أخرى', de: 'Ein weiteres Riff' },
-      },
-      {
-        kind: 'stop',
         title: { en: 'Hula Hula island', ar: 'جزيرة هولا هولا', de: 'Insel Hula Hula' },
         subtitle: { en: 'Soft white sand and crystal clear water', ar: 'رمال بيضاء ناعمة ومياه صافية', de: 'Weicher weißer Sand und kristallklares Wasser' },
       },
       {
         kind: 'break',
         title: { en: 'Open buffet lunch on board', ar: 'غداء بوفيه مفتوح على المركب', de: 'Offenes Buffet-Mittagessen an Bord' },
+      },
+      {
+        kind: 'stop',
+        title: { en: 'Second snorkeling stop', ar: 'ثاني محطة سنوركلينج', de: 'Zweiter Schnorchelstopp' },
+        subtitle: { en: 'Another reef', ar: 'شعاب أخرى', de: 'Ein weiteres Riff' },
       },
       {
         kind: 'end',
