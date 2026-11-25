@@ -179,9 +179,9 @@ export const LegalPoliciesModal: React.FC<LegalPoliciesModalProps> = ({
                 <h3 className="text-sm font-bold text-[#0F2233]">
                   {tText(
                     {
-                      en: '2. Free 24-Hour Cancellation & Rescheduling',
-                      ar: '2. إلغاء وتعديل مجاني حتى 24 ساعة قبل الرحلة',
-                      de: '2. Kostenlose Stornierung & Umbuchung bis 24 Std. vorher',
+                      en: '2. Cancellation & Rescheduling',
+                      ar: '2. الإلغاء وتعديل الموعد',
+                      de: '2. Stornierung & Umbuchung',
                     },
                     lang
                   )}
@@ -189,9 +189,9 @@ export const LegalPoliciesModal: React.FC<LegalPoliciesModalProps> = ({
                 <p>
                   {tText(
                     {
-                      en: 'You may cancel or move your excursion date free of charge up to 24 hours before your scheduled hotel pickup. Just message our Operations Desk with your WT reference ID.',
-                      ar: 'يمكنك إلغاء الحجز أو تعديل تاريخ الرحلة مجاناً بالكامل قبل موعد الاستلام من الفندق بـ 24 ساعة على الأقل، عبر إرسال رقم حجزك لفريق العمليات.',
-                      de: 'Sie können Ihren Ausflug bis 24 Stunden vor der geplanten Hotelabholung kostenlos stornieren oder umbuchen. Nennen Sie uns dazu einfach Ihre WT-Nummer.',
+                      en: 'Free cancellation up to 24 hours before the trip start time shown on your booking. Cancellations within 24 hours of the start time are charged at the full trip price. On the Marsa Alam trips, marine park permits are arranged in advance and are not refundable once issued. If you neither cancel nor appear at pickup, the booking is treated as completed and the full trip price applies.',
+                      ar: 'إلغاء مجاني حتى 24 ساعة قبل موعد بداية الرحلة المكتوب في حجزك. الإلغاء خلال آخر 24 ساعة قبل البداية يُحسب بسعر الرحلة الكامل. في رحلات مرسى علم، تصاريح المحمية البحرية تُجهَّز مقدمًا ولا تُسترد بعد إصدارها. إذا لم تُلغِ ولم تحضر في موعد الاستلام، يُحتسب الحجز مكتملًا ويُطبَّق سعر الرحلة الكامل.',
+                      de: 'Kostenlose Stornierung bis 24 Stunden vor der auf Ihrer Buchung angegebenen Startzeit der Tour. Bei einer Stornierung innerhalb von 24 Stunden vor der Startzeit wird der volle Tourpreis berechnet. Bei den Touren nach Marsa Alam gilt: Genehmigungen für den Meerespark werden im Voraus beschafft und sind nach Ausstellung nicht erstattungsfähig. Wenn Sie weder stornieren noch zur Abholung erscheinen, gilt die Buchung als abgeschlossen und der volle Tourpreis wird berechnet.',
                     },
                     lang
                   )}

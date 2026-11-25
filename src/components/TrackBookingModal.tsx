@@ -716,9 +716,9 @@ export const TrackBookingModal: React.FC<TrackBookingModalProps> = ({
                       <p className="text-[11px] text-[#166534]">
                         {tText(
                           {
-                            en: 'If paying cash on pickup, you may pay in EUR, USD, or EGP according to your preference. Free cancellation up to 24 hours before pickup.',
-                            ar: 'في حال الدفع كاش عند الاستلام، يمكنك السداد بأي عملة (يورو، دولار، أو جنيه مصري). الإلغاء مجاني قبل 24 ساعة من التحرك.',
-                            de: 'Bei Barzahlung bei Abholung können Sie in EUR, USD oder EGP zahlen. Kostenlose Stornierung bis 24h vor Abholung.',
+                            en: 'If paying cash on pickup, you may pay in EUR, USD, or EGP according to your preference. Free cancellation up to 24 hours before the trip.',
+                            ar: 'في حال الدفع كاش عند الاستلام، يمكنك السداد بأي عملة (يورو، دولار، أو جنيه مصري). إلغاء مجاني حتى 24 ساعة قبل الرحلة.',
+                            de: 'Bei Barzahlung bei Abholung können Sie in EUR, USD oder EGP zahlen. Kostenlose Stornierung bis 24 Stunden vor der Tour.',
                           },
                           lang
                         )}

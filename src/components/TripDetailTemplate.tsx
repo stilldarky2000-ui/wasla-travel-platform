@@ -1221,9 +1221,9 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
                 <span>
                         {tText(
                           {
-                            en: 'Free cancellation up to 24h before',
-                            ar: 'إلغاء مجاني قبل ٢٤ ساعة',
-                            de: 'Kostenlos stornierbar bis 24h vorher',
+                            en: 'Free cancellation up to 24 hours before the trip',
+                            ar: 'إلغاء مجاني حتى 24 ساعة قبل الرحلة',
+                            de: 'Kostenlose Stornierung bis 24 Stunden vor der Tour',
                           },
                           lang
                         )}
@@ -2125,9 +2125,9 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
                   <p className="text-[11.5px] font-medium text-[#475569]">
                     {tText(
                       {
-                        en: 'Free cancellation up to 24h before',
-                        ar: 'إلغاء مجاني قبل ٢٤ ساعة',
-                        de: 'Kostenlos stornierbar bis 24h vorher',
+                        en: 'Free cancellation up to 24 hours before the trip start time shown on your booking. Cancellations within 24 hours of the start time are charged at the full trip price. On the Marsa Alam trips, marine park permits are arranged in advance and are not refundable once issued.',
+                        ar: 'إلغاء مجاني حتى 24 ساعة قبل موعد بداية الرحلة المكتوب في حجزك. الإلغاء خلال آخر 24 ساعة قبل البداية يُحسب بسعر الرحلة الكامل. في رحلات مرسى علم، تصاريح المحمية البحرية تُجهَّز مقدمًا ولا تُسترد بعد إصدارها.',
+                        de: 'Kostenlose Stornierung bis 24 Stunden vor der auf Ihrer Buchung angegebenen Startzeit der Tour. Bei einer Stornierung innerhalb von 24 Stunden vor der Startzeit wird der volle Tourpreis berechnet. Bei den Touren nach Marsa Alam gilt: Genehmigungen für den Meerespark werden im Voraus beschafft und sind nach Ausstellung nicht erstattungsfähig.',
                       },
                       lang
                     )}

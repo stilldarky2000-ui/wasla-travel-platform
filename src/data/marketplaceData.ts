@@ -4664,6 +4664,11 @@ Danach geht es klimatisiert zurück durch die Wüste, mit dem ganzen antiken The
         de: 'Bitte senden Sie direkt nach der Buchungsbestätigung eine Passkopie für jeden Teilnehmer sowie Ihre Hotelzimmernummer. Die Passkopien sind für die Gebietsgenehmigungen erforderlich, und die Zimmernummer ermöglicht unseren Abholfahrzeugen die Einfahrt ins Resort, um Sie direkt innen abzuholen.',
       },
       {
+        en: 'On the Marsa Alam trips, marine park permits are arranged in advance and are not refundable once issued.',
+        ar: 'في رحلات مرسى علم، تصاريح المحمية البحرية تُجهَّز مقدمًا ولا تُسترد بعد إصدارها.',
+        de: 'Bei den Touren nach Marsa Alam gilt: Genehmigungen für den Meerespark werden im Voraus beschafft und sind nach Ausstellung nicht erstattungsfähig.',
+      },
+      {
         en: 'While Shaab Samadai is known for its wild dolphins, sightings cannot be guaranteed, as they are in their natural habitat.',
         ar: 'رغم شهرة شعاب صمداي بالدلافين البرية، لا يمكن ضمان رؤيتها لأنها تعيش في بيئتها الطبيعية.',
         de: 'Obwohl Shaab Samadai für seine wilden Delfine bekannt ist, können Sichtungen nicht garantiert werden, da sie in ihrem natürlichen Lebensraum leben.',
@@ -4895,6 +4900,11 @@ Danach geht es klimatisiert zurück durch die Wüste, mit dem ganzen antiken The
         en: 'Please send a passport copy for every participant, and your hotel room number, immediately after booking confirmation. The passport copies are required for the area permits, and the room number lets our pickup cars enter the resort and collect you from inside.',
         ar: 'يرجى إرسال صورة جواز السفر لكل مشارك، ورقم غرفتك بالفندق، فور تأكيد الحجز مباشرة. صور جوازات السفر مطلوبة لتصاريح المنطقة، ورقم الغرفة يسمح لسيارات الاستلام بدخول المنتجع واستلامك من الداخل.',
         de: 'Bitte senden Sie direkt nach der Buchungsbestätigung eine Passkopie für jeden Teilnehmer sowie Ihre Hotelzimmernummer. Die Passkopien sind für die Gebietsgenehmigungen erforderlich, und die Zimmernummer ermöglicht unseren Abholfahrzeugen die Einfahrt ins Resort, um Sie direkt innen abzuholen.',
+      },
+      {
+        en: 'On the Marsa Alam trips, marine park permits are arranged in advance and are not refundable once issued.',
+        ar: 'في رحلات مرسى علم، تصاريح المحمية البحرية تُجهَّز مقدمًا ولا تُسترد بعد إصدارها.',
+        de: 'Bei den Touren nach Marsa Alam gilt: Genehmigungen für den Meerespark werden im Voraus beschafft und sind nach Ausstellung nicht erstattungsfähig.',
       },
       {
         en: 'Sightings of sea turtles and dugongs are common but cannot be guaranteed, as they are wild animals.',

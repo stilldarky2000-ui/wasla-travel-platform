@@ -75,9 +75,9 @@ const FAQ_ITEMS: FaqItem[] = [
       de: 'Wie lauten die Stornierungs- und Umbuchungsbedingungen?',
     },
     answer: {
-      en: 'Free cancellation or rescheduling up to 24 hours before your pickup time. Inside the last 24 hours, boats, permits and drivers are already booked, but message us on WhatsApp or by email with your booking reference and we will move your date whenever we can.',
-      ar: 'يمكنك الإلغاء أو تغيير الموعد مجانًا حتى 24 ساعة قبل موعد التحرك. خلال آخر 24 ساعة تكون المراكب والتصاريح والسائقون قد حُجزوا بالفعل، لكن راسلنا واتساب أو بالإيميل برقم الحجز وسنغيّر موعدك متى أمكن.',
-      de: 'Kostenlose Stornierung oder Umbuchung bis 24 Stunden vor der Abholung. Innerhalb der letzten 24 Stunden sind Boote, Genehmigungen und Fahrer bereits gebucht – schreiben Sie uns per WhatsApp oder E-Mail mit Ihrer Buchungsnummer, und wir verschieben Ihren Termin, wann immer möglich.',
+      en: 'Free cancellation up to 24 hours before the trip start time shown on your booking. Cancellations within 24 hours of the start time are charged at the full trip price. On the Marsa Alam trips, marine park permits are arranged in advance and are not refundable once issued.',
+      ar: 'إلغاء مجاني حتى 24 ساعة قبل موعد بداية الرحلة المكتوب في حجزك. الإلغاء خلال آخر 24 ساعة قبل البداية يُحسب بسعر الرحلة الكامل. في رحلات مرسى علم، تصاريح المحمية البحرية تُجهَّز مقدمًا ولا تُسترد بعد إصدارها.',
+      de: 'Kostenlose Stornierung bis 24 Stunden vor der auf Ihrer Buchung angegebenen Startzeit der Tour. Bei einer Stornierung innerhalb von 24 Stunden vor der Startzeit wird der volle Tourpreis berechnet. Bei den Touren nach Marsa Alam gilt: Genehmigungen für den Meerespark werden im Voraus beschafft und sind nach Ausstellung nicht erstattungsfähig.',
     },
   },
   {

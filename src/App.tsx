@@ -1878,9 +1878,9 @@ export default function App() {
                       de: 'Keine versteckten Aufschläge',
                     },
                     {
-                      en: 'Free 24h cancellation',
-                      ar: 'إلغاء مجاني قبل 24 ساعة',
-                      de: '24 Std. kostenlos stornierbar',
+                      en: 'Free cancellation up to 24 hours before the trip',
+                      ar: 'إلغاء مجاني حتى 24 ساعة قبل الرحلة',
+                      de: 'Kostenlose Stornierung bis 24 Stunden vor der Tour',
                     },
                     {
                       en: 'Pay cash on pickup',

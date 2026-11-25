@@ -135,7 +135,7 @@ const VOUCHER_COPY: Record<GuestLanguageCode, VoucherLocaleCopy> = {
     totalAmountLabel: 'Total Excursion Price',
     customQuoteLabel: 'Confirmed Quote',
     paymentPolicyNote:
-      'Payable in EUR, USD, or EGP cash on pickup (or settled via official link). Free cancellation up to 24h before pickup.',
+      'Payable in EUR, USD, or EGP cash on pickup (or settled via official link). Free cancellation up to 24 hours before the trip.',
     boardingInstructionsTitle: 'Boarding & Pickup Instructions',
     boardingBullet1:
       'Please be ready at the designated meeting point 5–10 minutes before your confirmed hotel pickup time.',
@@ -177,7 +177,7 @@ const VOUCHER_COPY: Record<GuestLanguageCode, VoucherLocaleCopy> = {
     totalAmountLabel: 'Gesamtpreis',
     customQuoteLabel: 'Bestätigtes Angebot',
     paymentPolicyNote:
-      'Zahlbar in EUR, USD oder EGP in bar bei Abholung (oder über offiziellen Zahlungslink). Kostenlose Stornierung bis 24h vor Abholung.',
+      'Zahlbar in EUR, USD oder EGP in bar bei Abholung (oder über offiziellen Zahlungslink). Kostenlose Stornierung bis 24 Stunden vor der Tour.',
     boardingInstructionsTitle: 'Abhol- & Boarding-Hinweise',
     boardingBullet1:
       'Bitte seien Sie 5–10 Minuten vor Ihrer bestätigten Abholzeit am angegebenen Treffpunkt bereit.',
@@ -219,7 +219,7 @@ const VOUCHER_COPY: Record<GuestLanguageCode, VoucherLocaleCopy> = {
     totalAmountLabel: 'إجمالي سعر الرحلة',
     customQuoteLabel: 'عرض سعر معتمد',
     paymentPolicyNote:
-      'يُقبل السداد نقداً عند الاستلام باليورو أو الدولار أو الجنيه المصري (أو عبر رابط الدفع الرسمي). إلغاء مجاني حتى 24 ساعة قبل التحرك.',
+      'يُقبل السداد نقداً عند الاستلام باليورو أو الدولار أو الجنيه المصري (أو عبر رابط الدفع الرسمي). إلغاء مجاني حتى 24 ساعة قبل الرحلة.',
     boardingInstructionsTitle: 'تعليمات الاستلام والصعود للرحلة',
     boardingBullet1:
       'يرجى التواجد في نقطة الالتقاء المحددة قبل موعد التحرك من الفندق بـ 5 إلى 10 دقائق.',
@@ -261,7 +261,7 @@ const VOUCHER_COPY: Record<GuestLanguageCode, VoucherLocaleCopy> = {
     totalAmountLabel: 'Prix total',
     customQuoteLabel: 'Devis confirmé',
     paymentPolicyNote:
-      'Payable en espèces (EUR, USD ou EGP) lors de la prise en charge. Annulation gratuite jusqu’à 24h avant le départ.',
+      'Payable en espèces (EUR, USD ou EGP) lors de la prise en charge. Annulation gratuite jusqu’à 24 heures avant l’excursion.',
     boardingInstructionsTitle: 'Instructions de prise en charge',
     boardingBullet1:
       'Veuillez être prêt au point de rencontre 5 à 10 minutes avant l’heure de prise en charge.',
@@ -303,7 +303,7 @@ const VOUCHER_COPY: Record<GuestLanguageCode, VoucherLocaleCopy> = {
     totalAmountLabel: 'Prezzo totale',
     customQuoteLabel: 'Preventivo confermato',
     paymentPolicyNote:
-      'Pagabile in contanti in EUR, USD o EGP al momento del prelievo. Cancellazione gratuita fino a 24 ore prima.',
+      'Pagabile in contanti in EUR, USD o EGP al momento del prelievo. Cancellazione gratuita fino a 24 ore prima dell’escursione.',
     boardingInstructionsTitle: 'Istruzioni per il prelievo',
     boardingBullet1:
       'Presentarsi al punto d’incontro 5–10 minuti prima dell’orario di prelievo confermato.',
@@ -345,7 +345,7 @@ const VOUCHER_COPY: Record<GuestLanguageCode, VoucherLocaleCopy> = {
     totalAmountLabel: 'Precio total',
     customQuoteLabel: 'Presupuesto confirmado',
     paymentPolicyNote:
-      'Pagadero en efectivo en EUR, USD o EGP al momento de la recogida. Cancelación gratuita hasta 24h antes.',
+      'Pagadero en efectivo en EUR, USD o EGP al momento de la recogida. Cancelación gratuita hasta 24 horas antes de la excursión.',
     boardingInstructionsTitle: 'Instrucciones de recogida y embarque',
     boardingBullet1:
       'Esté listo en el punto de encuentro 5–10 minutos antes de su hora de recogida confirmada.',
@@ -387,7 +387,7 @@ const VOUCHER_COPY: Record<GuestLanguageCode, VoucherLocaleCopy> = {
     totalAmountLabel: 'Totaalprijs',
     customQuoteLabel: 'Bevestigde offerte',
     paymentPolicyNote:
-      'Contant betaalbaar in EUR, USD of EGP bij het ophalen. Gratis annuleren tot 24 uur voor vertrek.',
+      'Contant betaalbaar in EUR, USD of EGP bij het ophalen. Gratis annuleren tot 24 uur voor de excursie.',
     boardingInstructionsTitle: 'Ophaal- & Boardinginstructies',
     boardingBullet1:
       'Zorg dat u 5–10 minuten voor uw bevestigde ophaaltijd klaarstaat op het verzamelpunt.',
@@ -429,7 +429,7 @@ const VOUCHER_COPY: Record<GuestLanguageCode, VoucherLocaleCopy> = {
     totalAmountLabel: 'Cena całkowita',
     customQuoteLabel: 'Potwierdzona wycena',
     paymentPolicyNote:
-      'Płatne gotówką w EUR, USD lub EGP przy odbiorze. Bezpłatna anulacja do 24h przed odbiorem.',
+      'Płatne gotówką w EUR, USD lub EGP przy odbiorze. Bezpłatna anulacja do 24 godzin przed wycieczką.',
     boardingInstructionsTitle: 'Instrukcje odbioru z hotelu',
     boardingBullet1:
       'Prosimy o gotowość w miejscu zbiórki 5–10 minut przed potwierdzoną godziną odbioru.',
@@ -471,7 +471,7 @@ const VOUCHER_COPY: Record<GuestLanguageCode, VoucherLocaleCopy> = {
     totalAmountLabel: 'Итоговая стоимость',
     customQuoteLabel: 'Индивидуальный расчёт',
     paymentPolicyNote:
-      'Оплата наличными в EUR, USD или EGP при посадке. Бесплатная отмена за 24 часа до выезда.',
+      'Оплата наличными в EUR, USD или EGP при посадке. Бесплатная отмена за 24 часа до начала экскурсии.',
     boardingInstructionsTitle: 'Инструкции по посадке и трансферу',
     boardingBullet1:
       'Пожалуйста, будьте в указанном месте встречи за 5–10 минут до назначенного времени трансфера.',

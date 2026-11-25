@@ -13,9 +13,9 @@ DE: Hallo Wasla Travel, ich habe gerade auf eurer Website gebucht. Buchungsrefer
 
 ## 2. Day-before confirmation (we send; carries the confirmed pickup time)
 
-EN: Hi {guestName}, a quick reminder that your {tripName} is tomorrow, {date}. Our local team will pick you up at {pickupTime} from the {pickupPoint} at your hotel. Please reply to this message to confirm so the driver knows to wait for you. Bring your booking reference {bookingRef}, sunscreen, and a bit of cash for the payment. Free cancellation is still possible until 24 hours before the trip.
+EN: Hi {guestName}, a quick reminder that your {tripName} is tomorrow, {date}. Our local team will pick you up at {pickupTime} from the {pickupPoint} at your hotel. Please reply to this message to confirm so the driver knows to wait for you. Bring your booking reference {bookingRef}, sunscreen, and a bit of cash for the payment. Please reply to this message to confirm for tomorrow. If you cannot join us, please tell us tonight.
 
-DE: Hallo {guestName}, kurze Erinnerung: Dein Ausflug {tripName} findet morgen, am {date}, statt. Unser lokales Team holt dich um {pickupTime} am {pickupPoint} deines Hotels ab. Bitte bestätige kurz hier im Chat, damit der Fahrer Bescheid weiß. Denke an deine Buchungsreferenz {bookingRef}, Sonnenschutz und etwas Bargeld für die Bezahlung. Kostenlos stornieren kannst du noch bis 24 Stunden vor dem Ausflug.
+DE: Hallo {guestName}, kurze Erinnerung: Dein Ausflug {tripName} findet morgen, am {date}, statt. Unser lokales Team holt dich um {pickupTime} am {pickupPoint} deines Hotels ab. Bitte bestätige kurz hier im Chat, damit der Fahrer Bescheid weiß. Denke an deine Buchungsreferenz {bookingRef}, Sonnenschutz und etwas Bargeld für die Bezahlung. Bitte antworten Sie auf diese Nachricht und bestätigen Sie für morgen. Falls Sie nicht teilnehmen können, sagen Sie uns bitte heute Abend Bescheid.
 
 ## 3. Pickup-morning message
 
@@ -34,3 +34,7 @@ DE: Hallo {guestName}, ein kurzer Hinweis zu deinem Ausflug {tripName} am {date}
 EN: Hi {guestName}, thank you for spending the day with Wasla Travel. We hope you enjoyed the {tripName}. If you have a moment, a Google review helps our small local team a lot: {reviewLink}. Thanks so much, and we hope to see you again in Hurghada.
 
 DE: Hallo {guestName}, danke, dass du den Tag mit Wasla Travel verbracht hast. Wir hoffen, der {tripName} hat dir gefallen. Wenn du kurz Zeit hast, hilft uns eine Bewertung bei Google sehr, unser kleines Team freut sich darüber: {reviewLink}. Vielen Dank und hoffentlich bis bald in Hurghada.
+
+## History
+
+2026-11-25: حذف سطر الإلغاء من قالب اليوم السابق واستبداله بسطر تأكيد الحضور، بحكم الخبير وموافقة المالك.

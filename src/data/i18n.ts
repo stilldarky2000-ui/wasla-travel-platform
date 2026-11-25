@@ -256,8 +256,8 @@ const BASE_I18N: Record<'en' | 'ar' | 'de', Translations> = {
         desc: "Cash on pickup is the standard, if you'd rather pay in advance, just ask us and we'll send you a payment link.",
       },
       cancel: {
-        title: 'Free cancellation up to 24 hours before',
-        desc: 'Plans change, cancel or reschedule up to 24 hours ahead at zero fee.',
+        title: 'Free cancellation up to 24 hours before the trip',
+        desc: 'Cancellations within 24 hours of the start time are charged at the full trip price.',
       },
       whatsapp: {
         title: 'WhatsApp support',
@@ -306,7 +306,7 @@ const BASE_I18N: Record<'en' | 'ar' | 'de', Translations> = {
     modalNotesPlaceholder: 'Optional, e.g. 7-year-old beginner swimmer',
     modalEstTotal: 'Estimated total',
     modalSubmitBooking: 'Confirm Booking Request',
-    modalNoBotNote: 'Free cancellation up to 24h before. No instant bot charges.',
+    modalNoBotNote: 'Free cancellation up to 24 hours before the trip start time shown on your booking. Cancellations within 24 hours of the start time are charged at the full trip price. On the Marsa Alam trips, marine park permits are arranged in advance and are not refundable once issued. No instant bot charges.',
     modalValidationErr: 'Please enter your name, hotel location, WhatsApp number, and a valid email address.',
     modalConfirmedBadge: 'Request received',
     modalConfirmedTitle: 'Operator checking availability',
@@ -428,8 +428,8 @@ const BASE_I18N: Record<'en' | 'ar' | 'de', Translations> = {
         desc: 'الدفع نقداً عند الاستلام هو المعتاد، وإذا كنت تفضل الدفع مسبقاً، فقط اطلب منا وسنرسل لك رابط دفع.',
       },
       cancel: {
-        title: 'إلغاء مجاني حتى 24 ساعة قبل الموعد',
-        desc: 'تغيرت خططك؟ يمكنك الإلغاء أو التعديل قبل 24 ساعة مجاناً.',
+        title: 'إلغاء مجاني حتى 24 ساعة قبل الرحلة',
+        desc: 'الإلغاء خلال آخر 24 ساعة قبل البداية يُحسب بسعر الرحلة الكامل.',
       },
       whatsapp: {
         title: 'دعم مباشر عبر واتساب',
@@ -478,7 +478,7 @@ const BASE_I18N: Record<'en' | 'ar' | 'de', Translations> = {
     modalNotesPlaceholder: 'اختياري، مثال: طفل بعمر 7 سنوات',
     modalEstTotal: 'الإجمالي التقديري',
     modalSubmitBooking: 'إرسال طلب الحجز',
-    modalNoBotNote: 'إلغاء مجاني قبل 24 ساعة. لا يتم خصم أي مبلغ قبل التأكيد.',
+    modalNoBotNote: 'إلغاء مجاني حتى 24 ساعة قبل موعد بداية الرحلة المكتوب في حجزك. الإلغاء خلال آخر 24 ساعة قبل البداية يُحسب بسعر الرحلة الكامل. في رحلات مرسى علم، تصاريح المحمية البحرية تُجهَّز مقدمًا ولا تُسترد بعد إصدارها. لا يتم خصم أي مبلغ قبل التأكيد.',
     modalValidationErr: 'يرجى إدخال الاسم واسم الفندق ورقم الواتساب والبريد الإلكتروني.',
     modalConfirmedBadge: 'تم استلام الطلب',
     modalConfirmedTitle: 'المشغل يراجع التوافر الآن',
@@ -600,8 +600,8 @@ const BASE_I18N: Record<'en' | 'ar' | 'de', Translations> = {
         desc: 'Barzahlung bei Abholung ist der Standard, wenn Sie lieber vorab zahlen möchten, fragen Sie uns einfach und wir senden Ihnen einen Zahlungslink.',
       },
       cancel: {
-        title: 'Kostenlose Stornierung bis 24 Stunden vorher',
-        desc: 'Pläne ändern sich, bis 24 Stunden vor Start kostenlos umbuchen oder stornieren.',
+        title: 'Kostenlose Stornierung bis 24 Stunden vor der Tour',
+        desc: 'Bei einer Stornierung innerhalb von 24 Stunden vor der Startzeit wird der volle Tourpreis berechnet.',
       },
       whatsapp: {
         title: 'WhatsApp-Support',
@@ -650,7 +650,7 @@ const BASE_I18N: Record<'en' | 'ar' | 'de', Translations> = {
     modalNotesPlaceholder: 'Optional, z.B. 7-jähriges Kind',
     modalEstTotal: 'Geschätzter Gesamtpreis',
     modalSubmitBooking: 'Buchungsanfrage senden',
-    modalNoBotNote: 'Kostenlos stornierbar bis 24h vorher. Keine Sofortabbuchung.',
+    modalNoBotNote: 'Kostenlose Stornierung bis 24 Stunden vor der auf Ihrer Buchung angegebenen Startzeit der Tour. Bei einer Stornierung innerhalb von 24 Stunden vor der Startzeit wird der volle Tourpreis berechnet. Bei den Touren nach Marsa Alam gilt: Genehmigungen für den Meerespark werden im Voraus beschafft und sind nach Ausstellung nicht erstattungsfähig. Keine Sofortabbuchung.',
     modalValidationErr: 'Bitte geben Sie Namen, Hotel, WhatsApp-Nummer und eine gültige E-Mail an.',
     modalConfirmedBadge: 'Anfrage eingegangen',
     modalConfirmedTitle: 'Anbieter prüft Verfügbarkeit',
