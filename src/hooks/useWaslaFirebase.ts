@@ -2467,6 +2467,15 @@ export function useWaslaFirebase() {
     }
   }, []);
 
+  const deleteSupplierInDb = useCallback(async (id: string) => {
+    setSuppliers((prev) => prev.filter((s) => s.id !== id));
+    try {
+      await deleteDoc(doc(db, 'suppliers', id));
+    } catch (err) {
+      handleFirestoreError(err, OperationType.DELETE, `suppliers/${id}`);
+    }
+  }, []);
+
   const updatePublicSettingsInDb = useCallback(
     async (patch: Partial<PublicStorefrontSettings>) => {
       const merged = { ...publicSettings, ...patch };
@@ -2645,7 +2654,8 @@ export function useWaslaFirebase() {
 
   const testBookingAlert = useCallback(() => {
     playNewBookingChime(true);
-    const sample: PlatformBooking = bookings[0] || INITIAL_BOOKINGS[0];
+    const sample: PlatformBooking | undefined = bookings[0] || INITIAL_BOOKINGS[0];
+    if (!sample) return;
     setLatestNewBooking({ ...sample, id: sample.id });
     showDesktopBookingNotification(sample);
   }, [bookings]);
@@ -2699,6 +2709,7 @@ export function useWaslaFirebase() {
     sendChatMessageInDb,
     updateComplaintInDb,
     updateSupplierStatusInDb,
+    deleteSupplierInDb,
     updatePublicSettingsInDb,
     updateCommissionRateInDb,
     dismissNewBookingAlert,

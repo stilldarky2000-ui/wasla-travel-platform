@@ -271,6 +271,7 @@ export default function App() {
     sendChatMessageInDb,
     updateComplaintInDb,
     updateSupplierStatusInDb,
+    deleteSupplierInDb,
     updatePublicSettingsInDb,
     updateCommissionRateInDb,
     dismissNewBookingAlert,
@@ -1459,6 +1460,7 @@ export default function App() {
           onSendChatMessage={handleSendChatMessage}
           onCreateChat={(chat) => void createChatInDb(chat)}
           onUpdateSupplierStatus={(id, status) => void updateSupplierStatusInDb(id, status)}
+          onDeleteSupplier={(id) => void deleteSupplierInDb(id)}
         />
       )}
 

@@ -127,7 +127,44 @@ interface OwnerControlProps {
   onSendChatMessage?: (threadId: string, text: string) => void;
   onCreateChat?: (chat: ChatThread) => void;
   onUpdateSupplierStatus: (id: string, status: SupplierProfile['status']) => void;
+  onDeleteSupplier?: (id: string) => Promise<void> | void;
 }
+
+const paymentStatusLabel = (status: PaymentStatus, isAr: boolean): string => {
+  switch (status) {
+    case 'Cash on pickup':
+      return isAr ? 'كاش عند الاستلام' : 'Cash on pickup';
+    case 'Paid online':
+      return isAr ? 'مدفوع أونلاين' : 'Paid online';
+    case 'Link sent':
+      return isAr ? 'تم إرسال لينك الدفع' : 'Link sent';
+    case 'Awaiting link':
+      return isAr ? 'بانتظار لينك الدفع' : 'Awaiting link';
+    default:
+      return status;
+  }
+};
+
+const bookingStatusLabel = (status: BookingStatus, isAr: boolean): string => {
+  switch (status) {
+    case 'Pending':
+      return isAr ? 'معلّق' : 'Pending';
+    case 'Confirmed':
+      return isAr ? 'مؤكد' : 'Confirmed';
+    case 'Driver assigned':
+      return isAr ? 'تم تعيين السائق' : 'Driver assigned';
+    case 'Completed':
+      return isAr ? 'مكتمل' : 'Completed';
+    case 'Cancelled':
+      return isAr ? 'ملغي' : 'Cancelled';
+    case 'Refunded':
+      return isAr ? 'مسترد' : 'Refunded';
+    case 'No show':
+      return isAr ? 'لم يحضر' : 'No show';
+    default:
+      return status;
+  }
+};
 
 type OwnerTab = 'overview' | 'catalog' | 'copilot' | 'ads' | 'design';
 type CatalogSubTab = 'trips' | 'suppliers' | 'reviews' | 'team';
@@ -207,6 +244,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
   onSendChatMessage,
   onCreateChat,
   onUpdateSupplierStatus,
+  onDeleteSupplier,
 }) => {
   const [activeTab, setActiveTab] = useState<OwnerTab>('overview');
   const [catalogSubTab, setCatalogSubTab] = useState<CatalogSubTab>('trips');
@@ -219,6 +257,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
   });
   const [previewTripModal, setPreviewTripModal] = useState<Trip | null>(null);
   const [confirmDeleteTripId, setConfirmDeleteTripId] = useState<string | null>(null);
+  const [confirmDeleteSupplierId, setConfirmDeleteSupplierId] = useState<string | null>(null);
   const [selectedTripIds, setSelectedTripIds] = useState<Set<string>>(new Set());
   const [confirmBulkDelete, setConfirmBulkDelete] = useState(false);
   const [bulkDeleting, setBulkDeleting] = useState(false);
@@ -2274,7 +2313,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                               €{bk.grossEur}
                             </td>
                             <td className="py-3 px-4 whitespace-nowrap text-[#475569] font-medium">
-                              {bk.paymentStatus}
+                              {paymentStatusLabel(bk.paymentStatus, isAr)}
                             </td>
                             <td className="py-3 px-4 whitespace-nowrap">
                               <div className="flex flex-col gap-0.5">
@@ -2492,8 +2531,8 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                 </div>
 
                 {onDeleteTrip && (
-                  <div className="px-5 py-2.5 border-b border-[#E2E8F0] bg-[#F8FAFC] flex flex-wrap items-center gap-2.5 text-xs">
-                    <label className="inline-flex items-center gap-1.5 font-semibold text-[#0F2233] cursor-pointer">
+                  <div className="px-5 py-2.5 border-b border-[#E2E8F0] dark:border-[#334155] bg-[#F8FAFC] dark:bg-white/5 flex flex-wrap items-center gap-2.5 text-xs">
+                    <label className="inline-flex items-center gap-1.5 font-semibold text-[#0F2233] dark:text-white cursor-pointer">
                       <input
                         type="checkbox"
                         className="h-4 w-4 accent-[#EE5426] cursor-pointer"
@@ -2505,14 +2544,14 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                       />
                       <span>{isAr ? 'تحديد الكل' : 'Mark all'}</span>
                     </label>
-                    <span className="text-[#64748B] tabular-nums">
+                    <span className="text-[#64748B] dark:text-slate-300 tabular-nums">
                       {selectedTripIds.size} {isAr ? 'محددة' : 'marked'}
                     </span>
                     {selectedTripIds.size > 0 && !confirmBulkDelete && (
                       <button
                         type="button"
                         onClick={() => setConfirmBulkDelete(true)}
-                        className="inline-flex items-center gap-1 rounded-lg border border-[#FECACA] bg-white px-2.5 py-1.5 font-semibold text-[#B91C1C] hover:bg-[#FEF2F2] cursor-pointer"
+                        className="inline-flex items-center gap-1 rounded-lg border border-[#FECACA] dark:border-red-900/60 bg-white dark:bg-white/10 px-2.5 py-1.5 font-semibold text-[#B91C1C] dark:text-red-300 hover:bg-[#FEF2F2] dark:hover:bg-red-950/40 cursor-pointer"
                       >
                         <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
                         <span>{isAr ? `حذف المحدد (${selectedTripIds.size})` : `Delete marked (${selectedTripIds.size})`}</span>
@@ -2737,6 +2776,9 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                         <th className="py-3 px-4 text-end">{isAr ? 'مبيعات العملاء' : 'Guest Sales'}</th>
                         <th className="py-3 px-4 text-end">{isAr ? 'صافي المستحق' : 'Net Owed'}</th>
                         <th className="py-3 px-4 text-start">{isAr ? 'الحالة' : 'Status'}</th>
+                        {onDeleteSupplier && (
+                          <th className="py-3 px-4 text-end">{isAr ? 'حذف' : 'Delete'}</th>
+                        )}
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-[#E2E8F0]">
@@ -2780,6 +2822,41 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                                 <option value="Paused">Paused</option>
                               </select>
                             </td>
+                            {onDeleteSupplier && (
+                              <td className="py-3 px-4 text-end whitespace-nowrap">
+                                {confirmDeleteSupplierId === sup.id ? (
+                                  <span className="inline-flex items-center gap-1">
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        void onDeleteSupplier(sup.id);
+                                        setConfirmDeleteSupplierId(null);
+                                      }}
+                                      className="rounded-lg bg-[#B91C1C] px-2.5 py-1.5 font-semibold text-white hover:bg-[#991B1B] cursor-pointer"
+                                    >
+                                      {isAr ? 'تأكيد الحذف' : 'Confirm Delete'}
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => setConfirmDeleteSupplierId(null)}
+                                      className="rounded-lg border border-[#CBD5E1] bg-white px-2 py-1.5 font-semibold text-[#475569] cursor-pointer"
+                                    >
+                                      {isAr ? 'إلغاء' : 'Cancel'}
+                                    </button>
+                                  </span>
+                                ) : (
+                                  <button
+                                    type="button"
+                                    onClick={() => setConfirmDeleteSupplierId(sup.id)}
+                                    className="inline-flex items-center justify-center rounded-lg border border-[#E2E8F0] bg-white p-1.5 text-[#B91C1C] hover:bg-[#FEF2F2] cursor-pointer"
+                                    title={isAr ? 'حذف المورد' : 'Delete supplier'}
+                                    aria-label={`Delete ${sup.name}`}
+                                  >
+                                    <Trash2 className="h-3.5 w-3.5" />
+                                  </button>
+                                )}
+                              </td>
+                            )}
                           </tr>
                         );
                       })}
@@ -4571,7 +4648,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                                       <tr className="bg-[#F8FAFC]">
                                         <td className="px-3.5 py-2 font-semibold text-[#64748B]">Total Guest Price</td>
                                         <td className="px-3.5 py-2 font-mono font-bold text-[#15803D]">
-                                          €{bk.grossEur} ({bk.paymentStatus})
+                                          €{bk.grossEur} ({paymentStatusLabel(bk.paymentStatus, isAr)})
                                         </td>
                                       </tr>
                                       {bk.notes && (
@@ -4623,7 +4700,7 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                               {
                                 id: `bk-sys-${bk.id}`,
                                 sender: 'customer' as const,
-                                text: `طلب حجز جديد ${bk.id} · ${bk.tripTitle}\nالتاريخ: ${bk.date}${bk.tripStartTime ? ` · بداية الرحلة: ${bk.tripStartTime}` : ''}${bk.pickupTime ? ` · البيك أب: ${bk.pickupTime}` : ''}\nالفندق: ${bk.hotel}${bk.roomNumber ? ` (غرفة ${bk.roomNumber})` : ''} · ${bk.pickupSpot || 'Inside Reception'}\nعدد الأفراد: ${bk.adults} بالغ${bk.children > 0 ? ` + ${bk.children} طفل` : ''}${(bk.infants ?? 0) > 0 ? ` + ${bk.infants} رضيع` : ''}${bk.guestCountry ? ` · الجنسية: ${bk.guestCountry}` : ''}\nالإجمالي: €${bk.grossEur} (${bk.paymentStatus})${bk.notes ? `\nملاحظات العميل: ${bk.notes}` : ''}`,
+                                text: `طلب حجز جديد ${bk.id} · ${bk.tripTitle}\nالتاريخ: ${bk.date}${bk.tripStartTime ? ` · بداية الرحلة: ${bk.tripStartTime}` : ''}${bk.pickupTime ? ` · البيك أب: ${bk.pickupTime}` : ''}\nالفندق: ${bk.hotel}${bk.roomNumber ? ` (غرفة ${bk.roomNumber})` : ''} · ${bk.pickupSpot || 'Inside Reception'}\nعدد الأفراد: ${bk.adults} بالغ${bk.children > 0 ? ` + ${bk.children} طفل` : ''}${(bk.infants ?? 0) > 0 ? ` + ${bk.infants} رضيع` : ''}${bk.guestCountry ? ` · الجنسية: ${bk.guestCountry}` : ''}\nالإجمالي: €${bk.grossEur} (${paymentStatusLabel(bk.paymentStatus, true)})${bk.notes ? `\nملاحظات العميل: ${bk.notes}` : ''}`,
                                 timestamp: bk.createdAtMs
                                   ? new Date(bk.createdAtMs).toLocaleTimeString([], {
                                       hour: '2-digit',
@@ -5076,10 +5153,10 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                       </span>
                       <div className="flex items-center gap-1.5 text-[11px]">
                         <span className="rounded bg-white/15 px-2 py-0.5 font-semibold text-white">
-                          {bookingModalDraft.status}
+                          {bookingStatusLabel(bookingModalDraft.status, isAr)}
                         </span>
                         <span className="rounded bg-[#10B981]/25 px-2 py-0.5 font-semibold text-[#A7F3D0]">
-                          {bookingModalDraft.paymentStatus}
+                          {paymentStatusLabel(bookingModalDraft.paymentStatus, isAr)}
                         </span>
                       </div>
                     </div>
