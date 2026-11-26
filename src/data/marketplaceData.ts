@@ -68,8 +68,6 @@ export type ActivityCategoryId =
   | 'historical'
   | 'horse'
   | 'city'
-  | 'shopping'
-  | 'guides'
   | 'transfers';
 
 export type DestinationRegion = 'Hurghada' | 'Marsa Alam' | 'Luxor' | 'Cairo';
@@ -537,8 +535,6 @@ export const CATEGORY_FALLBACK_IMAGE: Record<ActivityCategoryId, string> = {
   historical: luxorTempleImg,
   horse: horseBeachImg,
   city: hurghadaMarinaImg,
-  shopping: heroCoastImg,
-  guides: luxorHatshepsutImg,
   transfers: privateVanImg,
 };
 
@@ -620,28 +616,6 @@ export const CATEGORIES: CategoryItem[] = [
       cs: 'Jízda na koni', sv: 'Ridning', ro: 'Echitație',
     },
     image: horseBeachImg,
-    targetSection: 'hurghada-marsa-alam',
-  },
-  {
-    id: 'guides',
-    name: {
-      en: 'Egyptian guides', ar: 'مرشدون مصريون', de: 'Ägyptische Guides',
-      fr: 'Guides égyptiens', es: 'Guías egipcios', it: 'Guide egiziane',
-      nl: 'Egyptische gidsen', pl: 'Egipscy przewodnicy', pt: 'Guias egípcios',
-      cs: 'Egyptští průvodci', sv: 'Egyptiska guider', ro: 'Ghizi egipteni',
-    },
-    image: luxorHatshepsutImg,
-    targetSection: 'cairo-luxor',
-  },
-  {
-    id: 'shopping',
-    name: {
-      en: 'Shopping tours', ar: 'جولات تسوق', de: 'Shopping-Touren',
-      fr: 'Circuits shopping', es: 'Tours de compras', it: 'Tour shopping',
-      nl: 'Shopping tours', pl: 'Wycieczki zakupowe', pt: 'Tours de compras',
-      cs: 'Nákupní prohlídky', sv: 'Shoppingturer', ro: 'Tururi de cumpărături',
-    },
-    image: heroCoastImg,
     targetSection: 'hurghada-marsa-alam',
   },
   {

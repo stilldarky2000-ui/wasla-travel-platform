@@ -410,18 +410,6 @@ select:not(.bg-transparent):not(.no-led):focus {
   font-family: "Outfit", "Inter", "Cairo", ui-sans-serif, system-ui, sans-serif;
 }
 
-.wasla-hero-scrim {
-  background:
-    linear-gradient(to right, rgba(0, 0, 0, 0.55) 0%, rgba(0, 0, 0, 0.28) 45%, rgba(0, 0, 0, 0) 72%),
-    linear-gradient(to top, rgba(0, 0, 0, 0.40) 0%, rgba(0, 0, 0, 0) 48%);
-}
-
-[dir="rtl"] .wasla-hero-scrim {
-  background:
-    linear-gradient(to left, rgba(0, 0, 0, 0.55) 0%, rgba(0, 0, 0, 0.28) 45%, rgba(0, 0, 0, 0) 72%),
-    linear-gradient(to top, rgba(0, 0, 0, 0.40) 0%, rgba(0, 0, 0, 0) 48%);
-}
-
 .wasla-hero-img {
   object-position: var(--hfx, 50%) var(--hfy, 50%);
 }

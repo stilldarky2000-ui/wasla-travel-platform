@@ -530,7 +530,7 @@ export default function App() {
     }
     if (
       act &&
-      ['sea', 'desert', 'historical', 'horse', 'city', 'shopping', 'guides', 'transfers'].includes(act)
+      ['sea', 'desert', 'historical', 'horse', 'city', 'transfers'].includes(act)
     ) {
       setSearchActivity(act);
     }
@@ -794,12 +794,12 @@ export default function App() {
       historical: 0,
       horse: 0,
       city: 0,
-      shopping: 0,
-      guides: 0,
       transfers: 0,
     };
     liveTrips.forEach((trip) => {
-      counts[trip.category] += 1;
+      if (trip.category in counts) {
+        counts[trip.category] += 1;
+      }
     });
     return counts;
   }, [liveTrips]);
@@ -1725,7 +1725,6 @@ export default function App() {
                     style={heroFocalStyle}
                   />
                 </div>
-                <div className="absolute inset-0 wasla-hero-scrim" />
 
                 <div className="relative z-10 mx-auto max-w-[1200px] px-4 sm:px-6 pt-7 sm:pt-16 lg:pt-20 pb-6 sm:pb-10 lg:pb-28 space-y-[18px] sm:space-y-8">
                   <div className="hero-enter">

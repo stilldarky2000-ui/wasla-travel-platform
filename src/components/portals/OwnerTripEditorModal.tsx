@@ -1073,8 +1073,6 @@ export const OwnerTripEditorModal: React.FC<OwnerTripEditorModalProps> = ({
                 <option value="desert">Desert trips</option>
                 <option value="historical">Historical</option>
                 <option value="horse">Horse riding</option>
-                <option value="guides">Egyptian guides</option>
-                <option value="shopping">Shopping tour</option>
                 <option value="city">City tour</option>
                 <option value="transfers">Transfers</option>
               </select>

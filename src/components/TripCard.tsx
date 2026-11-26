@@ -43,7 +43,7 @@ function getTripHighlightsSummary(trip: Trip, lang: Lang): string[] {
     tags.push(tText({ en: 'Small van · max 8', ar: 'ميني فان · بحد أقصى 8', de: 'Kleinbus · max. 8' }, lang));
   } else if (descText.includes('16 guests') || trip.highlights.some((h) => h.en.includes('16 guests'))) {
     tags.push(tText({ en: 'Small group · max 16', ar: 'مجموعة صغيرة · حد أقصى 16', de: 'Kleingruppe · max. 16' }, lang));
-  } else if (trip.category === 'guides' || trip.category === 'city' || trip.category === 'shopping') {
+  } else if (trip.category === 'city') {
     tags.push(tText({ en: 'Private local host', ar: 'مرافق محلي خاص', de: 'Privater lokaler Guide' }, lang));
   }
 
