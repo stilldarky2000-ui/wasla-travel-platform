@@ -22,38 +22,6 @@ import luxorHatshepsutCliffsRealImg from '../assets/images/luxor_hatshepsut_clif
 import luxorHatshepsutSphinxRealImg from '../assets/images/luxor_hatshepsut_sphinx_real.webp';
 import luxorWestbankColumnsRealImg from '../assets/images/luxor_westbank_columns_real.webp';
 import horseBeachImg from '../assets/images/trip_horse_sahl_hasheesh_1794609168296.jpg';
-import waslaHorseRideHeroImg from '../assets/images/wasla_horse_ride_hero.jpg';
-import waslaHorseRide02Img from '../assets/images/wasla_horse_ride_02.jpg';
-import waslaHorseRide03Img from '../assets/images/wasla_horse_ride_03.jpg';
-import waslaHorseRide04Img from '../assets/images/wasla_horse_ride_04.jpg';
-import waslaHorseRide05Img from '../assets/images/wasla_horse_ride_05.jpg';
-import waslaHorseRide06Img from '../assets/images/wasla_horse_ride_06.jpg';
-import waslaHorseRide07Img from '../assets/images/wasla_horse_ride_07.jpg';
-import waslaHorseRide08Img from '../assets/images/wasla_horse_ride_08.jpg';
-import waslaHorseSessionHeroImg from '../assets/images/wasla_horse_session_hero.jpg';
-import waslaHorseSession02Img from '../assets/images/wasla_horse_session_02.jpg';
-import waslaHorseSession03Img from '../assets/images/wasla_horse_session_03.jpg';
-import waslaHorseSession04Img from '../assets/images/wasla_horse_session_04.jpg';
-import waslaHorseSession05Img from '../assets/images/wasla_horse_session_05.jpg';
-import waslaHorseSession06Img from '../assets/images/wasla_horse_session_06.jpg';
-import waslaFlyingDressHeroImg from '../assets/images/wasla_flying_dress_hero.jpg';
-import waslaFlyingDress02Img from '../assets/images/wasla_flying_dress_02.jpg';
-import waslaFlyingDress03Img from '../assets/images/wasla_flying_dress_03.jpg';
-import waslaFlyingDress04Img from '../assets/images/wasla_flying_dress_04.jpg';
-import waslaFlyingDress05Img from '../assets/images/wasla_flying_dress_05.jpg';
-import waslaFlyingDress06Img from '../assets/images/wasla_flying_dress_06.jpg';
-import waslaCarriageHeroImg from '../assets/images/wasla_carriage_hero.jpg';
-import waslaCarriage02Img from '../assets/images/wasla_carriage_02.jpg';
-import waslaCarriage03Img from '../assets/images/wasla_carriage_03.jpg';
-import waslaCarriage04Img from '../assets/images/wasla_carriage_04.jpg';
-import waslaCarriage05Img from '../assets/images/wasla_carriage_05.jpg';
-import waslaCarriage06Img from '../assets/images/wasla_carriage_06.jpg';
-import waslaCamelHeroImg from '../assets/images/wasla_camel_hero.jpg';
-import waslaCamel02Img from '../assets/images/wasla_camel_02.jpg';
-import waslaCamel03Img from '../assets/images/wasla_camel_03.jpg';
-import waslaCamel04Img from '../assets/images/wasla_camel_04.jpg';
-import waslaCamel05Img from '../assets/images/wasla_camel_05.jpg';
-import waslaCamel06Img from '../assets/images/wasla_camel_06.jpg';
 import momentGuestImg from '../assets/images/moment_guest_red_sea_1794609167642.jpg';
 import cairoPyramidsImg from '../assets/images/trip_cairo_pyramids_giza_1795088654554.jpg';
 import luxorBalloonImg from '../assets/images/trip_luxor_hot_air_balloon_1795088654794.jpg';
@@ -434,38 +402,52 @@ const BUNDLED_IMAGE_ENTRIES: Array<{ token: string; asset: string }> = [
   { token: 'luxor_hatshepsut_sphinx_real', asset: luxorHatshepsutSphinxRealImg },
   { token: 'luxor_westbank_columns_real', asset: luxorWestbankColumnsRealImg },
   { token: 'trip_horse_sahl_hasheesh', asset: horseBeachImg },
-  { token: 'wasla_horse_ride_hero', asset: waslaHorseRideHeroImg },
-  { token: 'wasla_horse_ride_02', asset: waslaHorseRide02Img },
-  { token: 'wasla_horse_ride_03', asset: waslaHorseRide03Img },
-  { token: 'wasla_horse_ride_04', asset: waslaHorseRide04Img },
-  { token: 'wasla_horse_ride_05', asset: waslaHorseRide05Img },
-  { token: 'wasla_horse_ride_06', asset: waslaHorseRide06Img },
-  { token: 'wasla_horse_ride_07', asset: waslaHorseRide07Img },
-  { token: 'wasla_horse_ride_08', asset: waslaHorseRide08Img },
-  { token: 'wasla_horse_session_hero', asset: waslaHorseSessionHeroImg },
-  { token: 'wasla_horse_session_02', asset: waslaHorseSession02Img },
-  { token: 'wasla_horse_session_03', asset: waslaHorseSession03Img },
-  { token: 'wasla_horse_session_04', asset: waslaHorseSession04Img },
-  { token: 'wasla_horse_session_05', asset: waslaHorseSession05Img },
-  { token: 'wasla_horse_session_06', asset: waslaHorseSession06Img },
-  { token: 'wasla_flying_dress_hero', asset: waslaFlyingDressHeroImg },
-  { token: 'wasla_flying_dress_02', asset: waslaFlyingDress02Img },
-  { token: 'wasla_flying_dress_03', asset: waslaFlyingDress03Img },
-  { token: 'wasla_flying_dress_04', asset: waslaFlyingDress04Img },
-  { token: 'wasla_flying_dress_05', asset: waslaFlyingDress05Img },
-  { token: 'wasla_flying_dress_06', asset: waslaFlyingDress06Img },
-  { token: 'wasla_carriage_hero', asset: waslaCarriageHeroImg },
-  { token: 'wasla_carriage_02', asset: waslaCarriage02Img },
-  { token: 'wasla_carriage_03', asset: waslaCarriage03Img },
-  { token: 'wasla_carriage_04', asset: waslaCarriage04Img },
-  { token: 'wasla_carriage_05', asset: waslaCarriage05Img },
-  { token: 'wasla_carriage_06', asset: waslaCarriage06Img },
-  { token: 'wasla_camel_hero', asset: waslaCamelHeroImg },
-  { token: 'wasla_camel_02', asset: waslaCamel02Img },
-  { token: 'wasla_camel_03', asset: waslaCamel03Img },
-  { token: 'wasla_camel_04', asset: waslaCamel04Img },
-  { token: 'wasla_camel_05', asset: waslaCamel05Img },
-  { token: 'wasla_camel_06', asset: waslaCamel06Img },
+  { token: 'wasla_horse_ride_hero', asset: '/assets/aistudio/wasla_horse_ride_hero_8510c4d9.jpg' },
+  { token: 'wasla_horse_ride_02', asset: '/assets/aistudio/wasla_horse_ride_02_f74b4528.jpg' },
+  { token: 'wasla_horse_ride_03', asset: '/assets/aistudio/wasla_horse_ride_03_13df0b61.jpg' },
+  { token: 'wasla_horse_ride_04', asset: '/assets/aistudio/wasla_horse_ride_04_7cc335bb.jpg' },
+  { token: 'wasla_horse_ride_05', asset: '/assets/aistudio/wasla_horse_ride_05_5142bc54.jpg' },
+  { token: 'wasla_horse_ride_06', asset: '/assets/aistudio/wasla_horse_ride_06_fa141eb5.jpg' },
+  { token: 'wasla_horse_ride_07', asset: '/assets/aistudio/wasla_horse_ride_07_15eabdd9.jpg' },
+  { token: 'wasla_horse_ride_08', asset: '/assets/aistudio/wasla_horse_ride_08_9ca8b98a.jpg' },
+  { token: 'wasla_horse_ride_09', asset: '/assets/aistudio/wasla_horse_ride_09_da59de81.jpg' },
+  { token: 'wasla_horse_ride_10', asset: '/assets/aistudio/wasla_horse_ride_10_28693374.jpg' },
+  { token: 'wasla_horse_session_hero', asset: '/assets/aistudio/wasla_horse_session_hero_6356ff83.jpg' },
+  { token: 'wasla_horse_session_02', asset: '/assets/aistudio/wasla_horse_session_02_c7b3e932.jpg' },
+  { token: 'wasla_horse_session_03', asset: '/assets/aistudio/wasla_horse_session_03_42c0166c.jpg' },
+  { token: 'wasla_horse_session_04', asset: '/assets/aistudio/wasla_horse_session_04_3cad5dbe.jpg' },
+  { token: 'wasla_horse_session_05', asset: '/assets/aistudio/wasla_horse_session_05_9e389797.jpg' },
+  { token: 'wasla_horse_session_06', asset: '/assets/aistudio/wasla_horse_session_06_85285fbd.jpg' },
+  { token: 'wasla_horse_session_07', asset: '/assets/aistudio/wasla_horse_session_07_950b4d2d.jpg' },
+  { token: 'wasla_horse_session_08', asset: '/assets/aistudio/wasla_horse_session_08_d679f166.jpg' },
+  { token: 'wasla_horse_session_09', asset: '/assets/aistudio/wasla_horse_session_09_fccab7ff.jpg' },
+  { token: 'wasla_horse_session_10', asset: '/assets/aistudio/wasla_horse_session_10_75fb2b62.jpg' },
+  { token: 'wasla_flying_dress_hero', asset: '/assets/aistudio/wasla_flying_dress_hero_a13fca1f.jpg' },
+  { token: 'wasla_flying_dress_02', asset: '/assets/aistudio/wasla_flying_dress_02_ea11fdb6.jpg' },
+  { token: 'wasla_flying_dress_03', asset: '/assets/aistudio/wasla_flying_dress_03_9638bab4.jpg' },
+  { token: 'wasla_flying_dress_04', asset: '/assets/aistudio/wasla_flying_dress_04_23f24974.jpg' },
+  { token: 'wasla_flying_dress_05', asset: '/assets/aistudio/wasla_flying_dress_05_b8893129.jpg' },
+  { token: 'wasla_flying_dress_06', asset: '/assets/aistudio/wasla_flying_dress_06_d0bb0064.jpg' },
+  { token: 'wasla_flying_dress_07', asset: '/assets/aistudio/wasla_flying_dress_07_402b7708.jpg' },
+  { token: 'wasla_flying_dress_08', asset: '/assets/aistudio/wasla_flying_dress_08_ab60ae3c.jpg' },
+  { token: 'wasla_flying_dress_09', asset: '/assets/aistudio/wasla_flying_dress_09_a6bcaa81.jpg' },
+  { token: 'wasla_flying_dress_10', asset: '/assets/aistudio/wasla_flying_dress_10_da9064aa.jpg' },
+  { token: 'wasla_carriage_hero', asset: '/assets/aistudio/wasla_carriage_hero_2bb784d7.jpg' },
+  { token: 'wasla_carriage_02', asset: '/assets/aistudio/wasla_carriage_02_171988e9.jpg' },
+  { token: 'wasla_carriage_03', asset: '/assets/aistudio/wasla_carriage_03_a7153b35.jpg' },
+  { token: 'wasla_carriage_04', asset: '/assets/aistudio/wasla_carriage_04_1be8ea38.jpg' },
+  { token: 'wasla_carriage_05', asset: '/assets/aistudio/wasla_carriage_05_df712f6e.jpg' },
+  { token: 'wasla_carriage_06', asset: '/assets/aistudio/wasla_carriage_06_ce710787.jpg' },
+  { token: 'wasla_carriage_07', asset: '/assets/aistudio/wasla_carriage_07_25d623e6.jpg' },
+  { token: 'wasla_carriage_08', asset: '/assets/aistudio/wasla_carriage_08_3eed5f53.jpg' },
+  { token: 'wasla_carriage_09', asset: '/assets/aistudio/wasla_carriage_09_79702ebd.jpg' },
+  { token: 'wasla_carriage_10', asset: '/assets/aistudio/wasla_carriage_10_b96a003a.jpg' },
+  { token: 'wasla_camel_hero', asset: '/assets/aistudio/wasla_camel_hero_ce8902c7.jpg' },
+  { token: 'wasla_camel_02', asset: '/assets/aistudio/wasla_camel_02_45f730dd.jpg' },
+  { token: 'wasla_camel_03', asset: '/assets/aistudio/wasla_camel_03_b72cd12a.jpg' },
+  { token: 'wasla_camel_04', asset: '/assets/aistudio/wasla_camel_04_6005d0c7.jpg' },
+  { token: 'wasla_camel_05', asset: '/assets/aistudio/wasla_camel_05_61202011.jpg' },
+  { token: 'wasla_camel_06', asset: '/assets/aistudio/wasla_camel_06_28be9825.jpg' },
   { token: 'moment_guest_red_sea', asset: momentGuestImg },
   { token: 'trip_cairo_pyramids_giza', asset: cairoPyramidsImg },
   { token: 'trip_luxor_hot_air_balloon', asset: luxorBalloonImg },
@@ -528,7 +510,6 @@ const BUNDLED_IMAGE_ENTRIES: Array<{ token: string; asset: string }> = [
   { token: 'wasla_super_safari_hero', asset: '/assets/aistudio/wasla_super_safari_hero_6ea3298d.jpg' },
   { token: 'wasla_luxor_12', asset: '/assets/aistudio/wasla_luxor_12_efdc1632.jpg' },
   { token: 'wasla_cairo_pyramids_01', asset: '/assets/aistudio/wasla_cairo_pyramids_01_1c01f3d4.jpg' },
-  { token: 'wasla_flying_dress_10', asset: '/assets/aistudio/wasla_flying_dress_10_da9064aa.jpg' },
 ];
 
 export const CATEGORY_FALLBACK_IMAGE: Record<ActivityCategoryId, string> = {
@@ -4058,14 +4039,16 @@ Danach geht es klimatisiert zurück durch die Wüste, mit dem ganzen antiken The
     category: 'horse',
     destination: 'Hurghada',
     images: [
-      waslaHorseRideHeroImg,
-      waslaHorseRide02Img,
-      waslaHorseRide03Img,
-      waslaHorseRide04Img,
-      waslaHorseRide05Img,
-      waslaHorseRide06Img,
-      waslaHorseRide07Img,
-      waslaHorseRide08Img,
+      '/assets/aistudio/wasla_horse_ride_hero_8510c4d9.jpg',
+      '/assets/aistudio/wasla_horse_ride_02_f74b4528.jpg',
+      '/assets/aistudio/wasla_horse_ride_03_13df0b61.jpg',
+      '/assets/aistudio/wasla_horse_ride_04_7cc335bb.jpg',
+      '/assets/aistudio/wasla_horse_ride_05_5142bc54.jpg',
+      '/assets/aistudio/wasla_horse_ride_06_fa141eb5.jpg',
+      '/assets/aistudio/wasla_horse_ride_07_15eabdd9.jpg',
+      '/assets/aistudio/wasla_horse_ride_08_9ca8b98a.jpg',
+      '/assets/aistudio/wasla_horse_ride_09_da59de81.jpg',
+      '/assets/aistudio/wasla_horse_ride_10_28693374.jpg',
     ],
     galleryCaptions: [
       {
@@ -4329,12 +4312,16 @@ Danach geht es klimatisiert zurück durch die Wüste, mit dem ganzen antiken The
     category: 'horse',
     destination: 'Hurghada',
     images: [
-      waslaHorseSessionHeroImg,
-      waslaHorseSession02Img,
-      waslaHorseSession03Img,
-      waslaHorseSession04Img,
-      waslaHorseSession05Img,
-      waslaHorseSession06Img,
+      '/assets/aistudio/wasla_horse_session_hero_6356ff83.jpg',
+      '/assets/aistudio/wasla_horse_session_02_c7b3e932.jpg',
+      '/assets/aistudio/wasla_horse_session_03_42c0166c.jpg',
+      '/assets/aistudio/wasla_horse_session_04_3cad5dbe.jpg',
+      '/assets/aistudio/wasla_horse_session_05_9e389797.jpg',
+      '/assets/aistudio/wasla_horse_session_06_85285fbd.jpg',
+      '/assets/aistudio/wasla_horse_session_07_950b4d2d.jpg',
+      '/assets/aistudio/wasla_horse_session_08_d679f166.jpg',
+      '/assets/aistudio/wasla_horse_session_09_fccab7ff.jpg',
+      '/assets/aistudio/wasla_horse_session_10_75fb2b62.jpg',
     ],
     galleryCaptions: [
       {
@@ -4582,12 +4569,15 @@ Danach geht es klimatisiert zurück durch die Wüste, mit dem ganzen antiken The
     category: 'horse',
     destination: 'Hurghada',
     images: [
-      waslaFlyingDressHeroImg,
-      waslaFlyingDress02Img,
-      waslaFlyingDress03Img,
-      waslaFlyingDress04Img,
-      waslaFlyingDress05Img,
-      waslaFlyingDress06Img,
+      '/assets/aistudio/wasla_flying_dress_hero_a13fca1f.jpg',
+      '/assets/aistudio/wasla_flying_dress_02_ea11fdb6.jpg',
+      '/assets/aistudio/wasla_flying_dress_03_9638bab4.jpg',
+      '/assets/aistudio/wasla_flying_dress_04_23f24974.jpg',
+      '/assets/aistudio/wasla_flying_dress_05_b8893129.jpg',
+      '/assets/aistudio/wasla_flying_dress_06_d0bb0064.jpg',
+      '/assets/aistudio/wasla_flying_dress_07_402b7708.jpg',
+      '/assets/aistudio/wasla_flying_dress_08_ab60ae3c.jpg',
+      '/assets/aistudio/wasla_flying_dress_09_a6bcaa81.jpg',
       '/assets/aistudio/wasla_flying_dress_10_da9064aa.jpg',
     ],
     galleryCaptions: [
@@ -4825,12 +4815,16 @@ Danach geht es klimatisiert zurück durch die Wüste, mit dem ganzen antiken The
     category: 'horse',
     destination: 'Hurghada',
     images: [
-      waslaCarriageHeroImg,
-      waslaCarriage02Img,
-      waslaCarriage03Img,
-      waslaCarriage04Img,
-      waslaCarriage05Img,
-      waslaCarriage06Img,
+      '/assets/aistudio/wasla_carriage_hero_2bb784d7.jpg',
+      '/assets/aistudio/wasla_carriage_02_171988e9.jpg',
+      '/assets/aistudio/wasla_carriage_03_a7153b35.jpg',
+      '/assets/aistudio/wasla_carriage_04_1be8ea38.jpg',
+      '/assets/aistudio/wasla_carriage_05_df712f6e.jpg',
+      '/assets/aistudio/wasla_carriage_06_ce710787.jpg',
+      '/assets/aistudio/wasla_carriage_07_25d623e6.jpg',
+      '/assets/aistudio/wasla_carriage_08_3eed5f53.jpg',
+      '/assets/aistudio/wasla_carriage_09_79702ebd.jpg',
+      '/assets/aistudio/wasla_carriage_10_b96a003a.jpg',
     ],
     galleryCaptions: [
       {
@@ -5056,12 +5050,12 @@ Danach geht es klimatisiert zurück durch die Wüste, mit dem ganzen antiken The
     category: 'desert',
     destination: 'Hurghada',
     images: [
-      waslaCamelHeroImg,
-      waslaCamel02Img,
-      waslaCamel03Img,
-      waslaCamel04Img,
-      waslaCamel05Img,
-      waslaCamel06Img,
+      '/assets/aistudio/wasla_camel_hero_ce8902c7.jpg',
+      '/assets/aistudio/wasla_camel_02_45f730dd.jpg',
+      '/assets/aistudio/wasla_camel_03_b72cd12a.jpg',
+      '/assets/aistudio/wasla_camel_04_6005d0c7.jpg',
+      '/assets/aistudio/wasla_camel_05_61202011.jpg',
+      '/assets/aistudio/wasla_camel_06_28be9825.jpg',
     ],
     galleryCaptions: [
       {
