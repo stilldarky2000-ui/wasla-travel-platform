@@ -1,0 +1,3 @@
+# Local-only wrangler dev vars may hold a throwaway test secret — never commit.
+.dev.vars
+.wrangler/

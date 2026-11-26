@@ -1,0 +1,11 @@
+# Wasla Travel — voucher-link Worker prototype (STAGING TEST ONLY)
+# No custom-domain routes on purpose: this deploys to the workers.dev
+# subdomain only and must NEVER be attached to waslatravel.com.
+name = "wasla-voucher-prototype"
+main = "src/worker.js"
+compatibility_date = "2024-11-01"
+workers_dev = true
+
+# The signing secret is provided as a Worker secret, never in this file:
+#   wrangler secret put VOUCHER_SECRET
+# For local dev only, a .dev.vars file (git-ignored) may hold a test value.
