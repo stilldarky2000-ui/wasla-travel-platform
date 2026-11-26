@@ -527,6 +527,8 @@ const BUNDLED_IMAGE_ENTRIES: Array<{ token: string; asset: string }> = [
   { token: 'wasla_star_gazing_05', asset: '/assets/aistudio/wasla_star_gazing_05_abf6f8e3.jpg' },
   { token: 'wasla_super_safari_hero', asset: '/assets/aistudio/wasla_super_safari_hero_6ea3298d.jpg' },
   { token: 'wasla_luxor_12', asset: '/assets/aistudio/wasla_luxor_12_efdc1632.jpg' },
+  { token: 'wasla_cairo_pyramids_01', asset: '/assets/aistudio/wasla_cairo_pyramids_01_1c01f3d4.jpg' },
+  { token: 'wasla_flying_dress_10', asset: '/assets/aistudio/wasla_flying_dress_10_da9064aa.jpg' },
 ];
 
 export const CATEGORY_FALLBACK_IMAGE: Record<ActivityCategoryId, string> = {
@@ -4586,6 +4588,7 @@ Danach geht es klimatisiert zurück durch die Wüste, mit dem ganzen antiken The
       waslaFlyingDress04Img,
       waslaFlyingDress05Img,
       waslaFlyingDress06Img,
+      '/assets/aistudio/wasla_flying_dress_10_da9064aa.jpg',
     ],
     galleryCaptions: [
       {
@@ -4617,6 +4620,11 @@ Danach geht es klimatisiert zurück durch die Wüste, mit dem ganzen antiken The
         en: 'White dress, red hat, calm sea',
         ar: 'فستان أبيض وقبعة حمرا وبحر هادي',
         de: 'Weißes Kleid, roter Hut, ruhiges Meer',
+      },
+      {
+        en: 'The green dress by the Red Sea shoreline',
+        ar: 'الفستان الأخضر على شاطئ البحر الأحمر',
+        de: 'Das grüne Kleid am Ufer des Roten Meeres',
       },
     ],
     rating: 0,
@@ -5919,7 +5927,10 @@ Danach geht es klimatisiert zurück durch die Wüste, mit dem ganzen antiken The
     slug: '/trips/cairo-day-trip-hurghada/',
     category: 'historical',
     destination: 'Cairo',
-    images: [cairoPyramidsImg],
+    images: [
+      cairoPyramidsImg,
+      '/assets/aistudio/wasla_cairo_pyramids_01_1c01f3d4.jpg',
+    ],
     rating: 0,
     reviewCount: 0,
     duration: { en: '16 hours', ar: '16 ساعة', de: '16 Stunden' },
