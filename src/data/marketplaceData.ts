@@ -4491,13 +4491,27 @@ Danach geht es klimatisiert zurück durch die Wüste, mit dem ganzen antiken The
     rating: 0,
     reviewCount: 0,
     duration: {
-      en: '2 hours',
-      ar: 'ساعتين',
-      de: '2 Stunden',
+      en: '1 or 2 hours',
+      ar: 'ساعة أو ساعتين',
+      de: '1 oder 2 Stunden',
     },
     departureTimes: ['09:00 AM', '11:00 AM', '01:00 PM', '03:00 PM'],
     price: 20,
     options: [
+      {
+        id: 'opt-carriage-1h',
+        title: {
+          en: 'Carriage Ride, 1 Hour',
+          ar: 'جولة بالعربة، ساعة',
+          de: 'Kutschfahrt, 1 Stunde',
+        },
+        detail: {
+          en: 'Per person',
+          ar: 'للفرد',
+          de: 'Pro Person',
+        },
+        price: 20,
+      },
       {
         id: 'opt-carriage-2h',
         title: {
