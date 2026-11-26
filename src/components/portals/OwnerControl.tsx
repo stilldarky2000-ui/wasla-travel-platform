@@ -219,6 +219,9 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
   });
   const [previewTripModal, setPreviewTripModal] = useState<Trip | null>(null);
   const [confirmDeleteTripId, setConfirmDeleteTripId] = useState<string | null>(null);
+  const [selectedTripIds, setSelectedTripIds] = useState<Set<string>>(new Set());
+  const [confirmBulkDelete, setConfirmBulkDelete] = useState(false);
+  const [bulkDeleting, setBulkDeleting] = useState(false);
 
   // Executive Workspace & Copilot language state
   const [copilotLang, setCopilotLang] = useState<'ar' | 'en'>('ar');
@@ -2488,6 +2491,66 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                   </div>
                 </div>
 
+                {onDeleteTrip && (
+                  <div className="px-5 py-2.5 border-b border-[#E2E8F0] bg-[#F8FAFC] flex flex-wrap items-center gap-2.5 text-xs">
+                    <label className="inline-flex items-center gap-1.5 font-semibold text-[#0F2233] cursor-pointer">
+                      <input
+                        type="checkbox"
+                        className="h-4 w-4 accent-[#EE5426] cursor-pointer"
+                        checked={filteredCatalogTrips.length > 0 && filteredCatalogTrips.every((ft) => selectedTripIds.has(ft.id))}
+                        onChange={(e) => {
+                          setConfirmBulkDelete(false);
+                          setSelectedTripIds(e.target.checked ? new Set(filteredCatalogTrips.map((ft) => ft.id)) : new Set());
+                        }}
+                      />
+                      <span>{isAr ? 'تحديد الكل' : 'Mark all'}</span>
+                    </label>
+                    <span className="text-[#64748B] tabular-nums">
+                      {selectedTripIds.size} {isAr ? 'محددة' : 'marked'}
+                    </span>
+                    {selectedTripIds.size > 0 && !confirmBulkDelete && (
+                      <button
+                        type="button"
+                        onClick={() => setConfirmBulkDelete(true)}
+                        className="inline-flex items-center gap-1 rounded-lg border border-[#FECACA] bg-white px-2.5 py-1.5 font-semibold text-[#B91C1C] hover:bg-[#FEF2F2] cursor-pointer"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
+                        <span>{isAr ? `حذف المحدد (${selectedTripIds.size})` : `Delete marked (${selectedTripIds.size})`}</span>
+                      </button>
+                    )}
+                    {confirmBulkDelete && (
+                      <span className="inline-flex items-center gap-1.5">
+                        <button
+                          type="button"
+                          disabled={bulkDeleting}
+                          onClick={async () => {
+                            setBulkDeleting(true);
+                            try {
+                              for (const id of Array.from(selectedTripIds)) {
+                                await onDeleteTrip(id);
+                              }
+                              setSelectedTripIds(new Set());
+                            } finally {
+                              setBulkDeleting(false);
+                              setConfirmBulkDelete(false);
+                            }
+                          }}
+                          className="rounded-lg bg-[#B91C1C] px-2.5 py-1.5 font-semibold text-white hover:bg-[#991B1B] cursor-pointer disabled:opacity-60"
+                        >
+                          {bulkDeleting ? (isAr ? 'جارٍ الحذف...' : 'Deleting...') : isAr ? 'تأكيد حذف الكل' : 'Confirm delete all marked'}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setConfirmBulkDelete(false)}
+                          className="rounded-lg border border-[#CBD5E1] bg-white px-2 py-1.5 font-semibold text-[#475569] cursor-pointer"
+                        >
+                          {isAr ? 'إلغاء' : 'Cancel'}
+                        </button>
+                      </span>
+                    )}
+                  </div>
+                )}
+
                 {filteredCatalogTrips.length === 0 ? (
                   <div className="px-5 py-10 text-center text-xs text-[#64748B]">
                     {isAr ? 'لا توجد رحلات في هذا التصنيف حالياً.' : 'No trips in this status.'}
@@ -2504,6 +2567,24 @@ export const OwnerControl: React.FC<OwnerControlProps> = ({
                             status === 'Pending' ? 'bg-[#FFFBEB]/60' : 'bg-white hover:bg-[#F8FAFC]'
                           }`}
                         >
+                          {onDeleteTrip && (
+                            <label className="inline-flex items-start pt-0.5 shrink-0 cursor-pointer" title={isAr ? 'تحديد للحذف الجماعي' : 'Mark for bulk delete'}>
+                              <input
+                                type="checkbox"
+                                className="h-4 w-4 accent-[#EE5426] cursor-pointer"
+                                checked={selectedTripIds.has(trip.id)}
+                                onChange={(e) => {
+                                  setConfirmBulkDelete(false);
+                                  setSelectedTripIds((prev) => {
+                                    const next = new Set(prev);
+                                    if (e.target.checked) next.add(trip.id);
+                                    else next.delete(trip.id);
+                                    return next;
+                                  });
+                                }}
+                              />
+                            </label>
+                          )}
                           <div className="space-y-1 min-w-0">
                             <div className="flex flex-wrap items-center gap-2">
                               <span
