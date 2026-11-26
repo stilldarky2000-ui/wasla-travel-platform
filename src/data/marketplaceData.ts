@@ -3752,7 +3752,7 @@ Danach geht es klimatisiert zurück durch die Wüste, mit dem ganzen antiken The
       ar: 'رحلات الساعتين تبدأ في المواعيد المعروضة، ورحلة التلات ساعات تبدأ في أي وقت تختاره ويتأكد بعد الحجز.',
       de: 'Der 2-stündige Ritt startet zu den angegebenen Zeiten. Der 3-stündige Ritt startet zu Ihrer Wunschzeit, bestätigt nach der Buchung.',
     },
-    price: 40,
+    price: 30,
     options: [
       {
         id: 'opt-horse-2h',
@@ -3766,7 +3766,7 @@ Danach geht es klimatisiert zurück durch die Wüste, mit dem ganzen antiken The
           ar: 'ركوب موجّه مع مدرب، والاستلام من فنادق الغردقة مشمول',
           de: 'Geführter Ritt mit Reitlehrer, Hotelabholung in Hurghada inklusive',
         },
-        price: 40,
+        price: 30,
       },
       {
         id: 'opt-horse-3h-swim',
@@ -3780,7 +3780,7 @@ Danach geht es klimatisiert zurück durch die Wüste, mit dem ganzen antiken The
           ar: 'ركوب موجّه أطول مع وقفة سباحة في البحر مع حصانك، والبداية في وقت من اختيارك',
           de: 'Längerer geführter Ritt mit Badestopp im Meer, Start zu Ihrer Wunschzeit',
         },
-        price: 60,
+        price: 45,
       },
     ],
     shortDescription: {
@@ -3911,6 +3911,7 @@ Danach geht es klimatisiert zurück durch die Wüste, mit dem ganzen antiken The
       de: 'Hurghada und El Gouna inklusive · Sahl Hasheesh und Makadi +10 €/Pers. · Soma Bay und Safaga +15 €/Pers.',
     },
     supplierName: 'Al-Bahr Stables',
+    childPriceEur: 45,
     familyFriendly: true,
     womenFriendly: true,
     minChildAge: 5,
@@ -4164,6 +4165,7 @@ Danach geht es klimatisiert zurück durch die Wüste, mit dem ganzen antiken The
       de: 'Hurghada und El Gouna inklusive · Sahl Hasheesh und Makadi +10 €/Pers. · Soma Bay und Safaga +15 €/Pers.',
     },
     supplierName: 'Al-Bahr Stables',
+    childPriceEur: 60,
     familyFriendly: true,
     womenFriendly: true,
     minChildAge: 5,
@@ -4399,6 +4401,7 @@ Danach geht es klimatisiert zurück durch die Wüste, mit dem ganzen antiken The
       de: 'Private Hotelabholung inklusive',
     },
     supplierName: 'Al-Bahr Stables',
+    childPriceEur: 250,
     familyFriendly: false,
     womenFriendly: true,
     featured: false,
@@ -4503,9 +4506,9 @@ Danach geht es klimatisiert zurück durch die Wüste, mit dem ganzen antiken The
           de: 'Kutschfahrt, 2 Stunden',
         },
         detail: {
-          en: 'Per person, children ride free with a paying adult',
-          ar: 'للفرد، والأطفال مجانًا مع بالغ دافع',
-          de: 'Pro Person, Kinder fahren kostenlos mit einem zahlenden Erwachsenen',
+          en: 'Per person',
+          ar: 'للفرد',
+          de: 'Pro Person',
         },
         price: 20,
       },
@@ -4530,9 +4533,9 @@ Danach geht es klimatisiert zurück durch die Wüste, mit dem ganzen antiken The
       de: 'Eine entspannte Kutschfahrt am Strand von Hurghada entlang, und direkt ins flache Meer hinein, mit Ihrer Familie gemeinsam in einer Kutsche.',
     },
     fullDescription: {
-      en: 'Some Hurghada experiences are about speed. This one is about slowing down. Your carriage rolls along the beach at a walking pace, and then does the thing guests remember most: it rolls straight into the shallow sea, horses and wheels in the water, while you sit back and take it in.\n\nFamilies and groups ride together in one carriage, with a driver and team with you the whole way and photo stops whenever the light or the view asks for one.\n\nIt is an easy, gentle outing for all ages, and children ride free with a paying adult.',
-      ar: 'فيه تجارب في الغردقة عن السرعة، ودي عن الهدوء. عربتك بتمشي على الشاطئ بخطوة هادية، وبعدين بتعمل الحاجة اللي الضيوف بيفتكروها أكتر حاجة: بتدخل على طول جوه المية الضحلة، الخيل والعجل في المية، وانت قاعد مسترخي وبتتفرج.\n\nالعائلات والمجموعات بيركبوا سوا في عربة واحدة، مع سواق وفريق معاك الطريق كله ووقفات تصوير كل ما الإضاءة أو المنظر يطلب.\n\nخروجة سهلة وهادية لكل الأعمار، والأطفال بيركبوا مجانًا مع بالغ دافع.',
-      de: 'Manche Erlebnisse in Hurghada drehen sich um Tempo. Dieses dreht sich ums Entschleunigen. Ihre Kutsche rollt im Schritt am Strand entlang und tut dann das, woran sich Gäste am meisten erinnern: Sie fährt direkt ins flache Meer hinein, Pferde und Räder im Wasser, während Sie sich zurücklehnen und genießen.\n\nFamilien und Gruppen fahren gemeinsam in einer Kutsche, mit Fahrer und Team an Ihrer Seite und Fotostopps, wann immer Licht oder Aussicht danach verlangen.\n\nEin leichter, sanfter Ausflug für alle Altersgruppen, und Kinder fahren kostenlos mit einem zahlenden Erwachsenen.',
+      en: 'Some Hurghada experiences are about speed. This one is about slowing down. Your carriage rolls along the beach at a walking pace, and then does the thing guests remember most: it rolls straight into the shallow sea, horses and wheels in the water, while you sit back and take it in.\n\nFamilies and groups ride together in one carriage, with a driver and team with you the whole way and photo stops whenever the light or the view asks for one.\n\nIt is an easy, gentle outing for all ages.',
+      ar: 'فيه تجارب في الغردقة عن السرعة، ودي عن الهدوء. عربتك بتمشي على الشاطئ بخطوة هادية، وبعدين بتعمل الحاجة اللي الضيوف بيفتكروها أكتر حاجة: بتدخل على طول جوه المية الضحلة، الخيل والعجل في المية، وانت قاعد مسترخي وبتتفرج.\n\nالعائلات والمجموعات بيركبوا سوا في عربة واحدة، مع سواق وفريق معاك الطريق كله ووقفات تصوير كل ما الإضاءة أو المنظر يطلب.\n\nخروجة سهلة وهادية لكل الأعمار.',
+      de: 'Manche Erlebnisse in Hurghada drehen sich um Tempo. Dieses dreht sich ums Entschleunigen. Ihre Kutsche rollt im Schritt am Strand entlang und tut dann das, woran sich Gäste am meisten erinnern: Sie fährt direkt ins flache Meer hinein, Pferde und Räder im Wasser, während Sie sich zurücklehnen und genießen.\n\nFamilien und Gruppen fahren gemeinsam in einer Kutsche, mit Fahrer und Team an Ihrer Seite und Fotostopps, wann immer Licht oder Aussicht danach verlangen.\n\nEin leichter, sanfter Ausflug für alle Altersgruppen.',
     },
     highlights: [
       {
@@ -4610,9 +4613,9 @@ Danach geht es klimatisiert zurück durch die Wüste, mit dem ganzen antiken The
     ],
     knowBeforeYouGo: [
       {
-        en: 'The price is per person, and children ride free with a paying adult',
-        ar: 'السعر للفرد، والأطفال بيركبوا مجانًا مع بالغ دافع',
-        de: 'Der Preis gilt pro Person, und Kinder fahren kostenlos mit einem zahlenden Erwachsenen',
+        en: 'The price is per person',
+        ar: 'السعر للفرد',
+        de: 'Der Preis gilt pro Person',
       },
       {
         en: 'Tell us your hotel and we confirm your exact pickup time after booking',
@@ -4630,12 +4633,7 @@ Danach geht es klimatisiert zurück durch die Wüste, mit dem ganzen antiken The
     supplierName: 'Al-Bahr Stables',
     familyFriendly: true,
     womenFriendly: true,
-    kidsDiscount: {
-      en: 'Children ride free with a paying adult',
-      ar: 'الأطفال بيركبوا مجانًا مع بالغ دافع',
-      de: 'Kinder fahren kostenlos mit einem zahlenden Erwachsenen',
-    },
-    childPriceEur: 0,
+    childPriceEur: 20,
     featured: false,
     languages: ['English', 'German'],
     operatingDays: [0, 1, 2, 3, 4, 5, 6],
@@ -4729,7 +4727,7 @@ Danach geht es klimatisiert zurück durch die Wüste, mit dem ganzen antiken The
       de: '1 bis 3 Stunden',
     },
     departureTimes: ['08:00 AM (Morning)', '04:00 PM (Sunset)'],
-    price: 20,
+    price: 25,
     options: [
       {
         id: 'opt-camel-1h',
@@ -4743,7 +4741,7 @@ Danach geht es klimatisiert zurück durch die Wüste, mit dem ganzen antiken The
           ar: 'تجربة أولى هادية على الشاطئ',
           de: 'Ein sanfter erster Eindruck, am Strand entlang',
         },
-        price: 20,
+        price: 25,
       },
       {
         id: 'opt-camel-2h',
@@ -4757,7 +4755,7 @@ Danach geht es klimatisiert zurück durch die Wüste, mit dem ganzen antiken The
           ar: 'شاطئ أكتر وحافة الصحرا ووقفة شاي',
           de: 'Mehr Strand, der Wüstenrand und ein Teestopp',
         },
-        price: 20,
+        price: 25,
       },
       {
         id: 'opt-camel-3h',
@@ -4771,7 +4769,7 @@ Danach geht es klimatisiert zurück durch die Wüste, mit dem ganzen antiken The
           ar: 'الركوب الهادي الكامل، صباحًا أو مع الغروب',
           de: 'Der volle langsame Ritt, morgens oder bei Sonnenuntergang',
         },
-        price: 20,
+        price: 25,
       },
     ],
     shortDescription: {
@@ -4897,7 +4895,7 @@ Danach geht es klimatisiert zurück durch die Wüste, mit dem ganzen antiken The
     supplierName: 'Al-Bahr Stables',
     familyFriendly: true,
     womenFriendly: true,
-    childPriceEur: 20,
+    childPriceEur: 25,
     featured: false,
     languages: ['English', 'German'],
     operatingDays: [0, 1, 2, 3, 4, 5, 6],
