@@ -4848,89 +4848,7 @@ Danach geht es klimatisiert zurück durch die Wüste, mit dem ganzen antiken The
     languages: ['English', 'German'],
     operatingDays: [0, 1, 2, 3, 4, 5, 6],
   },
-  {
-    id: 'marsa-alam-abu-dabbab-turtles',
-    itinerary: [
-      {
-        kind: 'pickup',
-        title: { en: 'Pickup in Marsa Alam', ar: 'الاستلام في مرسى علم', de: 'Abholung in Marsa Alam' },
-        subtitle: { en: 'Transfer to Abu Dabbab bay', ar: 'الانتقال إلى خليج أبو دباب', de: 'Transfer zur Bucht von Abu Dabbab' },
-      },
-      {
-        kind: 'stop',
-        title: { en: 'Wildlife etiquette briefing', ar: 'شرح آداب التعامل مع الحياة البرية', de: 'Briefing zum Umgang mit den Tieren' },
-        subtitle: { en: 'With a local reef ranger, before you enter the water', ar: 'مع حارس شعاب محلي، قبل نزول المياه', de: 'Mit einem lokalen Riff-Ranger, bevor es ins Wasser geht' },
-      },
-      {
-        kind: 'stop',
-        title: { en: 'Guided snorkelling from the beach', ar: 'سنوركلينج إرشادي من الشاطئ', de: 'Geführtes Schnorcheln vom Strand' },
-        subtitle: { en: 'Walk straight in from soft sand, ideal for gentle swimmers', ar: 'دخول مباشر من رمال ناعمة، مثالي للسباحين الهادئين', de: 'Direkter Einstieg über weichen Sand, ideal für ruhige Schwimmer' },
-      },
-      {
-        kind: 'break',
-        title: { en: 'Free time on the beach', ar: 'وقت حر على الشاطئ', de: 'Freie Zeit am Strand' },
-      },
-      {
-        kind: 'end',
-        title: { en: 'Transfer back', ar: 'الانتقال عودة', de: 'Rücktransfer' },
-      },
-    ],
-    name: {
-      en: 'Marsa Alam Abu Dabbab Reef & Sea Turtles Day',
-      ar: 'خليج أبو دباب في مرسى علم والسباحة مع السلاحف البحرية',
-      de: 'Marsa Alam Abu Dabbab Riff & Meeresschildkröten',
-    },
-    category: 'sea',
-    destination: 'Marsa Alam',
-    images: [momentGuestImg, heroRedSeaVibrantImg, orangeBayImg],
-    rating: 4.9,
-    reviewCount: 41,
-    duration: { en: '6 hours', ar: '6 ساعات', de: '6 Stunden' },
-    departureTimes: ['09:00 AM'],
-    price: 49,
-    shortDescription: {
-      en: 'Sandy-entry bay famous for resident green sea turtles and gentle seagrass meadows, zero boat required.',
-      ar: 'خليج رملي شهير بالسلاحف البحرية الخضراء والشعاب المرجانية الهادئة بدون الحاجة لقارب.',
-      de: 'Sandige Bucht bekannt für Meeresschildkröten und bunte Riffe, direkter Strandeinstieg ohne Boot.',
-    },
-    highlights: [
-      {
-        en: 'Walk straight in from soft sand, ideal for gentle swimmers',
-        ar: 'دخول مباشر من الشاطئ الرملي بدون موج قوي',
-        de: 'Bequemer Einstieg direkt vom weichen Sandstrand',
-      },
-      {
-        en: 'Guided wildlife etiquette briefing with local reef ranger',
-        ar: 'شرح احترام الحياة البحرية مع مرشد محلي',
-        de: 'Respektvolle Tierbeobachtung mit lokalem Riff-Guide',
-      },
-    ],
-    historicalFacts: [
-      {
-        era: { en: 'Southern Coast Ecology', ar: 'بيئة ساحل جنوب البحر الأحمر', de: 'Ökologie des südlichen Roten Meeres' },
-        title: { en: 'Seagrass Sanctuary & Berenice Coast', ar: 'مرعى الأعشاب البحرية وساحل برنيس القديم', de: 'Seegraswiesen vor historischer Küste' },
-        metric: { en: 'Resident Green Turtles', ar: 'سلاحف بحرية مقيمة', de: 'Heimische Meeresschildkröten' },
-        fact: {
-          en: 'Abu Dabbab’s shallow seagrass meadow shelters resident green sea turtles and rare dugongs just north of ancient Ptolemaic Berenice Troglodytica.',
-          ar: 'يحتضن خليج أبو دباب مروج أعشاب بحرية طبيعية ترعى فيها السلاحف الخضراء والأطوم النادرة شمال ميناء برنيس البطلمي الأثري.',
-          de: 'Die geschützte Seegraswiese von Abu Dabbab bietet Meeresschildkröten und seltenen Seekühen Nahrung nördlich des antiken Hafens Berenike.',
-        },
-      },
-    ],
-    included: [
-      { en: 'Marsa Alam hotel transfer & beach beds', ar: 'توصيل مرسى علم وكراسي الشاطئ', de: 'Transfer in Marsa Alam & Sonnenliegen' },
-      { en: 'Snorkel gear & coastal lunch', ar: 'معدات الغطس والغداء', de: 'Schnorchelausrüstung & Mittagessen' },
-    ],
-    pickup: { en: 'Marsa Alam & Port Ghalib', ar: 'مرسى علم وبورت غالب', de: 'Marsa Alam & Port Ghalib' },
-    supplierName: 'South Red Sea Guides',
-    familyFriendly: true,
-    womenFriendly: true,
-    minChildAge: 4,
-    kidsDiscount: { en: '40% off ages 4–11', ar: 'خصم 40% من 4–11 سنة', de: '40% Rabatt für Kinder (4–11 J.)' },
-    featured: true,
-    operatingDays: [1, 3, 6],
-  },
-  {
+    {
     id: 'marsa-alam-samadai-dolphin-house',
     itinerary: [
       {
@@ -5678,75 +5596,7 @@ Danach geht es klimatisiert zurück durch die Wüste, mit dem ganzen antiken The
     featured: false,
     operatingDays: [0, 1, 2, 3, 4, 5, 6],
   },
-  {
-    id: 'cairo-khan-el-khalili-nile-evening',
-    itinerary: [
-      {
-        kind: 'pickup',
-        title: { en: 'Pickup and transfer to the old city', ar: 'الاستلام والانتقال إلى المدينة القديمة', de: 'Abholung und Transfer in die Altstadt' },
-      },
-      {
-        kind: 'stop',
-        title: { en: 'The Citadel', ar: 'القلعة', de: 'Die Zitadelle' },
-      },
-      {
-        kind: 'stop',
-        title: { en: 'Khan el-Khalili bazaar', ar: 'بازار خان الخليلي', de: 'Basar Khan el-Khalili' },
-        subtitle: { en: 'A curated route avoiding crowded tourist traps', ar: 'مسار مختار بيبعد عن الزحام والأماكن السياحية المكدسة', de: 'Eine kuratierte Route abseits der überlaufenen Touristenfallen' },
-      },
-      {
-        kind: 'stop',
-        title: { en: 'Sunset felucca on the Nile', ar: 'فلوكة على النيل وقت الغروب', de: 'Felucca auf dem Nil bei Sonnenuntergang' },
-        subtitle: { en: 'Private wooden felucca sail at golden hour', ar: 'إبحار خاص بفلوكة خشبية في الساعة الذهبية', de: 'Private Holz-Felucca in der goldenen Stunde' },
-      },
-      {
-        kind: 'end',
-        title: { en: 'Transfer back', ar: 'الانتقال عودة', de: 'Rücktransfer' },
-      },
-    ],
-    name: {
-      en: 'Cairo Old Bazaar, Citadel & Sunset Felucca Sail',
-      ar: 'جولة خان الخليلي والقلعة ومركب فلوكة عند الغروب في القاهرة',
-      de: 'Kairo Basar, Zitadelle & Sonnenuntergangs-Felukke auf dem Nil',
-    },
-    category: 'city',
-    destination: 'Cairo',
-    images: [luxorFeluccaImg, hurghadaMarinaImg],
-    rating: 4.8,
-    reviewCount: 25,
-    duration: { en: '5 hours', ar: '5 ساعات', de: '5 Stunden' },
-    departureTimes: ['02:00 PM (Afternoon)', '04:30 PM (Sunset)'],
-    price: 42,
-    shortDescription: {
-      en: 'Walk historic Moez Street and Khan el-Khalili with a local host before gliding across the Nile on a wooden felucca.',
-      ar: 'جولة في شارع المعز وخان الخليلي مع مضيف محلي ثم إبحار هادئ بالفلوكة في النيل.',
-      de: 'Spaziergang durch die Moez-Straße und Khan el-Khalili mit abschließender Nil-Felukkenfahrt.',
-    },
-    highlights: [
-      {
-        en: 'Curated route avoiding crowded tourist traps',
-        ar: 'مسار مدروس بعيداً عن الزحام المزعج',
-        de: 'Kuratierte Route abseits überlaufener Souvenirläden',
-      },
-      {
-        en: 'Private wooden felucca sail at golden hour',
-        ar: 'مركب فلوكة خاص وقت الغروب',
-        de: 'Private Holzfelukke zur goldenen Stunde',
-      },
-    ],
-    included: [
-      { en: 'Cairo hotel pickup & local host', ar: 'التوصيل من فندق القاهرة والمرافق', de: 'Abholung in Kairo & lokaler Gastgeber' },
-      { en: 'Private felucca charter & mint tea', ar: 'تأجير الفلوكة وشاي بالنعناع', de: 'Private Felukke & Minztee' },
-    ],
-    pickup: { en: 'Central Cairo & Giza hotels', ar: 'فنادق وسط القاهرة والجيزة', de: 'Hotels in Kairo & Gizeh' },
-    supplierName: 'Nile Horizon Guides',
-    familyFriendly: true,
-    womenFriendly: true,
-    minChildAge: 3,
-    featured: false,
-    operatingDays: [0, 4, 5, 6],
-  },
-  {
+    {
     id: 'luxor-sunrise-balloon',
     itinerary: [
       {
@@ -5815,111 +5665,7 @@ Danach geht es klimatisiert zurück durch die Wüste, mit dem ganzen antiken The
     featured: false,
     operatingDays: [1, 2, 4, 5, 6],
   },
-  {
-    id: 'hurghada-artisan-shopping-tour',
-    name: {
-      en: 'Hurghada Old Souq & Spice Shopping Tour',
-      ar: 'جولة تسوق في سوق الغردقة القديم والتوابل',
-      de: 'Hurghada Basar- & Gewürz-Shopping mit Guide',
-    },
-    category: 'shopping',
-    destination: 'Hurghada',
-    images: [heroCoastImg, hurghadaMarinaImg],
-    rating: 4.8,
-    reviewCount: 31,
-    duration: { en: '3 hours', ar: '3 ساعات', de: '3 Stunden' },
-    departureTimes: ['10:00 AM (Morning)', '04:00 PM (Afternoon)', '07:00 PM (Evening)'],
-    price: 22,
-    shortDescription: {
-      en: 'Fixed-price Egyptian cotton workshops, spice merchants, and papyrus artisans with zero pushy commission stops.',
-      ar: 'زيارة ورش القطن المصري وتجار التوابل بأسعار ثابتة بدون أي إجبار أو ضغط للشراء.',
-      de: 'Feste Preise bei ägyptischen Baumwollhändlern und Gewürzmärkten ohne aufdringliche Verkaufsstopps.',
-    },
-    highlights: [
-      {
-        en: 'Trusted fixed-price shops vetted by local Hurghada hosts',
-        ar: 'متاجر بأسعار واضحة ومعتمدة من مضيفين محليين',
-        de: 'Geprüfte Festpreisgeschäfte empfohlen von lokalen Gastgebern',
-      },
-      {
-        en: 'Available in English, German, Arabic, French, and Russian',
-        ar: 'متاحة بالإنجليزية والألمانية والعربية والفرنسية والروسية',
-        de: 'Verfügbar auf Deutsch, Englisch, Arabisch, Französisch & Russisch',
-      },
-    ],
-    included: [
-      { en: 'Hotel pickup & private host', ar: 'التوصيل من الفندق ومضيف خاص', de: 'Hotelabholung & privater Gastgeber' },
-      { en: 'Fresh mint tea at El Dahar market', ar: 'شاي بالنعناع في سوق الدهار', de: 'Frischer Minztee auf dem Markt' },
-    ],
-    pickup: { en: 'All Hurghada hotels', ar: 'جميع فنادق الغردقة', de: 'Alle Hotels in Hurghada' },
-    supplierName: 'Wasla City Hosts',
-    familyFriendly: true,
-    womenFriendly: true,
-    featured: false,
-    operatingDays: [2, 4, 6],
-    languages: ['English', 'German', 'French', 'Russian'],
-  },
-  {
-    id: 'egyptologist-private-guide-multilang',
-    itinerary: [
-      {
-        kind: 'pickup',
-        title: { en: 'Meet your Egyptologist', ar: 'مقابلة عالم المصريات', de: 'Treffen mit Ihrem Ägyptologen' },
-        subtitle: { en: 'Matched to your preferred language and archaeological focus', ar: 'متناسب مع لغتك المفضلة وتركيزك الأثري', de: 'Abgestimmt auf Ihre bevorzugte Sprache und Ihren archäologischen Schwerpunkt' },
-      },
-      {
-        kind: 'stop',
-        title: { en: 'Guided touring', ar: 'جولات إرشادية', de: 'Geführte Besichtigungen' },
-        subtitle: { en: 'The sites on your booked program, at your pace', ar: 'المواقع اللي في برنامج حجزك، وبإيقاعك انت', de: 'Die Orte Ihres gebuchten Programms, in Ihrem Tempo' },
-      },
-      {
-        kind: 'end',
-        title: { en: 'End of the tour', ar: 'نهاية الجولة', de: 'Ende der Tour' },
-      },
-    ],
-    name: {
-      en: 'Private Licensed Egyptologist Guide',
-      ar: 'مرشد سياحي وأثري مصري مرخص بجميع اللغات',
-      de: 'Privater lizenzierter Ägyptologe (alle Sprachen)',
-    },
-    category: 'guides',
-    destination: 'Cairo',
-    images: [luxorHatshepsutImg, luxorValleyKingsImg],
-    rating: 5.0,
-    reviewCount: 57,
-    duration: { en: '8 hours', ar: '8 ساعات', de: '8 Stunden' },
-    departureTimes: ['08:00 AM (Morning)', '01:00 PM (Afternoon)'],
-    price: 65,
-    shortDescription: {
-      en: 'Book a Ministry-licensed Egyptian historian fluent in English, German, French, Dutch, Spanish, Italian, Polish, or Arabic.',
-      ar: 'احجز مرشداً مصرياً مرخصاً يتحدث الإنجليزية أو الألمانية أو الفرنسية أو الإسبانية أو الإيطالية أو الهولندية أو العربية.',
-      de: 'Staatlich geprüfte ägyptische Guides fließend auf Deutsch, Englisch, Französisch, Spanisch, Italienisch, Niederländisch & Arabisch.',
-    },
-    highlights: [
-      {
-        en: 'Matched to your preferred language & archaeological focus',
-        ar: 'تخصيص المرشد حسب لغتك واهتماماتك التاريخية',
-        de: 'Passend zu Ihrer Wunschsprache und Ihren Interessen',
-      },
-      {
-        en: 'Option to combine with a private air-conditioned van',
-        ar: 'إمكانية إضافة سيارة مكيفة خاصة طوال اليوم',
-        de: 'Optional kombinierbar mit privatem klimatisiertem Van',
-      },
-    ],
-    included: [
-      { en: 'Full-day licensed Egyptologist', ar: 'مرشد أثري مرخص ليوم كامل', de: 'Ganztägiger lizenzierter Ägyptologe' },
-      { en: 'Custom museum & temple route plan', ar: 'تخطيط مسار مخصص للمتاحف والمعابد', de: 'Individuelle Routenplanung' },
-    ],
-    pickup: { en: 'Cairo, Giza, Luxor or Hurghada link', ar: 'القاهرة والجيزة والأقصر', de: 'Kairo, Gizeh oder Luxor' },
-    supplierName: 'Nile Horizon Guides',
-    familyFriendly: true,
-    womenFriendly: true,
-    featured: false,
-    operatingDays: [0, 1, 2, 3, 4, 5, 6],
-    languages: ['English', 'German', 'French', 'Dutch', 'Spanish', 'Italian', 'Polish'],
-  },
-];
+    ];
 
 export const MOMENTS: MomentItem[] = [
   {
@@ -6019,7 +5765,6 @@ export const TOP_LINK_COLUMNS: {
       { label: { en: 'Giftun Coral Reefs', ar: 'شعاب الجفتون المرجانية', de: 'Giftun Korallenriffe' }, tripId: 'orange-bay-small-group' },
       { label: { en: 'Sahl Hasheesh Bay', ar: 'خليج سهل حشيش', de: 'Bucht von Sahl Hasheesh' }, tripId: 'sahl-hasheesh-horse-swim' },
       { label: { en: 'El Dahar Old Souq', ar: 'سوق الدهار القديم', de: 'Altstadt-Basar El Dahar' }, tripId: 'hurghada-old-town-marina-walk' },
-      { label: { en: 'Abu Dabbab Bay', ar: 'خليج أبو دباب', de: 'Abu Dabbab Bucht' }, tripId: 'marsa-alam-abu-dabbab-turtles' },
     ],
   },
   {

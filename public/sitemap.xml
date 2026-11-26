@@ -25,9 +25,4 @@
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
-  <url>
-    <loc>https://waslatravel.com/?trip=marsa-alam-abu-dabbab-turtles</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
 </urlset>

@@ -766,19 +766,7 @@ export const INITIAL_TRIP_REVIEWS: TripReviewRecord[] = [
     lang: 'en',
     approvalStatus: 'Approved',
   },
-  {
-    id: 'rev-marsa-1',
-    tripId: 'marsa-alam-abu-dabbab-turtles',
-    tripTitle: 'Marsa Alam Abu Dabbab Reef & Sea Turtles Day',
-    guestName: 'Lukas Weber',
-    guestCountry: 'Austria',
-    rating: 5,
-    comment: 'Swam right beside two green sea turtles in Abu Dabbab walking straight in from the soft sand beach without needing a boat.',
-    visitDate: '2026-11-04',
-    lang: 'en',
-    approvalStatus: 'Approved',
-  },
-  {
+    {
     id: 'rev-cairo-1',
     tripId: 'cairo-pyramids-gem-day',
     tripTitle: 'Giza Pyramids, Sphinx & Grand Egyptian Museum',
@@ -802,18 +790,4 @@ export const INITIAL_TRIP_REVIEWS: TripReviewRecord[] = [
     lang: 'de',
     approvalStatus: 'Approved',
   },
-  {
-    id: 'rev-shopping-1',
-    tripId: 'hurghada-artisan-shopping-tour',
-    bookingId: 'WT-416',
-    verifiedBooking: true,
-    tripTitle: 'Hurghada Old Souq, Cotton & Spice Shopping with Local Host',
-    guestName: 'Lukas Weber',
-    guestCountry: 'Austria',
-    rating: 5,
-    comment: 'Transparent fixed prices in El Dahar souq for pure Egyptian cotton and fresh spices with zero pushy sales stops.',
-    visitDate: '2026-11-10',
-    lang: 'de',
-    approvalStatus: 'Approved',
-  },
-];
+  ];
