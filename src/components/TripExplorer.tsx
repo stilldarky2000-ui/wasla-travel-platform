@@ -23,7 +23,7 @@ import {
   formatTripOperatingDaysLabel,
   formatTripScheduleSummary,
   resolveBundledMediaUrl,
-  tText,
+  tText, tripDisplayName,
 } from '../data/marketplaceData';
 import { shareTripItem } from '../lib/shareTrip';
 import { formatPerGroupUnitLabel, formatTripLockupPrice } from '../lib/tripPricing';
@@ -382,7 +382,7 @@ export const TripExplorer: React.FC<TripExplorerProps> = ({
     }
   };
 
-  const activeName = activeTrip ? tText(activeTrip.name, lang) : '';
+  const activeName = activeTrip ? tripDisplayName(activeTrip, lang) : '';
   const categoryObj = activeTrip ? CATEGORIES.find((c) => c.id === activeTrip.category) : null;
   const categoryLabel = categoryObj
     ? tText(categoryObj.name, lang)
@@ -821,7 +821,7 @@ export const TripExplorer: React.FC<TripExplorerProps> = ({
             {filteredListTrips.map((trip) => {
               const isSelected = activeTrip?.id === trip.id;
               const isFav = favoriteTripIds.includes(trip.id);
-              const tripName = tText(trip.name, lang);
+              const tripName = tripDisplayName(trip, lang);
               return (
                 <div
                   key={trip.id}

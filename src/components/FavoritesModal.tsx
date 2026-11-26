@@ -6,7 +6,7 @@ import {
   CurrencyCode,
   Trip,
   formatCurrencyPrice,
-  tText,
+  tText, tripDisplayName,
 } from '../data/marketplaceData';
 import { shareTripItem } from '../lib/shareTrip';
 import { formatPerGroupUnitLabel, formatTripLockupPrice } from '../lib/tripPricing';
@@ -152,9 +152,9 @@ export const FavoritesModal: React.FC<FavoritesModalProps> = ({
                     <div className="relative aspect-[16/10] w-full overflow-hidden border-b border-[#C8C2B8]/50 dark:border-[#334155]">
                       <SmartImage
                         src={trip.images?.[0]}
-                        alt={tText(trip.name, lang)}
+                        alt={tripDisplayName(trip, lang)}
                         className="h-full w-full object-cover"
-                        placeholderLabel={tText(trip.name, lang)}
+                        placeholderLabel={tripDisplayName(trip, lang)}
                       />
                       <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#0F2233]/90 via-[#0F2233]/35 to-transparent" />
 
@@ -200,7 +200,7 @@ export const FavoritesModal: React.FC<FavoritesModalProps> = ({
                           <span>{trip.destination}</span>
                         </div>
                         <h3 className="font-display text-base sm:text-lg font-semibold leading-snug text-white line-clamp-2">
-                          {tText(trip.name, lang)}
+                          {tripDisplayName(trip, lang)}
                         </h3>
                       </div>
                     </div>

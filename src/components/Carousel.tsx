@@ -7,7 +7,7 @@ import {
   Trip,
   formatCurrencyPrice,
   formatTripScheduleSummary,
-  tText,
+  tText, tripDisplayName,
 } from '../data/marketplaceData';
 import { SmartImage } from './SmartImage';
 import { formatPerGroupUnitLabel, formatTripLockupPrice } from '../lib/tripPricing';
@@ -210,7 +210,7 @@ const HeroSlider: React.FC<HeroCarouselProps> = ({
               <SmartImage
                 src={trip.images?.[0]}
                 fallbackSrc={CATEGORY_FALLBACK_IMAGE[trip.category]}
-                alt={tText(trip.name, lang)}
+                alt={tripDisplayName(trip, lang)}
                 loading="eager"
                 className="h-full w-full"
               />
@@ -230,7 +230,7 @@ const HeroSlider: React.FC<HeroCarouselProps> = ({
                 </div>
 
                 <h3 className="font-display text-2xl sm:text-3xl font-semibold leading-tight text-white text-balance">
-                  {tText(trip.name, lang)}
+                  {tripDisplayName(trip, lang)}
                 </h3>
 
                 <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs sm:text-sm text-[#FFF7ED] tabular-nums">

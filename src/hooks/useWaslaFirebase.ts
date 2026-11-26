@@ -324,6 +324,16 @@ function sanitizeTripForFirestore(trip: Trip, supplierUid?: string): Record<stri
   return stripUndefined({
     id: sanitizeDocId(trip.id, 'trip'),
     name: sanitizeLocalized(trip.name, 160, 'Wasla Red Sea Excursion'),
+    displayName: trip.displayName
+      ? sanitizeLocalized(trip.displayName, 120, '')
+      : undefined,
+    seoTitle: trip.seoTitle
+      ? {
+          en: truncateText(trip.seoTitle.en, 90, ''),
+          de: truncateText(trip.seoTitle.de, 100, ''),
+        }
+      : undefined,
+    slug: trip.slug ? truncateText(trip.slug, 120, '') : undefined,
     category: trip.category,
     destination: trip.destination,
     images: cleanImages,

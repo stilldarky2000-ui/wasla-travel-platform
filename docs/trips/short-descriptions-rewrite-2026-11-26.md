@@ -1,4 +1,4 @@
-# shortDescription rewrites — the lines under the trip title (prepared 2026-11-26, FOR OWNER APPROVAL)
+# shortDescription rewrites — the lines under the trip title (prepared 2026-11-26; EN lines IMPLEMENTED in code 2026-11-26; AR/DE lines still the previous text until the follow-up pass)
 
 Panel spec (3 experts, unanimous, 2026-11-26): ONE sentence, 90-130 chars EN, the trip's single differentiator only, ZERO logistics (no lunch/drinks/stop counts — they live in highlights and itinerary), must pass the swap test (if it reads true under a sibling trip's title, it fails). Expert-finished lines are marked; the rest are Muse drafts written to the same spec for the owner's approval. AR/DE versions follow after EN approval (DE via the native review). The balloon row is HELD with its trip. Nothing in code yet.
 

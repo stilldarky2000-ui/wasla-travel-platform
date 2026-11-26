@@ -50,7 +50,7 @@ import {
   getZoneTransferFeePerPerson,
   getZoneTransferLabel,
   isTripOperatingOnDate,
-  tText,
+  tText, tripDisplayName,
 } from '../data/marketplaceData';
 import {
   SafeStorefrontBookingRef,
@@ -353,7 +353,7 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
     isFixedGroupPrice,
   };
 
-  const title = tText(trip.name, lang);
+  const title = tripDisplayName(trip, lang);
   const formatPrice = (eur: number) => formatCurrencyPrice(eur, currency, currency !== 'EUR');
   const formatLinePrice = (eur: number) => formatCurrencyPrice(eur, currency, false);
   const bookedTitleWithOption = selectedOption
@@ -3197,9 +3197,9 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
                     <div className="relative aspect-[16/10] w-full overflow-hidden bg-[#0F2233]">
                       <SmartImage
                         src={rel.images?.[0]}
-                        alt={tText(rel.name, lang)}
+                        alt={tripDisplayName(rel, lang)}
                         className="h-full w-full group-hover:scale-[1.04] transition-transform duration-300"
-                        placeholderLabel={tText(rel.name, lang)}
+                        placeholderLabel={tripDisplayName(rel, lang)}
                       />
                     </div>
                     <div className="p-3.5 space-y-1">
@@ -3213,7 +3213,7 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
                         )}
                       </div>
                       <p className="text-sm font-semibold text-[#0F2233] line-clamp-2 group-hover:text-[#EE5426] transition-colors">
-                        {tText(rel.name, lang)}
+                        {tripDisplayName(rel, lang)}
                       </p>
                     </div>
                   </div>

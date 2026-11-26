@@ -436,15 +436,6 @@ export default function App() {
         availability: 'https://schema.org/InStock',
         url: `https://waslatravel.com/?trip=${encodeURIComponent(activeDetailTrip.id)}`,
       },
-      ...(activeDetailTrip.reviewCount > 0
-        ? {
-            aggregateRating: {
-              '@type': 'AggregateRating',
-              ratingValue: activeDetailTrip.rating,
-              reviewCount: activeDetailTrip.reviewCount,
-            },
-          }
-        : {}),
     };
 
     const scriptEl =

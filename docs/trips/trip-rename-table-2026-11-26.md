@@ -1,4 +1,4 @@
-# Trip rename table — display names + SEO titles (prepared 2026-11-26, FOR OWNER APPROVAL)
+# Trip rename table — display names + SEO titles (prepared 2026-11-26; IMPLEMENTED in code 2026-11-26, commit pending push; AR/DE display names are Muse renderings pending native German review)
 
 Sources: names panel (4 experts, 2026-11-26) + SEO expert's keyword-researched titles (2026-11-26). Display-name spec: EN hard cap 48 chars, identifier first, ONE differentiator, no colon-tail lists. DE display budget used: ~50 (UX/CRO side of the panel split; the copywriter's 42 cap is recorded as dissent). AR and DE display names are Muse's renderings, flagged for the native German review before launch. The balloon row is prepared but HELD (status unconfirmed). Nothing in code yet; implementation is the displayName field split, landing with PKG-4, plus an Owner Control re-seed.
 

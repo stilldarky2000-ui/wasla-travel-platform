@@ -1,5 +1,5 @@
 import { Lang } from '../data/i18n';
-import { CurrencyCode, Trip, formatCurrencyPrice, tText } from '../data/marketplaceData';
+import { CurrencyCode, Trip, formatCurrencyPrice, tText, tripDisplayName } from '../data/marketplaceData';
 import { sanitizeBookingId } from '../hooks/useBookingReviewVerification';
 
 export type ShareOutcome = 'shared' | 'copied' | 'cancelled';
@@ -55,17 +55,17 @@ export async function shareTripItem(
   lang: Lang,
   currency: CurrencyCode = 'EUR'
 ): Promise<ShareOutcome> {
-  const title = `${tText(trip.name, lang)}, Wasla Travel`;
+  const title = `${tripDisplayName(trip, lang)}, Wasla Travel`;
   const priceText = formatCurrencyPrice(trip.price, currency);
   const shortDesc = tText(trip.shortDescription, lang);
   const shareUrl = buildTripShareUrl(trip.id);
 
   const text =
     lang === 'ar'
-      ? `${tText(trip.name, lang)} (${trip.destination})، ابتداءً من ${priceText} عبر وصلة ترافيل: ${shortDesc}`
+      ? `${tripDisplayName(trip, lang)} (${trip.destination})، ابتداءً من ${priceText} عبر وصلة ترافيل: ${shortDesc}`
       : lang === 'de'
-      ? `${tText(trip.name, lang)} (${trip.destination}), ab ${priceText} bei Wasla Travel: ${shortDesc}`
-      : `${tText(trip.name, lang)} (${trip.destination}), from ${priceText} with Wasla Travel: ${shortDesc}`;
+      ? `${tripDisplayName(trip, lang)} (${trip.destination}), ab ${priceText} bei Wasla Travel: ${shortDesc}`
+      : `${tripDisplayName(trip, lang)} (${trip.destination}), from ${priceText} with Wasla Travel: ${shortDesc}`;
 
   if (typeof navigator !== 'undefined' && typeof navigator.share === 'function') {
     try {

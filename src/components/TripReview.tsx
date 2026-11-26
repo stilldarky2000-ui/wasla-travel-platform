@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 import { doc, serverTimestamp, setDoc } from 'firebase/firestore';
 import { Lang } from '../data/i18n';
-import { Trip, tText } from '../data/marketplaceData';
+import { Trip, tText, tripDisplayName } from '../data/marketplaceData';
 import { INITIAL_BOOKINGS, INITIAL_TRIP_REVIEWS, TripReviewRecord } from '../data/platformData';
 import {
   BookingVerificationStatus,
@@ -448,7 +448,7 @@ export const PostTripReviewModal: React.FC<PostTripReviewModalProps> = ({
       }
 
       const reviewId = `rev-${Date.now()}-${Math.floor(100 + Math.random() * 900)}`;
-      const cleanTripTitle = (tText(trip.name, 'en') || trip.id).trim().slice(0, 240);
+      const cleanTripTitle = (tripDisplayName(trip, 'en') || trip.id).trim().slice(0, 240);
       const safeDate = (visitDate || liveCheck.tripDate || todayIso).slice(0, 20);
 
       const payload: Record<string, unknown> = {
@@ -518,7 +518,7 @@ export const PostTripReviewModal: React.FC<PostTripReviewModalProps> = ({
               <h2 id="post-trip-review-title" className="font-display text-lg font-semibold leading-tight text-white truncate">
                 {copy.formTitle}
               </h2>
-              <p className="text-[11px] text-[#FAF4ED]/90 truncate">{tText(trip.name, lang)}</p>
+              <p className="text-[11px] text-[#FAF4ED]/90 truncate">{tripDisplayName(trip, lang)}</p>
             </div>
           </div>
           <button

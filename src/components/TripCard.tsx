@@ -8,7 +8,7 @@ import {
   Trip,
   formatCurrencyPrice,
   formatTripScheduleSummary,
-  tText,
+  tText, tripDisplayName,
 } from '../data/marketplaceData';
 import { shareTripItem } from '../lib/shareTrip';
 import { formatPerGroupUnitLabel, formatTripLockupPrice } from '../lib/tripPricing';
@@ -129,10 +129,10 @@ export const TripCard: React.FC<TripCardProps> = ({
           <SmartImage
             src={trip.images?.[0]}
             fallbackSrc={CATEGORY_FALLBACK_IMAGE[trip.category]}
-            alt={tText(trip.name, lang)}
+            alt={tripDisplayName(trip, lang)}
             loading="eager"
             className="h-full w-full group-hover:scale-[1.04] transition-transform duration-500 ease-out"
-            placeholderLabel={tText(trip.name, lang)}
+            placeholderLabel={tripDisplayName(trip, lang)}
           />
 
           {/* Top-Start Subtle Category Label */}
@@ -223,7 +223,7 @@ export const TripCard: React.FC<TripCardProps> = ({
           </div>
 
           <h3 className="text-[15.5px] font-semibold tracking-[-0.01em] text-[#0F2233] leading-snug line-clamp-2 group-hover:text-[#EE5426] transition-colors">
-            {tText(trip.name, lang)}
+            {tripDisplayName(trip, lang)}
           </h3>
 
           {cardHighlights.length > 0 && (
