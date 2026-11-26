@@ -22,7 +22,6 @@ import {
   formatCurrencyPrice,
   formatTripOperatingDaysLabel,
   formatTripScheduleSummary,
-  resolveBundledMediaUrl,
   tText, tripDisplayName,
 } from '../data/marketplaceData';
 import { shareTripItem } from '../lib/shareTrip';
@@ -230,30 +229,6 @@ export const TripExplorer: React.FC<TripExplorerProps> = ({
   };
   const touchStartX = useRef<number | null>(null);
   const listRef = useRef<HTMLDivElement | null>(null);
-  const preloadedTripsRef = useRef<Map<string, HTMLImageElement[]>>(new Map());
-
-  useEffect(() => {
-    if (!activeTrip || activeTrip.images.length === 0) return;
-    if (preloadedTripsRef.current.has(activeTrip.id)) return;
-    const preloaded: HTMLImageElement[] = [];
-    for (const rawUrl of activeTrip.images) {
-      if (!rawUrl || !rawUrl.trim()) continue;
-      const resolvedUrl = resolveBundledMediaUrl(rawUrl);
-      if (!resolvedUrl) continue;
-      const img = new window.Image();
-      img.decoding = 'async';
-      img.referrerPolicy = 'no-referrer';
-      img.src = resolvedUrl;
-      preloaded.push(img);
-    }
-    preloadedTripsRef.current.set(activeTrip.id, preloaded);
-  }, [activeTrip]);
-
-  useEffect(() => {
-    return () => {
-      preloadedTripsRef.current.clear();
-    };
-  }, []);
 
   const resetLocalFilters = () => {
     setQuickFilter('all');
@@ -425,7 +400,7 @@ export const TripExplorer: React.FC<TripExplorerProps> = ({
                 <SmartImage
                   src={currentImg}
                   alt={activeName}
-                  loading="eager"
+                  loading="lazy"
                   className="h-full w-full"
                   placeholderLabel={activeName}
                 />
@@ -844,6 +819,7 @@ export const TripExplorer: React.FC<TripExplorerProps> = ({
                     <SmartImage
                       src={trip.images[0]}
                       alt={tripName}
+                      loading="lazy"
                       className="h-full w-full"
                       placeholderLabel={trip.destination}
                     />

@@ -1,5 +1,5 @@
 import { createBookingReference } from './lib/bookingReference';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Bell,
   Briefcase,
@@ -337,7 +337,7 @@ export default function App() {
   const [newsletterEmail, setNewsletterEmail] = useState('');
   const [newsletterConfirmed, setNewsletterConfirmed] = useState(false);
   const [lastSubscribedEmail, setLastSubscribedEmail] = useState('');
-  const [heroScrollY, setHeroScrollY] = useState(0);
+  const heroParallaxRef = useRef<HTMLDivElement | null>(null);
   const [touristPreviewOnly, setTouristPreviewOnly] = useState(false);
   const [policiesOpen, setPoliciesOpen] = useState(false);
   const [policiesTab, setPoliciesTab] = useState<LegalPolicyTab>('terms');
@@ -616,13 +616,47 @@ export default function App() {
   }, [lang, isRtl, workspace]);
 
   useEffect(() => {
-    const prefersReduced =
-      typeof window !== 'undefined' &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (typeof window === 'undefined') return;
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (prefersReduced) return;
-    const onScroll = () => setHeroScrollY(Math.min(window.scrollY, 500));
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
+
+    const desktopQuery = window.matchMedia('(min-width: 1024px)');
+    let rafId = 0;
+
+    const applyTransform = () => {
+      rafId = 0;
+      const el = heroParallaxRef.current;
+      if (!el) return;
+      if (!desktopQuery.matches) {
+        el.style.transform = '';
+        return;
+      }
+      const clampedY = Math.min(window.scrollY, 500);
+      el.style.transform = `translate3d(0, ${clampedY * 0.16}px, 0) scale(1.06)`;
+    };
+
+    const schedule = () => {
+      if (!desktopQuery.matches || rafId !== 0) return;
+      rafId = window.requestAnimationFrame(applyTransform);
+    };
+
+    const handleBreakpointChange = () => {
+      if (rafId !== 0) {
+        window.cancelAnimationFrame(rafId);
+        rafId = 0;
+      }
+      applyTransform();
+    };
+
+    applyTransform();
+    window.addEventListener('scroll', schedule, { passive: true });
+    desktopQuery.addEventListener('change', handleBreakpointChange);
+
+    return () => {
+      window.removeEventListener('scroll', schedule);
+      desktopQuery.removeEventListener('change', handleBreakpointChange);
+      if (rafId !== 0) window.cancelAnimationFrame(rafId);
+    };
   }, []);
 
   const pausedSupplierNames = useMemo(
@@ -1669,8 +1703,8 @@ export default function App() {
               {/* Image zone: photo + neutral scrim + eyebrow/headline only */}
               <div className="relative overflow-hidden text-white">
                 <div
-                  className="absolute inset-0 will-change-transform"
-                  style={{ transform: `translate3d(0, ${heroScrollY * 0.16}px, 0) scale(1.06)` }}
+                  ref={heroParallaxRef}
+                  className="absolute inset-0 lg:will-change-transform"
                 >
                   <img
                     src={
@@ -1679,6 +1713,9 @@ export default function App() {
                         : SITE_CONFIG.heroBackground
                     }
                     alt="Red Sea coastline in Hurghada"
+                    loading="eager"
+                    fetchPriority="high"
+                    decoding="async"
                     onError={(e) => {
                       if (e.currentTarget.src !== SITE_CONFIG.heroBackground) {
                         e.currentTarget.src = SITE_CONFIG.heroBackground;
@@ -2089,12 +2126,12 @@ export default function App() {
                           }}
                           className={`snap-start shrink-0 inline-flex min-h-[36px] items-center gap-1.5 rounded-lg border px-3.5 py-1.5 text-xs font-semibold active:scale-95 transition-all whitespace-nowrap cursor-pointer ${
                             active
-                              ? 'border-[#0F2233] bg-[#0F2233] text-white'
+                              ? 'border-[#0F2233] bg-[#0F2233] text-white dark:border-white dark:bg-white dark:text-[#0F2233]'
                               : 'border-[#E2E8F0] bg-white text-[#0F2233] hover:border-[#0F2233]/40 hover:bg-white'
                           }`}
                         >
                           <MapPin
-                            className={`h-3.5 w-3.5 shrink-0 ${active ? 'text-[#FDBA74]' : 'text-[#EE5426]'}`}
+                            className={`h-3.5 w-3.5 shrink-0 ${active ? 'text-[#FDBA74] dark:text-[#EE5426]' : 'text-[#EE5426]'}`}
                             aria-hidden="true"
                           />
                           <span>{item.label}</span>
@@ -2265,7 +2302,7 @@ export default function App() {
                           src={cat.image}
                           fallbackSrc={CATEGORY_FALLBACK_IMAGE[cat.id]}
                           alt={catTitle}
-                          loading="eager"
+                          loading="lazy"
                           className="h-full w-full group-hover:scale-[1.06] transition-transform duration-500 ease-out"
                           placeholderLabel={catTitle}
                         />

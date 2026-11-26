@@ -18,7 +18,7 @@ export const SmartImage: React.FC<SmartImageProps> = ({
   fallbackSrc,
   alt,
   className = '',
-  loading = 'eager',
+  loading = 'lazy',
   sizes,
   placeholderLabel,
 }) => {

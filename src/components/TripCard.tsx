@@ -130,7 +130,7 @@ export const TripCard: React.FC<TripCardProps> = ({
             src={trip.images?.[0]}
             fallbackSrc={CATEGORY_FALLBACK_IMAGE[trip.category]}
             alt={tripDisplayName(trip, lang)}
-            loading="eager"
+            loading="lazy"
             className="h-full w-full group-hover:scale-[1.04] transition-transform duration-500 ease-out"
             placeholderLabel={tripDisplayName(trip, lang)}
           />
@@ -191,19 +191,18 @@ export const TripCard: React.FC<TripCardProps> = ({
             )}
           </div>
 
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-18 bg-gradient-to-t from-[#0F2233]/82 via-[#0F2233]/28 to-transparent" />
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 px-3.5 pb-2.5 pt-4 text-white">
-            <div className="flex items-center justify-between gap-2 text-[11.5px] text-white/95 tabular-nums">
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 px-2.5 pb-2.5 text-white">
+            <div className="flex items-center justify-between gap-2 text-[11px] text-white tabular-nums">
               {hasVisibleRating ? (
-                <span className="inline-flex items-center gap-1 font-semibold text-white">
-                  <Star className="h-3.5 w-3.5 fill-[#F59E0B] text-[#F59E0B]" aria-hidden="true" />
+                <span className="inline-flex items-center gap-1 rounded-md bg-black/55 px-2 py-0.5 font-semibold text-white backdrop-blur-xs">
+                  <Star className="h-3 w-3 fill-[#F59E0B] text-[#F59E0B]" aria-hidden="true" />
                   {safeRating}
-                  <span className="font-normal text-white/75">({trip.reviewCount})</span>
+                  <span className="font-normal text-white/80">({trip.reviewCount})</span>
                 </span>
               ) : (
                 <span />
               )}
-              <span className="inline-flex items-center gap-1 text-white/95 truncate">
+              <span className="inline-flex items-center gap-1 rounded-md bg-black/55 px-2 py-0.5 font-medium text-white backdrop-blur-xs max-w-[70%]">
                 <MapPin className="h-3 w-3 text-[#FDBA74] shrink-0" aria-hidden="true" />
                 <span className="truncate">{trip.destination}</span>
               </span>

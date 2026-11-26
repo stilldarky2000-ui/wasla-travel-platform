@@ -839,7 +839,6 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
                   className="h-full w-full"
                   placeholderLabel={title}
                 />
-                <div className="pointer-events-none absolute inset-x-0 bottom-0 h-44 bg-gradient-to-t from-[#1C1008]/92 via-[#1C1008]/50 to-transparent" />
 
                 {/* Prev / Next Gallery Arrows */}
                 {galleryImages.length > 1 && (
@@ -878,17 +877,6 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
                       {safeImgIdx + 1} / {galleryImages.length}
                     </span>
                   </button>
-                </div>
-
-                <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 px-4 sm:px-5 pb-3.5 pt-6 text-white">
-                  <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-[#FFF7ED]">
-                    <span className="text-[#FED7AA] truncate max-w-[460px]">
-                      {getCaptionForImage(safeImgIdx)}
-                    </span>
-                    <span className="text-[11px] font-medium text-white/90 shrink-0">
-                      {operatingDaysLabel}
-                    </span>
-                  </div>
                 </div>
               </div>
 
@@ -3198,6 +3186,7 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
                       <SmartImage
                         src={rel.images?.[0]}
                         alt={tripDisplayName(rel, lang)}
+                        loading="lazy"
                         className="h-full w-full group-hover:scale-[1.04] transition-transform duration-300"
                         placeholderLabel={tripDisplayName(rel, lang)}
                       />
@@ -3350,6 +3339,7 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
                   <SmartImage
                     src={imgUrl}
                     alt={getCaptionForImage(idx)}
+                    loading={idx === safeImgIdx ? 'eager' : 'lazy'}
                     className="h-full w-full"
                     placeholderLabel={`${idx + 1}`}
                   />

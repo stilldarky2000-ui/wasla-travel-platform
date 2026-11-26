@@ -211,7 +211,7 @@ const HeroSlider: React.FC<HeroCarouselProps> = ({
                 src={trip.images?.[0]}
                 fallbackSrc={CATEGORY_FALLBACK_IMAGE[trip.category]}
                 alt={tripDisplayName(trip, lang)}
-                loading="eager"
+                loading="lazy"
                 className="h-full w-full"
               />
             </div>
