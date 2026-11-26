@@ -163,18 +163,38 @@ service cloud.firestore {
           'createdAt', 'updatedAt'
         ])
         && data.keys().hasOnly([
-          'id', 'name', 'category', 'destination', 'images', 'galleryCaptions', 'rating', 'reviewCount',
+          'id', 'name', 'displayName', 'seoTitle', 'slug', 'category', 'destination', 'images', 'galleryCaptions', 'rating', 'reviewCount',
           'duration', 'departureTimes', 'timingNote', 'price', 'options', 'shortDescription', 'fullDescription',
           'itinerary', 'historicalFacts', 'highlights', 'included', 'tips', 'notSuitableFor', 'meetingPoint', 'meetingPointUrl',
-          'whatToBring', 'notAllowed', 'knowBeforeYouGo', 'outerTransferEnabled', 'pickup',
+          'whatToBring', 'notAllowed', 'knowBeforeYouGo', 'outerTransferEnabled', 'freeTransferZones', 'pricingMode', 'maxGuests', 'pickup',
           'supplierName', 'supplierUid', 'approvalStatus', 'familyFriendly', 'womenFriendly',
-          'minChildAge', 'kidsDiscount', 'featured', 'languages',
+          'minChildAge', 'kidsDiscount', 'childPriceEur', 'childDiscountPercent', 'featured', 'languages',
           'operatingDays', 'availableFrom', 'availableTo', 'createdAt', 'updatedAt'
         ])
         && data.id is string && data.id.size() >= 1 && data.id.size() <= 128
         && data.name is map && data.name.en is string && data.name.en.size() >= 1 && data.name.en.size() <= 160
         && data.name.ar is string && data.name.ar.size() >= 1 && data.name.ar.size() <= 160
         && data.name.de is string && data.name.de.size() >= 1 && data.name.de.size() <= 160
+        && (
+          !('displayName' in data)
+          || (
+            data.displayName is map
+            && data.displayName.en is string && data.displayName.en.size() <= 120
+            && data.displayName.ar is string && data.displayName.ar.size() <= 120
+            && data.displayName.de is string && data.displayName.de.size() <= 120
+          )
+        )
+        && (
+          !('seoTitle' in data)
+          || (
+            data.seoTitle is map
+            && data.seoTitle.keys().hasOnly(['en', 'de', 'ar'])
+            && data.seoTitle.en is string && data.seoTitle.en.size() <= 120
+            && data.seoTitle.de is string && data.seoTitle.de.size() <= 120
+            && (!('ar' in data.seoTitle) || (data.seoTitle.ar is string && data.seoTitle.ar.size() <= 120))
+          )
+        )
+        && (!('slug' in data) || (data.slug is string && data.slug.size() <= 120))
         && data.category in ['sea', 'desert', 'historical', 'horse', 'city', 'shopping', 'guides', 'transfers']
         && data.destination in ['Hurghada', 'Marsa Alam', 'Luxor', 'Cairo']
         && data.images is list && data.images.size() >= 0 && data.images.size() <= 8
@@ -217,6 +237,20 @@ service cloud.firestore {
         && (!('notAllowed' in data) || (data.notAllowed is list && data.notAllowed.size() <= 15))
         && (!('knowBeforeYouGo' in data) || (data.knowBeforeYouGo is list && data.knowBeforeYouGo.size() <= 15))
         && (!('outerTransferEnabled' in data) || data.outerTransferEnabled is bool)
+        && (
+          !('freeTransferZones' in data)
+          || (
+            data.freeTransferZones is list
+            && data.freeTransferZones.size() <= 10
+            && (data.freeTransferZones.size() == 0 || (data.freeTransferZones[0] is string && data.freeTransferZones[0].size() <= 40))
+          )
+        )
+        && (!('pricingMode' in data) || data.pricingMode in ['per-person', 'per-group'])
+        && (
+          !('maxGuests' in data)
+          || (data.maxGuests is int && data.maxGuests >= 1 && data.maxGuests <= 100)
+          || (data.maxGuests is float && data.maxGuests >= 1.0 && data.maxGuests <= 100.0)
+        )
         && data.pickup is map && data.pickup.en is string && data.pickup.en.size() >= 1 && data.pickup.en.size() <= 160
         && data.supplierName is string && data.supplierName.size() >= 2 && data.supplierName.size() <= 120
         && (!('supplierUid' in data) || (data.supplierUid is string && data.supplierUid.size() <= 128))
@@ -229,6 +263,16 @@ service cloud.firestore {
           || (data.minChildAge is float && data.minChildAge >= 0.0 && data.minChildAge <= 18.0)
         )
         && (!('kidsDiscount' in data) || (data.kidsDiscount is map && data.kidsDiscount.en is string && data.kidsDiscount.en.size() <= 160))
+        && (
+          !('childPriceEur' in data)
+          || (data.childPriceEur is int && data.childPriceEur >= 0 && data.childPriceEur <= 50000)
+          || (data.childPriceEur is float && data.childPriceEur >= 0.0 && data.childPriceEur <= 50000.0)
+        )
+        && (
+          !('childDiscountPercent' in data)
+          || (data.childDiscountPercent is int && data.childDiscountPercent >= 0 && data.childDiscountPercent <= 100)
+          || (data.childDiscountPercent is float && data.childDiscountPercent >= 0.0 && data.childDiscountPercent <= 100.0)
+        )
         && data.featured is bool
         && (!('languages' in data) || (data.languages is list && data.languages.size() <= 12))
         && (

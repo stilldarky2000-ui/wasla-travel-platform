@@ -321,19 +321,59 @@ function sanitizeTripForFirestore(trip: Trip, supplierUid?: string): Record<stri
       ? trip.availableTo.trim()
       : undefined;
 
+  const cleanDisplayName =
+    trip.displayName &&
+    (trip.displayName.en?.trim() || trip.displayName.ar?.trim() || trip.displayName.de?.trim())
+      ? sanitizeLocalized(trip.displayName, 120, '')
+      : undefined;
+
+  const cleanSeoTitle =
+    trip.seoTitle && (trip.seoTitle.en?.trim() || trip.seoTitle.de?.trim())
+      ? {
+          en: truncateText(trip.seoTitle.en, 120, ''),
+          de: truncateText(trip.seoTitle.de, 120, ''),
+        }
+      : undefined;
+
+  const cleanSlug =
+    typeof trip.slug === 'string' && trip.slug.trim().length > 0
+      ? truncateText(trip.slug, 120, '')
+      : undefined;
+
+  const cleanFreeTransferZones =
+    Array.isArray(trip.freeTransferZones) && trip.freeTransferZones.length > 0
+      ? trip.freeTransferZones
+          .map((z) => truncateText(z, 40, ''))
+          .filter((z) => z.length > 0)
+          .slice(0, 10)
+      : undefined;
+
+  const cleanPricingMode =
+    trip.pricingMode === 'per-person' || trip.pricingMode === 'per-group'
+      ? trip.pricingMode
+      : undefined;
+
+  const safeMaxGuests =
+    trip.maxGuests !== undefined && Number.isFinite(Number(trip.maxGuests)) && Number(trip.maxGuests) >= 1
+      ? clampNumber(trip.maxGuests, 1, 100, 6)
+      : undefined;
+
+  const safeChildPriceEur =
+    trip.childPriceEur !== undefined && Number.isFinite(Number(trip.childPriceEur))
+      ? clampNumber(trip.childPriceEur, 0, 50000, 0)
+      : undefined;
+
+  const safeChildDiscountPercent =
+    trip.childDiscountPercent !== undefined && Number.isFinite(Number(trip.childDiscountPercent))
+      ? clampNumber(trip.childDiscountPercent, 0, 100, 50)
+      : undefined;
+
   return stripUndefined({
     id: sanitizeDocId(trip.id, 'trip'),
     name: sanitizeLocalized(trip.name, 160, 'Wasla Red Sea Excursion'),
-    displayName: trip.displayName
-      ? sanitizeLocalized(trip.displayName, 120, '')
-      : undefined,
-    seoTitle: trip.seoTitle
-      ? {
-          en: truncateText(trip.seoTitle.en, 90, ''),
-          de: truncateText(trip.seoTitle.de, 100, ''),
-        }
-      : undefined,
-    slug: trip.slug ? truncateText(trip.slug, 120, '') : undefined,
+    displayName: cleanDisplayName,
+    seoTitle: cleanSeoTitle,
+    slug: cleanSlug,
     category: trip.category,
     destination: trip.destination,
     images: cleanImages,
@@ -368,6 +408,10 @@ function sanitizeTripForFirestore(trip: Trip, supplierUid?: string): Record<stri
     knowBeforeYouGo: cleanKnowBefore && cleanKnowBefore.length > 0 ? cleanKnowBefore : undefined,
     outerTransferEnabled:
       trip.outerTransferEnabled !== undefined ? Boolean(trip.outerTransferEnabled) : undefined,
+    freeTransferZones:
+      cleanFreeTransferZones && cleanFreeTransferZones.length > 0 ? cleanFreeTransferZones : undefined,
+    pricingMode: cleanPricingMode,
+    maxGuests: safeMaxGuests,
     pickup: sanitizeLocalized(trip.pickup, 160, 'Hurghada hotels'),
     supplierName: safeSupplierName,
     supplierUid: safeSupplierUid,
@@ -378,6 +422,8 @@ function sanitizeTripForFirestore(trip: Trip, supplierUid?: string): Record<stri
     kidsDiscount: trip.kidsDiscount
       ? sanitizeLocalized(trip.kidsDiscount, 160, 'Child discount available')
       : undefined,
+    childPriceEur: safeChildPriceEur,
+    childDiscountPercent: safeChildDiscountPercent,
     featured: Boolean(trip.featured),
     languages: trip.languages
       ?.map((l) => truncateText(l, 40, ''))
@@ -2150,11 +2196,46 @@ export function useWaslaFirebase() {
         const snap = await getDoc(ref);
         if (snap.exists()) {
           const existingData = snap.data() as Record<string, unknown>;
+          const supplierAllowedKeys = new Set<string>([
+            'name',
+            'duration',
+            'departureTimes',
+            'timingNote',
+            'price',
+            'options',
+            'shortDescription',
+            'fullDescription',
+            'itinerary',
+            'historicalFacts',
+            'highlights',
+            'included',
+            'tips',
+            'notSuitableFor',
+            'meetingPoint',
+            'meetingPointUrl',
+            'whatToBring',
+            'notAllowed',
+            'knowBeforeYouGo',
+            'outerTransferEnabled',
+            'pickup',
+            'images',
+            'galleryCaptions',
+            'operatingDays',
+            'availableFrom',
+            'availableTo',
+            'approvalStatus',
+          ]);
           const optionalTripFields = [
+            'displayName',
+            'seoTitle',
+            'slug',
+            'galleryCaptions',
             'departureTimes',
             'timingNote',
             'options',
             'fullDescription',
+            'itinerary',
+            'historicalFacts',
             'tips',
             'notSuitableFor',
             'meetingPoint',
@@ -2164,15 +2245,30 @@ export function useWaslaFirebase() {
             'knowBeforeYouGo',
             'minChildAge',
             'kidsDiscount',
+            'childPriceEur',
+            'childDiscountPercent',
             'languages',
             'outerTransferEnabled',
+            'freeTransferZones',
+            'pricingMode',
+            'maxGuests',
+            'operatingDays',
+            'availableFrom',
+            'availableTo',
           ] as const;
+          const baseFields: Record<string, unknown> =
+            effectiveRole === 'supplier'
+              ? Object.fromEntries(
+                  Object.entries(sanitized).filter(([key]) => supplierAllowedKeys.has(key))
+                )
+              : sanitized;
           const updatePayload: Record<string, unknown> = {
-            ...sanitized,
+            ...baseFields,
             updatedAt: serverTimestamp(),
           };
           for (const field of optionalTripFields) {
-            if (!(field in sanitized) && field in existingData) {
+            if (effectiveRole === 'supplier' && !supplierAllowedKeys.has(field)) continue;
+            if (!(field in baseFields) && field in existingData) {
               updatePayload[field] = deleteField();
             }
           }
@@ -2188,7 +2284,7 @@ export function useWaslaFirebase() {
         handleFirestoreError(err, OperationType.UPDATE, `trips/${tripId}`);
       }
     },
-    []
+    [effectiveRole]
   );
 
   const deleteTripInDb = useCallback(async (tripId: string) => {
