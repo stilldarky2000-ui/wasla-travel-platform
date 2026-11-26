@@ -1,6 +1,5 @@
 import React from 'react';
 import {
-  Camera,
   CalendarCheck,
   CheckCircle2,
   Compass,
@@ -218,7 +217,7 @@ export const HowItWorksSection: React.FC<HowItWorksSectionProps> = ({
         </div>
       </div>
 
-      {/* Compact Bespoke Itinerary, Private Guide & Photography Strip */}
+      {/* Compact Custom Trip Strip */}
       <div className="card-wasla bg-[#FAF4ED] dark:bg-[#19354F]/70 border-[#EE5426]/30 px-5 py-5 sm:px-7 sm:py-6 flex flex-col lg:flex-row lg:items-center justify-between gap-5">
         <div className="space-y-1.5 max-w-2xl">
           <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-xs font-semibold text-[#EE5426]">
@@ -226,10 +225,6 @@ export const HowItWorksSection: React.FC<HowItWorksSectionProps> = ({
               <Compass className="h-3.5 w-3.5" aria-hidden="true" />
               <span>{t.footerAddonEyebrow}</span>
             </span>
-            <span aria-hidden="true" className="text-[#C8C2B8]">·</span>
-            <span>{t.footerGuideTitle}</span>
-            <span aria-hidden="true" className="text-[#C8C2B8]">·</span>
-            <span>{t.footerPhotoTitle}</span>
           </div>
           <h3 className="font-display text-lg sm:text-xl font-semibold text-[#0F2233] leading-snug">
             {t.footerAddonTitle}
@@ -237,9 +232,19 @@ export const HowItWorksSection: React.FC<HowItWorksSectionProps> = ({
           <p className="text-xs sm:text-sm leading-relaxed text-[#64748B]">
             {tText(
               {
-                en: 'Planning a private family boat, multi-city Nile route, licensed Egyptologist in your language, or coastal photographer? Tell us your dates and we prepare a custom quote.',
-                ar: 'تخطط لقارب عائلي خاص، برنامج متعدد المدن، مرشد أثري بلغتك، أو جلسة تصوير على البحر الأحمر؟ أرسل لنا تفاصيلك وسنجهز لك عرض سعر مخصص.',
-                de: 'Privates Familienboot, individuelle Nil-Route, lizenzierter Guide in Ihrer Sprache oder Fotoshooting? Teilen Sie uns Ihre Wünsche für ein maßgeschneidertes Angebot mit.',
+                en: 'A private boat just for your family, a route that links Luxor and Cairo, or a day built around your group: tell us your dates and what you have in mind, and we will put together a plan and a price for you personally.',
+                ar: 'مركب خاص لعيلتك بس، أو مسار يربط الأقصر والقاهرة، أو يوم متفصل على مجموعتك: قولنا تواريخك وفكرتك وهنجهز لك خطة وسعر بنفسنا.',
+                de: 'Ein privates Boot nur für Ihre Familie, eine Route, die Luxor und Kairo verbindet, oder ein Tag ganz nach den Wünschen Ihrer Gruppe: Nennen Sie uns Ihre Daten und Ihre Idee, und wir stellen Ihnen persönlich einen Plan und einen Preis zusammen.',
+              },
+              lang
+            )}
+          </p>
+          <p className="text-xs leading-relaxed text-[#64748B]">
+            {tText(
+              {
+                en: 'Guides are part of our trips, in English, German, French, Spanish or Italian. They are not a separate booking.',
+                ar: 'المرشدين جزء من رحلاتنا، بالإنجليزي والألماني والفرنساوي والإسباني والإيطالي، ومش حجز منفصل.',
+                de: 'Reiseleiter gehören bei uns zu jeder Tour, auf Englisch, Deutsch, Französisch, Spanisch oder Italienisch. Sie sind nicht separat buchbar.',
               },
               lang
             )}
@@ -249,18 +254,10 @@ export const HowItWorksSection: React.FC<HowItWorksSectionProps> = ({
         <div className="flex flex-wrap items-center gap-2.5 shrink-0">
           <button
             type="button"
-            onClick={() => onOpenCustomTrip(['Photography Session', 'Professional Egyptian Guide'])}
-            className="btn-wasla-outline min-h-[42px] gap-1.5 rounded-lg bg-white dark:bg-[#0F2233] px-4 py-2 text-xs whitespace-nowrap cursor-pointer"
-          >
-            <Camera className="h-3.5 w-3.5 text-[#EE5426]" aria-hidden="true" />
-            <span>{t.footerAddonCta}</span>
-          </button>
-          <button
-            type="button"
             onClick={() => onOpenCustomTrip(undefined)}
             className="btn-wasla-primary min-h-[42px] gap-1.5 rounded-lg px-5 py-2 text-xs whitespace-nowrap cursor-pointer"
           >
-            <span>{t.quickJumpCustom}</span>
+            <span>{t.footerAddonCta}</span>
           </button>
         </div>
       </div>
