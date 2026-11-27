@@ -3,6 +3,18 @@ import { ImageOff } from 'lucide-react';
 import fallbackCoastImg from '../assets/images/hero_red_sea_coast_1794609167890.jpg';
 import { resolveBundledMediaUrl } from '../data/marketplaceData';
 
+const preloadedImageUrls = new Set<string>();
+
+export function preloadImageUrl(rawUrl?: string | null): void {
+  if (typeof window === 'undefined' || !rawUrl || !rawUrl.trim()) return;
+  const resolved = resolveBundledMediaUrl(rawUrl);
+  if (!resolved || preloadedImageUrls.has(resolved)) return;
+  preloadedImageUrls.add(resolved);
+  const img = new Image();
+  img.decoding = 'async';
+  img.src = resolved;
+}
+
 interface SmartImageProps {
   src?: string;
   fallbackSrc?: string;

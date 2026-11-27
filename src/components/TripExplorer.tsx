@@ -26,7 +26,7 @@ import {
 } from '../data/marketplaceData';
 import { shareTripItem } from '../lib/shareTrip';
 import { formatPerGroupUnitLabel, formatTripLockupPrice } from '../lib/tripPricing';
-import { SmartImage } from './SmartImage';
+import { SmartImage, preloadImageUrl } from './SmartImage';
 
 type ExplorerSort = 'featured' | 'price-asc' | 'price-desc' | 'rating-desc';
 
@@ -341,6 +341,16 @@ export const TripExplorer: React.FC<TripExplorerProps> = ({
   const currentImg = images[imageIndex] ?? images[0] ?? '';
   const prevImage = () => setImageIndex((i) => (i - 1 + images.length) % images.length);
   const nextImage = () => setImageIndex((i) => (i + 1) % images.length);
+
+  useEffect(() => {
+    if (images.length <= 1) return;
+    const nextIdx = (imageIndex + 1) % images.length;
+    const prevIdx = (imageIndex - 1 + images.length) % images.length;
+    preloadImageUrl(images[nextIdx]);
+    if (prevIdx !== nextIdx) {
+      preloadImageUrl(images[prevIdx]);
+    }
+  }, [images, imageIndex]);
 
   const handleTouchStart = (e: React.TouchEvent) => {
     touchStartX.current = e.touches[0].clientX;

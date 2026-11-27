@@ -60,7 +60,7 @@ import {
 import { detectGuestCountry } from '../lib/nationalityDetect';
 import { printWaslaBoardingVoucher } from '../lib/printVoucher';
 import { shareTripItem } from '../lib/shareTrip';
-import { SmartImage } from './SmartImage';
+import { SmartImage, preloadImageUrl } from './SmartImage';
 import { TripReview } from './TripReview';
 import { WaslaBrandMark } from './WaslaBrandMark';
 import { WaslaHotelMapPicker } from './WaslaHotelMapPicker';
@@ -224,6 +224,7 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
 
   const pageTopRef = useRef<HTMLDivElement | null>(null);
   const confirmedCardRef = useRef<HTMLDivElement | null>(null);
+  const galleryTouchStartX = useRef<number | null>(null);
 
   const galleryImages = Array.isArray(trip.images) && trip.images.length > 0 ? trip.images : [''];
   const safeImgIdx = activeImageIndex < galleryImages.length ? activeImageIndex : 0;
@@ -276,6 +277,38 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
     window.addEventListener('keydown', handleKey, true);
     return () => window.removeEventListener('keydown', handleKey, true);
   }, [lightboxOpen, galleryImages.length]);
+
+  // Preload only adjacent (next/prev) gallery images for instant navigation without bulk download
+  useEffect(() => {
+    if (galleryImages.length <= 1) return;
+    const nextIdx = (safeImgIdx + 1) % galleryImages.length;
+    const prevIdx = (safeImgIdx - 1 + galleryImages.length) % galleryImages.length;
+    preloadImageUrl(galleryImages[nextIdx]);
+    if (prevIdx !== nextIdx) {
+      preloadImageUrl(galleryImages[prevIdx]);
+    }
+  }, [galleryImages, safeImgIdx]);
+
+  const handleGalleryTouchStart = (e: React.TouchEvent) => {
+    galleryTouchStartX.current = e.touches[0]?.clientX ?? null;
+  };
+  const handleGalleryTouchEnd = (e: React.TouchEvent) => {
+    if (galleryTouchStartX.current === null || galleryImages.length <= 1) return;
+    const endX = e.changedTouches[0]?.clientX;
+    if (typeof endX !== 'number') {
+      galleryTouchStartX.current = null;
+      return;
+    }
+    const delta = endX - galleryTouchStartX.current;
+    galleryTouchStartX.current = null;
+    if (Math.abs(delta) < 35) return;
+    const goNext = lang === 'ar' ? delta > 0 : delta < 0;
+    setActiveImageIndex((prev) =>
+      goNext
+        ? (prev + 1) % galleryImages.length
+        : (prev - 1 + galleryImages.length) % galleryImages.length
+    );
+  };
 
   const hasOuterZoneTransfer =
     trip.outerTransferEnabled === false
@@ -831,7 +864,11 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
                 </p>
               </div>
 
-<div className="group relative aspect-[16/10] w-full overflow-hidden rounded-xl border border-[#C8C2B8]/60 bg-[#0F2233]">
+<div
+                className="group relative aspect-[16/10] w-full overflow-hidden rounded-xl border border-[#C8C2B8]/60 bg-[#0F2233]"
+                onTouchStart={handleGalleryTouchStart}
+                onTouchEnd={handleGalleryTouchEnd}
+              >
                 <SmartImage
                   src={galleryImages[safeImgIdx]}
                   alt={getCaptionForImage(safeImgIdx)}
@@ -3284,7 +3321,11 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
             className="relative mx-auto my-4 flex w-full max-w-[1140px] flex-1 items-center justify-center overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="relative aspect-[16/10] w-full max-h-[72vh] overflow-hidden rounded-2xl border border-white/20 bg-black">
+            <div
+              className="relative aspect-[16/10] w-full max-h-[72vh] overflow-hidden rounded-2xl border border-white/20 bg-black"
+              onTouchStart={handleGalleryTouchStart}
+              onTouchEnd={handleGalleryTouchEnd}
+            >
               <SmartImage
                 src={galleryImages[safeImgIdx]}
                 alt={getCaptionForImage(safeImgIdx)}
