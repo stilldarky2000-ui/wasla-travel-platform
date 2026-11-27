@@ -230,6 +230,18 @@ export const TripExplorer: React.FC<TripExplorerProps> = ({
   const touchStartX = useRef<number | null>(null);
   const listRef = useRef<HTMLDivElement | null>(null);
 
+  const images = activeTrip && activeTrip.images.length > 0 ? activeTrip.images : [''];
+  const nextImageUrl = images.length > 1 ? images[(imageIndex + 1) % images.length] : null;
+  const prevImageUrl = images.length > 1 ? images[(imageIndex - 1 + images.length) % images.length] : null;
+
+  useEffect(() => {
+    if (isLoading || trips.length === 0 || !nextImageUrl) return;
+    preloadImageUrl(nextImageUrl);
+    if (prevImageUrl && prevImageUrl !== nextImageUrl) {
+      preloadImageUrl(prevImageUrl);
+    }
+  }, [isLoading, trips.length, nextImageUrl, prevImageUrl]);
+
   const resetLocalFilters = () => {
     setQuickFilter('all');
     setKeyword('');
@@ -337,20 +349,9 @@ export const TripExplorer: React.FC<TripExplorerProps> = ({
   const copiedLabel = tText({ en: 'Copied', ar: 'تم النسخ', de: 'Kopiert' }, lang);
   const fromWord = tText({ en: 'From', ar: 'يبدأ من', de: 'Ab' }, lang);
 
-  const images = activeTrip && activeTrip.images.length > 0 ? activeTrip.images : [''];
   const currentImg = images[imageIndex] ?? images[0] ?? '';
   const prevImage = () => setImageIndex((i) => (i - 1 + images.length) % images.length);
   const nextImage = () => setImageIndex((i) => (i + 1) % images.length);
-
-  useEffect(() => {
-    if (images.length <= 1) return;
-    const nextIdx = (imageIndex + 1) % images.length;
-    const prevIdx = (imageIndex - 1 + images.length) % images.length;
-    preloadImageUrl(images[nextIdx]);
-    if (prevIdx !== nextIdx) {
-      preloadImageUrl(images[prevIdx]);
-    }
-  }, [images, imageIndex]);
 
   const handleTouchStart = (e: React.TouchEvent) => {
     touchStartX.current = e.touches[0].clientX;
