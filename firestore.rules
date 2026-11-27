@@ -197,9 +197,9 @@ service cloud.firestore {
         && (!('slug' in data) || (data.slug is string && data.slug.size() <= 120))
         && data.category in ['sea', 'desert', 'historical', 'horse', 'city', 'shopping', 'guides', 'transfers']
         && data.destination in ['Hurghada', 'Marsa Alam', 'Luxor', 'Cairo']
-        && data.images is list && data.images.size() >= 0 && data.images.size() <= 8
+        && data.images is list && data.images.size() >= 0 && data.images.size() <= 20
         && (data.images.size() == 0 || (data.images[0] is string && data.images[0].size() <= 250000))
-        && (!('galleryCaptions' in data) || (data.galleryCaptions is list && data.galleryCaptions.size() <= 8))
+        && (!('galleryCaptions' in data) || (data.galleryCaptions is list && data.galleryCaptions.size() <= 20))
         && (
           (data.rating is int && data.rating >= 0 && data.rating <= 5)
           || (data.rating is float && data.rating >= 0.0 && data.rating <= 5.0)

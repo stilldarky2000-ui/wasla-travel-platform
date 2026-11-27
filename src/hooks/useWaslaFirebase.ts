@@ -203,7 +203,7 @@ function sanitizeTripForFirestore(trip: Trip, supplierUid?: string): Record<stri
   const cleanImagesRaw = (trip.images || [])
     .filter((img): img is string => typeof img === 'string' && img.trim().length > 0 && img.length <= 250000)
     .map((img) => resolveBundledMediaUrl(img, trip.category))
-    .slice(0, 8);
+    .slice(0, 20);
   const cleanImages =
     cleanImagesRaw.length > 0
       ? cleanImagesRaw
@@ -275,7 +275,7 @@ function sanitizeTripForFirestore(trip: Trip, supplierUid?: string): Record<stri
 
   const cleanGalleryCaptions = Array.isArray(trip.galleryCaptions)
     ? trip.galleryCaptions
-        .slice(0, 8)
+        .slice(0, 20)
         .filter((c) => c && (c.en?.trim() || c.ar?.trim() || c.de?.trim()))
         .map((c) => sanitizeLocalized(c, 200, 'Excursion photo'))
     : undefined;

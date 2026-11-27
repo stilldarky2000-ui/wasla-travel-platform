@@ -361,12 +361,12 @@ export const OwnerTripEditorModal: React.FC<OwnerTripEditorModalProps> = ({
         const { dataUrl } = await optimizeTripImage(file);
         if (dataUrl && dataUrl.length <= 245000) processed.push(dataUrl);
       }
-      const nextAdded = processed.slice(0, Math.max(0, 8 - images.length));
-      setImages((prev) => [...prev, ...nextAdded].slice(0, 8));
+      const nextAdded = processed.slice(0, Math.max(0, 20 - images.length));
+      setImages((prev) => [...prev, ...nextAdded].slice(0, 20));
       setGalleryCaptionDrafts((prev) => [
         ...prev,
         ...nextAdded.map(() => ({ en: '', ar: '', de: '' })),
-      ].slice(0, 8));
+      ].slice(0, 20));
       setUploadNote(
         processed.length > 0 ? `Added ${processed.length} optimized WebP image(s).` : 'Select JPG/PNG/WebP images.'
       );
@@ -384,9 +384,9 @@ export const OwnerTripEditorModal: React.FC<OwnerTripEditorModalProps> = ({
       setUploadNote('Please enter a valid https:// URL.');
       return;
     }
-    if (!images.includes(url) && images.length < 8) {
-      setImages((prev) => [...prev, url].slice(0, 8));
-      setGalleryCaptionDrafts((prev) => [...prev, { en: '', ar: '', de: '' }].slice(0, 8));
+    if (!images.includes(url) && images.length < 20) {
+      setImages((prev) => [...prev, url].slice(0, 20));
+      setGalleryCaptionDrafts((prev) => [...prev, { en: '', ar: '', de: '' }].slice(0, 20));
     }
     setImageUrlInput('');
     setUploadNote('');
@@ -1708,7 +1708,7 @@ export const OwnerTripEditorModal: React.FC<OwnerTripEditorModalProps> = ({
           <div className="rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] p-4 space-y-3">
             <div className="flex items-center gap-2 text-xs font-semibold text-[#0F2233]">
               <ImagePlus className="h-4 w-4 text-[#EE5426]" aria-hidden="true" />
-              <span>Photos & Gallery Captions ({images.length}/8)</span>
+              <span>Photos & Gallery Captions ({images.length}/20)</span>
             </div>
             <div className="flex flex-col sm:flex-row gap-2">
               <input

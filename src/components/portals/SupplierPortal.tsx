@@ -216,9 +216,9 @@ export const SupplierPortal: React.FC<SupplierPortalProps> = ({
           processed.push(dataUrl);
         }
       }
-      const nextAdded = processed.slice(0, Math.max(0, 8 - uploadedImages.length));
-      setUploadedImages((prev) => [...prev, ...nextAdded].slice(0, 8));
-      setGalleryCaptions((prev) => [...prev, ...nextAdded.map(() => '')].slice(0, 8));
+      const nextAdded = processed.slice(0, Math.max(0, 20 - uploadedImages.length));
+      setUploadedImages((prev) => [...prev, ...nextAdded].slice(0, 20));
+      setGalleryCaptions((prev) => [...prev, ...nextAdded.map(() => '')].slice(0, 20));
       setUploadNote(
         processed.length > 0
           ? `Added ${processed.length} optimized WebP photo(s) ready for storefront.`
@@ -238,9 +238,9 @@ export const SupplierPortal: React.FC<SupplierPortalProps> = ({
       setUploadNote('Please enter a valid https:// image URL.');
       return;
     }
-    if (!uploadedImages.includes(url) && uploadedImages.length < 8) {
-      setUploadedImages((prev) => [...prev, url].slice(0, 8));
-      setGalleryCaptions((prev) => [...prev, ''].slice(0, 8));
+    if (!uploadedImages.includes(url) && uploadedImages.length < 20) {
+      setUploadedImages((prev) => [...prev, url].slice(0, 20));
+      setGalleryCaptions((prev) => [...prev, ''].slice(0, 20));
     }
     setImageUrlInput('');
     setUploadNote('');

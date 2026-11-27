@@ -3322,7 +3322,7 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
 
           {galleryImages.length > 1 && (
             <div
-              className="mx-auto flex max-w-[1140px] items-center justify-center gap-2.5 overflow-x-auto py-1"
+              className="mx-auto flex w-full max-w-[1140px] items-center justify-start gap-2.5 overflow-x-auto px-1 py-1.5"
               onClick={(e) => e.stopPropagation()}
             >
               {galleryImages.map((imgUrl, idx) => (
@@ -3330,7 +3330,7 @@ export const TripDetailTemplate: React.FC<TripDetailTemplateProps> = ({
                   key={idx}
                   type="button"
                   onClick={() => setActiveImageIndex(idx)}
-                  className={`relative h-14 w-20 shrink-0 overflow-hidden rounded-lg border-2 transition-all cursor-pointer ${
+                  className={`relative h-14 w-20 shrink-0 overflow-hidden rounded-lg border-2 transition-all cursor-pointer first:ms-auto last:me-auto ${
                     safeImgIdx === idx
                       ? 'border-[#EE5426] opacity-100 scale-105'
                       : 'border-white/30 opacity-65 hover:opacity-100'
